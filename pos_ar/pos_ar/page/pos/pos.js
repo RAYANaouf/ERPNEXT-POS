@@ -20,6 +20,11 @@ let selectedItemMap  = new Map();
 let warehouseList    = []
 let PosProfileList   = []
 
+let selectedItem     = null
+
+
+/* to prevent multy listener set */
+let detailsItemFieldsListeners = false
 async function main(){
 
 	customersList  = await fetchCustomers()
@@ -81,8 +86,6 @@ function setItemGroupsInList(){
 	groupItemList_html.innerHTML = "" ;
 
 	itemGroupList.forEach(group_item =>{
-		console.log("item : " , group_item )
-
 		const option = document.createElement("option");
 		option.value = group_item.name;
 		option.textContent = group_item.customer_name;
@@ -281,7 +284,7 @@ function renderItemDetailsCart(item){
 
 
 	//quantity
-	quantity.value = 1.000
+	quantity.value = item.quantity
 
 	//rate
 	rate.value = 250.00
@@ -294,7 +297,6 @@ function renderItemDetailsCart(item){
 
 
 	//uom
-	console.log("stock uom : " , item.sales_uom)
 	uom.value = item.stock_uom
 
 	//uom_c_f
@@ -309,11 +311,41 @@ function renderItemDetailsCart(item){
 	itemGroup.textContent = "Item Group : " + item.item_group
 
 	//priceListRate
-	priceListRate.value = 250.00 + "DA"
+	priceListRate.value = getItemPrice(item.name) + "DA"
 
 
 
 
+	//listeners
+	if(!detailsItemFieldsListeners)
+		setItemDetailsFieldsListener(item)
+}
+
+
+/********************* setListener functions      *****************************/
+
+function setItemDetailsFieldsListener(){
+
+	//make sure to set the listener variable to true indecate that it has been alread set
+	detailsItemFieldsListeners = true
+
+	const quantityInput = document.getElementById("itemDetailsQuantityInput");
+	quantityInput.addEventListener('input' , function(event){
+
+		let newQuantity = parseFloat(quantityInput.value);
+
+		if(isNaN(newQuantity) || newQuantity <= 0){
+			console.warn("Invaide Quantity value")
+			return;
+		}
+
+		selectedItem.quantity = newQuantity;
+		selectedItemMap.set(selectedItem.name , item);
+
+		//function to redraw the selected item list
+		setSelectedItem();
+
+	})
 }
 
 /********************* show and hide  functions   *****************************/
@@ -368,7 +400,6 @@ function getItemByItemGroup(item_group){
 
 	let filtredItemList = [];
 
-	console.log("starting getItemByGroup FUN : " , item_group)
 
 	itemList.forEach(item =>{
 		if(item.item_group == item_group){
@@ -388,6 +419,10 @@ function getItemPrice(itemId){
 
 
 function itemClick(item){
+
+	//expose the item as selected one
+	selectedItem = item
+
 	const cart = document.getElementById("CartBox");
 
 	if(!selectedItemMap.has(item.name)){
