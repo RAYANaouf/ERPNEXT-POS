@@ -221,6 +221,9 @@ function setSelectedItem(){
 		//item
 		itemElement.classList.add("rowBox" , "align_center" , "row_sbtw" , "ItemElement");
 		itemElement.addEventListener("click" , function(event){
+			//expose the item as selected one
+			selectedItem = item
+
 			hideSelectorCart();
 			renderItemDetailsCart(item);
 		})
@@ -326,6 +329,7 @@ function renderItemDetailsCart(item){
 
 function setItemDetailsFieldsListener(){
 
+
 	//make sure to set the listener variable to true indecate that it has been alread set
 	detailsItemFieldsListeners = true
 
@@ -340,11 +344,12 @@ function setItemDetailsFieldsListener(){
 		}
 
 		selectedItem.quantity = newQuantity;
-		selectedItemMap.set(selectedItem.name , item);
+		selectedItemMap.set(selectedItem.name , selectedItem);
 
 		//function to redraw the selected item list
 		setSelectedItem();
-
+		calculateQnatity();
+		calculateNetTotal();
 	})
 }
 
@@ -420,8 +425,6 @@ function getItemPrice(itemId){
 
 function itemClick(item){
 
-	//expose the item as selected one
-	selectedItem = item
 
 	const cart = document.getElementById("CartBox");
 
