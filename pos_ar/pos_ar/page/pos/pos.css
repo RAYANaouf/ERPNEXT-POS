@@ -16,7 +16,9 @@
 	display : none;
 }
 
-
+.content{
+	background : #ac650035 ;
+}
 
 
 
@@ -110,6 +112,7 @@ input:focus{
 	width         : 70%   ;
 	padding       : 10px  ;
 
+
 	order         : 1 ;
 
 
@@ -120,6 +123,7 @@ input:focus{
 	height      : 100% ;
 	width       : 30%  ;
 	padding     : 10px;
+
 
 	order      : 2 ;
 }
@@ -135,15 +139,20 @@ input:focus{
 }
 
 #LeftSection #SelectorBox{
-	width     : 100% ;
-	height    : 100% ;
-	animation : mymove 1s  ;
-	display   : block ;
-	overflow-y    : scroll ; 
+	width       : 100%    ;
+	height      : 100%    ;
+	background  : #FFFFFF ;
+
+	animation   : mymove 1s  ;
+	display     : block ;
+	overflow-y  : scroll ; 
+	background    : #FFFFFF ;
 
 	border        : 2px solid #c0c0c0 ;
 	border-radius : 16px;
 }
+
+
 
 
 /*header*/
@@ -185,8 +194,7 @@ input:focus{
 }
 
 #LeftSection #SelectorBox #itemsContainer .itemBox:hover {
-	border     : 3px solid #a0a0a0 ;
-	background : #F0F0F0 ;
+	border     : 3px solid #ac6500 ;
 }
 
 #LeftSection #SelectorBox #itemsContainer .itemBox .itemImage{
@@ -228,6 +236,7 @@ input:focus{
 	height    : 100% ;
 	animation : mymove 1s ;
 	display   : none ;
+	background    : #FFFFFF ;
 
 	overflow-y    : scroll ; 
 	border        : 2px solid #c0c0c0 ;
@@ -309,6 +318,7 @@ input:focus{
 	height : 45px  ;
 	width  : 100%  ; 
 	margin-bottom   : 5px    ;
+	background    : #FFFFFF ;
 
 
 	animation : mymove 1.5s  ;
@@ -335,6 +345,7 @@ input:focus{
 	height : calc(100% - 55px) ;
 	margin-top : 5px    ;
 	padding    : 0px 0px 16px 0px ;
+	background    : #FFFFFF ;
 
 	animation : mymove 2s  ;
 
