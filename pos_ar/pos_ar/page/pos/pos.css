@@ -17,7 +17,7 @@
 }
 
 .content{
-	background : #ac650035 ;
+	background : #fff6d2 ;
 }
 
 
@@ -69,19 +69,19 @@ input{
 	font-size     : small  ;
 
 	background    : #f5f5f5  ;
-	border        : 2px solid #e0e0e0 !important;
+	border        : 2px solid #cccccc !important;
 	border-radius : 10px     ;
 
 }
 input:focus{
-	border  : 2px solid #ac6500 !important ;
+	border  : 2.5px solid #ac6500 !important ;
 	outline : none !important;
 	background : #fcfcfc !important;
 }
 
 #MainContainer input:disabled{
 	border : none !important;
-	background : #f5f5f5 !important;
+	background : #fafafa !important;
 }
 
 .CartTitle{
@@ -96,9 +96,11 @@ input:focus{
 
 }
 
-.xBtn{
+#itemDetailsCartXBtn{
 	width  : 26px ;
 	height : 26px ;
+
+	cursor : pointer ;
 }
 
 
@@ -112,6 +114,7 @@ input:focus{
 #MainContainer{
 	height : 100vh ;
 	width  : 100% ;
+	padding : 26px 0px ;
 }
 
 
@@ -331,7 +334,7 @@ input:focus{
 
 /************* right *****************/
 #RightSection #CustomerBox{
-	height : 45px  ;
+	height : 55px  ;
 	width  : 100%  ; 
 	margin-bottom   : 5px    ;
 	background    : #FFFFFF ;

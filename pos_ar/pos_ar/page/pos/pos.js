@@ -25,6 +25,9 @@ let selectedItem     = null
 
 /* to prevent multy listener set */
 let detailsItemFieldsListeners = false
+let detailsItemKeysListeners   = false
+
+
 async function main(){
 
 	customersList  = await fetchCustomers()
@@ -317,8 +320,7 @@ function renderItemDetailsCart(item){
 
 
 	//listeners
-	if(!detailsItemFieldsListeners)
-		setItemDetailsFieldsListener(item)
+	setItemDetailsFieldsListener()
 }
 
 
@@ -327,27 +329,63 @@ function renderItemDetailsCart(item){
 function setItemDetailsFieldsListener(){
 
 
-	//make sure to set the listener variable to true indecate that it has been alread set
-	detailsItemFieldsListeners = true
 
-	const quantityInput = document.getElementById("itemDetailsQuantityInput");
-	quantityInput.addEventListener('input' , function(event){
+        if(!detailsItemFieldsListeners){
+		//make sure to set the listener variable to true indecate that it has been alread set
+		detailsItemFieldsListeners = true
 
-		let newQuantity = parseFloat(quantityInput.value);
+		const quantityInput = document.getElementById("itemDetailsQuantityInput");
+		quantityInput.addEventListener('input' , function(event){
+			console.log("check of loop")
+			let newQuantity = parseFloat(quantityInput.value);
 
-		if(isNaN(newQuantity) || newQuantity <= 0){
-			console.warn("Invaide Quantity value")
-			return;
-		}
+			if(isNaN(newQuantity) || newQuantity <= 0){
+				console.warn("Invaide Quantity value")
+				return;
+			}
 
-		selectedItem.quantity = newQuantity;
-		selectedItemMap.set(selectedItem.name , selectedItem);
+			selectedItem.quantity = newQuantity;
+			selectedItemMap.set(selectedItem.name , selectedItem);
 
-		//function to redraw the selected item list
-		setSelectedItem();
-		calculateQnatity();
-		calculateNetTotal();
-	})
+			//function to redraw the selected item list
+			setSelectedItem();
+			calculateQnatity();
+			calculateNetTotal();
+		})
+	}
+
+
+        if(!detailsItemKeysListeners){
+
+                //make sure to set the listener variable to true indecate that it has been alread set
+		detailsItemKeysListeners = true
+
+		const key_0        = document.getElementById("key_0");
+		const key_1        = document.getElementById("key_1");
+		const key_2        = document.getElementById("key_2");
+		const key_3        = document.getElementById("key_3");
+		const key_4        = document.getElementById("key_4");
+		const key_5        = document.getElementById("key_5");
+		const key_6        = document.getElementById("key_6");
+		const key_7        = document.getElementById("key_7");
+		const key_8        = document.getElementById("key_8");
+		const key_9        = document.getElementById("key_9");
+		const key_quantity = document.getElementById("key_quantity");
+		const key_discount = document.getElementById("key_discount");
+		const key_rate     = document.getElementById("key_rate");
+		const key_remove   = document.getElementById("key_remove");
+		const key_delete   = document.getElementById("key_delete");
+		const key_point    = document.getElementById("key_point");
+
+		let keys = [key_0,key_1,key_2,key_3,key_4,key_5,key_6,key_7,key_8,key_9,key_quantity,key_discount,key_rate,key_remove,key_delete,key_point]
+
+		keys.forEach(key=>{
+			key.addEventListener('click',function(){
+				console.log(`${key.textContent} was clicked`)
+			})
+		})
+	}
+
 }
 
 /********************* show and hide  functions   *****************************/
