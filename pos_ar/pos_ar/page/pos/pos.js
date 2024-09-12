@@ -363,6 +363,8 @@ function showItemDetails(){
 	const editSelectedItemCart = document.getElementById("editSelectedItemCart");
 	editSelectedItemCart.style.display = "block";
 
+	setCartDetailsOrientation("landscape")
+
 	document.getElementById("itemDetailsCartXBtn").addEventListener('click', function(event){
 		hideItemDetails();
 		showSelectorCart();
@@ -375,6 +377,8 @@ function hideItemDetails(){
 
 	const editSelectedItemCart = document.getElementById("editSelectedItemCart");
 	editSelectedItemCart.style.display = "none";
+
+        setCartDetailsOrientation("portrait");
 
 }
 
@@ -394,6 +398,25 @@ function hideSelectorCart(){
 	const cartDetails = document.getElementById("cartDetails");
 	cartDetails.style.display = "none";
 
+}
+
+function setCartDetailsOrientation(orientation){
+	const container = document.getElementById("cartDetails");
+
+	//to hide or show
+	const discount = document.getElementById("discount");
+
+	if(orientation == "landscape"){
+		container.style.display = "flex"
+		container.classList.add("rowBox")
+		container.classList.remove("columnBox")
+		discount.style.display = "none"
+	}
+	else{
+		container.classList.remove("rowBox")
+		container.classList.add("columnBox")
+		discount.style.display = "flex"
+	}
 }
 
 
