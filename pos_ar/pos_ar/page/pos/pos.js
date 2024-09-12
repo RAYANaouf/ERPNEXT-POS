@@ -336,7 +336,6 @@ function setItemDetailsFieldsListener(){
 
 		const quantityInput = document.getElementById("itemDetailsQuantityInput");
 		quantityInput.addEventListener('input' , function(event){
-			console.log("check of loop")
 			let newQuantity = parseFloat(quantityInput.value);
 
 			if(isNaN(newQuantity) || newQuantity <= 0){
@@ -355,6 +354,9 @@ function setItemDetailsFieldsListener(){
 		quantityInput.addEventListener('focus' , function(event){
 			selectedField = quantityInput
 			selectedField.style.border = "border: 2.5px solid rgb(172, 101, 0) !important;"
+		})
+		quantityInput.addEventListener('blur' , function(event){
+			selectedField = null
 		})
 
 	}
