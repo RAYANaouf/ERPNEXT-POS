@@ -42,6 +42,7 @@ async function main(){
 	setCustomersInList();
 	setItemGroupsInList();
         setWarehouseList();
+	setPriceListInItemDetailsList();
 
 	//set listener
 	document.getElementById("ItemGroupInput").addEventListener('input' , function(event){
@@ -102,6 +103,18 @@ function setWarehouseList(){
 		option.value = warehouse.name;
 		option.textContent = warehouse.warehouse_name;
 		warehouseList_html.appendChild(option);
+	})
+}
+
+function setPriceListInItemDetailsList(){
+	const itemDetailsPriceList_html = document.getElementById("detailsPriceList");
+	itemDetailsPriceList_html.innerHTML = "" ;
+
+	priceLists.forEach(priceList => {
+		const option = document.createElement("option");
+		option.value = priceList.name
+		option.textContent = priceList.price_list_name
+		itemDetailsPriceList_html.appendChild(option);
 	})
 }
 
@@ -236,7 +249,6 @@ function renderItemDetailsCart(item){
 	const imageContainer    = document.getElementById("detailsItemImage") ;
 
 	const name  = document.getElementById("detailsItemName");
-	const price = document.getElementById("detailsItemPrice");
 
 
 	const quantity  = document.getElementById("itemDetailsQuantityInput");
@@ -247,7 +259,8 @@ function renderItemDetailsCart(item){
 
 	const uom           = document.getElementById("itemDetailsUomInput");
 	const uom_c_f       = document.getElementById("itemDetailsUomConversionFactorInput");
-	const warehouse     = document.getElementById("warehouseListInput");
+	const warehouse     = document.getElementById("detailsItemWarehouse");
+	const itemGroup     = document.getElementById("detailsItemGroup");
 	const priceListRate = document.getElementById("itemDetailsPriceListRateInput");
 
 	//populate
@@ -268,15 +281,12 @@ function renderItemDetailsCart(item){
 	}
 
 	name.textContent  = item.item_name;
-	price.textContent = getItemPrice(item) + " DA";
 
 
 
 	//name
 	name.classList.add("rowBox" , "align_center");
 
-	//price
-	price.classList.add("rowBox" , "align_center");
 
 
 
@@ -302,7 +312,9 @@ function renderItemDetailsCart(item){
 	uom_c_f.value = 1
 
 	//warehouse
-	warehouse.value = PosProfileList[0].warehouse
+	warehouse.textContent = "Warehouse : " + PosProfileList[0].warehouse
+	//item group
+	itemGroup.textContent = "Item Group : " + item.item_group
 
 	//priceListRate
 	priceListRate.value = 250.00 + "DA"

@@ -28,10 +28,17 @@
                 <div id="detailsItemImage" class="rowBox centerItem"></div>
                 <div id="price_and_name" class="columnBox">
                     <div id="detailsItemName" class="rowBox align_center"></div>
-                    <div id="detailsItemGroupWarhouseContainer" class="rowBox align_center row_sbtw">
-                        <div id="detailsItemGroup">Group : Product</div>
+                    <div id="detailsItemGroupWarhouseContainer" class="rowBox align_center row_sa">
+                        <div id="detailsItemGroup" class="rowBox align_center">Group : ...</div>
+                        <div id="detailsItemWarehouse" class="rowBox align_center">Warehouse : ...</div>
                     </div>
-                    <input id="detailsItemPrice" class ="rowBox align_center">
+                    <div id="detailsItemPriceListContainer" class="rowBox align_center">
+                        <label for="detailsItemPriceListLabel">Price List : </label>
+                        <input list="detailsPriceList" id="detailsItemPriceListInput" class ="rowBox align_center">
+                            <datalist id="detailsPriceList">
+                                <option>fetching Price Lists ...</option>
+		            </datalist>
+                    </div>
                 </div>
             </div>
             <div id="itemDetailsAll"  class="rowBox">

@@ -41,6 +41,10 @@
 	justify-content: space-between;
 }
 
+.row_sa{
+	justify-content: space-around;
+}
+
 .columnBox {
 	display        : flex   ; 
 	flex-direction : column ;
@@ -249,7 +253,7 @@ input:focus{
 
 #LeftSection #itemDetailsCart #itemDetailsHeader #detailsItemImage{
 	max-width  : 150px ;
-	min-width  : 100px ;
+	min-width  : 150px ;
 	max-height : 150px ;
 	min-height : 150px ;
 	margin : 16px 30px ;
@@ -274,9 +278,12 @@ input:focus{
 	font-size : 25px ;
 	font-weight : 700 ;
 }
-#LeftSection #itemDetailsCart #itemDetailsHeader #price_and_name #detailsItemGroup{
-	font-size : 16px ;
+#LeftSection #itemDetailsCart #itemDetailsHeader #price_and_name #detailsItemGroupWarhouseContainer{
+	font-size : 15px ;
 	font-weight : 500 ;
+}
+#LeftSection #itemDetailsCart #itemDetailsHeader #price_and_name #detailsItemGroupWarhouseContainer div{
+	flex-grow : 1 ;
 }
 #LeftSection #itemDetailsCart #itemDetailsHeader #price_and_name input{
 	height : 35px ;
@@ -286,6 +293,14 @@ input:focus{
 	background : #f0f0f0 ;
 }
 
+
+#LeftSection #itemDetailsCart #itemDetailsHeader #detailsItemPriceListContainer label{
+	flex-grow : 1 ;
+}
+
+#LeftSection #itemDetailsCart #itemDetailsHeader #detailsItemPriceListContainer input{
+	flex-grow : 2 ;
+}
 
 #LeftSection #itemDetailsCart #itemDetailsAll{
 	grow       : 1       ;
