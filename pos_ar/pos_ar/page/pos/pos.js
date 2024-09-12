@@ -21,7 +21,7 @@ let warehouseList    = []
 let PosProfileList   = []
 
 let selectedItem     = null
-
+let selectedField    = null
 
 /* to prevent multy listener set */
 let detailsItemFieldsListeners = false
@@ -352,6 +352,11 @@ function setItemDetailsFieldsListener(){
 			calculateQnatity();
 			calculateNetTotal();
 		})
+		quantityInput.addEventListener('focus' , function(event){
+			selectedField = quantityInput
+			selectedField.style.border = "border: 2.5px solid rgb(172, 101, 0) !important;"
+		})
+
 	}
 
 
@@ -380,10 +385,23 @@ function setItemDetailsFieldsListener(){
 		let keys = [key_0,key_1,key_2,key_3,key_4,key_5,key_6,key_7,key_8,key_9,key_quantity,key_discount,key_rate,key_remove,key_delete,key_point]
 
 		keys.forEach(key=>{
-			key.addEventListener('click',function(){
-				console.log(`${key.textContent} was clicked`)
+			key.addEventListener('mousedown',function(event){
+				event.preventDefault();
+				//selectedField.focus();
+				const keyContent = key.textContent;
+
+				if(!isNaN(keyContent)){
+					selectedField.value += keyContent
+				}
+				else if(keyContent == "." && !selectedField.value.includes(".")){
+					selectedField.value += keyContent
+				}
+				else if(keyContent == "Rate"){
+					
+				}
 			})
 		})
+
 	}
 
 }
