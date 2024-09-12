@@ -47,7 +47,7 @@
 }
 
 .C_A_Center{
-editSelectedItemCart	align-items    : center ; 
+	align-items    : center ; 
 }
 
 
@@ -64,7 +64,7 @@ input{
 
 	font-size     : smaller  ;
 
-	background    : #f0f0f0  ;
+	background    : #f5f5f5  ;
 	border        : 2px solid #e0e0e0 ;
 	border-radius : 10px     ;
 
@@ -251,6 +251,7 @@ input:focus{
 	max-width  : 150px ;
 	min-width  : 100px ;
 	max-height : 150px ;
+	min-height : 150px ;
 	margin : 16px 30px ;
 	background : #f0f0f0;
 	border-radius : 12px ;
@@ -266,11 +267,18 @@ input:focus{
 }
 #LeftSection #itemDetailsCart #itemDetailsHeader #price_and_name{
 	width : 65%;
-	
-	justify-content : center ;
+	padding-top : 30px ;
 }
 
-#LeftSection #itemDetailsCart #itemDetailsHeader #price_and_name div{
+#LeftSection #itemDetailsCart #itemDetailsHeader #price_and_name #detailsItemName{
+	font-size : 25px ;
+	font-weight : 700 ;
+}
+#LeftSection #itemDetailsCart #itemDetailsHeader #price_and_name #detailsItemGroup{
+	font-size : 16px ;
+	font-weight : 500 ;
+}
+#LeftSection #itemDetailsCart #itemDetailsHeader #price_and_name input{
 	height : 35px ;
 	margin : 16px ;
 	padding : 0px 16px ;
