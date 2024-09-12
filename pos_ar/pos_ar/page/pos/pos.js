@@ -22,13 +22,13 @@ let PosProfileList   = []
 
 async function main(){
 
-	customersList = await fetchCustomers()
-	itemGroupList = await fetchItemGroups()
-	itemList      = await fetchItems()
-	itemPrices    = await fetchItemPrice()
-	priceLists    = await fetchPriceList()
-	warehouseList = await fetchWarehouseList()
-	POSProfileList = await fetchPosProfileList()
+	customersList  = await fetchCustomers()
+	itemGroupList  = await fetchItemGroups()
+	itemList       = await fetchItems()
+	itemPrices     = await fetchItemPrice()
+	priceLists     = await fetchPriceList()
+	warehouseList  = await fetchWarehouseList()
+	PosProfileList = await fetchPosProfileList()
 
 	console.log("customersList : " , customersList )
 	console.log("itemGroupList : " , itemGroupList )
@@ -247,7 +247,7 @@ function renderItemDetailsCart(item){
 
 	const uom           = document.getElementById("itemDetailsUomInput");
 	const uom_c_f       = document.getElementById("itemDetailsUomConversionFactorInput");
-	const warehouse     = document.getElementById("itemDetailsWarehouseInput");
+	const warehouse     = document.getElementById("warehouseListInput");
 	const priceListRate = document.getElementById("itemDetailsPriceListRateInput");
 
 	//populate
@@ -295,13 +295,14 @@ function renderItemDetailsCart(item){
 
 
 	//uom
-	uom.value = "Pair"
+	console.log("stock uom : " , item.sales_uom)
+	uom.value = item.stock_uom
 
 	//uom_c_f
 	uom_c_f.value = 1
 
 	//warehouse
-	warehouse.value = POSProfileList[0].warehouse
+	warehouse.value = PosProfileList[0].warehouse
 
 	//priceListRate
 	priceListRate.value = 250.00 + "DA"
@@ -451,7 +452,7 @@ async function fetchItemGroups() {
 async function fetchItems() {
     try {
 	return await frappe.db.get_list('Item', {
-			fields: ['name', 'item_name' , 'image' , 'item_group' ],
+			fields: ['name', 'item_name' , 'image' , 'item_group' , 'stock_uom'  ],
     			filters: {}
 		})
 
