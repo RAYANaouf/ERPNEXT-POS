@@ -66,18 +66,23 @@ input{
 	height        : 25px     ;
 	padding       : 0px 8px  ;
 
-	font-size     : smaller  ;
+	font-size     : small  ;
 
 	background    : #f5f5f5  ;
-	border        : 2px solid #e0e0e0 ;
+	border        : 2px solid #e0e0e0 !important;
 	border-radius : 10px     ;
 
 }
 input:focus{
-	border  : none ;
-	outline : none ;
+	border  : 2px solid #ac6500 !important ;
+	outline : none !important;
+	background : #fcfcfc !important;
 }
 
+#MainContainer input:disabled{
+	border : none !important;
+	background : #f5f5f5 !important;
+}
 
 .CartTitle{
 	padding : 8px 0px 8px;
@@ -95,11 +100,11 @@ input:focus{
 	width  : 26px ;
 	height : 26px ;
 }
-.xBtn:hover{
-	width  : 30px ;
-	height : 30px ;
-}
 
+
+.pointerCursor{
+	cursor : pointer ;
+}
 
 /***********************************************************/
 
@@ -113,7 +118,7 @@ input:focus{
 #LeftSection{
 
 	height        : 100%  ;
-	width         : 70%   ;
+	width         : 65%   ;
 	padding       : 10px  ;
 
 
@@ -125,7 +130,7 @@ input:focus{
 
 #RightSection{
 	height      : 100% ;
-	width       : 30%  ;
+	width       : 35%  ;
 	padding     : 10px;
 
 
@@ -285,13 +290,6 @@ input:focus{
 #LeftSection #itemDetailsCart #itemDetailsHeader #price_and_name #detailsItemGroupWarhouseContainer div{
 	flex-grow : 1 ;
 }
-#LeftSection #itemDetailsCart #itemDetailsHeader #price_and_name input{
-	height : 35px ;
-	margin : 16px ;
-	padding : 0px 16px ;
-	border-radius : 12px ;
-	background : #f0f0f0 ;
-}
 
 
 #LeftSection #itemDetailsCart #itemDetailsHeader #detailsItemPriceListContainer label{
@@ -322,20 +320,15 @@ input:focus{
 	margin-left : 8px ;
 }
 
+
 #LeftSection #itemDetailsCart #itemDetailsAll input{
         
 	height : 35px ;
 	margin-bottom : 16px ;
-	background    : #f0f0f0 ;
-	border        : 2px solid #e0e0e0 ; 
 
         justify-content : center ;
 }
 
-#LeftSection #itemDetailsCart #itemDetailsAll input:disabled{
-	border : none ;
-	background : #f5f5f5 ;
-}
 /************* right *****************/
 #RightSection #CustomerBox{
 	height : 45px  ;
@@ -454,7 +447,11 @@ input:focus{
 
 #RightSection #CartBox #cartDetails{
 	width  : calc(100% - 32px) ;
-	margin : 8px 16px ;
+	margin : 2px 16px ;
+}
+
+#RightSection #CartBox #cartDetails>div{
+	width : 100% ;
 }
 
 #RightSection #CartBox #cartDetails #discount{
@@ -480,7 +477,7 @@ input:focus{
 	padding : 0px 16px ;
 
 	font-weight : 700 ;
-	font-size : large ;
+	font-size : larger ;
 }
 
 #RightSection #CartBox #checkoutBtn{
@@ -507,7 +504,7 @@ input:focus{
 
 #RightSection #editSelectedItemCart{
 	width  : cla(100%-32px) ; 
-	margin : 5px 16px    ;
+	margin : 0px 16px    ;
 	padding    : 0px 0px 16px 0px ;
 
 	animation : mymove 2s  ;
@@ -522,7 +519,6 @@ input:focus{
 
 /*grid*/
 .grid-container {
-	padding: 2px;
 
 	display: grid;
 	grid-template-columns : auto auto auto auto ;

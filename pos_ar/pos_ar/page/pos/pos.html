@@ -38,15 +38,15 @@
                 <div id="itemDetails_C1" class="columnBox">
                     <div class="columnBox">
                         <label for="itemDetailsQuantityInput">Quantity</label>
-                        <input type="float" id="itemDetailsQuantityInput">
+                        <input type="float" id="itemDetailsQuantityInput" class="pointerCursor">
                     </div>
                     <div class="columnBox">
                         <label for="itemDetailsRateInput">Rate</label>
-                        <input type="float" id="itemDetailsRateInput">
+                        <input type="float" id="itemDetailsRateInput" class="pointerCursor">
                     </div>
                     <div class="columnBox">
                         <label for="itemDetailsDiscountInput">Discount (%)</label>
-                        <input type="float" id="itemDetailsDiscountInput">
+                        <input type="float" id="itemDetailsDiscountInput" class="pointerCursor">
                     </div>
                     <div class="columnBox">
                         <label for="itemDetailsAvailableInput">Available Qty at Warehouse</label>
@@ -56,15 +56,17 @@
                 <div id="itemDetails_C2" class="columnBox">
                     <div class="columnBox">
                         <label for="itemDetailsUomInput">UOM *</label>
-                        <input type="text" id="itemDetailsUomInput">
+                        <input type="text" id="itemDetailsUomInput"  disabled>
                     </div>
+                    <!--
                     <div class="columnBox">
                         <label for="itemDetailsUomConversionFactorInput">UOM Conversion Factor *</label>
                         <input type="float" id="itemDetailsUomConversionFactorInput" disabled>
                     </div>
+                    -->
                     <div class="columnBox">
                         <label for="detailsPriceList">Price List *</label>
-                        <input list="detailsPriceList" id="detailsItemPriceListInput" class ="rowBox align_center">
+                        <input list="detailsPriceList" id="detailsItemPriceListInput" class ="rowBox align_center pointerCursor">
                         <datalist id="detailsPriceList">
                             <option>fetching Price Lists ...</option>
 		        </datalist>
@@ -117,7 +119,7 @@
                         </div>
 			<div id="grandTotal" class="rowBox align_center row_sbtw">
                             <div id="grandTotalTitle">Grand Total</div>
-                            <div id="grandTotalValue"></div>
+                            <div id="grandTotalValue">0.00</div>
                         </div>
                 </div>
                 <div id="editSelectedItemCart">
@@ -137,7 +139,7 @@
                         <div class="grid-item">.</div>
                         <div class="grid-item">0</div>
                         <div class="grid-item">Delete</div>  
-                        <div class="grid-item" style="color:red;">Remove</div>  
+                        <div class="grid-item" style="color:red;font-weight:700;">Remove</div>  
                     </div>
                 </div>
 

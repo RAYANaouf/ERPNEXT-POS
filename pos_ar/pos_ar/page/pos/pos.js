@@ -219,7 +219,7 @@ function setSelectedItem(){
 
 
 		//item
-		itemElement.classList.add("rowBox" , "align_center" , "row_sbtw" , "ItemElement");
+		itemElement.classList.add("rowBox" , "align_center" , "row_sbtw" , "ItemElement" , "pointerCursor");
 		itemElement.addEventListener("click" , function(event){
 			//expose the item as selected one
 			selectedItem = item
@@ -253,7 +253,6 @@ function renderItemDetailsCart(item){
 
 
 	const uom           = document.getElementById("itemDetailsUomInput");
-	const uom_c_f       = document.getElementById("itemDetailsUomConversionFactorInput");
 	const priceList     = document.getElementById("detailsItemPriceListInput");
 	const priceListRate = document.getElementById("itemDetailsPriceListRateInput");
 
@@ -302,8 +301,6 @@ function renderItemDetailsCart(item){
 	//uom
 	uom.value = item.stock_uom
 
-	//uom_c_f
-	uom_c_f.value = 1
 
 	//priceList
 	priceList.value = priceLists[0].price_list_name
@@ -404,18 +401,34 @@ function setCartDetailsOrientation(orientation){
 	const container = document.getElementById("cartDetails");
 
 	//to hide or show
-	const discount = document.getElementById("discount");
+	const discount   = document.getElementById("discount");
+	const quantity   = document.getElementById("totalQuantity");
+	const netTotal   = document.getElementById("netTotal");
+	const GrandTotal = document.getElementById("grandTotal");
 
 	if(orientation == "landscape"){
 		container.style.display = "flex"
-		container.classList.add("rowBox")
+		container.classList.add("rowBox","align_center")
 		container.classList.remove("columnBox")
 		discount.style.display = "none"
+
+		//make the text smaller
+		quantity.style.fontSize = "smaller"
+		netTotal.style.fontSize = "smaller"
+		GrandTotal.style.fontSize = "small"
+		GrandTotal.style.fontWeight = "500"
 	}
 	else{
 		container.classList.remove("rowBox")
 		container.classList.add("columnBox")
 		discount.style.display = "flex"
+
+		//reset
+		quantity.style.fontSize = "small"
+		netTotal.style.fontSize = "small"
+		GrandTotal.style.fontSize = "larger"
+		GrandTotal.style.fontWeight = "700"
+
 	}
 }
 
