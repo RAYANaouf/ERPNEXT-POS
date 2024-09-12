@@ -41,7 +41,6 @@ async function main(){
 
 	setCustomersInList();
 	setItemGroupsInList();
-        setWarehouseList();
 	setPriceListInItemDetailsList();
 
 	//set listener
@@ -93,18 +92,6 @@ function setItemGroupsInList(){
 }
 
 
-function setWarehouseList(){
-
-	const warehouseList_html = document.getElementById("warehouseList");
-	warehouseList_html.innerHTML = "" ;
-
-	warehouseList.forEach(warehouse =>{
-		const option = document.createElement("option");
-		option.value = warehouse.name;
-		option.textContent = warehouse.warehouse_name;
-		warehouseList_html.appendChild(option);
-	})
-}
 
 function setPriceListInItemDetailsList(){
 	const itemDetailsPriceList_html = document.getElementById("detailsPriceList");
@@ -249,6 +236,8 @@ function renderItemDetailsCart(item){
 	const imageContainer    = document.getElementById("detailsItemImage") ;
 
 	const name  = document.getElementById("detailsItemName");
+	const warehouse     = document.getElementById("detailsItemWarehouse");
+	const itemGroup     = document.getElementById("detailsItemGroup");
 
 
 	const quantity  = document.getElementById("itemDetailsQuantityInput");
@@ -259,8 +248,7 @@ function renderItemDetailsCart(item){
 
 	const uom           = document.getElementById("itemDetailsUomInput");
 	const uom_c_f       = document.getElementById("itemDetailsUomConversionFactorInput");
-	const warehouse     = document.getElementById("detailsItemWarehouse");
-	const itemGroup     = document.getElementById("detailsItemGroup");
+	const priceList     = document.getElementById("detailsItemPriceListInput");
 	const priceListRate = document.getElementById("itemDetailsPriceListRateInput");
 
 	//populate
@@ -280,6 +268,7 @@ function renderItemDetailsCart(item){
 		imageContainer.appendChild(image);
 	}
 
+	//name
 	name.textContent  = item.item_name;
 
 
@@ -310,6 +299,9 @@ function renderItemDetailsCart(item){
 
 	//uom_c_f
 	uom_c_f.value = 1
+
+	//priceList
+	priceList.value = priceLists[0].price_list_name
 
 	//warehouse
 	warehouse.textContent = "Warehouse : " + PosProfileList[0].warehouse
@@ -492,7 +484,7 @@ async function fetchPriceList() {
     try {
 	return await frappe.db.get_list('Price List', {
 			fields: ['name', 'price_list_name' , 'currency' ],
-    			filters: {}
+    			filters: {selling : 1 }
 		})
 
     } catch (error) {

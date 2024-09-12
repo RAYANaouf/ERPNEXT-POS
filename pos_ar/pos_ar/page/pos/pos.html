@@ -32,13 +32,6 @@
                         <div id="detailsItemGroup" class="rowBox align_center">Group : ...</div>
                         <div id="detailsItemWarehouse" class="rowBox align_center">Warehouse : ...</div>
                     </div>
-                    <div id="detailsItemPriceListContainer" class="rowBox align_center">
-                        <label for="detailsItemPriceListLabel">Price List : </label>
-                        <input list="detailsPriceList" id="detailsItemPriceListInput" class ="rowBox align_center">
-                            <datalist id="detailsPriceList">
-                                <option>fetching Price Lists ...</option>
-		            </datalist>
-                    </div>
                 </div>
             </div>
             <div id="itemDetailsAll"  class="rowBox">
@@ -70,11 +63,11 @@
                         <input type="float" id="itemDetailsUomConversionFactorInput" disabled>
                     </div>
                     <div class="columnBox">
-                        <label for="itemDetailsWarehouseInput">Warehouse *</label>
-                        <input list="warehouseList" id="warehouseListInput">
-                        <datalist id="warehouseList">
-                            <option>fetching warehouse ...</option>
-                        </datalist>
+                        <label for="detailsPriceList">Price List *</label>
+                        <input list="detailsPriceList" id="detailsItemPriceListInput" class ="rowBox align_center">
+                        <datalist id="detailsPriceList">
+                            <option>fetching Price Lists ...</option>
+		        </datalist>
                     </div>
                     <div class="columnBox">
                         <label for="itemDetailsPriceListRateInput">Price List Rate</label>
