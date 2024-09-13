@@ -211,7 +211,7 @@ function setSelectedItem(){
 		itemQuantity.classList.add("itemQuantity");
 		rightGroup.appendChild(itemQuantity);
 		//price
-		itemPrice.textContent = getItemPrice(item.name) + " DA"
+		itemPrice.textContent = item.amount + " DA"
 		itemPrice.classList.add("itemPrice");
 		rightGroup.appendChild(itemPrice);
 
@@ -409,8 +409,8 @@ function setItemDetailsFieldsListener(){
 				return;
 			}
 
-			//selectedItem. = newRate;
-			//selectedItemMap.set(selectedItem.name , selectedItem);
+			selectedItem.amount = newRate;
+			selectedItemMap.set(selectedItem.name , selectedItem);
 
 			//function to redraw the selected item list
 			setSelectedItem();
@@ -464,6 +464,9 @@ function setItemDetailsFieldsListener(){
 			selectedField = discountInput
 		})
 		discountInput.addEventListener('blur' , function(event){
+			if(selectedField.value > 100 ){
+				selectedField.value = 100;
+			}
 			selectedField = null
 		})
 
@@ -655,7 +658,7 @@ function itemClick(item){
 function calculateNetTotal(){
 	let netTotal = 0;
 	selectedItemMap.forEach((value,key) =>{
-		netTotal += value.quantity * getItemPrice(value.name)
+		netTotal += value.quantity * value.amount
 	})
 
 	const netTotal_HTML = document.getElementById("netTotalValue");
