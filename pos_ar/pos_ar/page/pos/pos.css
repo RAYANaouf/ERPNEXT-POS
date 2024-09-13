@@ -558,3 +558,9 @@ input:focus{
 .grid-item:hover {
 	background      : #e0e0e0;
 }
+
+.grid-item.selected {
+	border       : 2px solid #c0c0c0 ;
+	background   : #e0e0e0 ;
+	
+}

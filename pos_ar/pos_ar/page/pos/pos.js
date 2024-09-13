@@ -383,9 +383,13 @@ function setItemDetailsFieldsListener(){
 		})
 		quantityInput.addEventListener('focus' , function(event){
 			selectedField = quantityInput
+			const key_quantity = document.getElementById("key_quantity");
+			key_quantity.classList.add("selected")
 		})
 		quantityInput.addEventListener('blur' , function(event){
 			selectedField = null
+			const key_quantity = document.getElementById("key_quantity");
+			key_quantity.classList.remove("selected")
 		})
 
 
@@ -426,9 +430,13 @@ function setItemDetailsFieldsListener(){
 		})
 		rateInput.addEventListener('focus' , function(event){
 			selectedField = rateInput
+			const key_rate     = document.getElementById("key_rate");
+			key_rate.classList.add("selected");
 		})
 		rateInput.addEventListener('blur' , function(event){
 			selectedField = null
+			const key_rate     = document.getElementById("key_rate");
+			key_rate.classList.remove("selected");
 		})
 
 
@@ -472,12 +480,16 @@ function setItemDetailsFieldsListener(){
 		})
 		discountInput.addEventListener('focus' , function(event){
 			selectedField = discountInput
+			const key_discount = document.getElementById("key_discount");
+			key_discount.classList.add("selected");
 		})
 		discountInput.addEventListener('blur' , function(event){
 			if(selectedField.value > 100 ){
 				selectedField.value = 100;
 			}
 			selectedField = null
+			const key_discount = document.getElementById("key_discount");
+			key_discount.classList.remove("selected");
 		})
 
 	}
@@ -521,12 +533,21 @@ function setItemDetailsFieldsListener(){
 				}
 				else if(keyContent == "Quantity"){
 					quantityInput.focus();
+					key_discount.classList.remove("selected");
+					key_rate.classList.remove("selected");
+					key_quantity.classList.add("selected");
 				}
 				else if(keyContent == "Rate"){
 					rateInput.focus();
+					key_discount.classList.remove("selected");
+					key_rate.classList.add("selected");
+					key_quantity.classList.remove("selected");
 				}
 				else if(keyContent == "Discount"){
 					discountInput.focus();
+					key_discount.classList.add("selected");
+					key_rate.classList.remove("selected");
+					key_quantity.classList.remove("selected");
 				}
 
 				//update selectedItem map
