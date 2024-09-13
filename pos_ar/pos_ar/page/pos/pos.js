@@ -59,7 +59,11 @@ async function main(){
 	document.getElementById("ItemGroupInput").addEventListener('input' , function(event){
 		setItemInFlow(getItemByItemGroup(event.target.value));
 	});
-
+	document.getElementById("checkoutBtn").addEventListener('mousedown' , function(even){
+		event.preventDefault();
+		showPaymentMethodCart();
+		hideSelectorCart();
+	})
 
 }
 
@@ -234,7 +238,6 @@ function setSelectedItem(){
 			//expose the item as selected one
 			selectedItem = item
 
-			hideSelectorCart();
 			renderItemDetailsCart(item);
 		})
 
@@ -545,46 +548,54 @@ function setItemDetailsFieldsListener(){
 //item detailscart
 function showItemDetails(){
 	const itemDetailsCart = document.getElementById("itemDetailsCart");
-	itemDetailsCart.style.display = "block";
-
-
+	const selectorBox = document.getElementById("SelectorBox");
+	const paymentMethodCart = document.getElementById("paymentMethodCart");
 	const editSelectedItemCart = document.getElementById("editSelectedItemCart");
-	editSelectedItemCart.style.display = "block";
 
+
+	selectorBox.style.display = "none";
+	paymentMethodCart.style.display = "none";
+	itemDetailsCart.style.display = "block";
+	editSelectedItemCart.style.display = "block";
 	setCartDetailsOrientation("landscape")
 
+
+
+
 	document.getElementById("itemDetailsCartXBtn").addEventListener('click', function(event){
-		hideItemDetails();
 		showSelectorCart();
 	})
 }
 
-function hideItemDetails(){
-	const itemDetailsCart = document.getElementById("itemDetailsCart");
-	itemDetailsCart.style.display = "none";
-
-	const editSelectedItemCart = document.getElementById("editSelectedItemCart");
-	editSelectedItemCart.style.display = "none";
-
-        setCartDetailsOrientation("portrait");
-
-}
 
 //selectors cart
 function showSelectorCart(){
+	const itemDetailsCart = document.getElementById("itemDetailsCart");
 	const selectorBox = document.getElementById("SelectorBox");
-	selectorBox.style.display = "block";
+	const paymentMethodCart = document.getElementById("paymentMethodCart");
+	const editSelectedItemCart = document.getElementById("editSelectedItemCart");
 
-	const cartDetails = document.getElementById("cartDetails");
-	cartDetails.style.display = "flex";
+	itemDetailsCart.style.display = "none";
+	selectorBox.style.display = "flex";
+	paymentMethodCart.style.display = "none";
+	editSelectedItemCart.style.display = "none";
+	setCartDetailsOrientation("portrait")
+
+
 }
 
-function hideSelectorCart(){
-	const selectorBox = document.getElementById("SelectorBox");
-	selectorBox.style.display = "none";
 
-	const cartDetails = document.getElementById("cartDetails");
-	cartDetails.style.display = "none";
+//show payment method
+function showPaymentMethodCart(){
+	const itemDetailsCart = document.getElementById("itemDetailsCart");
+	const selectorBox = document.getElementById("SelectorBox");
+	const paymentMethodCart = document.getElementById("paymentMethodCart");
+	const editSelectedItemCart = document.getElementById("editSelectedItemCart");
+
+	itemDetailsCart.style.display = "none";
+	selectorBox.style.display = "none";
+	editSelectedItemCart.style.display = "none";
+	paymentMethodCart.style.display = "flex";
 
 }
 
