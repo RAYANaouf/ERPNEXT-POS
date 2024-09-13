@@ -305,7 +305,7 @@ function renderItemDetailsCart(item){
 	discount.value = 0.00
 
 	//available
-	available.value = 1
+	available.value = getQtyInWarehouse(item.name ,  PosProfileList[0].warehouse)
 
 
 	//uom
@@ -682,6 +682,12 @@ function calculateQnatity(){
 	totalQuantity_HTML.textContent = quantity;
 }
 
+function getQtyInWarehouse(itemId , warehouseId){
+
+	const bin = binList.find(bin => bin.item_code == itemId && bin.warehouse == warehouseId)
+
+	return bin ? bin.actual_qty : 0
+}
 
 
 /*********************  get data functions ******************************/
