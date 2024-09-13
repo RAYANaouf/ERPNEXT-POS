@@ -19,6 +19,8 @@ let priceLists       = []
 let selectedItemMap  = new Map();
 let warehouseList    = []
 let PosProfileList   = []
+let binList          = []
+
 
 let selectedItem     = null
 let selectedField    = null
@@ -37,6 +39,7 @@ async function main(){
 	priceLists     = await fetchPriceList()
 	warehouseList  = await fetchWarehouseList()
 	PosProfileList = await fetchPosProfileList()
+	binList        = await fetchBinList()
 
 	console.log("customersList : " , customersList )
 	console.log("itemGroupList : " , itemGroupList )
@@ -44,7 +47,8 @@ async function main(){
 	console.log("itemPrices : "    , itemPrices    )
 	console.log("priceLists : "    , priceLists    )
 	console.log("warehouseList : " , warehouseList )
-	console.log("POSProfileList : ", PosProfileList )
+	console.log("POSProfileList : ", PosProfileList)
+	console.log("fetchBinList : "  , binList  )
 
 
 	setCustomersInList();
@@ -452,8 +456,11 @@ function setItemDetailsFieldsListener(){
 				return;
 			}
 
-			//selectedItem. = newDiscount;
-			//selectedItemMap.set(selectedItem.name , selectedItem);
+			if(newDiscount < 100)
+				selectedItem.discount = newDiscount
+			else
+				selectedItem.discount = 100;
+			selectedItemMap.set(selectedItem.name , selectedItem);
 
 			//function to redraw the selected item list
 			setSelectedItem();
@@ -768,6 +775,20 @@ async function fetchPosProfileList(){
         }
         catch(error){
                 console.error('Error fetching Warehouse list : ' , error)
+                return [];
+        }
+}
+
+
+async function fetchBinList(){
+        try{
+                return await frappe.db.get_list('Bin' , {
+                        fields  : ['actual_qty' , 'item_code' , 'warehouse'],
+                        filters : {}
+                })
+        }
+        catch(error){
+                console.error('Error fetching Bin list : ' , error)
                 return [];
         }
 }
