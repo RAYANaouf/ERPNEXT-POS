@@ -328,18 +328,19 @@ function renderItemDetailsCart(item){
 
 function setItemDetailsFieldsListener(){
 
-	const quantityInput = document.getElementById("itemDetailsQuantityInput");
+
 
         if(!detailsItemFieldsListeners){
 		//make sure to set the listener variable to true indecate that it has been alread set
 		detailsItemFieldsListeners = true
 
+		const quantityInput = document.getElementById("itemDetailsQuantityInput");
 		quantityInput.addEventListener('input' , function(event){
-			console.log("we are triggered here")
 			let newQuantity = parseFloat(quantityInput.value);
 
 			if(isNaN(newQuantity) || newQuantity <= 0){
 				console.warn("Invaide Quantity value")
+				newQuantity.
 				return;
 			}
 
@@ -401,14 +402,6 @@ function setItemDetailsFieldsListener(){
 				else if(keyContent == "Rate"){
 					
 				}
-				//update selectedItem map
-				selectedItem.quantity = quantityInput.value;
-				selectedItemMap.set(selectedItem.name , selectedItem);
-
-		                //function to redraw the selected item list
-				setSelectedItem();
-				calculateQnatity();
-				calculateNetTotal();
 			})
 		})
 
