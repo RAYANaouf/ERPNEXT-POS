@@ -516,9 +516,16 @@ function setItemDetailsFieldsListener(){
 				else if(keyContent == "." && !selectedField.value.includes(".")){
 					selectedField.value += keyContent
 				}
-				else if(keyContent == "Rate"){
-					
+				else if(keyContent == "Quantity"){
+					quantityInput.focus();
 				}
+				else if(keyContent == "Rate"){
+					rateInput.focus();
+				}
+				else if(keyContent == "Discount"){
+					discountInput.focus();
+				}
+
 				//update selectedItem map
 				selectedItem.quantity = quantityInput.value;
 				selectedItemMap.set(selectedItem.name , selectedItem);

@@ -155,7 +155,7 @@ input:focus{
 	background  : #FFFFFF ;
 
 	animation   : mymove 1s  ;
-	display     : block ;
+	display     : flex ;
 	overflow-y  : scroll ; 
 	background    : #FFFFFF ;
 
@@ -329,6 +329,19 @@ input:focus{
 	margin-bottom : 16px ;
 
         justify-content : center ;
+}
+
+/** paymentMethodCart **/
+#LeftSection #paymentMethodCart{
+	width     : 100% ;
+	height    : 100% ;
+	animation : mymove 1s ;
+	display   : none ;
+	background    : #FFFFFF ;
+
+	overflow-y    : scroll ; 
+	border        : 2px solid #c0c0c0 ;
+	border-radius : 16px;	
 }
 
 /************* right *****************/
