@@ -335,7 +335,26 @@ function setItemDetailsFieldsListener(){
 		detailsItemFieldsListeners = true
 
 		quantityInput.addEventListener('input' , function(event){
-			console.log("we are triggered here")
+			const value = this.value ;
+
+			console.log("before if : " , value , "|| value.includes('.') " , !value.slice(0,-1).includes(".") , "|| is number ==> " , !isNaN(value[value.length-1]) );
+
+			if(value.length == 0){
+				this.value = 0
+			}
+			else if (!value.slice(0,-1).includes(".")  && value[value.length-1] == "."){
+				this.value = value
+			}
+			else if(value[value.length-1] == "."){
+				this.value = value.slice(0,-1);
+			}
+			else if(isNaN(value[value.length-1])){
+				this.value = value.slice(0,-1);
+			}
+			else{
+				this.value = value;
+			}
+
 			let newQuantity = parseFloat(quantityInput.value);
 
 			if(isNaN(newQuantity) || newQuantity <= 0){
