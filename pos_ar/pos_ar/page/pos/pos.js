@@ -169,6 +169,9 @@ function setItemInFlow(filtered_item_list){
 function setSelectedItem(){
 
 
+	console.log("map ==> " , selectedItemMap )
+
+
 	const selectedItemsContainer = document.getElementById("selectedItemsContainer");
 	selectedItemsContainer.innerHTML = "";
 
@@ -292,7 +295,7 @@ function renderItemDetailsCart(item){
 	quantity.value = item.quantity
 
 	//rate
-	rate.value = 250.00
+	rate.value = item.amount
 
 	//discount
 	discount.value = 0.00
@@ -422,7 +425,7 @@ function setItemDetailsFieldsListener(){
 		})
 
 
-		// field listeners
+		// discount field listeners
 		discountInput.addEventListener('input' , function(event){
 			const value = this.value ;
 
@@ -442,14 +445,14 @@ function setItemDetailsFieldsListener(){
 				this.value = value;
 			}
 
-			let newRate = parseFloat(rateInput.value);
+			let newDiscount = parseFloat(discountInput.value);
 
-			if(isNaN(newRate) || newRate <= 0){
-				console.warn("Invaide Rate value")
+			if(isNaN(newDiscount) || newDiscount <= 0){
+				console.warn("Invaide discount value")
 				return;
 			}
 
-			//selectedItem. = newRate;
+			//selectedItem. = newDiscount;
 			//selectedItemMap.set(selectedItem.name , selectedItem);
 
 			//function to redraw the selected item list
@@ -457,10 +460,10 @@ function setItemDetailsFieldsListener(){
 			calculateQnatity();
 			calculateNetTotal();
 		})
-		rateInput.addEventListener('focus' , function(event){
-			selectedField = rateInput
+		discountInput.addEventListener('focus' , function(event){
+			selectedField = discountInput
 		})
-		rateInput.addEventListener('blur' , function(event){
+		discountInput.addEventListener('blur' , function(event){
 			selectedField = null
 		})
 
@@ -637,6 +640,7 @@ function itemClick(item){
 
 	if(!selectedItemMap.has(item.name)){
 		item.quantity = 1 ;
+		item.amount   = getItemPrice(item.name);
 		selectedItemMap.set( item.name  , item);
 	}
 	else{
