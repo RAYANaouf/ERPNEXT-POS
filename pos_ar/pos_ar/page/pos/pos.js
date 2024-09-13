@@ -177,9 +177,6 @@ function setItemInFlow(filtered_item_list){
 function setSelectedItem(){
 
 
-	console.log("map ==> " , selectedItemMap )
-
-
 	const selectedItemsContainer = document.getElementById("selectedItemsContainer");
 	selectedItemsContainer.innerHTML = "";
 
@@ -237,7 +234,7 @@ function setSelectedItem(){
 		itemElement.addEventListener("click" , function(event){
 			//expose the item as selected one
 			selectedItem = item
-
+			itemElement.classList.add("selected")
 			renderItemDetailsCart(item);
 		})
 
