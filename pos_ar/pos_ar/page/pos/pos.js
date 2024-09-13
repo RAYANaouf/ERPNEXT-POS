@@ -234,7 +234,7 @@ function setSelectedItem(){
 		itemElement.addEventListener("click" , function(event){
 			//expose the item as selected one
 			selectedItem = item
-			itemElement.classList.add("selected")
+			makeItemHighlight(itemElement);
 			renderItemDetailsCart(item);
 		})
 
@@ -723,6 +723,16 @@ function getQtyInWarehouse(itemId , warehouseId){
 	const bin = binList.find(bin => bin.item_code == itemId && bin.warehouse == warehouseId)
 
 	return bin ? bin.actual_qty : 0
+}
+
+function  makeItemHighlight(itemElement){
+	const selectedItemsContainer = document.getElementById("selectedItemsContainer");
+	const selectedItems = selectedItemsContainer.querySelectorAll(".selected")
+	console.log("selectedItems : " , selectedItems)
+	selectedItems.forEach(selectedItem=>{
+		selected.classList.remove("selected");
+	})
+	itemElement.classList.add("selected")
 }
 
 
