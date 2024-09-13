@@ -329,15 +329,16 @@ function renderItemDetailsCart(item){
 function setItemDetailsFieldsListener(){
 
 	const quantityInput = document.getElementById("itemDetailsQuantityInput");
+	const rateInput     = document.getElementById("itemDetailsRateInput");
+	const discountInput = document.getElementById("itemDetailsDiscountInput");
 
         if(!detailsItemFieldsListeners){
 		//make sure to set the listener variable to true indecate that it has been alread set
 		detailsItemFieldsListeners = true
 
+		//quantity field listeners
 		quantityInput.addEventListener('input' , function(event){
 			const value = this.value ;
-
-			console.log("before if : " , value , "|| value.includes('.') " , !value.slice(0,-1).includes(".") , "|| is number ==> " , !isNaN(value[value.length-1]) );
 
 			if(value.length == 0){
 				this.value = 0
@@ -372,9 +373,94 @@ function setItemDetailsFieldsListener(){
 		})
 		quantityInput.addEventListener('focus' , function(event){
 			selectedField = quantityInput
-			selectedField.style.border = "border: 2.5px solid rgb(172, 101, 0) !important;"
 		})
 		quantityInput.addEventListener('blur' , function(event){
+			selectedField = null
+		})
+
+
+		//rate field listeners
+		rateInput.addEventListener('input' , function(event){
+			const value = this.value ;
+
+			if(value.length == 0){
+				this.value = 0
+			}
+			else if (!value.slice(0,-1).includes(".")  && value[value.length-1] == "."){
+				this.value = value
+			}
+			else if(value[value.length-1] == "."){
+				this.value = value.slice(0,-1);
+			}
+			else if(isNaN(value[value.length-1])){
+				this.value = value.slice(0,-1);
+			}
+			else{
+				this.value = value;
+			}
+
+			let newRate = parseFloat(rateInput.value);
+
+			if(isNaN(newRate) || newRate <= 0){
+				console.warn("Invaide Rate value")
+				return;
+			}
+
+			//selectedItem. = newRate;
+			//selectedItemMap.set(selectedItem.name , selectedItem);
+
+			//function to redraw the selected item list
+			setSelectedItem();
+			calculateQnatity();
+			calculateNetTotal();
+		})
+		rateInput.addEventListener('focus' , function(event){
+			selectedField = rateInput
+		})
+		rateInput.addEventListener('blur' , function(event){
+			selectedField = null
+		})
+
+
+		// field listeners
+		discountInput.addEventListener('input' , function(event){
+			const value = this.value ;
+
+			if(value.length == 0){
+				this.value = 0
+			}
+			else if(!value.slice(0,-1).includes(".")  && value[value.length-1] == "."){
+				this.value = value
+			}
+			else if(value[value.length-1] == "."){
+				this.value = value.slice(0,-1);
+			}
+			else if(isNaN(value[value.length-1])){
+				this.value = value.slice(0,-1);
+			}
+			else{
+				this.value = value;
+			}
+
+			let newRate = parseFloat(rateInput.value);
+
+			if(isNaN(newRate) || newRate <= 0){
+				console.warn("Invaide Rate value")
+				return;
+			}
+
+			//selectedItem. = newRate;
+			//selectedItemMap.set(selectedItem.name , selectedItem);
+
+			//function to redraw the selected item list
+			setSelectedItem();
+			calculateQnatity();
+			calculateNetTotal();
+		})
+		rateInput.addEventListener('focus' , function(event){
+			selectedField = rateInput
+		})
+		rateInput.addEventListener('blur' , function(event){
 			selectedField = null
 		})
 
