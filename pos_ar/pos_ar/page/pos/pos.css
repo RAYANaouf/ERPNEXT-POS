@@ -20,7 +20,20 @@
 	background : #fff6d2 ;
 }
 
-
+/*set up the scroll bar */
+html::-webkit-scrollbar{
+	width : 2em ;
+}
+html::-webkit-scrollbar-track{
+	background : hsl(120 75% 50% / 1);
+}
+html::-webkit-scrollbar-thumb{
+	background : hsl(120 100% 20% / 1);
+	border-radius : 100vw ; 
+}
+html::-webkit-scrollbar-thumb:hover{
+	background : hsl(120 100% 10% / 1);
+}
 
 /****************       generals       *****************/
 
@@ -156,6 +169,7 @@ input:focus{
 	background  : #FFFFFF ;
 
 	animation   : mymove 1s  ;
+	box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
 	display     : flex ;
 	overflow-y  : scroll ; 
 	background    : #FFFFFF ;
@@ -250,6 +264,7 @@ input:focus{
 	animation : mymove 1s ;
 	display   : none ;
 	background    : #FFFFFF ;
+	box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
 
 	overflow-y    : scroll ; 
 	border        : 2px solid #c0c0c0 ;
@@ -340,6 +355,7 @@ input:focus{
 	animation : mymove 1s ;
 	display   : none ;
 	background    : #FFFFFF ;
+	box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
 
 	overflow-y    : scroll ; 
 	border        : 2px solid #c0c0c0 ;
@@ -355,6 +371,7 @@ input:focus{
 
 
 	animation : mymove 1.5s  ;
+	box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
 
 	border          : 2px solid #c0c0c0 ;
 	border-radius   : 16px   ;
@@ -381,7 +398,7 @@ input:focus{
 	background    : #FFFFFF ;
 
 	animation : mymove 2s  ;
-
+	box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
 	border        : 2px solid #c0c0c0 ;
 	border-radius : 16px;
 	overFlow-y    : scroll; 	
@@ -574,3 +591,5 @@ input:focus{
 	background   : #e0e0e0 ;
 	
 }
+
+
