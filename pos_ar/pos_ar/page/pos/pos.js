@@ -616,6 +616,12 @@ function showPaymentMethodCart(){
 	editSelectedItemCart.style.display = "none";
 	paymentMethodCart.style.display = "flex";
 
+
+	document.getElementById("paymentMethodCartXBtn").addEventListener('click', function(event){
+		showItemDetails();
+	})
+
+
 }
 
 function setCartDetailsOrientation(orientation){
