@@ -582,6 +582,7 @@ function showItemDetails(){
 
 	document.getElementById("itemDetailsCartXBtn").addEventListener('click', function(event){
 		showSelectorCart();
+		deselectItems();
 	})
 }
 
@@ -730,9 +731,17 @@ function  makeItemHighlight(itemElement){
 	const selectedItems = selectedItemsContainer.querySelectorAll(".selected")
 	console.log("selectedItems : " , selectedItems)
 	selectedItems.forEach(selectedItem=>{
-		selected.classList.remove("selected");
+		selectedItem.classList.remove("selected");
 	})
 	itemElement.classList.add("selected")
+}
+
+function  deselectItems(){
+	const selectedItemsContainer = document.getElementById("selectedItemsContainer");
+	const selectedItems = selectedItemsContainer.querySelectorAll(".selected")
+	selectedItems.forEach(selectedItem=>{
+		selectedItem.classList.remove("selected");
+	})
 }
 
 
