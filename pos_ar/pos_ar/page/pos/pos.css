@@ -168,10 +168,10 @@ input:focus{
 	height      : 100%    ;
 	background  : #FFFFFF ;
 
-	animation   : mymove 1s  ;
-	box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
-	display     : flex ;
-	overflow-y  : scroll ; 
+	animation     : mymove 1s  ;
+	box-shadow    : rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+	display       : flex ;
+	overflow-y    : auto ; 
 	background    : #FFFFFF ;
 
 	border        : 2px solid #c0c0c0 ;
@@ -266,7 +266,7 @@ input:focus{
 	background    : #FFFFFF ;
 	box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
 
-	overflow-y    : scroll ; 
+	overflow-y    : auto ; 
 	border        : 2px solid #c0c0c0 ;
 	border-radius : 16px;
 }
@@ -358,7 +358,7 @@ input:focus{
 	background    : #FFFFFF ;
 	box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
 
-	overflow-y    : scroll ; 
+	overflow-y    : auto ; 
 	border        : 2px solid #c0c0c0 ;
 	border-radius : 16px;	
 }
@@ -405,17 +405,17 @@ input:focus{
 }
 
 #RightSection #CartBox{
-	width  : 100% ; 
-	height : calc(100% - 55px) ;
-	margin-top : 5px    ;
-	padding    : 0px 0px 16px 0px ;
+	width         : 100% ; 
+	height        : calc(100% - 55px) ;
+	margin-top    : 5px    ;
+	padding       : 0px 0px 16px 0px ;
 	background    : #FFFFFF ;
 
-	animation : mymove 2s  ;
-	box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+	animation     : mymove 2s  ;
+	box-shadow    : rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
 	border        : 2px solid #c0c0c0 ;
-	border-radius : 16px;
-	overFlow-y    : scroll; 	
+	border-radius : 16px ;
+	overFlow-y    : auto ; 	
 
 	flex-grow     : 1;	
 }
@@ -442,8 +442,8 @@ input:focus{
 
 #RightSection #CartBox #selectedItemsContainer{	
 	min-height : 70px ;
-	flex-grow  : 1     ;
-	overflow-y : scroll;
+	flex-grow  : 1    ;
+	overflow-y : auto ;
 }
 
 /* element  */
