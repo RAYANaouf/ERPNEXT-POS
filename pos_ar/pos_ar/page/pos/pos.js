@@ -619,7 +619,7 @@ function showPaymentMethodCart(){
 
 	itemDetailsCart.style.display = "none";
 	selectorBox.style.display = "none";
-	editSelectedItemCart.style.display = "none";
+	editSelectedItemCart.style.display = "grid";
 	paymentMethodCart.style.display = "flex";
 
 

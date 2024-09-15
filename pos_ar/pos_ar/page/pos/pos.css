@@ -458,9 +458,30 @@ button:hover{
 	overflow   : hidden   ;
 }
 
-#LeftSection #paymentMethodCart #paymentDetailsContainer div{
+#LeftSection #paymentMethodCart #paymentDetailsContainer>div{
 	width        : 33.33%   ; 
 	height       : 100%     ;
+}
+
+#LeftSection #paymentMethodCart #paymentDetailsContainer div div{
+	width        : 100%     ;
+	height       : 50%      ;
+}
+
+#LeftSection #paymentMethodCart #paymentDetailsContainer div div:first-child{
+	width        : 100%     ;
+	height       : 50%      ;
+
+	font-weight  : 600      ;
+	font-size    : 16px     ;
+}
+#LeftSection #paymentMethodCart #paymentDetailsContainer div div:nth-child(2){
+	width        : 100%     ;
+	height       : 50%      ;
+
+	font-weight  : 500      ;
+	font-size    : 25px     ;
+
 }
 
 #LeftSection #paymentMethodCart #paymentDetailsContainer hr{
