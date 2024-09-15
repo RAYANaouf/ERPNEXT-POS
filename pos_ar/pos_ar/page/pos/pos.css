@@ -366,7 +366,7 @@ button:hover{
 #LeftSection #paymentMethodCart{
 	width     : 100% ;
 	height    : 100% ;
-	padding   : 0px 16px 16px 0px  ;
+	padding   : 0px 16px 16px 16px  ;
 	animation : mymove 1s ;
 	display   : none ;
 	background    : #FFFFFF ;
@@ -395,29 +395,91 @@ button:hover{
 	flex-grow : 1    ;
 }
 
-#LeftSection #paymentMethodCart #paymentMethodCartFooter{
+#LeftSection #paymentMethodCart #paymentMethodContent #paymentContentTopSection{
+	width  : 100% ;
+	margin : 0px 0px 16px 0px ;
+}
+
+#cashBox{
+	height  : 100px ;
+	width   : 50%   ;
+	margin  : 6px 16px ;
+	padding : 12px  ;
+
+	border : 2px solid #eeeeee;
+	border-radius : 12px ;
+}
+
+#cashBox .title{
+	padding     : 0px 0px 16px 0px ;
+
+	color       : #777777 ;
+	font-size   : 16px    ;
+	font-weight : 400     ;
+
+}
+
+#LeftSection #paymentMethodCart #paymentMethodContent #paymentContentBottomSection{
 	width : 100% ;
 }
+
+
+
+#redeemLoyaltyPoints{
+	height : 100px ;
+	width  : 50%   ;
+	margin : 6px 16px ;
+	padding : 12px  ;
+
+	border : 2px solid #eeeeee;
+	border-radius : 12px ;
+}
+
+#redeemLoyaltyPoints .title{
+
+	padding     : 0px 0px 16px 0px ;
+
+	color     : #777777 ;
+	font-size : 16px    ;
+	font-weight : 400     ;
+}
+
+
+
+
 
 #LeftSection #paymentMethodCart #paymentDetailsContainer{
 	width      : 80%      ;
 	height     : 150px    ;
 	background : #f0f0f0  ;
-	margin     : 16px 0px ;
-	
+	margin     : 16px 0px ;	
 	border-radius : 12px  ;
+
+	overflow   : hidden   ;
 }
 
 #LeftSection #paymentMethodCart #paymentDetailsContainer div{
-	width : 33.33% ; 
-	border-right : 1px solid #999999 ;
+	width        : 33.33%   ; 
+	height       : 100%     ;
 }
+
+#LeftSection #paymentMethodCart #paymentDetailsContainer hr{
+	width        : 2px      ; 
+	height       : 70%      ;
+	background   : #888888  ;
+}
+
+
+#LeftSection #paymentMethodCart #paymentMethodCartFooter{
+	width : 100% ;
+}
+
 
 #LeftSection #paymentMethodCart #paymentMethodCartFooter #completeOrderBtn{
 	width  : 80%  ;
-	height : 45px ;
-
-	font-size  : larger;
+	height : 55px ;
+	margin : 32px 0px   ;
+	font-size  : larger ;
 	font-weight: 600;
 	
 }
@@ -633,6 +695,7 @@ button:hover{
 	background      : #f5f5f5;
 	border          : 2px solid #e0e0e0;
 	border-radius   : 12px  ;
+	color           : black ;
 	font-size       : small ;
 	text-align      : center;
 
@@ -643,6 +706,7 @@ button:hover{
 
 .grid-item:hover {
 	background      : #e0e0e0;
+	border          : 2px solid #e0e0e0;
 }
 
 .grid-item.selected {
