@@ -61,8 +61,7 @@ async function main(){
 	});
 	document.getElementById("checkoutBtn").addEventListener('mousedown' , function(even){
 		event.preventDefault();
-		showPaymentMethodCart();
-		hideSelectorCart();
+		renderPaymentMethodCart();
 	})
 
 }
@@ -329,6 +328,19 @@ function renderItemDetailsCart(item){
 
 	//listeners
 	setItemDetailsFieldsListener()
+}
+
+function renderPaymentMethodCart(){
+	showPaymentMethodCart();
+
+
+	const grandTotal = document.getElementById("paymentGrandTotalValue");
+	const paidAmount = document.getElementById("paimentPaidAmountValue");
+	const toBePaid   = document.getElementById("paimentToBePaidValue");
+
+	grandTotal.textContent = document.getElementById("grandTotalValue").textContent ;
+	paidAmount.textContent = 001 ;
+	toBePaid.textContent   = 001 ;
 }
 
 
@@ -739,6 +751,10 @@ function calculateGrandTotal(){
 
 	const grandTotal_HTML = document.getElementById("grandTotalValue");
 	grandTotal_HTML.textContent = grandTotal;
+
+	console.log("calculate grand totla " , grandTotal)
+
+
 }
 
 
