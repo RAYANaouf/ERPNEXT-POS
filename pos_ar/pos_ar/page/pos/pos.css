@@ -97,6 +97,20 @@ input:focus{
 	background : #fafafa !important;
 }
 
+
+button{
+	border        : 3px solid #6a3e00 ;
+	background    : #ac6500           ;
+	border-radius : 8px               ;	
+
+	color         : white             ;
+}
+
+button:hover{
+	border        : 4px solid #6a3e00 ;	
+}
+
+
 .CartTitle{
 	padding : 8px 0px 8px;
 	color   : #404040 ;
@@ -352,7 +366,7 @@ input:focus{
 #LeftSection #paymentMethodCart{
 	width     : 100% ;
 	height    : 100% ;
-	padding   : 0px 16px  ;
+	padding   : 0px 16px 16px 0px  ;
 	animation : mymove 1s ;
 	display   : none ;
 	background    : #FFFFFF ;
@@ -376,6 +390,37 @@ input:focus{
 }
 
 
+#LeftSection #paymentMethodCart #paymentMethodContent{
+	width     : 100% ;
+	flex-grow : 1    ;
+}
+
+#LeftSection #paymentMethodCart #paymentMethodCartFooter{
+	width : 100% ;
+}
+
+#LeftSection #paymentMethodCart #paymentDetailsContainer{
+	width      : 80%      ;
+	height     : 150px    ;
+	background : #f0f0f0  ;
+	margin     : 16px 0px ;
+	
+	border-radius : 12px  ;
+}
+
+#LeftSection #paymentMethodCart #paymentDetailsContainer div{
+	width : 33.33% ; 
+	border-right : 1px solid #999999 ;
+}
+
+#LeftSection #paymentMethodCart #paymentMethodCartFooter #completeOrderBtn{
+	width  : 80%  ;
+	height : 45px ;
+
+	font-size  : larger;
+	font-weight: 600;
+	
+}
 /************* right *****************/
 #RightSection #CustomerBox{
 	height : 55px  ;
@@ -541,8 +586,8 @@ input:focus{
 	margin  : 0px 16px 0px 16px  ;
 	padding : 8px 0px ;
 	
-	color   : #FFFFFF  ;
-	font-size: larger;
+	color      : #FFFFFF  ;
+	font-size  : larger;
 	font-weight: 600;
 	
 	background : #ac6500 ;
