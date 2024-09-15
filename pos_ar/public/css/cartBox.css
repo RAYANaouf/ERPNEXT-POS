@@ -1,0 +1,202 @@
+
+#RightSection #CartBox{
+        width         : 100% ;
+        height        : calc(100% - 55px) ;
+        margin-top    : 5px    ;
+        padding       : 0px 0px 16px 0px ;
+        background    : #FFFFFF ;
+
+        animation     : mymove 2s  ;
+        box-shadow    : rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+        border        : 2px solid #c0c0c0 ;
+        border-radius : 16px ;
+        overFlow-y    : auto ;
+
+        flex-grow     : 1;
+}
+
+#RightSection #CartBox #CartBoxTopBar{
+        width   : 100%;
+        padding : 0px 16px ;
+}
+
+
+/*** items container***/
+
+
+#RightSection #CartBox #cartHeader{
+        width   : calc(100% - 32px)  ;
+        height  : 40px     ;
+        margin  : 0px 16px ;
+        padding : 6px 0px 0px 0px ;
+}
+
+#RightSection #CartBox #cartHeader #quantityTitle{
+        margin : 0px 16px 0px 0px ;
+}
+
+#RightSection #CartBox #selectedItemsContainer{
+        min-height : 70px ;
+        flex-grow  : 1    ;
+        overflow-y : auto ;
+}
+
+/* element  */
+#RightSection #CartBox .ItemElement{
+        width   : calc(100% - 32px)  ;
+        height  : 60px     ;
+        min-height : 60px  ;
+        margin  : 0px 16px ;
+        padding : 4px      ;
+
+        /*animation : mymove 1s */
+
+}
+
+
+#RightSection #CartBox .ItemElement:hover{
+        background : #F0F0F0 ;
+
+        border     : 3px solid #e0e0e0 ;
+        border-radius : 12px  ;
+
+}
+
+#RightSection #CartBox .ItemElement.selected{
+        background : #ffffff ;
+
+        border     : 3px solid #ac6500 ;
+        border-radius : 12px  ;
+}
+
+
+#RightSection #CartBox .ItemElement .selectedItemImage{
+        width      : 45px ;
+        height     : 45px ;
+        margin     : 0px 16px 0px 5px  ;
+        background : #e0e0e0 ;
+        border-radius : 12px ;
+
+        object-fit : cover ;
+}
+
+#RightSection #CartBox .ItemElement .selectedItemName{
+        padding : 6px 0px 0px 0px  ;
+}
+
+#RightSection #CartBox .ItemElement .itemQuantity{
+        margin : 0px 16px 0px 0px ;
+}
+
+/*** footer ***/
+#RightSection #CartBox #cartFooter{
+        width  : 100%  ;
+}
+
+
+
+#RightSection #CartBox #cartDetails{
+        width  : calc(100% - 32px) ;
+        margin : 2px 16px ;
+}
+
+#RightSection #CartBox #cartDetails>div{
+        width : 100% ;
+}
+
+#RightSection #CartBox #cartDetails #discount{
+        height : 25px  ;
+        border : 1px dashed #c0c0c0 ;
+        border-radius : 12px  ;
+        padding : 0px 16px ;
+}
+#RightSection #CartBox #cartDetails #discount:hover{
+        background : #F0F0F0 ;
+}
+#RightSection #CartBox #cartDetails #totalQuantity{
+        height : 25px  ;
+        padding : 0px 16px ;
+}
+#RightSection #CartBox #cartDetails #netTotal{
+        height : 24px  ;
+        padding : 0px 16px ;
+}
+
+#RightSection #CartBox #cartDetails #grandTotal{
+        height : 30px  ;
+        margin : 4px 0px ;
+        padding : 0px 16px ;
+
+        font-weight : 700 ;
+        font-size : larger ;
+}
+
+#RightSection #CartBox #checkoutBtn{
+        width   : calc(100% - 32px)  ;
+        margin  : 0px 16px 0px 16px  ;
+        padding : 8px 0px ;
+
+        color      : #FFFFFF  ;
+        font-size  : larger;
+        font-weight: 600;
+
+        background : #ac6500 ;
+        border  : 3px solid #6a3e00;
+        border-radius : 8px  ;
+        outline : none ;
+}
+#RightSection #CartBox #checkoutBtn:hover{
+        border  : 4px solid #6a3e00;
+        font-weight: 700;
+}
+
+
+#RightSection #editSelectedItemCart{
+        width  : cla(100%-32px) ;
+        margin : 0px 16px    ;
+        padding    : 0px 0px 16px 0px ;
+
+        animation : mymove 2s  ;
+
+        overFlow-y    : hidden;
+
+        display       : none ;
+
+}
+
+
+
+/*grid*/
+.grid-container {
+
+        display: grid;
+        grid-template-columns : auto auto auto auto ;
+
+}
+.grid-item {
+        height          : 45px ;
+        padding         : 4px  ;
+        margin          : 6px  ;
+
+        background      : #f5f5f5;
+        border          : 2px solid #e0e0e0;
+        border-radius   : 12px  ;
+        color           : black ;
+        font-size       : small ;
+        text-align      : center;
+
+        display         : flex  ;
+        justify-content : center;
+        align-items     : center;
+}
+.grid-item:hover {
+        background      : #e0e0e0;
+        border          : 2px solid #e0e0e0;
+}
+
+.grid-item.selected {
+        border       : 2px solid #c0c0c0 ;
+        background   : #e0e0e0 ;
+
+}
+

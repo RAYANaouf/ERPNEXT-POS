@@ -1,0 +1,28 @@
+/************* right *****************/
+#RightSection #CustomerBox{
+        height : 55px  ;
+        width  : 100%  ;
+        margin-bottom   : 5px    ;
+        background    : #FFFFFF ;
+
+
+        animation : mymove 1.5s  ;
+        box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+
+        border          : 2px solid #c0c0c0 ;
+        border-radius   : 16px   ;
+
+
+}
+
+#RightSection #CustomerBox #CustomerInput{
+        width   : 100% ;
+        margin  : 0px 16px;
+}
+
+
+#RightSection #CustomerBox input:focus{
+        border  : none ;
+        outline : none ;
+}
+

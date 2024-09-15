@@ -1,0 +1,93 @@
+/* item details cart */
+#LeftSection #itemDetailsCart{
+        width     : 100% ;
+        height    : 100% ;
+        animation : mymove 1s ;
+        display   : none ;
+        background    : #FFFFFF ;
+        box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+
+        overflow-y    : auto ;
+        border        : 2px solid #c0c0c0 ;
+        border-radius : 16px;
+}
+
+#LeftSection #itemDetailsCart #itemDetailsCartHeader{
+        padding : 4px 16px 4px 16px ;
+}
+
+#LeftSection #itemDetailsCart #itemDetailsHeader #detailsItemImage{
+        max-width  : 150px ;
+        min-width  : 150px ;
+        max-height : 150px ;
+        min-height : 150px ;
+        margin : 16px 30px ;
+        background : #f0f0f0;
+        border-radius : 12px ;
+        border : 1.5px solid #e0e0e0;
+
+        overflow : hidden ;
+}
+
+#LeftSection #itemDetailsCart #itemDetailsHeader #detailsItemImage img{
+        width : 100%;
+        height : 100% ;
+        object-fit : cover ;
+}
+
+
+#LeftSection #itemDetailsCart #itemDetailsHeader #price_and_name{
+        width : 65%;
+        padding-top : 30px ;
+}
+
+#LeftSection #itemDetailsCart #itemDetailsHeader #price_and_name #detailsItemName{
+        font-size : 45px ;
+        font-weight : 700 ;
+}
+#LeftSection #itemDetailsCart #itemDetailsHeader #price_and_name #detailsItemGroupWarhouseContainer{
+        font-size : 15px ;
+        font-weight : 500 ;
+}
+#LeftSection #itemDetailsCart #itemDetailsHeader #price_and_name #detailsItemGroupWarhouseContainer div{
+        flex-grow : 1 ;
+}
+
+
+#LeftSection #itemDetailsCart #itemDetailsHeader #detailsItemPriceListContainer label{
+        flex-grow : 1 ;
+}
+
+#LeftSection #itemDetailsCart #itemDetailsHeader #detailsItemPriceListContainer input{
+        flex-grow : 2 ;
+}
+
+#LeftSection #itemDetailsCart #itemDetailsAll{
+        grow       : 1       ;
+
+        justify-content : center ;
+}
+
+
+#LeftSection #itemDetailsCart #itemDetailsAll #itemDetails_C1{
+        width  : 40% ;
+        height : 100% ;
+
+        margin-right : 8px ;
+
+}
+#LeftSection #itemDetailsCart #itemDetailsAll #itemDetails_C2{
+        width  : 40% ;
+        height : 100% ;
+
+        margin-left : 8px ;
+}
+
+
+#LeftSection #itemDetailsCart #itemDetailsAll input{
+
+        height : 35px ;
+        margin-bottom : 16px ;
+
+        justify-content : center ;
+}
