@@ -136,6 +136,7 @@ function setItemInFlow(filtered_item_list){
 			setSelectedItem();
 			calculateNetTotal();
 			calculateQnatity();
+			calculateGrandTotal();
 		});
 
 
@@ -377,6 +378,7 @@ function setItemDetailsFieldsListener(){
 			setSelectedItem();
 			calculateQnatity();
 			calculateNetTotal();
+			calculateGrandTotal();
 		})
 		quantityInput.addEventListener('focus' , function(event){
 			selectedField = quantityInput
@@ -533,6 +535,11 @@ function setItemDetailsFieldsListener(){
 					key_discount.classList.remove("selected");
 					key_rate.classList.remove("selected");
 					key_quantity.classList.add("selected");
+					//update selectedItem map
+					selectedItem.quantity = quantityInput.value;
+					selectedItemMap.set(selectedItem.name , selectedItem);
+					//return to selectorCart
+					showSelectorCart()
 				}
 				else if(keyContent == "Rate"){
 					rateInput.focus();
@@ -546,10 +553,11 @@ function setItemDetailsFieldsListener(){
 					key_rate.classList.remove("selected");
 					key_quantity.classList.remove("selected");
 				}
+				else if(keyContent == "Remove"){
+					selectedItemMap.delete(selectedItem.name);
+				}
 
-				//update selectedItem map
-				selectedItem.quantity = quantityInput.value;
-				selectedItemMap.set(selectedItem.name , selectedItem);
+
 
 		                //function to redraw the selected item list
 				setSelectedItem();
@@ -598,9 +606,7 @@ function showSelectorCart(){
 	selectorBox.style.display = "flex";
 	paymentMethodCart.style.display = "none";
 	editSelectedItemCart.style.display = "none";
-	setCartDetailsOrientation("portrait")
-
-
+	setCartDetailsOrientation("portrait");
 }
 
 
@@ -618,7 +624,7 @@ function showPaymentMethodCart(){
 
 
 	document.getElementById("paymentMethodCartXBtn").addEventListener('click', function(event){
-		showItemDetails();
+		showSelectorCart();
 	})
 
 
@@ -724,6 +730,18 @@ function calculateQnatity(){
 	const totalQuantity_HTML = document.getElementById("totalQuantityValue");
 	totalQuantity_HTML.textContent = quantity;
 }
+
+function calculateGrandTotal(){
+	let grandTotal = 0;
+	selectedItemMap.forEach((value,key) =>{
+		grandTotal += value.quantity * value.amount
+	})
+
+	const grandTotal_HTML = document.getElementById("grandTotalValue");
+	grandTotal_HTML.textContent = grandTotal;
+}
+
+
 
 function getQtyInWarehouse(itemId , warehouseId){
 
