@@ -538,8 +538,6 @@ function setItemDetailsFieldsListener(){
 					//update selectedItem map
 					selectedItem.quantity = quantityInput.value;
 					selectedItemMap.set(selectedItem.name , selectedItem);
-					//return to selectorCart
-					showSelectorCart()
 				}
 				else if(keyContent == "Rate"){
 					rateInput.focus();
@@ -555,6 +553,8 @@ function setItemDetailsFieldsListener(){
 				}
 				else if(keyContent == "Remove"){
 					selectedItemMap.delete(selectedItem.name);
+					//return to selectorCart
+					showSelectorCart()
 				}
 
 
