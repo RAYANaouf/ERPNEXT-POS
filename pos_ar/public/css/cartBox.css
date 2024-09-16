@@ -35,7 +35,7 @@
 
         box-shadow    : rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
         border        : 2px solid #c0c0c0 ;
-        border-radius : 0px 0px 16px 16px ;
+        border-radius : 0px 16px 16px 16px ;
         overFlow-y    : auto ;
 
         flex-grow     : 1;

@@ -28,7 +28,7 @@
 	background : hsl(120 75% 50% / 1);
 }
 ::-webkit-scrollbar-thumb{
-	background : hsl(120 100% 20% / 1);
+	background : #6a3e00;
 	border-radius : 100vw ; 
 }
 ::-webkit-scrollbar-thumb:hover{

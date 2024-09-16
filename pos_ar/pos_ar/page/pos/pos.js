@@ -1,3 +1,5 @@
+frappe.provide("pos_ar.PointOfSale");
+
 frappe.pages['pos'].on_page_load = function(wrapper) {
 	var page = frappe.ui.make_app_page({
 		parent: wrapper,
@@ -7,7 +9,16 @@ frappe.pages['pos'].on_page_load = function(wrapper) {
 
 	$(frappe.render_template("pos" , {} )).appendTo(page.body);
 
-	main()
+	frappe.require([
+		"/assets/pos_ar/js/posController.js"
+		], function() {
+		console.log("hey here is you answer : " , new pos_ar.PointOfSale.Controller())
+		//wrapper.pos = new pos_ar.PointOfSale.Controller(wrapper);
+	//	window.cur_pos = wrapper.pos ;
+	});
+
+	main();
+
 }
 
 
