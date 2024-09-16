@@ -20,10 +20,11 @@ let selectedItemMap  = new Map();
 let warehouseList    = []
 let PosProfileList   = []
 let binList          = []
-
+let tabList          = ["C1"]
 
 let selectedItem     = null
 let selectedField    = null
+let selectedTab      = tabList[0]
 
 /* to prevent multy listener set */
 let detailsItemFieldsListeners = false
@@ -48,7 +49,9 @@ async function main(){
 	console.log("priceLists : "    , priceLists    )
 	console.log("warehouseList : " , warehouseList )
 	console.log("POSProfileList : ", PosProfileList)
-	console.log("fetchBinList : "  , binList  )
+	console.log("bin list : "      , binList       )
+	console.log("tabList  : "      , tabList       )
+	console.log("selected Tab : "  , selectedTab   )
 
 
 	setCustomersInList();
@@ -62,6 +65,9 @@ async function main(){
 	document.getElementById("checkoutBtn").addEventListener('mousedown' , function(even){
 		event.preventDefault();
 		renderPaymentMethodCart();
+	})
+	document.getElementById("addTabBtn").addEventListener('click' , function(event){
+		console.log("we are here")
 	})
 
 }

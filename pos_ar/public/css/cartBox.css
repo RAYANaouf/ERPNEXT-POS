@@ -12,16 +12,18 @@
 
 	border        : 1px solid #c0c0c0 ;
 	border-bottom : none ;
-	border-radius : 12px 6px 0px 0px  ;
+	border-radius : 12px 12px 0px 0px  ;
 
 
 	position      : relative          ;
 	bottom        : -1px              ;
 
 }
-
+#RightSection #tabs div.unselected{
+	background : #f9f9f9 ;
+}
 #RightSection #tabs div:hover{
-	background    : #f0f0f0 ; 
+	background    : #e0e0e0 ; 
 }
 
 #RightSection #CartBox{
