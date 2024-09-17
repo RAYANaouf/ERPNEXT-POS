@@ -3,11 +3,7 @@ frappe.provide("pos_ar.PointOfSale");
 
 frappe.require([
 	"/assets/pos_ar/js/pos_item_selector.js"
-	], function() {
-	console.log("hey here is you answer : " , new pos_ar.PointOfSale.Controller(wrapper))
-	//wrapper.pos = new pos_ar.PointOfSale.Controller(wrapper);
-	//window.cur_pos = wrapper.pos ;
-});
+	], function() {});
 
 pos_ar.PointOfSale.Controller = class {
         constructor(wrapper) {
@@ -81,9 +77,15 @@ pos_ar.PointOfSale.Controller = class {
 	}
 
 	prepare_components(){
+		this.set_right_and_left_sections();
 		this.init_item_selector();
 		this.init_item_details();
 		this.init_paymentCart();
+	}
+
+	set_right_and_left_sections(){
+		this.$components_wrapper.append('<div id="LeftSection" class="columnBox"></div>')
+		this.$components_wrapper.append('<div id="RightSection" class="columnBox">')
 	}
 
 	init_item_selector(){
