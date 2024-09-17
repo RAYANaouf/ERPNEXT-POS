@@ -1,6 +1,14 @@
 
 frappe.provide("pos_ar.PointOfSale");
 
+frappe.require([
+	"/assets/pos_ar/js/pos_item_selector.js"
+	], function() {
+	console.log("hey here is you answer : " , new pos_ar.PointOfSale.Controller(wrapper))
+	//wrapper.pos = new pos_ar.PointOfSale.Controller(wrapper);
+	//window.cur_pos = wrapper.pos ;
+});
+
 pos_ar.PointOfSale.Controller = class {
         constructor(wrapper) {
 		//principales variable
@@ -20,15 +28,17 @@ pos_ar.PointOfSale.Controller = class {
 
 		this.selectedItem     = null
 		this.selectedField    = null
-		//this.selectedTab      = tabList[0]
-
+		this.selectedTab      = this.tabList[0]
 
 		//prevent set listener multiple times
 		this.detailsItemFieldsListeners = false
 		this.detailsItemKeysListeners   = false
 
-		this.prepare_container();
+
+
         	this.prepare_app_defaults();
+		this.prepare_container();
+		this.prepare_components();
 	}
 
 	async prepare_app_defaults(){
@@ -53,6 +63,10 @@ pos_ar.PointOfSale.Controller = class {
 		console.log("selected Tab : "  , this.selectedTab   )
 	}
 
+
+
+	/***********************  ui ******************************************/
+
 	prepare_container(){
 		//append css styles
 		this.wrapper.append('<link rel="stylesheet" type="text/css" href="/assets/pos_ar/css/selectorBox.css">')
@@ -62,7 +76,26 @@ pos_ar.PointOfSale.Controller = class {
 		this.wrapper.append('<link rel="stylesheet" type="text/css" href="/assets/pos_ar/css/cartBox.css">')
 
 		this.wrapper.append('<div id="MainContainer" class="rowBox"></div>');
+
 		this.$components_wrapper = this.wrapper.find("#MainContainer");
+	}
+
+	prepare_components(){
+		this.init_item_selector();
+		this.init_item_details();
+		this.init_paymentCart();
+	}
+
+	init_item_selector(){
+		this.item_selector = new pos_ar.PointOfSale.pos_item_selector(this.$components_wrapper)
+	}
+
+	init_item_details(){
+		
+	}
+
+	init_paymentCart(){
+		
 	}
 
 
