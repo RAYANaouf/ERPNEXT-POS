@@ -7,20 +7,20 @@ frappe.pages['pos'].on_page_load = function(wrapper) {
 		single_column: true
 	});
 
-	$(frappe.render_template("pos" , {} )).appendTo(page.body);
+	//$(frappe.render_template("pos" , {} )).appendTo(page.body);
 
 	frappe.require([
 		"/assets/pos_ar/js/posController.js"
 		], function() {
-		console.log("hey here is you answer : " , new pos_ar.PointOfSale.Controller())
+		console.log("hey here is you answer : " , new pos_ar.PointOfSale.Controller(wrapper))
 		//wrapper.pos = new pos_ar.PointOfSale.Controller(wrapper);
 	//	window.cur_pos = wrapper.pos ;
 	});
 
-	main();
+	//main();
 
 }
-
+/*
 
 let customersList    = []
 let itemGroupList    = []
@@ -36,8 +36,10 @@ let tabList          = ["C1"]
 let selectedItem     = null
 let selectedField    = null
 let selectedTab      = tabList[0]
-
+*/
 /* to prevent multy listener set */
+
+/*
 let detailsItemFieldsListeners = false
 let detailsItemKeysListeners   = false
 
@@ -90,10 +92,10 @@ async function main(){
 
 
 
-
+*/
 
 /******************************  update the UI ***********************************/
-
+/*
 function setCustomersInList(){
 
 	const customerList_html = document.getElementById("CustomerList");
@@ -359,10 +361,10 @@ function renderPaymentMethodCart(){
 	paidAmount.textContent = 001 ;
 	toBePaid.textContent   = 001 ;
 }
-
+*/
 
 /********************* setListener functions      *****************************/
-
+/*
 function setItemDetailsFieldsListener(){
 
 	const quantityInput = document.getElementById("itemDetailsQuantityInput");
@@ -598,8 +600,10 @@ function setItemDetailsFieldsListener(){
 	}
 
 }
-
+*/
 /********************* show and hide  functions   *****************************/
+
+/*
 //item detailscart
 function showItemDetails(){
 	const itemDetailsCart = document.getElementById("itemDetailsCart");
@@ -695,10 +699,10 @@ function setCartDetailsOrientation(orientation){
 }
 
 
-
+*/
 /******************************* Tools  *************************************/
 
-
+/*
 function getItemByItemGroup(item_group){
 
 	let filtredItemList = [];
@@ -800,9 +804,10 @@ function  deselectItems(){
 		selectedItem.classList.remove("selected");
 	})
 }
-
+*/
 
 /*********************  get data functions ******************************/
+/*
 
 async function fetchCustomers() {
     try {
@@ -910,3 +915,4 @@ async function fetchBinList(){
                 return [];
         }
 }
+*/
