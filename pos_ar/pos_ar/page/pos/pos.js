@@ -10,12 +10,11 @@ frappe.pages['pos'].on_page_load = function(wrapper) {
 	//$(frappe.render_template("pos" , {} )).appendTo(page.body);
 
 	frappe.require([
-		"/assets/pos_ar/js/pos_item_selector.js",
-		"/assets/pos_ar/js/posController.js"
+		"pos.bundle.js"
 		], function() {
-		console.log("hey here is you answer : " , new pos_ar.PointOfSale.Controller(wrapper))
+		new pos_ar.PointOfSale.Controller(wrapper);
 		//wrapper.pos = new pos_ar.PointOfSale.Controller(wrapper);
-	//	window.cur_pos = wrapper.pos ;
+		//window.cur_pos = wrapper.pos ;
 	});
 
 	//main();

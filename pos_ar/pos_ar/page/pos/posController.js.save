@@ -2,6 +2,7 @@
 
 pos_ar.PointOfSale.Controller = class {
         constructor(wrapper) {
+                console.log("hello from pos controller")
 		//principales variable
                 this.wrapper = $(wrapper).find(".layout-main-section");
                 this.page    = wrapper.page ;
@@ -27,14 +28,10 @@ pos_ar.PointOfSale.Controller = class {
 
 
 
-                this.start_app();
-        }
-
-	 async start_app(){
-		await  this.prepare_app_defaults();
-		this.prepare_container();
+                this.prepare_app_defaults();
+                this.prepare_container();
                 this.prepare_components();
-	}
+        }
 
         async prepare_app_defaults(){
                 this.customersList  = await this.fetchCustomers()
@@ -92,14 +89,7 @@ pos_ar.PointOfSale.Controller = class {
         }
 
         init_item_selector(){
-		console.log("item list from controller : " , this.itemList)
-                this.item_selector = new pos_ar.PointOfSale.pos_item_selector(
-						this.$leftSection ,
-						this.itemList ,
-						this.itemGroupList ,
-						this.itemPrices ,
-						item => { this.itemClick_selector(item)  }
-					)
+                this.item_selector = new pos_ar.PointOfSale.pos_item_selector(this.$leftSection)
 	}
 
 	init_customer_box(){
@@ -112,21 +102,6 @@ pos_ar.PointOfSale.Controller = class {
         init_paymentCart(){
 
         }
-
-
-
-        /*********************  callbacks functions ******************************/
-
-	itemClick_selector(item){
-		console.log("item clicked ====> ", item);
-		//itemClick(item);
-		//setSelectedItem();
-		//calculateNetTotal();
-		//calculateQnatity();
-		//calculateGrandTotal();
-	}
-
-
 
 
         /*********************  get data functions ******************************/
