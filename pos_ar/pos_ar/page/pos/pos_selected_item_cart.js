@@ -96,7 +96,7 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 		this.buttonsContainer.append('<button id="key_remove"   class="grid-item" style="color:red;font-weight:700;">Remove</button>')
 
 		this.checkoutBtn = this.cartFooter.find('#checkoutBtn')
-		this.checkoutBtn.addEventListener('mousedown' , event =>{
+		this.checkoutBtn.on('mousedown' , event =>{
 			this.on_checkout_click();
 		})
 	}
