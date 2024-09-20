@@ -103,11 +103,17 @@ pos_ar.PointOfSale.Controller = class {
 	}
 
 	init_customer_box(){
-		this.customer_box  = new pos_ar.PointOfSale.pos_customer_box(this.$rightSection)
+		this.customer_box  = new pos_ar.PointOfSale.pos_customer_box(
+									this.$rightSection
+									)
 	}
         init_item_details(){
-		this.selected_item_cart  = new pos_ar.PointOfSale.pos_selected_item_cart(this.$rightSection)
-        }
+		this.selected_item_cart  = new pos_ar.PointOfSale.pos_selected_item_cart(
+									this.$rightSection ,
+									this.selectedItemMap,
+									this.onCheckout
+									)
+	}
 
         init_paymentCart(){
 
@@ -118,16 +124,36 @@ pos_ar.PointOfSale.Controller = class {
         /*********************  callbacks functions ******************************/
 
 	itemClick_selector(item){
-		console.log("item clicked ====> ", item);
-		//itemClick(item);
-		//setSelectedItem();
-		//calculateNetTotal();
-		//calculateQnatity();
-		//calculateGrandTotal();
+
+		if(!this.selectedItemMap.has(item.name)){
+			item.quantity = 1 ;
+			item.amount   = this.getItemPrice(item.name);
+			this.selectedItemMap.set( item.name  , item);
+		}
+		else{
+			const existingItem = this.selectedItemMap.get(item.name);
+			existingItem.quantity += 1 ;
+			this.selectedItemMap.set( item.name  , existingItem);
+		}
+
+		this.selected_item_cart.calculateNetTotal();
+		this.selected_item_cart.calculateQnatity();
+		this.selected_item_cart.calculateGrandTotal();
+		this.selected_item_cart.refreshSelectedItem();
+
+
+	}
+
+	onCheckout(){
+		console.log("im here in the callback")
 	}
 
 
-
+	/*****************************  tools  **********************************/
+	getItemPrice(itemId){
+		const price = this.itemPrices.find(itemPrice => itemPrice.item_code == itemId)
+		return price ? price.price_list_rate  : 0
+        }
 
         /*********************  get data functions ******************************/
 
