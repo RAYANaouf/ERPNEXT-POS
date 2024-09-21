@@ -59,6 +59,7 @@
       this.set_right_and_left_sections();
       this.init_item_selector();
       this.init_customer_box();
+      this.init_selected_item();
       this.init_item_details();
       this.init_paymentCart();
     }
@@ -85,11 +86,16 @@
         this.$rightSection
       );
     }
-    init_item_details() {
+    init_selected_item() {
       this.selected_item_cart = new pos_ar.PointOfSale.pos_selected_item_cart(
         this.$rightSection,
         this.selectedItemMap,
         this.onCheckout
+      );
+    }
+    init_item_details() {
+      this.item_details = new pos_ar.PointOfSale.pos_item_details(
+        this.$leftSection
       );
     }
     init_paymentCart() {
@@ -110,7 +116,7 @@
       this.selected_item_cart.refreshSelectedItem();
     }
     onCheckout() {
-      console.log("im here in the callback");
+      console.log("here we are on callback");
     }
     getItemPrice(itemId) {
       const price = this.itemPrices.find((itemPrice) => itemPrice.item_code == itemId);
@@ -471,5 +477,17 @@
       itemElement.classList.add("selected");
     }
   };
+
+  // ../pos_ar/pos_ar/pos_ar/page/pos/pos_item_details.js
+  pos_ar.PointOfSale.pos_item_details = class {
+    constructor(wrapper) {
+      this.wrapper = wrapper;
+      this.prepare_item_details_cart();
+    }
+    prepare_item_details_cart() {
+      this.wrapper.append('<div id="itemDetailsCart" class="columnBox align_center"><div>');
+      this.item_details_cart = this.wrapper.find("#itemDetailsCart");
+    }
+  };
 })();
-//# sourceMappingURL=pos.bundle.SYFAVSZG.js.map
+//# sourceMappingURL=pos.bundle.S3VKWD26.js.map

@@ -78,9 +78,9 @@ pos_ar.PointOfSale.Controller = class {
                 this.set_right_and_left_sections();
                 this.init_item_selector();
 		this.init_customer_box();
-		this.init_selected_item();
-		this.init_item_details();
-                this.init_paymentCart();
+		this.init_selected_item_cart();
+                //this.init_item_details();
+                //this.init_paymentCart();
         }
 
         set_right_and_left_sections(){
@@ -93,7 +93,6 @@ pos_ar.PointOfSale.Controller = class {
         }
 
         init_item_selector(){
-		console.log("item list from controller : " , this.itemList)
                 this.item_selector = new pos_ar.PointOfSale.pos_item_selector(
 						this.$leftSection ,
 						this.itemList ,
@@ -108,7 +107,8 @@ pos_ar.PointOfSale.Controller = class {
 									this.$rightSection
 									)
 	}
-        init_selected_item(){
+
+        init_selected_item_cart(){
 		this.selected_item_cart  = new pos_ar.PointOfSale.pos_selected_item_cart(
 									this.$rightSection ,
 									this.selectedItemMap,
@@ -116,10 +116,10 @@ pos_ar.PointOfSale.Controller = class {
 									)
 	}
 
-	init_item_details(){
-		this.item_details = new pos_ar.PointOfSale.pos_item_details(
-									this.$leftSection
-								)
+        init_item_details(){
+		this.item_details_cart  = new pos_ar.PointOfSale.pos_item_details(
+									this.$rightSection ,
+									)
 	}
 
         init_paymentCart(){
@@ -131,7 +131,7 @@ pos_ar.PointOfSale.Controller = class {
         /*********************  callbacks functions ******************************/
 
 	itemClick_selector(item){
-
+/*
 		if(!this.selectedItemMap.has(item.name)){
 			item.quantity = 1 ;
 			item.amount   = this.getItemPrice(item.name);
@@ -147,12 +147,11 @@ pos_ar.PointOfSale.Controller = class {
 		this.selected_item_cart.calculateQnatity();
 		this.selected_item_cart.calculateGrandTotal();
 		this.selected_item_cart.refreshSelectedItem();
-
-
+*/
 	}
 
 	onCheckout(){
-		console.log("here we are on callback")
+		console.log("im here in the callback");
 	}
 
 
