@@ -181,6 +181,15 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 	}
 
 
+	showKeyboard(){
+		editSelectedItem.css('display','flex')
+	}
+
+	hideKeyboard(){
+		editSelectedItem.css('display','none')
+	}
+
+
 	/*************************  tools  **********************************/
 
 

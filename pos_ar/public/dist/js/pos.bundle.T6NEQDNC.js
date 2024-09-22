@@ -491,6 +491,12 @@
         selectedItemsContainer.appendChild(itemElement);
       });
     }
+    showKeyboard() {
+      editSelectedItem.css("display", "flex");
+    }
+    hideKeyboard() {
+      editSelectedItem.css("display", "none");
+    }
     calculateNetTotal() {
       let netTotal = 0;
       this.selected_item_map.forEach((value, key) => {
@@ -684,4 +690,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.QAAP7TVL.js.map
+//# sourceMappingURL=pos.bundle.T6NEQDNC.js.map
