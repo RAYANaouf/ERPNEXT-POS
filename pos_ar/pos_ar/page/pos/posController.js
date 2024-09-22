@@ -120,8 +120,13 @@ pos_ar.PointOfSale.Controller = class {
 	}
 
 	init_item_details(){
+		console.log("warehouse ==> " , this.PosProfileList[0].warehouse)
 		this.item_details = new pos_ar.PointOfSale.pos_item_details(
 									this.$leftSection,
+									this.PosProfileList[0].warehouse,
+									this.priceLists,
+									this.itemPrices,
+									this.binList,
 									this.selectedItem,
 									this.onClose_details.bind(this)
 								)
@@ -160,13 +165,12 @@ pos_ar.PointOfSale.Controller = class {
 	}
 
 	onSelectedItemClick(item){
-		this.selectedItem = item;
-		console.log("item in cotroller  " , this.selectedItem)
-		console.log("item in class " , this.item_details.selected_item)
+		console.log("item in controller 00 " , this.selectedItem)
+		console.log("item in class 00 " , this.item_details.selected_item)
 
 		this.item_selector.hideCart();
 		this.item_details.show_cart();
-		this.item_details.refreshDate();
+		this.item_details.refreshDate(item);
 		console.log("done!")
 	}
 

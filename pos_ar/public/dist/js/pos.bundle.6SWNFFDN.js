@@ -97,8 +97,13 @@
       );
     }
     init_item_details() {
+      console.log("warehouse ==> ", this.PosProfileList[0].warehouse);
       this.item_details = new pos_ar.PointOfSale.pos_item_details(
         this.$leftSection,
+        this.PosProfileList[0].warehouse,
+        this.priceLists,
+        this.itemPrices,
+        this.binList,
         this.selectedItem,
         this.onClose_details.bind(this)
       );
@@ -125,12 +130,11 @@
       this.selected_item_cart.refreshSelectedItem();
     }
     onSelectedItemClick(item) {
-      this.selectedItem = item;
-      console.log("item in cotroller  ", this.selectedItem);
-      console.log("item in class ", this.item_details.selected_item);
+      console.log("item in controller 00 ", this.selectedItem);
+      console.log("item in class 00 ", this.item_details.selected_item);
       this.item_selector.hideCart();
       this.item_details.show_cart();
-      this.item_details.refreshDate();
+      this.item_details.refreshDate(item);
       console.log("done!");
     }
     onCheckout() {
@@ -526,12 +530,16 @@
 
   // ../pos_ar/pos_ar/pos_ar/page/pos/pos_item_details.js
   pos_ar.PointOfSale.pos_item_details = class {
-    constructor(wrapper, selectedItem, onClose) {
+    constructor(wrapper, warehouse, priceLists, itemPrices, binList, selectedItem, onClose) {
       console.log("hello from item_details 0");
       this.wrapper = wrapper;
+      this.warehouse = warehouse;
+      this.price_lists = priceLists;
+      this.item_prices = itemPrices;
       this.selected_item = selectedItem;
       this.on_close_cart = onClose;
-      console.log("start with : ", this.selected_item);
+      this.bin_list = binList;
+      console.log("start with : ", warehouse);
       this.prepare_item_details_cart();
     }
     prepare_item_details_cart() {
@@ -568,8 +576,44 @@
       this.c2.append('<div class="columnBox"><label for="detailsPriceList">Price List *</label><input list="detailsPriceList" id="detailsItemPriceListInput" class ="rowBox align_center pointerCursor"><datalist id="detailsPriceList"><option>fetching Price Lists ...</option></datalist></div>');
       this.c2.append('<div class="columnBox"><label for="itemDetailsPriceListRateInput">Price List Rate</label><input type="text" id="itemDetailsPriceListRateInput" disabled></div>');
     }
-    refreshDate() {
-      console.log("refreshing data with  item 35 ==> ", this.selected_item);
+    refreshDate(item) {
+      console.log("start ref");
+      const imageContainer = document.getElementById("detailsItemImage");
+      const name = document.getElementById("detailsItemName");
+      const warehouse = document.getElementById("detailsItemWarehouse");
+      const itemGroup = document.getElementById("detailsItemGroup");
+      const quantity = document.getElementById("itemDetailsQuantityInput");
+      const rate = document.getElementById("itemDetailsRateInput");
+      const discount = document.getElementById("itemDetailsDiscountInput");
+      const available = document.getElementById("itemDetailsAvailableInput");
+      const uom = document.getElementById("itemDetailsUomInput");
+      const priceList = document.getElementById("detailsItemPriceListInput");
+      const priceListRate = document.getElementById("itemDetailsPriceListRateInput");
+      if (item.image) {
+        const image = document.createElement("img");
+        image.src = item.image;
+        imageContainer.innerHTML = "";
+        imageContainer.appendChild(image);
+      } else {
+        const image = document.createElement("div");
+        image.textContent = item.item_name[0];
+        image.style.fontSize = "xx-large";
+        image.style.fontWeight = "700";
+        imageContainer.innerHTML = "";
+        imageContainer.appendChild(image);
+      }
+      name.textContent = item.item_name;
+      name.classList.add("rowBox", "align_center");
+      quantity.value = item.quantity;
+      rate.value = item.amount;
+      discount.value = 0;
+      available.value = this.getQtyInWarehouse(item.name, warehouse);
+      uom.value = item.stock_uom;
+      priceList.value = this.price_lists[0].price_list_name;
+      warehouse.textContent = "Warehouse : " + this.warehouse;
+      itemGroup.textContent = "Item Group : " + item.item_group;
+      priceListRate.value = this.getItemPrice(item.name) + "DA";
+      console.log("end ref");
     }
     show_cart() {
       console.log("show 02");
@@ -578,6 +622,14 @@
     hide_cart() {
       console.log("hide 001");
       this.item_details_cart.css("display", "none");
+    }
+    getItemPrice(itemId) {
+      const price = this.item_prices.find((itemPrice) => itemPrice.item_code == itemId);
+      return price ? price.price_list_rate : 0;
+    }
+    getQtyInWarehouse(itemId, warehouseId) {
+      const bin = this.bin_list.find((bin2) => bin2.item_code == itemId && bin2.warehouse == warehouseId);
+      return bin ? bin.actual_qty : 0;
     }
   };
 
@@ -628,4 +680,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.TVTS7TO6.js.map
+//# sourceMappingURL=pos.bundle.6SWNFFDN.js.map

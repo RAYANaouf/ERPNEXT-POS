@@ -3,15 +3,23 @@ pos_ar.PointOfSale.pos_item_details = class{
 
 	constructor(
 		wrapper,
+		warehouse,
+		priceLists,
+		itemPrices,
+		binList,
 		selectedItem,
 		onClose,
 	){
 		console.log("hello from item_details 0")
-		this.wrapper        = wrapper
+		this.wrapper        = wrapper;
+		this.warehouse      = warehouse;
+		this.price_lists    = priceLists;
+		this.item_prices    = itemPrices;
 		this.selected_item  = selectedItem;
 		this.on_close_cart  = onClose;
+		this.bin_list       = binList;
 
-		console.log("start with : " , this.selected_item)
+		console.log("start with : " , warehouse)
 
 		this.prepare_item_details_cart()
 	}
@@ -68,8 +76,77 @@ pos_ar.PointOfSale.pos_item_details = class{
 
 	}
 
-	refreshDate(){
-		console.log("refreshing data with  item 35 ==> " , this.selected_item)
+	refreshDate(item){
+
+		console.log("start ref")
+		const imageContainer    = document.getElementById("detailsItemImage") ;
+		const name  = document.getElementById("detailsItemName");
+		const warehouse     = document.getElementById("detailsItemWarehouse");
+		const itemGroup     = document.getElementById("detailsItemGroup");
+
+		const quantity  = document.getElementById("itemDetailsQuantityInput");
+		const rate      = document.getElementById("itemDetailsRateInput");
+		const discount  = document.getElementById("itemDetailsDiscountInput");
+		const available = document.getElementById("itemDetailsAvailableInput");
+
+		const uom           = document.getElementById("itemDetailsUomInput");
+		const priceList     = document.getElementById("detailsItemPriceListInput");
+		const priceListRate = document.getElementById("itemDetailsPriceListRateInput");
+
+		//populate
+		if(item.image){
+			const image = document.createElement("img");
+			image.src = item.image;
+			imageContainer.innerHTML = "";
+			imageContainer.appendChild(image);
+		}
+		else{
+			const image = document.createElement("div");
+			image.textContent = item.item_name[0];
+			image.style.fontSize = "xx-large";
+			image.style.fontWeight = "700";
+			imageContainer.innerHTML = "";
+			imageContainer.appendChild(image);
+		}
+
+		//name
+		name.textContent  = item.item_name;
+		name.classList.add("rowBox" , "align_center");
+
+
+		//quantity
+		quantity.value = item.quantity
+
+		//rate
+		rate.value = item.amount
+
+		//discount
+		discount.value = 0.00
+
+		//available
+		available.value = this.getQtyInWarehouse(item.name ,  warehouse)
+
+
+		//uom
+		uom.value = item.stock_uom
+
+
+		//priceList
+		priceList.value = this.price_lists[0].price_list_name
+		//warehouse
+		warehouse.textContent = "Warehouse : " + this.warehouse
+		//item group
+		itemGroup.textContent = "Item Group : " + item.item_group
+
+		//priceListRate
+		priceListRate.value = this.getItemPrice(item.name) + "DA"
+
+
+		console.log("end ref")
+
+
+		//listeners
+		//setItemDetailsFieldsListener()
 	}
 
 	show_cart(){
@@ -81,5 +158,20 @@ pos_ar.PointOfSale.pos_item_details = class{
 		console.log('hide 001')
 		this.item_details_cart.css("display" , "none");
 	}
+
+
+	/*************************** funs  ************************************/
+
+	getItemPrice(itemId){
+		const price = this.item_prices.find(itemPrice => itemPrice.item_code == itemId)
+		return price ? price.price_list_rate  : 0
+	}
+
+
+	getQtyInWarehouse(itemId , warehouseId){
+		const bin = this.bin_list.find(bin => bin.item_code == itemId && bin.warehouse == warehouseId)
+		return bin ? bin.actual_qty : 0
+	}
+
 
 }
