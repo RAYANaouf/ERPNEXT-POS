@@ -4,6 +4,7 @@ pos_ar.PointOfSale.pos_item_details = class{
 	constructor(
 		wrapper
 	){
+		console.log("hello from item_details 0")
 		this.wrapper = wrapper
 		this.prepare_item_details_cart()
 	}
@@ -33,8 +34,36 @@ pos_ar.PointOfSale.pos_item_details = class{
 		this.item_group_warehouse_details.append('<div id="detailsItemWarehouse" class="rowBox align_center">Warehouse : ...</div>')
 
 		this.item_details_cart.append('<div id="itemDetailsAll"  class="rowBox"></div>')
-		
 
+		this.details_all = this.item_details_cart.find('#itemDetailsAll')
+		this.details_all.append('<div id="itemDetails_C1" class="columnBox"></div>')
+
+		this.c1 = this.details_all.find('#itemDetails_C1')
+		this.c1.append('<div class="columnBox"><label for="itemDetailsQuantityInput">Quantity</label><input type="float" id="itemDetailsQuantityInput" class="pointerCursor"></div>')
+		this.c1.append('<div class="columnBox"><label for="itemDetailsRateInput">Rate</label><input type="float" id="itemDetailsRateInput" class="pointerCursor"></div>')
+		this.c1.append('<div class="columnBox"><label for="itemDetailsDiscountInput">Discount (%)</label><input type="float" id="itemDetailsDiscountInput" class="pointerCursor"></div>')
+		this.c1.append('<div class="columnBox"><label for="itemDetailsAvailableInput">Available Qty at Warehouse</label><input type="float" id="itemDetailsAvailableInput" disabled></div>')
+
+
+		this.details_all.append('<div id="itemDetails_C2" class="columnBox"></div>')
+
+		this.c2 = this.details_all.find('#itemDetails_C2')
+		this.c2.append('<div class="columnBox"><label for="itemDetailsUomInput">UOM *</label><input type="text" id="itemDetailsUomInput"  disabled></div>')
+		this.c2.append('<div class="columnBox"><label for="detailsPriceList">Price List *</label><input list="detailsPriceList" id="detailsItemPriceListInput" class ="rowBox align_center pointerCursor"><datalist id="detailsPriceList"><option>fetching Price Lists ...</option></datalist></div>')
+		this.c2.append('<div class="columnBox"><label for="itemDetailsPriceListRateInput">Price List Rate</label><input type="text" id="itemDetailsPriceListRateInput" disabled></div>')
+
+
+
+	}
+
+	show_cart(){
+		console.log('show 01')
+		this.item_details_cart.css("display" , "flex");
+	}
+
+	hide_cart(){
+		console.log('hide')
+		//this.item_details_cart.css("display" , "none");
 	}
 
 }

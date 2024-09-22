@@ -13,7 +13,12 @@
 }
 
 #LeftSection #itemDetailsCart #itemDetailsCartHeader{
-        padding : 4px 16px 4px 16px ;
+        width   : 100% ;
+	padding : 4px 16px 4px 16px ;
+}
+
+#LeftSection #itemDetailsCart #itemDetailsHeader {
+	width : 100% ;
 }
 
 #LeftSection #itemDetailsCart #itemDetailsHeader #detailsItemImage{
@@ -63,8 +68,8 @@
 }
 
 #LeftSection #itemDetailsCart #itemDetailsAll{
-        grow       : 1       ;
-
+        width      : 100%    ;
+	grow       : 1       ;
         justify-content : center ;
 }
 

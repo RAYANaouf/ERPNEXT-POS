@@ -112,7 +112,7 @@ pos_ar.PointOfSale.Controller = class {
 		this.selected_item_cart  = new pos_ar.PointOfSale.pos_selected_item_cart(
 									this.$rightSection ,
 									this.selectedItemMap,
-									this.onCheckout
+									this.onCheckout.bind(this)
 									)
 	}
 
@@ -152,7 +152,10 @@ pos_ar.PointOfSale.Controller = class {
 	}
 
 	onCheckout(){
-		console.log("here we are on callback")
+		console.log("here we are on callback 01 " , this.item_details)
+		this.item_selector.hideCart();
+		this.item_details.show_cart();
+		console.log("done!")
 	}
 
 

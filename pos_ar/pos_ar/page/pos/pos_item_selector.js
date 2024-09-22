@@ -28,6 +28,9 @@ pos_ar.PointOfSale.pos_item_selector = class {
 		this.setListeners();
 	}
 
+
+
+	/***********************  ui  functions  ***************************************/
 	prepare_select_box(){
 		this.wrapper.append('<div id="SelectorBox" class="columnBox"></div>')
 
@@ -113,6 +116,15 @@ pos_ar.PointOfSale.pos_item_selector = class {
                 	itemsContainer_html.appendChild(itemBox);
         	});
 
+	}
+
+	//show and hide
+	showCart(){
+		this.selectorBox.css("display" , "flex")
+	}
+
+	hideCart(){
+		this.selectorBox.css("display" , "none")
 	}
 
 	//**************** set listeners method ****************************//
