@@ -124,7 +124,7 @@ pos_ar.PointOfSale.pos_item_details = class{
 		discount.value = 0.00
 
 		//available
-		available.value = this.getQtyInWarehouse(item.name ,  warehouse)
+		available.value = this.getQtyInWarehouse(item.name ,  this.warehouse)
 
 
 		//uom

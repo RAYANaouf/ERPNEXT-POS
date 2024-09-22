@@ -134,23 +134,27 @@
       console.log("item in class 00 ", this.item_details.selected_item);
       this.item_selector.hideCart();
       this.item_details.show_cart();
+      this.payment_cart.hideCart();
       this.item_details.refreshDate(item);
       console.log("done!");
     }
     onCheckout() {
       console.log("here we are on callback 02 ", this.item_details);
       this.item_selector.hideCart();
+      this.item_details.hide_cart();
       this.payment_cart.showCart();
       console.log("done!");
     }
     onClose_details() {
       console.log("onClose callback 001");
       this.item_selector.showCart();
+      this.payment_cart.hideCart();
       this.item_details.hide_cart();
       this.selected_item_cart.cleanHeighlight();
     }
     onClose_payment_cart() {
       this.item_selector.showCart();
+      this.item_details.hide_cart();
       this.payment_cart.hideCart();
     }
     getItemPrice(itemId) {
@@ -607,7 +611,7 @@
       quantity.value = item.quantity;
       rate.value = item.amount;
       discount.value = 0;
-      available.value = this.getQtyInWarehouse(item.name, warehouse);
+      available.value = this.getQtyInWarehouse(item.name, this.warehouse);
       uom.value = item.stock_uom;
       priceList.value = this.price_lists[0].price_list_name;
       warehouse.textContent = "Warehouse : " + this.warehouse;
@@ -680,4 +684,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.6SWNFFDN.js.map
+//# sourceMappingURL=pos.bundle.QAAP7TVL.js.map
