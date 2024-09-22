@@ -167,7 +167,7 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 			itemElement.addEventListener("click" , event =>{
 				console.log("we are click")
 				this.makeItemHighlight(itemElement)
-				this.on_selected_item_click();
+				this.on_selected_item_click(item);
 				//expose the item as selected one
 				//selectedItem = item
 				//makeItemHighlight(itemElement);
@@ -221,6 +221,15 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 			selectedItem.classList.remove("selected");
 		})
 		itemElement.classList.add("selected")
+	}
+
+	cleanHeighlight(){
+		const selectedItemsContainer = document.getElementById("selectedItemsContainer");
+		const selectedItems = selectedItemsContainer.querySelectorAll(".selected")
+		selectedItems.forEach(selectedItem=>{
+			selectedItem.classList.remove("selected");
+		})
+
 	}
 
 

@@ -14,7 +14,7 @@
       this.PosProfileList = [];
       this.binList = [];
       this.tabList = ["C1"];
-      this.selectedItem = null;
+      this.selectedItem = {};
       this.selectedField = null;
       this.selectedTab = this.tabList[0];
       this.detailsItemFieldsListeners = false;
@@ -90,13 +90,16 @@
       this.selected_item_cart = new pos_ar.PointOfSale.pos_selected_item_cart(
         this.$rightSection,
         this.selectedItemMap,
-        this.onSelectedItemClick.bind(this),
+        (item) => {
+          this.onSelectedItemClick(item);
+        },
         this.onCheckout.bind(this)
       );
     }
     init_item_details() {
       this.item_details = new pos_ar.PointOfSale.pos_item_details(
         this.$leftSection,
+        this.selectedItem,
         this.onClose_details.bind(this)
       );
     }
@@ -121,10 +124,13 @@
       this.selected_item_cart.calculateGrandTotal();
       this.selected_item_cart.refreshSelectedItem();
     }
-    onSelectedItemClick() {
-      console.log("selected item click callback 02 ", this.item_details);
+    onSelectedItemClick(item) {
+      this.selectedItem = item;
+      console.log("item in cotroller  ", this.selectedItem);
+      console.log("item in class ", this.item_details.selected_item);
       this.item_selector.hideCart();
       this.item_details.show_cart();
+      this.item_details.refreshDate();
       console.log("done!");
     }
     onCheckout() {
@@ -137,6 +143,7 @@
       console.log("onClose callback 001");
       this.item_selector.showCart();
       this.item_details.hide_cart();
+      this.selected_item_cart.cleanHeighlight();
     }
     onClose_payment_cart() {
       this.item_selector.showCart();
@@ -471,7 +478,7 @@
         itemElement.addEventListener("click", (event2) => {
           console.log("we are click");
           this.makeItemHighlight(itemElement);
-          this.on_selected_item_click();
+          this.on_selected_item_click(item);
         });
         selectedItemsContainer.appendChild(itemElement);
       });
@@ -508,14 +515,23 @@
       });
       itemElement.classList.add("selected");
     }
+    cleanHeighlight() {
+      const selectedItemsContainer = document.getElementById("selectedItemsContainer");
+      const selectedItems = selectedItemsContainer.querySelectorAll(".selected");
+      selectedItems.forEach((selectedItem) => {
+        selectedItem.classList.remove("selected");
+      });
+    }
   };
 
   // ../pos_ar/pos_ar/pos_ar/page/pos/pos_item_details.js
   pos_ar.PointOfSale.pos_item_details = class {
-    constructor(wrapper, onClose) {
+    constructor(wrapper, selectedItem, onClose) {
       console.log("hello from item_details 0");
       this.wrapper = wrapper;
+      this.selected_item = selectedItem;
       this.on_close_cart = onClose;
+      console.log("start with : ", this.selected_item);
       this.prepare_item_details_cart();
     }
     prepare_item_details_cart() {
@@ -551,6 +567,9 @@
       this.c2.append('<div class="columnBox"><label for="itemDetailsUomInput">UOM *</label><input type="text" id="itemDetailsUomInput"  disabled></div>');
       this.c2.append('<div class="columnBox"><label for="detailsPriceList">Price List *</label><input list="detailsPriceList" id="detailsItemPriceListInput" class ="rowBox align_center pointerCursor"><datalist id="detailsPriceList"><option>fetching Price Lists ...</option></datalist></div>');
       this.c2.append('<div class="columnBox"><label for="itemDetailsPriceListRateInput">Price List Rate</label><input type="text" id="itemDetailsPriceListRateInput" disabled></div>');
+    }
+    refreshDate() {
+      console.log("refreshing data with  item 35 ==> ", this.selected_item);
     }
     show_cart() {
       console.log("show 02");
@@ -609,4 +628,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.J3YHL2HK.js.map
+//# sourceMappingURL=pos.bundle.TVTS7TO6.js.map

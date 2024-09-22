@@ -17,7 +17,7 @@ pos_ar.PointOfSale.Controller = class {
                 this.binList          = []
                 this.tabList          = ["C1"]
 
-                this.selectedItem     = null
+                this.selectedItem     = {}
                 this.selectedField    = null
                 this.selectedTab      = this.tabList[0]
 
@@ -95,10 +95,10 @@ pos_ar.PointOfSale.Controller = class {
         init_item_selector(){
 		console.log("item list from controller : " , this.itemList)
                 this.item_selector = new pos_ar.PointOfSale.pos_item_selector(
-						this.$leftSection ,
-						this.itemList ,
+						this.$leftSection  ,
+						this.itemList      ,
 						this.itemGroupList ,
-						this.itemPrices ,
+						this.itemPrices    ,
 						item => { this.itemClick_selector(item)  }
 					)
 	}
@@ -112,7 +112,9 @@ pos_ar.PointOfSale.Controller = class {
 		this.selected_item_cart  = new pos_ar.PointOfSale.pos_selected_item_cart(
 									this.$rightSection ,
 									this.selectedItemMap,
-									this.onSelectedItemClick.bind(this),
+									item => {
+										this.onSelectedItemClick(item)
+									},
 									this.onCheckout.bind(this)
 									)
 	}
@@ -120,6 +122,7 @@ pos_ar.PointOfSale.Controller = class {
 	init_item_details(){
 		this.item_details = new pos_ar.PointOfSale.pos_item_details(
 									this.$leftSection,
+									this.selectedItem,
 									this.onClose_details.bind(this)
 								)
 	}
@@ -156,10 +159,14 @@ pos_ar.PointOfSale.Controller = class {
 
 	}
 
-	onSelectedItemClick(){
-		console.log("selected item click callback 02 " , this.item_details)
+	onSelectedItemClick(item){
+		this.selectedItem = item;
+		console.log("item in cotroller  " , this.selectedItem)
+		console.log("item in class " , this.item_details.selected_item)
+
 		this.item_selector.hideCart();
 		this.item_details.show_cart();
+		this.item_details.refreshDate();
 		console.log("done!")
 	}
 
@@ -174,6 +181,7 @@ pos_ar.PointOfSale.Controller = class {
 		console.log("onClose callback 001")
 		this.item_selector.showCart();
 		this.item_details.hide_cart();
+		this.selected_item_cart.cleanHeighlight();
 	}
 
 	onClose_payment_cart(){

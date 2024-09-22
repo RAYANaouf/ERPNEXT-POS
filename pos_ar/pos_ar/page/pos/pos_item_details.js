@@ -3,11 +3,15 @@ pos_ar.PointOfSale.pos_item_details = class{
 
 	constructor(
 		wrapper,
+		selectedItem,
 		onClose,
 	){
 		console.log("hello from item_details 0")
-		this.wrapper = wrapper
-		this.on_close_cart = onClose;
+		this.wrapper        = wrapper
+		this.selected_item  = selectedItem;
+		this.on_close_cart  = onClose;
+
+		console.log("start with : " , this.selected_item)
 
 		this.prepare_item_details_cart()
 	}
@@ -62,6 +66,10 @@ pos_ar.PointOfSale.pos_item_details = class{
 
 
 
+	}
+
+	refreshDate(){
+		console.log("refreshing data with  item 35 ==> " , this.selected_item)
 	}
 
 	show_cart(){
