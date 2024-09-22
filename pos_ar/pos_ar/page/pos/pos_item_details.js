@@ -2,22 +2,30 @@
 pos_ar.PointOfSale.pos_item_details = class{
 
 	constructor(
-		wrapper
+		wrapper,
+		onClose,
 	){
 		console.log("hello from item_details 0")
 		this.wrapper = wrapper
+		this.on_close_cart = onClose;
+
 		this.prepare_item_details_cart()
 	}
 
-	prepare_item_details_cart(){
-		this.wrapper.append('<div id="itemDetailsCart" class="columnBox align_center"><div>')
 
-		this.item_details_cart = this.wrapper.find("#itemDetailsCart")
-		this.item_details_cart.append('<div id="itemDetailsCartHeader" class="rowBox header align_center row_sbtw"></div>')
+        prepare_item_details_cart(){
+                this.wrapper.append('<div id="itemDetailsCart" class="columnBox align_center"><div>')
 
-		this.cart_header = this.item_details_cart.find('#itemDetailsCartHeader')
-		this.cart_header.append('<h4 class="CartTitle">Item Details</h4>')
-		this.cart_header.append('<img src="/assets/pos_ar/images/cancel.png" alt="Cancel Button" id="itemDetailsCartXBtn" class="xBtn">')
+                this.item_details_cart = this.wrapper.find("#itemDetailsCart")
+                this.item_details_cart.append('<div id="itemDetailsCartHeader" class="rowBox header align_center row_sbtw"></div>')
+
+                this.cart_header = this.item_details_cart.find('#itemDetailsCartHeader')
+                this.cart_header.append('<h4 class="CartTitle">Item Details</h4>')
+                this.cart_header.append('<img src="/assets/pos_ar/images/cancel.png" alt="Cancel Button" id="itemDetailsCartXBtn" class="xBtn">')
+
+                this.close_btn = this.cart_header.find("#itemDetailsCartXBtn").on("click", (event) =>{
+                        this.on_close_cart();
+                })
 
 		this.item_details_cart.append('<div id="itemDetailsHeader" class="rowBox"></div>')
 
@@ -57,13 +65,13 @@ pos_ar.PointOfSale.pos_item_details = class{
 	}
 
 	show_cart(){
-		console.log('show 01')
+		console.log('show 02')
 		this.item_details_cart.css("display" , "flex");
 	}
 
 	hide_cart(){
-		console.log('hide')
-		//this.item_details_cart.css("display" , "none");
+		console.log('hide 001')
+		this.item_details_cart.css("display" , "none");
 	}
 
 }

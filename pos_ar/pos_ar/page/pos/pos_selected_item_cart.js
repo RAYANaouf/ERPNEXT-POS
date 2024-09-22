@@ -5,11 +5,13 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 	constructor(
 		wrapper ,
 		selectedItemMap,
+		onSelectedItemClick,
 		onCheckoutClick,
 	){
 		this.wrapper = wrapper;
-		this.selected_item_map = selectedItemMap;
-		this.on_checkout_click = onCheckoutClick;
+		this.selected_item_map      = selectedItemMap;
+		this.on_checkout_click      = onCheckoutClick;
+		this.on_selected_item_click = onSelectedItemClick;
 
 		this.prepare_selected_item_cart();
 	}
@@ -165,6 +167,7 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 			itemElement.addEventListener("click" , event =>{
 				console.log("we are click")
 				this.makeItemHighlight(itemElement)
+				this.on_selected_item_click();
 				//expose the item as selected one
 				//selectedItem = item
 				//makeItemHighlight(itemElement);

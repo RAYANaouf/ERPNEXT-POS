@@ -90,15 +90,20 @@
       this.selected_item_cart = new pos_ar.PointOfSale.pos_selected_item_cart(
         this.$rightSection,
         this.selectedItemMap,
+        this.onSelectedItemClick.bind(this),
         this.onCheckout.bind(this)
       );
     }
     init_item_details() {
       this.item_details = new pos_ar.PointOfSale.pos_item_details(
-        this.$leftSection
+        this.$leftSection,
+        this.onClose_details.bind(this)
       );
     }
     init_paymentCart() {
+      this.payment_cart = new pos_ar.PointOfSale.pos_payment_cart(
+        this.$leftSection
+      );
     }
     itemClick_selector(item) {
       if (!this.selectedItemMap.has(item.name)) {
@@ -115,11 +120,22 @@
       this.selected_item_cart.calculateGrandTotal();
       this.selected_item_cart.refreshSelectedItem();
     }
+    onSelectedItemClick() {
+      console.log("selected item click callback 02 ", this.item_details);
+      this.item_selector.hideCart();
+      this.item_details.show_cart();
+      console.log("done!");
+    }
     onCheckout() {
       console.log("here we are on callback 01 ", this.item_details);
       this.item_selector.hideCart();
       this.item_details.show_cart();
       console.log("done!");
+    }
+    onClose_details() {
+      console.log("onClose callback 001");
+      this.item_selector.showCart();
+      this.item_details.hide_cart();
     }
     getItemPrice(itemId) {
       const price = this.itemPrices.find((itemPrice) => itemPrice.item_code == itemId);
@@ -338,10 +354,11 @@
 
   // ../pos_ar/pos_ar/pos_ar/page/pos/pos_selected_item_cart.js
   pos_ar.PointOfSale.pos_selected_item_cart = class {
-    constructor(wrapper, selectedItemMap, onCheckoutClick) {
+    constructor(wrapper, selectedItemMap, onSelectedItemClick, onCheckoutClick) {
       this.wrapper = wrapper;
       this.selected_item_map = selectedItemMap;
       this.on_checkout_click = onCheckoutClick;
+      this.on_selected_item_click = onSelectedItemClick;
       this.prepare_selected_item_cart();
     }
     prepare_selected_item_cart() {
@@ -449,6 +466,7 @@
         itemElement.addEventListener("click", (event2) => {
           console.log("we are click");
           this.makeItemHighlight(itemElement);
+          this.on_selected_item_click();
         });
         selectedItemsContainer.appendChild(itemElement);
       });
@@ -489,9 +507,10 @@
 
   // ../pos_ar/pos_ar/pos_ar/page/pos/pos_item_details.js
   pos_ar.PointOfSale.pos_item_details = class {
-    constructor(wrapper) {
+    constructor(wrapper, onClose) {
       console.log("hello from item_details 0");
       this.wrapper = wrapper;
+      this.on_close_cart = onClose;
       this.prepare_item_details_cart();
     }
     prepare_item_details_cart() {
@@ -501,6 +520,9 @@
       this.cart_header = this.item_details_cart.find("#itemDetailsCartHeader");
       this.cart_header.append('<h4 class="CartTitle">Item Details</h4>');
       this.cart_header.append('<img src="/assets/pos_ar/images/cancel.png" alt="Cancel Button" id="itemDetailsCartXBtn" class="xBtn">');
+      this.close_btn = this.cart_header.find("#itemDetailsCartXBtn").on("click", (event2) => {
+        this.on_close_cart();
+      });
       this.item_details_cart.append('<div id="itemDetailsHeader" class="rowBox"></div>');
       this.header_details = this.item_details_cart.find("#itemDetailsHeader");
       this.header_details.append('<div id="detailsItemImage" class="rowBox centerItem"></div>');
@@ -526,12 +548,21 @@
       this.c2.append('<div class="columnBox"><label for="itemDetailsPriceListRateInput">Price List Rate</label><input type="text" id="itemDetailsPriceListRateInput" disabled></div>');
     }
     show_cart() {
-      console.log("show 01");
+      console.log("show 02");
       this.item_details_cart.css("display", "flex");
     }
     hide_cart() {
-      console.log("hide");
+      console.log("hide 001");
+      this.item_details_cart.css("display", "none");
+    }
+  };
+
+  // ../pos_ar/pos_ar/pos_ar/page/pos/pos_payment_cart.js
+  pos_ar.PointOfSale.pos_item_details = class {
+    constructor(wrapper) {
+      this.wrapper = wrapper;
+      console.log("hello from payment cart");
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.Q4IDQRWA.js.map
+//# sourceMappingURL=pos.bundle.5UUYM5HG.js.map

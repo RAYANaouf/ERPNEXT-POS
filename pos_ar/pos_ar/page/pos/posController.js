@@ -112,18 +112,22 @@ pos_ar.PointOfSale.Controller = class {
 		this.selected_item_cart  = new pos_ar.PointOfSale.pos_selected_item_cart(
 									this.$rightSection ,
 									this.selectedItemMap,
+									this.onSelectedItemClick.bind(this),
 									this.onCheckout.bind(this)
 									)
 	}
 
 	init_item_details(){
 		this.item_details = new pos_ar.PointOfSale.pos_item_details(
-									this.$leftSection
+									this.$leftSection,
+									this.onClose_details.bind(this)
 								)
 	}
 
         init_paymentCart(){
-
+		this.payment_cart = new pos_ar.PointOfSale.pos_payment_cart(
+									this.$leftSection
+								)
         }
 
 
@@ -151,11 +155,24 @@ pos_ar.PointOfSale.Controller = class {
 
 	}
 
+	onSelectedItemClick(){
+		console.log("selected item click callback 02 " , this.item_details)
+		this.item_selector.hideCart();
+		this.item_details.show_cart();
+		console.log("done!")
+	}
+
 	onCheckout(){
 		console.log("here we are on callback 01 " , this.item_details)
 		this.item_selector.hideCart();
 		this.item_details.show_cart();
 		console.log("done!")
+	}
+
+	onClose_details(){
+		console.log("onClose callback 001")
+		this.item_selector.showCart();
+		this.item_details.hide_cart();
 	}
 
 
