@@ -5,11 +5,13 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 	constructor(
 		wrapper ,
 		selectedItemMap,
+		selectedField,
 		onSelectedItemClick,
 		onCheckoutClick,
 	){
 		this.wrapper = wrapper;
 		this.selected_item_map      = selectedItemMap;
+		this.selected_field         = selectedField  ;
 		this.on_checkout_click      = onCheckoutClick;
 		this.on_selected_item_click = onSelectedItemClick;
 
@@ -223,6 +225,63 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 			grandTotal.css('font-size' , 'larger')
 			grandTotal.css('font-weight' , '700' )
 		}
+	}
+
+	makeSelectedButtonHighlighted(){
+		const quantityButton = this.buttonsContainer.find('#key_quantity')
+		const rateButton     = this.buttonsContainer.find('#key_rate')
+		const discountButton = this.buttonsContainer.find('#key_discount')
+
+		if(this.selected_field.field_name == "quantity"){
+			quantityButton.addClass('selected')
+			rateButton.removeClass('selected')
+			discountButton.removeClass('selected')
+		}
+		else if(this.selected_field.field_name == "rate"){
+			quantityButton.removeClass('selected')
+			rateButton.addClass('selected')
+			discountButton.removeClass('selected')
+		}
+		else if(this.selected_field.field_name == "discount"){
+			quantityButton.removeClass('selected')
+			rateButton.removeClass('selected')
+			discountButton.addClass('selected')
+		}
+		else{
+			quantityButton.removeClass('selected')
+			rateButton.removeClass('selected')
+			discountButton.removeClass('selected')
+		}
+
+	}
+
+	/************************  set listeners  ***************************/
+
+	setButtonsListeners(){
+		const key_0        = this.buttonsContainer.find('key_0')
+		const key_1        = this.buttonsContainer.find('key_0')
+		const key_2        = this.buttonsContainer.find('key_0')
+		const key_3        = this.buttonsContainer.find('key_0')
+		const key_4        = this.buttonsContainer.find('key_0')
+		const key_5        = this.buttonsContainer.find('key_0')
+		const key_6        = this.buttonsContainer.find('key_0')
+		const key_7        = this.buttonsContainer.find('key_0')
+		const key_8        = this.buttonsContainer.find('key_0')
+		const key_9        = this.buttonsContainer.find('key_0')
+		const key_quantity = this.buttonsContainer.find('key_0')
+		const key_discount = this.buttonsContainer.find('key_0')
+		const key_rate     = this.buttonsContainer.find('key_0')
+		const key_remove   = this.buttonsContainer.find('key_0')
+		const key_delete   = this.buttonsContainer.find('key_0')
+		const key_point    = this.buttonsContainer.find('key_0')
+
+		let keys = [key_0 , key_1 , key_2 , key_3 , key_4 , key_5 , key_6 , key_7 , key_8 , key_9 , key_quantity , key_discount , key_rate , key_remove , key_delete , key_point]
+
+		keys.forEach(key =>{
+			key.on('mousedown' , (event)=>{
+				event.preventDefault();
+			})
+		})
 	}
 
 	/*************************  tools  **********************************/

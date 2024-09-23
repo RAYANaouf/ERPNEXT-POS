@@ -8,6 +8,7 @@ pos_ar.PointOfSale.pos_item_details = class{
 		itemPrices,
 		binList,
 		selectedItem,
+		selectedField,
 		onInput,
 		onClose,
 	){
@@ -16,7 +17,8 @@ pos_ar.PointOfSale.pos_item_details = class{
 		this.warehouse      = warehouse ;
 		this.price_lists    = priceLists;
 		this.item_prices    = itemPrices;
-		this.selected_item  = selectedItem;
+		this.selected_item  = selectedItem ;
+		this.selected_field = selectedField;
 		this.on_input       = onInput;
 		this.on_close_cart  = onClose;
 		this.bin_list       = binList;
@@ -157,6 +159,8 @@ pos_ar.PointOfSale.pos_item_details = class{
 		console.log("end ref")
 
 
+		//hightlited fields
+		this.makeSelectedFieldHighlighted()
 		//listeners
 		//setItemDetailsFieldsListener()
 	}
@@ -169,6 +173,32 @@ pos_ar.PointOfSale.pos_item_details = class{
 	hide_cart(){
 		console.log('hide 001')
 		this.item_details_cart.css("display" , "none");
+	}
+
+	makeSelectedFieldHighlighted(){
+
+
+		if(this.selected_field.field_name == "quantity"){
+			this.c1.find('#itemDetailsQuantityInput').addClass('selected')
+			this.c1.find('#itemDetailsRateInput').removeClass('selected')
+			this.c1.find('#itemDetailsDiscountInput').removeClass('selected')
+		}
+		else if(this.selected_field.field_name == "rate"){
+			this.c1.find('#itemDetailsQuantityInput').removeClass('selected')
+			this.c1.find('#itemDetailsRateInput').addClass('selected')
+			this.c1.find('#itemDetailsDiscountInput').removeClass('selected')
+		}
+		else if(this.selected_field.field_name == "discount"){
+			this.c1.find('#itemDetailsQuantityInput').removeClass('selected')
+			this.c1.find('#itemDetailsRateInput').removeClass('selected')
+			this.c1.find('#itemDetailsDiscountInput').addClass('selected')
+		}
+		else{
+			this.c1.find('#itemDetailsQuantityInput').removeClass('selected')
+			this.c1.find('#itemDetailsRateInput').removeClass('selected')
+			this.c1.find('#itemDetailsDiscountInput').removeClass('selected')
+		}
+
 	}
 
 

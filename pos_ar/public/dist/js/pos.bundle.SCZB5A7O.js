@@ -15,10 +15,8 @@
       this.binList = [];
       this.tabList = ["C1"];
       this.selectedItem = {};
-      this.selectedField = null;
+      this.selectedField = {};
       this.selectedTab = this.tabList[0];
-      this.detailsItemFieldsListeners = false;
-      this.detailsItemKeysListeners = false;
       this.start_app();
     }
     async start_app() {
@@ -90,6 +88,7 @@
       this.selected_item_cart = new pos_ar.PointOfSale.pos_selected_item_cart(
         this.$rightSection,
         this.selectedItemMap,
+        this.selectedField,
         (item) => {
           this.onSelectedItemClick(item);
         },
@@ -105,8 +104,9 @@
         this.itemPrices,
         this.binList,
         this.selectedItem,
-        (field, value) => {
-          this.onInput(field, value);
+        this.selectedField,
+        (event2, field, value) => {
+          this.onInput(event2, field, value);
         },
         this.onClose_details.bind(this)
       );
@@ -133,16 +133,14 @@
       this.selected_item_cart.refreshSelectedItem();
     }
     onSelectedItemClick(item) {
+      let me = this;
       Object.assign(this.selectedItem, item);
-      console.log("item in class 12 ", this.item_details.selected_item);
-      console.log("item in controller 12 ", this.selectedItem);
       this.item_details.show_cart();
       this.selected_item_cart.showKeyboard();
       this.item_selector.hideCart();
       this.payment_cart.hideCart();
       this.selected_item_cart.setKeyboardOrientation("landscape");
       this.item_details.refreshDate(item);
-      console.log("done!");
     }
     onCheckout() {
       console.log("here we are on callback 02 ", this.item_details);
@@ -166,10 +164,16 @@
       this.item_details.hide_cart();
       this.payment_cart.hideCart();
     }
-    onInput(trigger, field, value) {
+    onInput(event2, field, value) {
       console.log("the field => ", field, "change with value => ", value);
-      if (trigger == "focus" || trigger == "blur") {
-        console.log("trigger : ", trigger, " ==>", field);
+      if (event2 == "focus" || event2 == "blur") {
+        if (event2 == "focus")
+          Object.assign(this.selectedField, { field_name: field });
+        if (event2 == "blur")
+          Object.assign(this.selectedField, { field_name: null });
+        console.log("selected field => ", this.selectedField, "selected_field => ", this.item_details.selected_field);
+        this.item_details.makeSelectedFieldHighlighted();
+        this.selected_item_cart.makeSelectedButtonHighlighted();
         return;
       }
       if (field == "quantity") {
@@ -180,6 +184,7 @@
         this.selectedItem.amount = value;
         this.selectedItemMap.set(this.selectedItem.name, this.selectedItem);
         this.selected_item_cart.refreshSelectedItem();
+      } else if (field == "") {
       }
     }
     getItemPrice(itemId) {
@@ -399,9 +404,10 @@
 
   // ../pos_ar/pos_ar/pos_ar/page/pos/pos_selected_item_cart.js
   pos_ar.PointOfSale.pos_selected_item_cart = class {
-    constructor(wrapper, selectedItemMap, onSelectedItemClick, onCheckoutClick) {
+    constructor(wrapper, selectedItemMap, selectedField, onSelectedItemClick, onCheckoutClick) {
       this.wrapper = wrapper;
       this.selected_item_map = selectedItemMap;
+      this.selected_field = selectedField;
       this.on_checkout_click = onCheckoutClick;
       this.on_selected_item_click = onSelectedItemClick;
       this.prepare_selected_item_cart();
@@ -549,6 +555,52 @@
         grandTotal.css("font-weight", "700");
       }
     }
+    makeSelectedButtonHighlighted() {
+      const quantityButton = this.buttonsContainer.find("#key_quantity");
+      const rateButton = this.buttonsContainer.find("#key_rate");
+      const discountButton = this.buttonsContainer.find("#key_discount");
+      if (this.selected_field.field_name == "quantity") {
+        quantityButton.addClass("selected");
+        rateButton.removeClass("selected");
+        discountButton.removeClass("selected");
+      } else if (this.selected_field.field_name == "rate") {
+        quantityButton.removeClass("selected");
+        rateButton.addClass("selected");
+        discountButton.removeClass("selected");
+      } else if (this.selected_field.field_name == "discount") {
+        quantityButton.removeClass("selected");
+        rateButton.removeClass("selected");
+        discountButton.addClass("selected");
+      } else {
+        quantityButton.removeClass("selected");
+        rateButton.removeClass("selected");
+        discountButton.removeClass("selected");
+      }
+    }
+    setButtonsListeners() {
+      const key_0 = this.buttonsContainer.find("key_0");
+      const key_1 = this.buttonsContainer.find("key_0");
+      const key_2 = this.buttonsContainer.find("key_0");
+      const key_3 = this.buttonsContainer.find("key_0");
+      const key_4 = this.buttonsContainer.find("key_0");
+      const key_5 = this.buttonsContainer.find("key_0");
+      const key_6 = this.buttonsContainer.find("key_0");
+      const key_7 = this.buttonsContainer.find("key_0");
+      const key_8 = this.buttonsContainer.find("key_0");
+      const key_9 = this.buttonsContainer.find("key_0");
+      const key_quantity = this.buttonsContainer.find("key_0");
+      const key_discount = this.buttonsContainer.find("key_0");
+      const key_rate = this.buttonsContainer.find("key_0");
+      const key_remove = this.buttonsContainer.find("key_0");
+      const key_delete = this.buttonsContainer.find("key_0");
+      const key_point = this.buttonsContainer.find("key_0");
+      let keys = [key_0, key_1, key_2, key_3, key_4, key_5, key_6, key_7, key_8, key_9, key_quantity, key_discount, key_rate, key_remove, key_delete, key_point];
+      keys.forEach((key) => {
+        key.on("mousedown", (event2) => {
+          event2.preventDefault();
+        });
+      });
+    }
     calculateNetTotal() {
       let netTotal = 0;
       this.selected_item_map.forEach((value, key) => {
@@ -592,13 +644,14 @@
 
   // ../pos_ar/pos_ar/pos_ar/page/pos/pos_item_details.js
   pos_ar.PointOfSale.pos_item_details = class {
-    constructor(wrapper, warehouse, priceLists, itemPrices, binList, selectedItem, onInput, onClose) {
+    constructor(wrapper, warehouse, priceLists, itemPrices, binList, selectedItem, selectedField, onInput, onClose) {
       console.log("hello from item_details 0");
       this.wrapper = wrapper;
       this.warehouse = warehouse;
       this.price_lists = priceLists;
       this.item_prices = itemPrices;
       this.selected_item = selectedItem;
+      this.selected_field = selectedField;
       this.on_input = onInput;
       this.on_close_cart = onClose;
       this.bin_list = binList;
@@ -681,6 +734,7 @@
       itemGroup.textContent = "Item Group : " + item.item_group;
       priceListRate.value = this.getItemPrice(item.name) + "DA";
       console.log("end ref");
+      this.makeSelectedFieldHighlighted();
     }
     show_cart() {
       console.log("show 02");
@@ -689,6 +743,25 @@
     hide_cart() {
       console.log("hide 001");
       this.item_details_cart.css("display", "none");
+    }
+    makeSelectedFieldHighlighted() {
+      if (this.selected_field.field_name == "quantity") {
+        this.c1.find("#itemDetailsQuantityInput").addClass("selected");
+        this.c1.find("#itemDetailsRateInput").removeClass("selected");
+        this.c1.find("#itemDetailsDiscountInput").removeClass("selected");
+      } else if (this.selected_field.field_name == "rate") {
+        this.c1.find("#itemDetailsQuantityInput").removeClass("selected");
+        this.c1.find("#itemDetailsRateInput").addClass("selected");
+        this.c1.find("#itemDetailsDiscountInput").removeClass("selected");
+      } else if (this.selected_field.field_name == "discount") {
+        this.c1.find("#itemDetailsQuantityInput").removeClass("selected");
+        this.c1.find("#itemDetailsRateInput").removeClass("selected");
+        this.c1.find("#itemDetailsDiscountInput").addClass("selected");
+      } else {
+        this.c1.find("#itemDetailsQuantityInput").removeClass("selected");
+        this.c1.find("#itemDetailsRateInput").removeClass("selected");
+        this.c1.find("#itemDetailsDiscountInput").removeClass("selected");
+      }
     }
     setDetailsFieldsListeners() {
       this.quantityInput = this.c1.find("#itemDetailsQuantityInput");
@@ -835,4 +908,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.CFNJX5SN.js.map
+//# sourceMappingURL=pos.bundle.SCZB5A7O.js.map

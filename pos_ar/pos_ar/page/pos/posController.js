@@ -18,13 +18,8 @@ pos_ar.PointOfSale.Controller = class {
                 this.tabList          = ["C1"]
 
                 this.selectedItem     = {}
-                this.selectedField    = null
+                this.selectedField    = {}
                 this.selectedTab      = this.tabList[0]
-
-                //prevent set listener multiple times
-                this.detailsItemFieldsListeners = false
-                this.detailsItemKeysListeners   = false
-
 
 
                 this.start_app();
@@ -112,6 +107,7 @@ pos_ar.PointOfSale.Controller = class {
 		this.selected_item_cart  = new pos_ar.PointOfSale.pos_selected_item_cart(
 									this.$rightSection ,
 									this.selectedItemMap,
+									this.selectedField,
 									item => {
 										this.onSelectedItemClick(item)
 									},
@@ -128,8 +124,9 @@ pos_ar.PointOfSale.Controller = class {
 									this.itemPrices,
 									this.binList,
 									this.selectedItem,
-									(field , value) =>{
-										this.onInput(field , value);
+									this.selectedField,
+									(event , field , value) =>{
+										this.onInput(event , field , value);
 									},
 									this.onClose_details.bind(this)
 								)
@@ -169,11 +166,9 @@ pos_ar.PointOfSale.Controller = class {
 
 	onSelectedItemClick(item){
 
+		let me = this
+
 		Object.assign(this.selectedItem , item)
-
-		console.log("item in class 12 " , this.item_details.selected_item)
-		console.log("item in controller 12 " , this.selectedItem)
-
 
 
 		//show
@@ -190,7 +185,6 @@ pos_ar.PointOfSale.Controller = class {
 
 		//refresh data
 		this.item_details.refreshDate(item);
-		console.log("done!")
 	}
 
 	onCheckout(){
@@ -235,13 +229,22 @@ pos_ar.PointOfSale.Controller = class {
 	}
 
 
-	onInput( trigger , field , value){
+	onInput( event , field , value){
 		console.log("the field => " , field  , "change with value => " , value);
 
-		if(trigger == "focus" || trigger == "blur"){
-			console.log( "trigger : " , trigger  ,  " ==>" , field)
+		if(event == "focus" || event == "blur"){
+			if(event == "focus")
+				Object.assign(this.selectedField , {field_name : field})
+			if(event == "blur")
+				Object.assign(this.selectedField , {field_name : null})
+
+			console.log('selected field => ' , this.selectedField , "selected_field => " , this.item_details.selected_field)
+			this.item_details.makeSelectedFieldHighlighted()
+			this.selected_item_cart.makeSelectedButtonHighlighted();
+
 			return;
 		}
+
 
 
 		if( field ==  "quantity" ){
@@ -255,6 +258,9 @@ pos_ar.PointOfSale.Controller = class {
 			this.selectedItemMap.set(this.selectedItem.name , this.selectedItem)
 			//redrawing
 			this.selected_item_cart.refreshSelectedItem();
+		}
+		else if( field == ""){
+			
 		}
 
 	}

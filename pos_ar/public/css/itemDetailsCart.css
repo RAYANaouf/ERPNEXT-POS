@@ -96,3 +96,7 @@
 
         justify-content : center ;
 }
+
+#LeftSection #itemDetailsCart #itemDetailsAll input.selected{
+        border        : 2px solid #ac6500 !important;
+}
