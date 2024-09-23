@@ -26,6 +26,7 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 	start_work(){
 		this.prepare_selected_item_cart();
 		this.setButtonsListeners();
+		this.setListener()
 	}
 
 	/********************************* ui *****************************************/
@@ -43,6 +44,7 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 		this.tabs.append('<div class="selected">C1</div>')
 		this.tabs.append('<div id="addTabBtn" class="unselected">+</div>')
 
+		this.add_tab_button = this.tabs.find('#addTabBtn')
 
 		this.cartBox.append('<div id="CartBoxTopBar" class=" rowBox align_center  row_sbtw"><div>')
 		this.cartBox.append('<div id="cartHeader" class="rowBox row_sbtw align_center"></div>')
@@ -126,6 +128,9 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 
 
 
+	refreshTabs(){
+		this.tabs
+	}
 
 	refreshSelectedItem(){
 
@@ -321,6 +326,15 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 				}
 
 			})
+		})
+
+	}
+
+	setListener(){
+
+		this.add_tab_button.on('mousedown' , (event)=>{
+			this.tabs.append('<div class="selected">C1</div>')
+			console.log("add Tab ::")
 		})
 
 	}

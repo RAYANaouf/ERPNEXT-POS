@@ -19,6 +19,11 @@
 	bottom        : -2px              ;
 
 }
+
+#RightSection #tabs #addTabBtn{
+	cursor : pointer ; 
+}
+
 #RightSection #tabs div.unselected{
 	background : #f0f0f0;
 }

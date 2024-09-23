@@ -431,6 +431,7 @@
     start_work() {
       this.prepare_selected_item_cart();
       this.setButtonsListeners();
+      this.setListener();
     }
     prepare_selected_item_cart() {
       this.wrapper.append('<div id="tabs"    class="rowBox"></div>');
@@ -439,6 +440,7 @@
       this.cartBox = this.wrapper.find("#CartBox");
       this.tabs.append('<div class="selected">C1</div>');
       this.tabs.append('<div id="addTabBtn" class="unselected">+</div>');
+      this.add_tab_button = this.tabs.find("#addTabBtn");
       this.cartBox.append('<div id="CartBoxTopBar" class=" rowBox align_center  row_sbtw"><div>');
       this.cartBox.append('<div id="cartHeader" class="rowBox row_sbtw align_center"></div>');
       this.cartBox.append('<div id="selectedItemsContainer" class="columnBox"></div>');
@@ -500,6 +502,9 @@
       this.checkoutBtn.on("mousedown", (event2) => {
         this.on_checkout_click();
       });
+    }
+    refreshTabs() {
+      this.tabs;
     }
     refreshSelectedItem() {
       const selectedItemsContainer = document.getElementById("selectedItemsContainer");
@@ -637,6 +642,12 @@
             this.on_key_pressed("remove", null);
           }
         });
+      });
+    }
+    setListener() {
+      this.add_tab_button.on("mousedown", (event2) => {
+        this.tabs.append('<div class="selected">C1</div>');
+        console.log("add Tab ::");
       });
     }
     calculateNetTotal() {
@@ -981,4 +992,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.AW6MXZMC.js.map
+//# sourceMappingURL=pos.bundle.F74YOH6U.js.map
