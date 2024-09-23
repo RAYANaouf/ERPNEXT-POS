@@ -179,6 +179,9 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 
 		})
 
+		this.calculateNetTotal();
+		this.calculateQnatity();
+		this.calculateGrandTotal();
 	}
 
 

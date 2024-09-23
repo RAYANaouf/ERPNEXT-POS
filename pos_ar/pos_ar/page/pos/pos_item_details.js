@@ -8,14 +8,16 @@ pos_ar.PointOfSale.pos_item_details = class{
 		itemPrices,
 		binList,
 		selectedItem,
+		onInput,
 		onClose,
 	){
 		console.log("hello from item_details 0")
-		this.wrapper        = wrapper;
-		this.warehouse      = warehouse;
+		this.wrapper        = wrapper   ;
+		this.warehouse      = warehouse ;
 		this.price_lists    = priceLists;
 		this.item_prices    = itemPrices;
 		this.selected_item  = selectedItem;
+		this.on_input       = onInput;
 		this.on_close_cart  = onClose;
 		this.bin_list       = binList;
 
@@ -179,7 +181,35 @@ pos_ar.PointOfSale.pos_item_details = class{
 		this.discountInput = this.c1.find('#itemDetailsDiscountInput')
 
 		this.quantityInput.on('input' , (event)=>{
-			console.log("quantity input " , this.value)
+			const value = event.target.value;
+
+			if(value.length == 0){
+				event.target.value = 0
+			}
+			else if (!value.slice(0,-1).includes(".")  && value[value.length-1] == "."){
+				event.target.value = value
+			}
+			else if(value[value.length-1] == "."){
+				event.target.value = value.slice(0,-1);
+			}
+			else if(isNaN(value[value.length-1])){
+				event.target.value = value.slice(0,-1);
+			}
+			else{
+				event.target.value = value
+			}
+
+			//new quantity
+			let newQuantity = parseFloat(this.quantityInput.val());
+			if(isNaN(newQuantity)){
+				console.warn("Invaide Quantity value =>" , this.quantityInput.val())
+				return;
+			}
+			else if(newQuantity <= 0){
+				newQuantity = 0;
+			}
+
+			this.on_input("quantity" , newQuantity)
 		})
 
 	}

@@ -128,6 +128,9 @@ pos_ar.PointOfSale.Controller = class {
 									this.itemPrices,
 									this.binList,
 									this.selectedItem,
+									(field , value) =>{
+										this.onInput(field , value);
+									},
 									this.onClose_details.bind(this)
 								)
 	}
@@ -224,6 +227,21 @@ pos_ar.PointOfSale.Controller = class {
 		this.item_selector.showCart();
 		this.item_details.hide_cart();
 		this.payment_cart.hideCart();
+	}
+
+
+	onInput(field , value){
+		console.log("the field => " , field  , "change with value ::: " , value);
+
+
+		console.log(" item => " ,this.selectedItem)
+
+		this.selectedItem.quantity = value;
+		this.selectedItemMap.set(this.selectedItem.name , this.selectedItem)
+
+		console.log("the new data. item => " , this.selectedItem , "the map => " , this.selectedItemMap)
+		//redraw what should be redrawed
+		//this.selected_item_cart.refreshSelectedItem();
 	}
 
 

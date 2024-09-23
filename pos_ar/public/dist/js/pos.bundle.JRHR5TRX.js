@@ -105,6 +105,9 @@
         this.itemPrices,
         this.binList,
         this.selectedItem,
+        (field, value) => {
+          this.onInput(field, value);
+        },
         this.onClose_details.bind(this)
       );
     }
@@ -161,6 +164,13 @@
       this.item_selector.showCart();
       this.item_details.hide_cart();
       this.payment_cart.hideCart();
+    }
+    onInput(field, value) {
+      console.log("the field => ", field, "change with value ::: ", value);
+      console.log(" item => ", this.selectedItem);
+      this.selectedItem.quantity = value;
+      this.selectedItemMap.set(this.selectedItem.name, this.selectedItem);
+      console.log("the new data. item => ", this.selectedItem, "the map => ", this.selectedItemMap);
     }
     getItemPrice(itemId) {
       const price = this.itemPrices.find((itemPrice) => itemPrice.item_code == itemId);
@@ -495,6 +505,9 @@
         });
         selectedItemsContainer.appendChild(itemElement);
       });
+      this.calculateNetTotal();
+      this.calculateQnatity();
+      this.calculateGrandTotal();
     }
     showKeyboard() {
       this.editSelectedItem.css("display", "flex");
@@ -569,13 +582,14 @@
 
   // ../pos_ar/pos_ar/pos_ar/page/pos/pos_item_details.js
   pos_ar.PointOfSale.pos_item_details = class {
-    constructor(wrapper, warehouse, priceLists, itemPrices, binList, selectedItem, onClose) {
+    constructor(wrapper, warehouse, priceLists, itemPrices, binList, selectedItem, onInput, onClose) {
       console.log("hello from item_details 0");
       this.wrapper = wrapper;
       this.warehouse = warehouse;
       this.price_lists = priceLists;
       this.item_prices = itemPrices;
       this.selected_item = selectedItem;
+      this.on_input = onInput;
       this.on_close_cart = onClose;
       this.bin_list = binList;
       console.log("start with : ", warehouse);
@@ -671,7 +685,26 @@
       this.rateInput = this.c1.find("#itemDetailsRateInput");
       this.discountInput = this.c1.find("#itemDetailsDiscountInput");
       this.quantityInput.on("input", (event2) => {
-        console.log("quantity input ", this.value);
+        const value = event2.target.value;
+        if (value.length == 0) {
+          event2.target.value = 0;
+        } else if (!value.slice(0, -1).includes(".") && value[value.length - 1] == ".") {
+          event2.target.value = value;
+        } else if (value[value.length - 1] == ".") {
+          event2.target.value = value.slice(0, -1);
+        } else if (isNaN(value[value.length - 1])) {
+          event2.target.value = value.slice(0, -1);
+        } else {
+          event2.target.value = value;
+        }
+        let newQuantity = parseFloat(this.quantityInput.val());
+        if (isNaN(newQuantity)) {
+          console.warn("Invaide Quantity value =>", this.quantityInput.val());
+          return;
+        } else if (newQuantity <= 0) {
+          newQuantity = 0;
+        }
+        this.on_input("quantity", newQuantity);
       });
     }
     getItemPrice(itemId) {
@@ -731,4 +764,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.Q2KKNTNL.js.map
+//# sourceMappingURL=pos.bundle.JRHR5TRX.js.map
