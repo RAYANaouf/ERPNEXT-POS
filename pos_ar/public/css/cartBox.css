@@ -10,17 +10,17 @@
 	background : #FFFFFF ;
 
 
-	border        : 1px solid #c0c0c0 ;
+	border        : 2.5px solid #c0c0c0 ;
 	border-bottom : none ;
 	border-radius : 12px 12px 0px 0px  ;
 
 
 	position      : relative          ;
-	bottom        : -1px              ;
+	bottom        : -2px              ;
 
 }
 #RightSection #tabs div.unselected{
-	background : #f9f9f9 ;
+	background : #f0f0f0;
 }
 #RightSection #tabs div:hover{
 	background    : #e0e0e0 ; 
@@ -62,7 +62,7 @@
 }
 
 #RightSection #CartBox #selectedItemsContainer{
-        min-height : 70px ;
+        min-height : 110px ;
         flex-grow  : 1    ;
         overflow-y : auto ;
 }
