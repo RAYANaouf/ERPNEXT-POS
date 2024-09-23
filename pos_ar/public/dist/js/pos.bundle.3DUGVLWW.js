@@ -191,9 +191,15 @@
       }
     }
     onKeyPressed(action, key) {
-      console.log("you press ", key, " action : ", action);
       if (action == "quantity") {
         this.item_details.requestFocus("quantity");
+      } else if (action == "rate") {
+        this.item_details.requestFocus("rate");
+      } else if (action == "discount") {
+        this.item_details.requestFocus("discount");
+      } else if (action == "addToField") {
+        console.log("you press :::", key, " action ::: ", action, "while the selected field is : ", this.selectedField);
+        this.item_details.addToField(this.selectedField.field_name, key);
       }
     }
     getItemPrice(itemId) {
@@ -413,10 +419,10 @@
 
   // ../pos_ar/pos_ar/pos_ar/page/pos/pos_selected_item_cart.js
   pos_ar.PointOfSale.pos_selected_item_cart = class {
-    constructor(wrapper, selectedItemMap, selectedField2, onSelectedItemClick, onKeyPressed, onCheckoutClick) {
+    constructor(wrapper, selectedItemMap, selectedField, onSelectedItemClick, onKeyPressed, onCheckoutClick) {
       this.wrapper = wrapper;
       this.selected_item_map = selectedItemMap;
-      this.selected_field = selectedField2;
+      this.selected_field = selectedField;
       this.on_key_pressed = onKeyPressed;
       this.on_checkout_click = onCheckoutClick;
       this.on_selected_item_click = onSelectedItemClick;
@@ -615,7 +621,7 @@
           const keyContent = key.text();
           if (!isNaN(keyContent)) {
             this.on_key_pressed("addToField", key.text());
-          } else if (keyContent == "." && !selectedField.value.includes(".")) {
+          } else if (keyContent == ".") {
             this.on_key_pressed("addToField", key.text());
           } else if (keyContent == "Quantity") {
             this.on_key_pressed("quantity", null);
@@ -672,14 +678,14 @@
 
   // ../pos_ar/pos_ar/pos_ar/page/pos/pos_item_details.js
   pos_ar.PointOfSale.pos_item_details = class {
-    constructor(wrapper, warehouse, priceLists, itemPrices, binList, selectedItem, selectedField2, onInput, onClose) {
+    constructor(wrapper, warehouse, priceLists, itemPrices, binList, selectedItem, selectedField, onInput, onClose) {
       console.log("hello from item_details 0");
       this.wrapper = wrapper;
       this.warehouse = warehouse;
       this.price_lists = priceLists;
       this.item_prices = itemPrices;
       this.selected_item = selectedItem;
-      this.selected_field = selectedField2;
+      this.selected_field = selectedField;
       this.on_input = onInput;
       this.on_close_cart = onClose;
       this.bin_list = binList;
@@ -794,6 +800,35 @@
     requestFocus(field) {
       if (field == "quantity") {
         this.c1.find("#itemDetailsQuantityInput").focus();
+      } else if (field == "rate") {
+        this.c1.find("#itemDetailsRateInput").focus();
+      } else if (field == "discount") {
+        this.c1.find("#itemDetailsDiscountInput").focus();
+      }
+    }
+    addToField(field, value) {
+      console.log("field : ", field, "value : ", value);
+      if (field == "quantity") {
+        this.c1.find("#itemDetailsQuantityInput").val((index, currentValue) => {
+          if (value == "." && currentValue.includes("."))
+            return currentValue;
+          else
+            return currentValue + value;
+        });
+      } else if (field == "rate") {
+        this.c1.find("#itemDetailsRateInput").val((index, currentValue) => {
+          if (value == "." && currentValue.includes("."))
+            return currentValue;
+          else
+            return currentValue + value;
+        });
+      } else if (field == "discount") {
+        this.c1.find("#itemDetailsDiscountInput").val((index, currentValue) => {
+          if (value == "." && currentValue.includes("."))
+            return currentValue;
+          else
+            return currentValue + value;
+        });
       }
     }
     setDetailsFieldsListeners() {
@@ -829,7 +864,7 @@
         this.on_input("blur", "quantity", null);
       });
       this.rateInput.on("input", (event2) => {
-        const value = this.value;
+        const value = event2.target.value;
         if (value.length == 0) {
           event2.target.value = 0;
         } else if (!value.slice(0, -1).includes(".") && value[value.length - 1] == ".") {
@@ -839,9 +874,10 @@
         } else if (isNaN(value[value.length - 1])) {
           event2.target.value = value.slice(0, -1);
         } else {
-          this.value = value;
+          event2.target.value = value;
         }
         let newRate = parseFloat(this.rateInput.val());
+        console.log("new rate : ", newRate);
         if (isNaN(newRate)) {
           console.warn("Invalide Rate value");
           return;
@@ -855,7 +891,7 @@
         this.on_input("blur", "rate", null);
       });
       this.discountInput.on("input", (event2) => {
-        const value = this.value;
+        const value = event2.target.value;
         if (value.length == 0) {
           event2.target.value = 0;
         } else if (!value.slice(0, -1).includes(".") && value[value.length - 1] == ".") {
@@ -941,4 +977,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.JZASIL4L.js.map
+//# sourceMappingURL=pos.bundle.3DUGVLWW.js.map

@@ -294,7 +294,7 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 				if(!isNaN(keyContent)){
 					this.on_key_pressed( "addToField" , key.text())
 				}
-				else if(keyContent == "." && !selectedField.value.includes(".")){
+				else if(keyContent == "."){
 					this.on_key_pressed( "addToField" , key.text())
 				}
 				else if(keyContent == "Quantity"){

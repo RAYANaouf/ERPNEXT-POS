@@ -201,12 +201,58 @@ pos_ar.PointOfSale.pos_item_details = class{
 
 	}
 
+
 	requestFocus(field){
 		if(field == "quantity"){
 			this.c1.find('#itemDetailsQuantityInput').focus();
 		}
+		else if(field == "rate"){
+			this.c1.find('#itemDetailsRateInput').focus();
+		}
+		else if(field == "discount"){
+			this.c1.find('#itemDetailsDiscountInput').focus();
+		}
 	}
 
+
+/*
+
+else if(keyContent == "." && !selectedField.value.includes(".")){
+                                        this.on_key_pressed( "addToField" , key.text())
+                                }
+
+*/
+	addToField(field , value){
+
+		console.log('field : ' , field , 'value : ' , value )
+			
+		if(field == "quantity"){
+			this.c1.find('#itemDetailsQuantityInput').val( (index,currentValue) =>{
+				if(value == "." && currentValue.includes("."))
+					return currentValue
+				else
+					return currentValue + value
+			})
+		}
+		else if(field == "rate"){
+			this.c1.find('#itemDetailsRateInput').val( (index,currentValue) =>{
+				if(value == "." && currentValue.includes("."))
+					return currentValue
+				else
+					return currentValue + value
+			})
+		}
+		else if(field == "discount"){
+			this.c1.find('#itemDetailsDiscountInput').val( (index,currentValue) =>{
+				if(value == "." && currentValue.includes("."))
+					return currentValue
+				else
+					return currentValue + value
+			})
+
+		}
+
+	}
 
 	/**************************  set listener  ****************************/
 
@@ -260,7 +306,7 @@ pos_ar.PointOfSale.pos_item_details = class{
 
 		//rate field listeners
 		this.rateInput.on('input' , (event)=>{
-			const value = this.value ;
+			const value = event.target.value ;
 
 			if(value.length == 0){
 				event.target.value = 0
@@ -275,11 +321,12 @@ pos_ar.PointOfSale.pos_item_details = class{
 				event.target.value = value.slice(0,-1);
 			}
 			else{
-				this.value = value;
+				event.target.value = value;
 			}
 
 			let newRate = parseFloat(this.rateInput.val());
 
+			console.log("new rate : " , newRate)
 			if(isNaN(newRate)){
 				console.warn("Invalide Rate value")
 				return;
@@ -298,7 +345,7 @@ pos_ar.PointOfSale.pos_item_details = class{
 
 		//discount field listener
 		this.discountInput.on('input' , (event)=>{
-			const value = this.value ;
+			const value = event.target.value ;
 
 			if(value.length == 0){
 				event.target.value = 0;

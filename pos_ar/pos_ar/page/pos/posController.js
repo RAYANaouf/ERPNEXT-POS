@@ -269,9 +269,18 @@ pos_ar.PointOfSale.Controller = class {
 	}
 
 	onKeyPressed( action  , key){
-		console.log("you press " , key , " action : " , action)
 		if(action == "quantity"){
 			this.item_details.requestFocus("quantity")
+		}
+		else if(action == "rate"){
+			this.item_details.requestFocus("rate")
+		}
+		else if(action == "discount"){
+			this.item_details.requestFocus("discount")
+		}
+		else if(action == "addToField"){
+			console.log("you press :::" , key , " action ::: " , action , "while the selected field is : " , this.selectedField)
+			this.item_details.addToField(this.selectedField.field_name , key)
 		}
 	}
 
