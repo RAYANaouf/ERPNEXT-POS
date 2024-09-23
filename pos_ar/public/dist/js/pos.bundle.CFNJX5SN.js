@@ -166,13 +166,21 @@
       this.item_details.hide_cart();
       this.payment_cart.hideCart();
     }
-    onInput(field, value) {
+    onInput(trigger, field, value) {
       console.log("the field => ", field, "change with value => ", value);
-      console.log(" item => ", this.selectedItem);
-      this.selectedItem.quantity = value;
-      this.selectedItemMap.set(this.selectedItem.name, this.selectedItem);
-      console.log("the new data. item => ", this.selectedItem, "the map => ", this.selectedItemMap);
-      this.selected_item_cart.refreshSelectedItem();
+      if (trigger == "focus" || trigger == "blur") {
+        console.log("trigger : ", trigger, " ==>", field);
+        return;
+      }
+      if (field == "quantity") {
+        this.selectedItem.quantity = value;
+        this.selectedItemMap.set(this.selectedItem.name, this.selectedItem);
+        this.selected_item_cart.refreshSelectedItem();
+      } else if (field == "rate") {
+        this.selectedItem.amount = value;
+        this.selectedItemMap.set(this.selectedItem.name, this.selectedItem);
+        this.selected_item_cart.refreshSelectedItem();
+      }
     }
     getItemPrice(itemId) {
       const price = this.itemPrices.find((itemPrice) => itemPrice.item_code == itemId);
@@ -706,7 +714,68 @@
         } else if (newQuantity <= 0) {
           newQuantity = 0;
         }
-        this.on_input("quantity", newQuantity);
+        this.on_input("input", "quantity", newQuantity);
+      });
+      this.quantityInput.on("focus", (event2) => {
+        this.on_input("focus", "quantity", null);
+      });
+      this.quantityInput.on("blur", (event2) => {
+        this.on_input("blur", "quantity", null);
+      });
+      this.rateInput.on("input", (event2) => {
+        const value = this.value;
+        if (value.length == 0) {
+          event2.target.value = 0;
+        } else if (!value.slice(0, -1).includes(".") && value[value.length - 1] == ".") {
+          event2.target.value = value;
+        } else if (value[value.length - 1] == ".") {
+          event2.target.value = value.slice(0, -1);
+        } else if (isNaN(value[value.length - 1])) {
+          event2.target.value = value.slice(0, -1);
+        } else {
+          this.value = value;
+        }
+        let newRate = parseFloat(this.rateInput.val());
+        if (isNaN(newRate)) {
+          console.warn("Invalide Rate value");
+          return;
+        }
+        this.on_input("input", "rate", newRate);
+      });
+      this.rateInput.on("focus", (event2) => {
+        this.on_input("focus", "rate", null);
+      });
+      this.rateInput.on("blur", (event2) => {
+        this.on_input("blur", "rate", null);
+      });
+      this.discountInput.on("input", (event2) => {
+        const value = this.value;
+        if (value.length == 0) {
+          event2.target.value = 0;
+        } else if (!value.slice(0, -1).includes(".") && value[value.length - 1] == ".") {
+          event2.target.value = value;
+        } else if (value[value.length - 1] == ".") {
+          event2.target.value = value.slice(0, -1);
+        } else if (isNaN(value[value.length - 1])) {
+          event2.target.value = value.slice(0, -1);
+        } else {
+          event2.target.value = value;
+        }
+        let newDiscount = parseFloat(this.discountInput.val());
+        if (isNaN(newDiscount)) {
+          console.warn("Invalide discount value");
+          return;
+        }
+        if (newDiscount < 100)
+          this.on_input("input", "discount", newDiscount);
+        else
+          this.on_input("input", "discount", 100);
+      });
+      this.discountInput.on("focus", (event2) => {
+        this.on_input("focus", "discount", null);
+      });
+      this.discountInput.on("blur", (event2) => {
+        this.on_input("blur", "discount", null);
       });
     }
     getItemPrice(itemId) {
@@ -766,4 +835,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.5C2WYR5N.js.map
+//# sourceMappingURL=pos.bundle.CFNJX5SN.js.map

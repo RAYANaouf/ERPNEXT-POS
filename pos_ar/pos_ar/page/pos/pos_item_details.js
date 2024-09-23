@@ -180,6 +180,8 @@ pos_ar.PointOfSale.pos_item_details = class{
 		this.rateInput     = this.c1.find('#itemDetailsRateInput')
 		this.discountInput = this.c1.find('#itemDetailsDiscountInput')
 
+
+		//quantity input
 		this.quantityInput.on('input' , (event)=>{
 			const value = event.target.value;
 
@@ -209,7 +211,96 @@ pos_ar.PointOfSale.pos_item_details = class{
 				newQuantity = 0;
 			}
 
-			this.on_input("quantity" , newQuantity)
+			this.on_input( "input" , "quantity" , newQuantity)
+		})
+
+		this.quantityInput.on('focus' , (event)=>{
+			this.on_input( "focus" , "quantity" , null)
+		})
+
+		this.quantityInput.on('blur' , (event)=>{
+			this.on_input( "blur" , "quantity" , null)
+		})
+
+		//rate field listeners
+		this.rateInput.on('input' , (event)=>{
+			const value = this.value ;
+
+			if(value.length == 0){
+				event.target.value = 0
+			}
+			else if (!value.slice(0,-1).includes(".")  && value[value.length-1] == "."){
+				event.target.value = value
+			}
+			else if(value[value.length-1] == "."){
+				event.target.value = value.slice(0,-1);
+			}
+			else if(isNaN(value[value.length-1])){
+				event.target.value = value.slice(0,-1);
+			}
+			else{
+				this.value = value;
+			}
+
+			let newRate = parseFloat(this.rateInput.val());
+
+			if(isNaN(newRate)){
+				console.warn("Invalide Rate value")
+				return;
+			}
+
+
+			this.on_input( "input" , "rate" , newRate)
+		})
+		this.rateInput.on('focus' , (event)=>{
+			this.on_input( "focus" , "rate" , null)
+		})
+		this.rateInput.on('blur' , (event)=>{
+			this.on_input( "blur" , "rate" , null)
+		})
+
+
+		//discount field listener
+		this.discountInput.on('input' , (event)=>{
+			const value = this.value ;
+
+			if(value.length == 0){
+				event.target.value = 0;
+			}
+			else if(!value.slice(0,-1).includes(".")  && value[value.length-1] == "."){
+				event.target.value = value;
+			}
+			else if(value[value.length-1] == "."){
+				event.target.value = value.slice(0,-1);
+			}
+			else if(isNaN(value[value.length-1])){
+				event.target.value = value.slice(0,-1);
+			}
+			else{
+				event.target.value = value ;
+			}
+
+			let newDiscount = parseFloat(this.discountInput.val());
+
+			if(isNaN(newDiscount)){
+				console.warn("Invalide discount value")
+				return
+			}
+
+			if(newDiscount < 100)
+				this.on_input( "input" , "discount" , newDiscount)
+			else
+				this.on_input( "input" , "discount" , 100)
+
+
+		})
+
+		this.discountInput.on('focus' , (event)=>{
+			this.on_input( "focus" , "discount" , null)
+		})
+
+		this.discountInput.on('blur' , (event)=>{
+			this.on_input( "blur" , "discount" , null)
 		})
 
 	}

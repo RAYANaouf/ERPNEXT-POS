@@ -235,18 +235,28 @@ pos_ar.PointOfSale.Controller = class {
 	}
 
 
-	onInput(field , value){
+	onInput( trigger , field , value){
 		console.log("the field => " , field  , "change with value => " , value);
 
+		if(trigger == "focus" || trigger == "blur"){
+			console.log( "trigger : " , trigger  ,  " ==>" , field)
+			return;
+		}
 
-		console.log(" item => " ,this.selectedItem)
 
-		this.selectedItem.quantity = value;
-		this.selectedItemMap.set(this.selectedItem.name , this.selectedItem)
+		if( field ==  "quantity" ){
+			this.selectedItem.quantity = value;
+			this.selectedItemMap.set(this.selectedItem.name , this.selectedItem)
+			//redrawing
+			this.selected_item_cart.refreshSelectedItem();
+		}
+		else if( field ==  "rate" ){
+			this.selectedItem.amount = value;
+			this.selectedItemMap.set(this.selectedItem.name , this.selectedItem)
+			//redrawing
+			this.selected_item_cart.refreshSelectedItem();
+		}
 
-		console.log("the new data. item => " , this.selectedItem , "the map => " , this.selectedItemMap)
-		//redraw what should be redrawed
-		this.selected_item_cart.refreshSelectedItem();
 	}
 
 
