@@ -168,8 +168,13 @@ pos_ar.PointOfSale.Controller = class {
 	}
 
 	onSelectedItemClick(item){
-		console.log("item in controller 12 " , this.selectedItem)
+
+		Object.assign(this.selectedItem , item)
+
 		console.log("item in class 12 " , this.item_details.selected_item)
+		console.log("item in controller 12 " , this.selectedItem)
+
+
 
 		//show
 		this.item_details.show_cart();
@@ -231,7 +236,7 @@ pos_ar.PointOfSale.Controller = class {
 
 
 	onInput(field , value){
-		console.log("the field => " , field  , "change with value ::: " , value);
+		console.log("the field => " , field  , "change with value => " , value);
 
 
 		console.log(" item => " ,this.selectedItem)
@@ -241,7 +246,7 @@ pos_ar.PointOfSale.Controller = class {
 
 		console.log("the new data. item => " , this.selectedItem , "the map => " , this.selectedItemMap)
 		//redraw what should be redrawed
-		//this.selected_item_cart.refreshSelectedItem();
+		this.selected_item_cart.refreshSelectedItem();
 	}
 
 

@@ -133,8 +133,9 @@
       this.selected_item_cart.refreshSelectedItem();
     }
     onSelectedItemClick(item) {
-      console.log("item in controller 12 ", this.selectedItem);
+      Object.assign(this.selectedItem, item);
       console.log("item in class 12 ", this.item_details.selected_item);
+      console.log("item in controller 12 ", this.selectedItem);
       this.item_details.show_cart();
       this.selected_item_cart.showKeyboard();
       this.item_selector.hideCart();
@@ -166,11 +167,12 @@
       this.payment_cart.hideCart();
     }
     onInput(field, value) {
-      console.log("the field => ", field, "change with value ::: ", value);
+      console.log("the field => ", field, "change with value => ", value);
       console.log(" item => ", this.selectedItem);
       this.selectedItem.quantity = value;
       this.selectedItemMap.set(this.selectedItem.name, this.selectedItem);
       console.log("the new data. item => ", this.selectedItem, "the map => ", this.selectedItemMap);
+      this.selected_item_cart.refreshSelectedItem();
     }
     getItemPrice(itemId) {
       const price = this.itemPrices.find((itemPrice) => itemPrice.item_code == itemId);
@@ -764,4 +766,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.JRHR5TRX.js.map
+//# sourceMappingURL=pos.bundle.5C2WYR5N.js.map
