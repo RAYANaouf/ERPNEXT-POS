@@ -178,7 +178,7 @@
 
 
 #RightSection #editSelectedItemCart{
-        width  : cla(100%-32px) ;
+        width  : clac(100% - 32px) ;
         margin : 0px 16px    ;
         padding    : 0px 0px 16px 0px ;
 
@@ -194,8 +194,8 @@
 
 /*grid*/
 .grid-container {
-
-        display: grid;
+	width   : 100%;
+        display : grid;
         grid-template-columns : auto auto auto auto ;
 
 }

@@ -49,6 +49,7 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 
 
 
+
 		this.cartFooter = this.cartBox.find('#cartFooter')
 		this.cartFooter.append('<div id="cartDetails" class="columnBox"></div>')
 		this.cartFooter.append('<div id="editSelectedItemCart"></div>')
@@ -69,12 +70,12 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 		this.totalQuantity.append('<div id="totalQuantityValue">0</div>')
 
 		this.netTotal      = this.cartDetails.find('#netTotal')
-		this.totalQuantity.append('<div id="netTotalTitle">Net Total</div>')
-		this.totalQuantity.append('<div id="netTotalValue">0.00</div>')
+		this.netTotal.append('<div id="netTotalTitle">Net Total</div>')
+		this.netTotal.append('<div id="netTotalValue">0.00</div>')
 
 		this.grandTotal    = this.cartDetails.find('#grandTotal')
-		this.totalQuantity.append('<div id="grandTotalTitle">Grand Total</div>')
-		this.totalQuantity.append('<div id="grandTotalValue">0.00</div>')
+		this.grandTotal.append('<div id="grandTotalTitle">Grand Total</div>')
+		this.grandTotal.append('<div id="grandTotalValue">0.00</div>')
 
 		this.editSelectedItem = this.cartFooter.find('#editSelectedItemCart')
 		this.editSelectedItem.append('<div class="grid-container">')
@@ -182,13 +183,44 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 
 
 	showKeyboard(){
-		editSelectedItem.css('display','flex')
+		this.editSelectedItem.css('display','flex')
 	}
 
 	hideKeyboard(){
-		editSelectedItem.css('display','none')
+		this.editSelectedItem.css('display','none')
 	}
 
+	setKeyboardOrientation( orientation ){
+
+		const discount   = this.cartDetails.find('#discount')
+		const quantity   = this.cartDetails.find('#totalQuantity')
+		const netTotal   = this.cartDetails.find('#netTotal')
+		const grandTotal = this.cartDetails.find('#grandTotal')
+
+		if(orientation == "landscape"){
+			this.cartDetails.css('display' , 'flex')
+			this.cartDetails.addClass('rowBox align_center')
+			this.cartDetails.removeClass('columnBox')
+			discount.css('display' , 'none')
+
+			//make the text smaller
+			quantity.css('font-size' , 'smaller')
+			netTotal.css('font-size' , 'smaller')
+			grandTotal.css('font-size' , 'small')
+			grandTotal.css('font-weight' , '500')
+		}
+		else{
+			this.cartDetails.addClass('columnBox')
+			this.cartDetails.removeClass('rowBox')
+			discount.css('display','flex')
+
+			//reset
+			quantity.css('font-size'   , 'small' )
+			netTotal.css('font-size'   , 'small' )
+			grandTotal.css('font-size' , 'larger')
+			grandTotal.css('font-weight' , '700' )
+		}
+	}
 
 	/*************************  tools  **********************************/
 

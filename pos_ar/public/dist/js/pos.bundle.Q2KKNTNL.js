@@ -130,26 +130,31 @@
       this.selected_item_cart.refreshSelectedItem();
     }
     onSelectedItemClick(item) {
-      console.log("item in controller 00 ", this.selectedItem);
-      console.log("item in class 00 ", this.item_details.selected_item);
-      this.item_selector.hideCart();
+      console.log("item in controller 12 ", this.selectedItem);
+      console.log("item in class 12 ", this.item_details.selected_item);
       this.item_details.show_cart();
+      this.selected_item_cart.showKeyboard();
+      this.item_selector.hideCart();
       this.payment_cart.hideCart();
+      this.selected_item_cart.setKeyboardOrientation("landscape");
       this.item_details.refreshDate(item);
       console.log("done!");
     }
     onCheckout() {
       console.log("here we are on callback 02 ", this.item_details);
+      this.payment_cart.showCart();
       this.item_selector.hideCart();
       this.item_details.hide_cart();
-      this.payment_cart.showCart();
-      console.log("done!");
+      this.selected_item_cart.hideKeyboard();
+      this.selected_item_cart.setKeyboardOrientation("landscape");
     }
     onClose_details() {
-      console.log("onClose callback 001");
+      console.log("onClose callback 002");
       this.item_selector.showCart();
       this.payment_cart.hideCart();
       this.item_details.hide_cart();
+      this.selected_item_cart.hideKeyboard();
+      this.selected_item_cart.setKeyboardOrientation("portrait");
       this.selected_item_cart.cleanHeighlight();
     }
     onClose_payment_cart() {
@@ -417,11 +422,11 @@
       this.totalQuantity.append('<div id="totalQuantityTitle">Total Quantity</div>');
       this.totalQuantity.append('<div id="totalQuantityValue">0</div>');
       this.netTotal = this.cartDetails.find("#netTotal");
-      this.totalQuantity.append('<div id="netTotalTitle">Net Total</div>');
-      this.totalQuantity.append('<div id="netTotalValue">0.00</div>');
+      this.netTotal.append('<div id="netTotalTitle">Net Total</div>');
+      this.netTotal.append('<div id="netTotalValue">0.00</div>');
       this.grandTotal = this.cartDetails.find("#grandTotal");
-      this.totalQuantity.append('<div id="grandTotalTitle">Grand Total</div>');
-      this.totalQuantity.append('<div id="grandTotalValue">0.00</div>');
+      this.grandTotal.append('<div id="grandTotalTitle">Grand Total</div>');
+      this.grandTotal.append('<div id="grandTotalValue">0.00</div>');
       this.editSelectedItem = this.cartFooter.find("#editSelectedItemCart");
       this.editSelectedItem.append('<div class="grid-container">');
       this.buttonsContainer = this.editSelectedItem.find(".grid-container");
@@ -492,10 +497,34 @@
       });
     }
     showKeyboard() {
-      editSelectedItem.css("display", "flex");
+      this.editSelectedItem.css("display", "flex");
     }
     hideKeyboard() {
-      editSelectedItem.css("display", "none");
+      this.editSelectedItem.css("display", "none");
+    }
+    setKeyboardOrientation(orientation) {
+      const discount = this.cartDetails.find("#discount");
+      const quantity = this.cartDetails.find("#totalQuantity");
+      const netTotal = this.cartDetails.find("#netTotal");
+      const grandTotal = this.cartDetails.find("#grandTotal");
+      if (orientation == "landscape") {
+        this.cartDetails.css("display", "flex");
+        this.cartDetails.addClass("rowBox align_center");
+        this.cartDetails.removeClass("columnBox");
+        discount.css("display", "none");
+        quantity.css("font-size", "smaller");
+        netTotal.css("font-size", "smaller");
+        grandTotal.css("font-size", "small");
+        grandTotal.css("font-weight", "500");
+      } else {
+        this.cartDetails.addClass("columnBox");
+        this.cartDetails.removeClass("rowBox");
+        discount.css("display", "flex");
+        quantity.css("font-size", "small");
+        netTotal.css("font-size", "small");
+        grandTotal.css("font-size", "larger");
+        grandTotal.css("font-weight", "700");
+      }
     }
     calculateNetTotal() {
       let netTotal = 0;
@@ -550,7 +579,11 @@
       this.on_close_cart = onClose;
       this.bin_list = binList;
       console.log("start with : ", warehouse);
+      this.start_the_work();
+    }
+    start_the_work() {
       this.prepare_item_details_cart();
+      this.setDetailsFieldsListeners();
     }
     prepare_item_details_cart() {
       this.wrapper.append('<div id="itemDetailsCart" class="columnBox align_center"><div>');
@@ -633,6 +666,14 @@
       console.log("hide 001");
       this.item_details_cart.css("display", "none");
     }
+    setDetailsFieldsListeners() {
+      this.quantityInput = this.c1.find("#itemDetailsQuantityInput");
+      this.rateInput = this.c1.find("#itemDetailsRateInput");
+      this.discountInput = this.c1.find("#itemDetailsDiscountInput");
+      this.quantityInput.on("input", (event2) => {
+        console.log("quantity input ", this.value);
+      });
+    }
     getItemPrice(itemId) {
       const price = this.item_prices.find((itemPrice) => itemPrice.item_code == itemId);
       return price ? price.price_list_rate : 0;
@@ -690,4 +731,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.T6NEQDNC.js.map
+//# sourceMappingURL=pos.bundle.Q2KKNTNL.js.map

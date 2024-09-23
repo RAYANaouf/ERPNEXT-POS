@@ -165,30 +165,59 @@ pos_ar.PointOfSale.Controller = class {
 	}
 
 	onSelectedItemClick(item){
-		console.log("item in controller 00 " , this.selectedItem)
-		console.log("item in class 00 " , this.item_details.selected_item)
+		console.log("item in controller 12 " , this.selectedItem)
+		console.log("item in class 12 " , this.item_details.selected_item)
 
-		this.item_selector.hideCart();
+		//show
 		this.item_details.show_cart();
+		this.selected_item_cart.showKeyboard();
+
+		//close
+		this.item_selector.hideCart();
 		this.payment_cart.hideCart();
+
+		//change display
+		this.selected_item_cart.setKeyboardOrientation("landscape");
+
+
+		//refresh data
 		this.item_details.refreshDate(item);
 		console.log("done!")
 	}
 
 	onCheckout(){
 		console.log("here we are on callback 02 " , this.item_details)
+
+		//show
+		this.payment_cart.showCart();
+
+		//hide
 		this.item_selector.hideCart();
 		this.item_details.hide_cart();
-		this.payment_cart.showCart();
-		console.log("done!")
+		this.selected_item_cart.hideKeyboard();
+
+		//change display
+		this.selected_item_cart.setKeyboardOrientation("landscape");
+
 	}
 
 	onClose_details(){
-		console.log("onClose callback 001")
+		console.log("onClose callback 002")
+
+		//show
 		this.item_selector.showCart();
+
+		//hide
 		this.payment_cart.hideCart();
 		this.item_details.hide_cart();
+		this.selected_item_cart.hideKeyboard();
+
+		//change display
+		this.selected_item_cart.setKeyboardOrientation("portrait");
 		this.selected_item_cart.cleanHeighlight();
+
+
+
 	}
 
 	onClose_payment_cart(){

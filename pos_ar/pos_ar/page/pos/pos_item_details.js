@@ -21,9 +21,19 @@ pos_ar.PointOfSale.pos_item_details = class{
 
 		console.log("start with : " , warehouse)
 
-		this.prepare_item_details_cart()
+		this.start_the_work();
 	}
 
+
+	// start function
+
+	start_the_work(){
+		this.prepare_item_details_cart();
+		this.setDetailsFieldsListeners();
+	}
+
+
+	/****************************    ui functions   **********************************/
 
         prepare_item_details_cart(){
                 this.wrapper.append('<div id="itemDetailsCart" class="columnBox align_center"><div>')
@@ -157,6 +167,21 @@ pos_ar.PointOfSale.pos_item_details = class{
 	hide_cart(){
 		console.log('hide 001')
 		this.item_details_cart.css("display" , "none");
+	}
+
+
+	/**************************  set listener  ****************************/
+
+	setDetailsFieldsListeners(){
+
+		this.quantityInput = this.c1.find('#itemDetailsQuantityInput')
+		this.rateInput     = this.c1.find('#itemDetailsRateInput')
+		this.discountInput = this.c1.find('#itemDetailsDiscountInput')
+
+		this.quantityInput.on('input' , (event)=>{
+			console.log("quantity input " , this.value)
+		})
+
 	}
 
 
