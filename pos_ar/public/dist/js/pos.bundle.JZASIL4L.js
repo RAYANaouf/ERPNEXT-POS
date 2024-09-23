@@ -92,6 +92,9 @@
         (item) => {
           this.onSelectedItemClick(item);
         },
+        (action, key) => {
+          this.onKeyPressed(action, key);
+        },
         this.onCheckout.bind(this)
       );
     }
@@ -185,6 +188,12 @@
         this.selectedItemMap.set(this.selectedItem.name, this.selectedItem);
         this.selected_item_cart.refreshSelectedItem();
       } else if (field == "") {
+      }
+    }
+    onKeyPressed(action, key) {
+      console.log("you press ", key, " action : ", action);
+      if (action == "quantity") {
+        this.item_details.requestFocus("quantity");
       }
     }
     getItemPrice(itemId) {
@@ -404,13 +413,18 @@
 
   // ../pos_ar/pos_ar/pos_ar/page/pos/pos_selected_item_cart.js
   pos_ar.PointOfSale.pos_selected_item_cart = class {
-    constructor(wrapper, selectedItemMap, selectedField, onSelectedItemClick, onCheckoutClick) {
+    constructor(wrapper, selectedItemMap, selectedField2, onSelectedItemClick, onKeyPressed, onCheckoutClick) {
       this.wrapper = wrapper;
       this.selected_item_map = selectedItemMap;
-      this.selected_field = selectedField;
+      this.selected_field = selectedField2;
+      this.on_key_pressed = onKeyPressed;
       this.on_checkout_click = onCheckoutClick;
       this.on_selected_item_click = onSelectedItemClick;
+      this.start_work();
+    }
+    start_work() {
       this.prepare_selected_item_cart();
+      this.setButtonsListeners();
     }
     prepare_selected_item_cart() {
       this.wrapper.append('<div id="CartBox" class="columnBox"></div>');
@@ -578,26 +592,40 @@
       }
     }
     setButtonsListeners() {
-      const key_0 = this.buttonsContainer.find("key_0");
-      const key_1 = this.buttonsContainer.find("key_0");
-      const key_2 = this.buttonsContainer.find("key_0");
-      const key_3 = this.buttonsContainer.find("key_0");
-      const key_4 = this.buttonsContainer.find("key_0");
-      const key_5 = this.buttonsContainer.find("key_0");
-      const key_6 = this.buttonsContainer.find("key_0");
-      const key_7 = this.buttonsContainer.find("key_0");
-      const key_8 = this.buttonsContainer.find("key_0");
-      const key_9 = this.buttonsContainer.find("key_0");
-      const key_quantity = this.buttonsContainer.find("key_0");
-      const key_discount = this.buttonsContainer.find("key_0");
-      const key_rate = this.buttonsContainer.find("key_0");
-      const key_remove = this.buttonsContainer.find("key_0");
-      const key_delete = this.buttonsContainer.find("key_0");
-      const key_point = this.buttonsContainer.find("key_0");
+      const key_0 = this.buttonsContainer.find("#key_0");
+      const key_1 = this.buttonsContainer.find("#key_1");
+      const key_2 = this.buttonsContainer.find("#key_2");
+      const key_3 = this.buttonsContainer.find("#key_3");
+      const key_4 = this.buttonsContainer.find("#key_4");
+      const key_5 = this.buttonsContainer.find("#key_5");
+      const key_6 = this.buttonsContainer.find("#key_6");
+      const key_7 = this.buttonsContainer.find("#key_7");
+      const key_8 = this.buttonsContainer.find("#key_8");
+      const key_9 = this.buttonsContainer.find("#key_9");
+      const key_quantity = this.buttonsContainer.find("#key_quantity");
+      const key_discount = this.buttonsContainer.find("#key_discount");
+      const key_rate = this.buttonsContainer.find("#key_rate");
+      const key_remove = this.buttonsContainer.find("#key_remove");
+      const key_delete = this.buttonsContainer.find("#key_delete");
+      const key_point = this.buttonsContainer.find("#key_point");
       let keys = [key_0, key_1, key_2, key_3, key_4, key_5, key_6, key_7, key_8, key_9, key_quantity, key_discount, key_rate, key_remove, key_delete, key_point];
       keys.forEach((key) => {
         key.on("mousedown", (event2) => {
           event2.preventDefault();
+          const keyContent = key.text();
+          if (!isNaN(keyContent)) {
+            this.on_key_pressed("addToField", key.text());
+          } else if (keyContent == "." && !selectedField.value.includes(".")) {
+            this.on_key_pressed("addToField", key.text());
+          } else if (keyContent == "Quantity") {
+            this.on_key_pressed("quantity", null);
+          } else if (keyContent == "Rate") {
+            this.on_key_pressed("rate", null);
+          } else if (keyContent == "Discount") {
+            this.on_key_pressed("discount", null);
+          } else if (keyContent == "Remove") {
+            this.on_key_pressed("remove", null);
+          }
         });
       });
     }
@@ -644,14 +672,14 @@
 
   // ../pos_ar/pos_ar/pos_ar/page/pos/pos_item_details.js
   pos_ar.PointOfSale.pos_item_details = class {
-    constructor(wrapper, warehouse, priceLists, itemPrices, binList, selectedItem, selectedField, onInput, onClose) {
+    constructor(wrapper, warehouse, priceLists, itemPrices, binList, selectedItem, selectedField2, onInput, onClose) {
       console.log("hello from item_details 0");
       this.wrapper = wrapper;
       this.warehouse = warehouse;
       this.price_lists = priceLists;
       this.item_prices = itemPrices;
       this.selected_item = selectedItem;
-      this.selected_field = selectedField;
+      this.selected_field = selectedField2;
       this.on_input = onInput;
       this.on_close_cart = onClose;
       this.bin_list = binList;
@@ -761,6 +789,11 @@
         this.c1.find("#itemDetailsQuantityInput").removeClass("selected");
         this.c1.find("#itemDetailsRateInput").removeClass("selected");
         this.c1.find("#itemDetailsDiscountInput").removeClass("selected");
+      }
+    }
+    requestFocus(field) {
+      if (field == "quantity") {
+        this.c1.find("#itemDetailsQuantityInput").focus();
       }
     }
     setDetailsFieldsListeners() {
@@ -908,4 +941,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.SCZB5A7O.js.map
+//# sourceMappingURL=pos.bundle.JZASIL4L.js.map

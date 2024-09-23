@@ -111,6 +111,9 @@ pos_ar.PointOfSale.Controller = class {
 									item => {
 										this.onSelectedItemClick(item)
 									},
+									(action , key) =>{
+										this.onKeyPressed(action , key)
+									},
 									this.onCheckout.bind(this)
 									)
 	}
@@ -263,6 +266,13 @@ pos_ar.PointOfSale.Controller = class {
 			
 		}
 
+	}
+
+	onKeyPressed( action  , key){
+		console.log("you press " , key , " action : " , action)
+		if(action == "quantity"){
+			this.item_details.requestFocus("quantity")
+		}
 	}
 
 

@@ -201,6 +201,12 @@ pos_ar.PointOfSale.pos_item_details = class{
 
 	}
 
+	requestFocus(field){
+		if(field == "quantity"){
+			this.c1.find('#itemDetailsQuantityInput').focus();
+		}
+	}
+
 
 	/**************************  set listener  ****************************/
 

@@ -7,18 +7,26 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 		selectedItemMap,
 		selectedField,
 		onSelectedItemClick,
+		onKeyPressed,
 		onCheckoutClick,
 	){
 		this.wrapper = wrapper;
-		this.selected_item_map      = selectedItemMap;
-		this.selected_field         = selectedField  ;
-		this.on_checkout_click      = onCheckoutClick;
+		this.selected_item_map      = selectedItemMap ;
+		this.selected_field         = selectedField   ;
+		this.on_key_pressed         = onKeyPressed    ;
+		this.on_checkout_click      = onCheckoutClick ;
 		this.on_selected_item_click = onSelectedItemClick;
 
-		this.prepare_selected_item_cart();
+		this.start_work();
 	}
 
 
+
+	// start the class function
+	start_work(){
+		this.prepare_selected_item_cart();
+		this.setButtonsListeners();
+	}
 
 	/********************************* ui *****************************************/
 
@@ -258,30 +266,53 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 	/************************  set listeners  ***************************/
 
 	setButtonsListeners(){
-		const key_0        = this.buttonsContainer.find('key_0')
-		const key_1        = this.buttonsContainer.find('key_0')
-		const key_2        = this.buttonsContainer.find('key_0')
-		const key_3        = this.buttonsContainer.find('key_0')
-		const key_4        = this.buttonsContainer.find('key_0')
-		const key_5        = this.buttonsContainer.find('key_0')
-		const key_6        = this.buttonsContainer.find('key_0')
-		const key_7        = this.buttonsContainer.find('key_0')
-		const key_8        = this.buttonsContainer.find('key_0')
-		const key_9        = this.buttonsContainer.find('key_0')
-		const key_quantity = this.buttonsContainer.find('key_0')
-		const key_discount = this.buttonsContainer.find('key_0')
-		const key_rate     = this.buttonsContainer.find('key_0')
-		const key_remove   = this.buttonsContainer.find('key_0')
-		const key_delete   = this.buttonsContainer.find('key_0')
-		const key_point    = this.buttonsContainer.find('key_0')
+		const key_0        = this.buttonsContainer.find('#key_0')
+		const key_1        = this.buttonsContainer.find('#key_1')
+		const key_2        = this.buttonsContainer.find('#key_2')
+		const key_3        = this.buttonsContainer.find('#key_3')
+		const key_4        = this.buttonsContainer.find('#key_4')
+		const key_5        = this.buttonsContainer.find('#key_5')
+		const key_6        = this.buttonsContainer.find('#key_6')
+		const key_7        = this.buttonsContainer.find('#key_7')
+		const key_8        = this.buttonsContainer.find('#key_8')
+		const key_9        = this.buttonsContainer.find('#key_9')
+		const key_quantity = this.buttonsContainer.find('#key_quantity')
+		const key_discount = this.buttonsContainer.find('#key_discount')
+		const key_rate     = this.buttonsContainer.find('#key_rate')
+		const key_remove   = this.buttonsContainer.find('#key_remove')
+		const key_delete   = this.buttonsContainer.find('#key_delete')
+		const key_point    = this.buttonsContainer.find('#key_point')
 
 		let keys = [key_0 , key_1 , key_2 , key_3 , key_4 , key_5 , key_6 , key_7 , key_8 , key_9 , key_quantity , key_discount , key_rate , key_remove , key_delete , key_point]
+
 
 		keys.forEach(key =>{
 			key.on('mousedown' , (event)=>{
 				event.preventDefault();
+				const keyContent = key.text();
+
+				if(!isNaN(keyContent)){
+					this.on_key_pressed( "addToField" , key.text())
+				}
+				else if(keyContent == "." && !selectedField.value.includes(".")){
+					this.on_key_pressed( "addToField" , key.text())
+				}
+				else if(keyContent == "Quantity"){
+					this.on_key_pressed( "quantity" , null)
+				}
+				else if(keyContent == "Rate"){
+					this.on_key_pressed( "rate" , null)
+				}
+				else if(keyContent == "Discount"){
+					this.on_key_pressed( "discount" , null)
+				}
+				else if(keyContent == "Remove"){
+					this.on_key_pressed( "remove" , null)
+				}
+
 			})
 		})
+
 	}
 
 	/*************************  tools  **********************************/
@@ -334,6 +365,7 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 		})
 
 	}
+
 
 
 }
