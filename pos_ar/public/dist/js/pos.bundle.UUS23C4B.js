@@ -1,4 +1,21 @@
 (() => {
+  var __defProp = Object.defineProperty;
+  var __getOwnPropSymbols = Object.getOwnPropertySymbols;
+  var __hasOwnProp = Object.prototype.hasOwnProperty;
+  var __propIsEnum = Object.prototype.propertyIsEnumerable;
+  var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
+  var __spreadValues = (a, b) => {
+    for (var prop in b || (b = {}))
+      if (__hasOwnProp.call(b, prop))
+        __defNormalProp(a, prop, b[prop]);
+    if (__getOwnPropSymbols)
+      for (var prop of __getOwnPropSymbols(b)) {
+        if (__propIsEnum.call(b, prop))
+          __defNormalProp(a, prop, b[prop]);
+      }
+    return a;
+  };
+
   // ../pos_ar/pos_ar/pos_ar/page/pos/posController.js
   pos_ar.PointOfSale.Controller = class {
     constructor(wrapper) {
@@ -123,16 +140,18 @@
       );
     }
     itemClick_selector(item) {
+      const itemCloned = __spreadValues({}, item);
       console.log("old ===> ", this.selectedItemMaps);
-      console.log("updated ===> ", this.selectedItemMaps.get(this.selectedTab.tabName).has(item.name));
-      if (!this.selectedItemMaps.get(this.selectedTab.tabName).has(item.name)) {
-        item.quantity = 1;
-        item.amount = this.getItemPrice(item.name);
-        this.selectedItemMaps.get(this.selectedTab.tabName).set(item.name, item);
+      console.log("updated ===> ", this.selectedItemMaps.get(this.selectedTab.tabName).has(itemCloned.name));
+      if (!this.selectedItemMaps.get(this.selectedTab.tabName).has(itemCloned.name)) {
+        itemCloned.quantity = 1;
+        itemCloned.amount = this.getItemPrice(itemCloned.name);
+        this.selectedItemMaps.get(this.selectedTab.tabName).set(itemCloned.name, itemCloned);
       } else {
-        const existingItem = this.selectedItemMaps.get(this.selectedTab.tabName).get(item.name);
+        const existingItem = this.selectedItemMaps.get(this.selectedTab.tabName).get(itemCloned.name);
+        console.log("quantity ===> ", existingItem.quantity);
         existingItem.quantity += 1;
-        this.selectedItemMaps.get(this.selectedTab.tabName).set(item.name, existingItem);
+        this.selectedItemMaps.get(this.selectedTab.tabName).set(itemCloned.name, existingItem);
       }
       console.log("updated ===> ", this.selectedItemMaps);
       this.selected_item_cart.calculateNetTotal();
@@ -1020,4 +1039,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.GL2GABSJ.js.map
+//# sourceMappingURL=pos.bundle.UUS23C4B.js.map

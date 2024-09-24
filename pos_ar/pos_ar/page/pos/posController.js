@@ -150,22 +150,23 @@ pos_ar.PointOfSale.Controller = class {
 
 	itemClick_selector(item){
 
-
+		const itemCloned = { ...item }
 
 		console.log("old ===> " , this.selectedItemMaps )
 
-		console.log("updated ===> " , this.selectedItemMaps.get(this.selectedTab.tabName).has(item.name) )
+		console.log("updated ===> " , this.selectedItemMaps.get(this.selectedTab.tabName).has(itemCloned.name) )
 
 
-		if(!this.selectedItemMaps.get(this.selectedTab.tabName).has(item.name)){
-			item.quantity = 1 ;
-			item.amount   = this.getItemPrice(item.name);
-			this.selectedItemMaps.get(this.selectedTab.tabName).set( item.name , item )
+		if(!this.selectedItemMaps.get(this.selectedTab.tabName).has(itemCloned.name)){
+			itemCloned.quantity = 1 ;
+			itemCloned.amount   = this.getItemPrice(itemCloned.name);
+			this.selectedItemMaps.get(this.selectedTab.tabName).set( itemCloned.name , itemCloned )
 		}
 		else{
-			const existingItem = this.selectedItemMaps.get(this.selectedTab.tabName).get(item.name);
+			const existingItem = this.selectedItemMaps.get(this.selectedTab.tabName).get(itemCloned.name);
+			console.log("quantity ===> " , existingItem.quantity);
 			existingItem.quantity += 1 ;
-			this.selectedItemMaps.get(this.selectedTab.tabName).set( item.name , existingItem);
+			this.selectedItemMaps.get(this.selectedTab.tabName).set( itemCloned.name , existingItem);
 		}
 
 
