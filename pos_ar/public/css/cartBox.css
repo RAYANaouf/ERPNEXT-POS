@@ -1,12 +1,14 @@
 
 
 #RightSection #tabs{
-	background : #f5f5f5  ;
 
-	overflow-x : hidden ;
 }
 
-#RightSection #tabs div{
+
+
+
+
+#RightSection #tabs div.tab{
 	padding    : 4px 12px 4px 12px ;
 	margin     : 0px 6px 0px 0px ;
 	background : #FFFFFF ;
@@ -29,7 +31,7 @@
 #RightSection #tabs div.unselected{
 	background : #f0f0f0;
 }
-#RightSection #tabs div:hover{
+#RightSection #tabs div.tab:hover{
 	background    : #e0e0e0 ; 
 }
 

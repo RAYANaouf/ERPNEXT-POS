@@ -33,18 +33,19 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 
 	prepare_selected_item_cart(){
 
-		this.wrapper.append('<div id="tabs"    class="rowBox"></div>')
+		this.wrapper.append('<div id="tabs"    class="rowBox"><div id="tabs_container" class="rowBox"></div></div>')
 		this.wrapper.append('<div id="CartBox" class="columnBox"></div>')
 
 
-		this.tabs    = this.wrapper.find("#tabs")
-		this.cartBox = this.wrapper.find("#CartBox")
+		this.tabs_bar       = this.wrapper.find("#tabs")
+		this.tabs_container = this.tabs_bar.find('#tabs_container')
+		this.cartBox        = this.wrapper.find("#CartBox")
 
 
-		this.tabs.append('<div class="selected">C1</div>')
-		this.tabs.append('<div id="addTabBtn" class="unselected">+</div>')
+		this.tabs_container.append('<div class="tab selected">C1</div>')
+		this.tabs_bar.append('<div id="addTabBtn" class="tab unselected">+</div>')
 
-		this.add_tab_button = this.tabs.find('#addTabBtn')
+		this.add_tab_button = this.tabs_bar.find('#addTabBtn')
 
 		this.cartBox.append('<div id="CartBoxTopBar" class=" rowBox align_center  row_sbtw"><div>')
 		this.cartBox.append('<div id="cartHeader" class="rowBox row_sbtw align_center"></div>')
@@ -129,7 +130,7 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 
 
 	refreshTabs(){
-		this.tabs
+		//this.tabs_bar
 	}
 
 	refreshSelectedItem(){
@@ -333,7 +334,7 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 	setListener(){
 
 		this.add_tab_button.on('mousedown' , (event)=>{
-			this.tabs.append('<div class="selected">C1</div>')
+			this.tabs_container.append('<div class="tab selected">C1</div>')
 			console.log("add Tab ::")
 		})
 

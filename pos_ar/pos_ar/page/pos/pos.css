@@ -163,6 +163,7 @@ button:hover{
 	width       : 35%  ;
 	padding     : 10px;
 
+	overflow : hidden ;
 
 	order      : 2 ;
 }
