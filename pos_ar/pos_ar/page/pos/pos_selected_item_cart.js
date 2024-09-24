@@ -19,6 +19,8 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 		this.on_checkout_click       = onCheckoutClick ;
 		this.on_selected_item_click  = onSelectedItemClick;
 
+
+		this.counter = 1 ;
 		console.log("selected map : " , this.selected_item_maps)
 
 		this.start_work();
@@ -340,8 +342,10 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 	setListener(){
 
 		this.add_tab_button.on('mousedown' , (event)=>{
-			this.tabs_container.append('<div class="tab selected">C1</div>')
-			console.log("add Tab ::")
+			this.counter += 1 ;
+			this.selected_item_maps.set(`C${this.counter}` , new Map())
+			this.tabs_container.append(`<div class="tab selected">C${this.counter}</div>`)
+			console.log("add Tab new map ==> " , this.selected_item_maps)
 		})
 
 	}

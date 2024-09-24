@@ -12,12 +12,11 @@
 	padding    : 4px 12px 4px 12px ;
 	margin     : 0px 6px 0px 0px ;
 	background : #FFFFFF ;
-
-
 	border        : 2.5px solid #c0c0c0 ;
 	border-bottom : none ;
 	border-radius : 12px 12px 0px 0px  ;
 
+	cursor : pointer ; 
 
 	position      : relative          ;
 	bottom        : -2px              ;

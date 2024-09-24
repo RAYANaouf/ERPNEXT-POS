@@ -13,7 +13,7 @@ pos_ar.PointOfSale.Controller = class {
                 this.priceLists        = []
                 this.selectedItemMap   = new Map();
                 this.selectedItemMaps  = new Map([
-							["tab1" , new Map()]
+							["C1" , new Map()]
 						])
                 this.warehouseList     = []
                 this.PosProfileList    = []

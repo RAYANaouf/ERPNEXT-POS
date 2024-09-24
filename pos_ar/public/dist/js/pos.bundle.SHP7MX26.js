@@ -11,7 +11,7 @@
       this.priceLists = [];
       this.selectedItemMap = /* @__PURE__ */ new Map();
       this.selectedItemMaps = /* @__PURE__ */ new Map([
-        ["tab1", /* @__PURE__ */ new Map()]
+        ["C1", /* @__PURE__ */ new Map()]
       ]);
       this.warehouseList = [];
       this.PosProfileList = [];
@@ -435,6 +435,7 @@
       this.on_key_pressed = onKeyPressed;
       this.on_checkout_click = onCheckoutClick;
       this.on_selected_item_click = onSelectedItemClick;
+      this.counter = 1;
       console.log("selected map : ", this.selected_item_maps);
       this.start_work();
     }
@@ -657,8 +658,10 @@
     }
     setListener() {
       this.add_tab_button.on("mousedown", (event2) => {
-        this.tabs_container.append('<div class="tab selected">C1</div>');
-        console.log("add Tab ::");
+        this.counter += 1;
+        this.selected_item_maps.set(`C${this.counter}`, /* @__PURE__ */ new Map());
+        this.tabs_container.append(`<div class="tab selected">C${this.counter}</div>`);
+        console.log("add Tab new map ==> ", this.selected_item_maps);
       });
     }
     calculateNetTotal() {
@@ -1003,4 +1006,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.DYFS6737.js.map
+//# sourceMappingURL=pos.bundle.SHP7MX26.js.map
