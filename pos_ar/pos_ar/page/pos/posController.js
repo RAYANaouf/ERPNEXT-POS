@@ -113,6 +113,9 @@ pos_ar.PointOfSale.Controller = class {
 									item => {
 										this.onSelectedItemClick(item)
 									},
+									tab =>{
+										this.onClose_details();
+									},
 									(action , key) =>{
 										this.onKeyPressed(action , key)
 									},

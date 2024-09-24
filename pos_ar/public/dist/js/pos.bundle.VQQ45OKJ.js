@@ -111,6 +111,9 @@
         (item) => {
           this.onSelectedItemClick(item);
         },
+        (tab) => {
+          this.onClose_details();
+        },
         (action, key) => {
           this.onKeyPressed(action, key);
         },
@@ -442,7 +445,7 @@
 
   // ../pos_ar/pos_ar/pos_ar/page/pos/pos_selected_item_cart.js
   pos_ar.PointOfSale.pos_selected_item_cart = class {
-    constructor(wrapper, selectedItemMaps, selectedTab, selectedField, onSelectedItemClick, onKeyPressed, onCheckoutClick) {
+    constructor(wrapper, selectedItemMaps, selectedTab, selectedField, onSelectedItemClick, onTabClick, onKeyPressed, onCheckoutClick) {
       this.wrapper = wrapper;
       this.selected_item_maps = selectedItemMaps;
       this.selected_tab = selectedTab;
@@ -450,6 +453,7 @@
       this.on_key_pressed = onKeyPressed;
       this.on_checkout_click = onCheckoutClick;
       this.on_selected_item_click = onSelectedItemClick;
+      this.on_tab_click = onTabClick;
       this.counter = 1;
       this.start_work();
     }
@@ -546,6 +550,7 @@
         this.calculateNetTotal();
         this.calculateQnatity();
         this.calculateGrandTotal();
+        this.on_tab_click(clickedTab);
         console.log("clicked tab ==> ", clickedTab);
       });
     }
@@ -694,6 +699,7 @@
         this.selected_tab.tabName = `C${this.counter}`;
         this.refreshTabs();
         this.refreshSelectedItem();
+        this.on_tab_click();
         console.log("add Tab new map ==> ", this.selected_item_maps);
       });
     }
@@ -1039,4 +1045,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.UUS23C4B.js.map
+//# sourceMappingURL=pos.bundle.VQQ45OKJ.js.map

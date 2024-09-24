@@ -8,6 +8,7 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 		selectedTab      ,
 		selectedField    ,
 		onSelectedItemClick,
+		onTabClick       ,
 		onKeyPressed     ,
 		onCheckoutClick  ,
 	){
@@ -18,6 +19,7 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 		this.on_key_pressed          = onKeyPressed    ;
 		this.on_checkout_click       = onCheckoutClick ;
 		this.on_selected_item_click  = onSelectedItemClick;
+		this.on_tab_click            = onTabClick      ;
 
 
 		this.counter = 1 ;
@@ -158,6 +160,8 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 			this.calculateNetTotal();
 			this.calculateQnatity();
 			this.calculateGrandTotal();
+
+			this.on_tab_click(clickedTab);
 
 			console.log("clicked tab ==> " , clickedTab)
 		})
@@ -368,9 +372,10 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 			this.selected_item_maps.set(`C${this.counter}` , new Map())
 			this.selected_tab.tabName = `C${this.counter}`
 
+			//update UI
 			this.refreshTabs()
 			this.refreshSelectedItem()
-
+			this.on_tab_click();
 			console.log("add Tab new map ==> " , this.selected_item_maps)
 		})
 
