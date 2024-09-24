@@ -110,6 +110,7 @@ pos_ar.PointOfSale.Controller = class {
 									this.$rightSection ,
 									this.selectedItemMap,
 									this.selectedItemMaps,
+									this.selectedTab,
 									this.selectedField,
 									item => {
 										this.onSelectedItemClick(item)

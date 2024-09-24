@@ -91,6 +91,7 @@
         this.$rightSection,
         this.selectedItemMap,
         this.selectedItemMaps,
+        this.selectedTab,
         this.selectedField,
         (item) => {
           this.onSelectedItemClick(item);
@@ -426,16 +427,16 @@
 
   // ../pos_ar/pos_ar/pos_ar/page/pos/pos_selected_item_cart.js
   pos_ar.PointOfSale.pos_selected_item_cart = class {
-    constructor(wrapper, selectedItemMap, selectedItemMaps, selectedField, onSelectedItemClick, onKeyPressed, onCheckoutClick) {
+    constructor(wrapper, selectedItemMap, selectedItemMaps, selectedTab, selectedField, onSelectedItemClick, onKeyPressed, onCheckoutClick) {
       this.wrapper = wrapper;
       this.selected_item_map = selectedItemMap;
       this.selected_item_maps = selectedItemMaps;
+      this.selected_tab = selectedTab;
       this.selected_field = selectedField;
       this.on_key_pressed = onKeyPressed;
       this.on_checkout_click = onCheckoutClick;
       this.on_selected_item_click = onSelectedItemClick;
       this.counter = 1;
-      console.log("selected map : ", this.selected_item_maps);
       this.start_work();
     }
     start_work() {
@@ -515,12 +516,15 @@
       });
     }
     refreshTabs() {
+      this.tabs_container.empty();
+      for (let key of this.selected_item_maps.keys()) {
+        this.tabs_container.append(`<div class="tab">${key}</div>`);
+      }
     }
     refreshSelectedItem() {
-      console.log("new selected map :::", this.selected_item_maps);
       const selectedItemsContainer = document.getElementById("selectedItemsContainer");
       selectedItemsContainer.innerHTML = "";
-      this.selected_item_map.forEach((item, itemId) => {
+      this.selected_item_maps.get(this.selected_tab.tabName).forEach((item, itemId) => {
         const itemElement = document.createElement("div");
         const leftGroup = document.createElement("div");
         const rightGroup = document.createElement("div");
@@ -659,7 +663,9 @@
       this.add_tab_button.on("mousedown", (event2) => {
         this.counter += 1;
         this.selected_item_maps.set(`C${this.counter}`, /* @__PURE__ */ new Map());
-        this.tabs_container.append(`<div class="tab selected">C${this.counter}</div>`);
+        this.selected_tab.tabName = `C${this.counter}`;
+        this.refreshTabs();
+        this.refreshSelectedItem();
         console.log("add Tab new map ==> ", this.selected_item_maps);
       });
     }
@@ -1005,4 +1011,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.JISCJKOC.js.map
+//# sourceMappingURL=pos.bundle.QOG4U4XP.js.map

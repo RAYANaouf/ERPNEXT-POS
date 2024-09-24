@@ -6,6 +6,7 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 		wrapper          ,
 		selectedItemMap  ,
 		selectedItemMaps ,
+		selectedTab      ,
 		selectedField    ,
 		onSelectedItemClick,
 		onKeyPressed     ,
@@ -14,6 +15,7 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 		this.wrapper                 = wrapper;
 		this.selected_item_map       = selectedItemMap ;
 		this.selected_item_maps      = selectedItemMaps;
+		this.selected_tab            = selectedTab     ;
 		this.selected_field          = selectedField   ;
 		this.on_key_pressed          = onKeyPressed    ;
 		this.on_checkout_click       = onCheckoutClick ;
@@ -21,7 +23,6 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 
 
 		this.counter = 1 ;
-		console.log("selected map : " , this.selected_item_maps)
 
 		this.start_work();
 	}
@@ -136,18 +137,21 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 
 
 	refreshTabs(){
-		//this.tabs_bar
+		//clear the tabs_container
+		this.tabs_container.empty()
+
+		for(let key of this.selected_item_maps.keys() ){
+			this.tabs_container.append(`<div class="tab">${key}</div>`)
+		}
 	}
 
 	refreshSelectedItem(){
 
 
-		console.log("new selected map :::" , this.selected_item_maps)
-
 		const selectedItemsContainer = document.getElementById("selectedItemsContainer");
 		selectedItemsContainer.innerHTML = "";
 
-		this.selected_item_map.forEach((item,itemId) =>{
+		this.selected_item_maps.get(this.selected_tab.tabName).forEach((item,itemId) =>{
 			const itemElement   = document.createElement("div");
 			const leftGroup     = document.createElement("div");
 			const rightGroup    = document.createElement("div");
@@ -344,7 +348,11 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 		this.add_tab_button.on('mousedown' , (event)=>{
 			this.counter += 1 ;
 			this.selected_item_maps.set(`C${this.counter}` , new Map())
-			this.tabs_container.append(`<div class="tab selected">C${this.counter}</div>`)
+			this.selected_tab.tabName = `C${this.counter}`
+
+			this.refreshTabs()
+			this.refreshSelectedItem()
+
 			console.log("add Tab new map ==> " , this.selected_item_maps)
 		})
 
