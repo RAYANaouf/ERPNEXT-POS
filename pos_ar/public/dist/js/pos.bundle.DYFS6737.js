@@ -10,6 +10,9 @@
       this.itemPrices = [];
       this.priceLists = [];
       this.selectedItemMap = /* @__PURE__ */ new Map();
+      this.selectedItemMaps = /* @__PURE__ */ new Map([
+        ["tab1", /* @__PURE__ */ new Map()]
+      ]);
       this.warehouseList = [];
       this.PosProfileList = [];
       this.binList = [];
@@ -33,16 +36,16 @@
       this.warehouseList = await this.fetchWarehouseList();
       this.PosProfileList = await this.fetchPosProfileList();
       this.binList = await this.fetchBinList();
-      console.log("customersList : ", this.customersList);
-      console.log("itemGroupList : ", this.itemGroupList);
-      console.log("itemList : ", this.itemList);
-      console.log("itemPrices : ", this.itemPrices);
-      console.log("priceLists : ", this.priceLists);
-      console.log("warehouseList : ", this.warehouseList);
-      console.log("POSProfileList : ", this.PosProfileList);
-      console.log("bin list : ", this.binList);
-      console.log("tabList  : ", this.tabList);
-      console.log("selected Tab : ", this.selectedTab);
+      console.log("customersList => ", this.customersList);
+      console.log("itemGroupList => ", this.itemGroupList);
+      console.log("itemList      => ", this.itemList);
+      console.log("itemPrices    => ", this.itemPrices);
+      console.log("priceLists    => ", this.priceLists);
+      console.log("warehouseList => ", this.warehouseList);
+      console.log("POSProfileList => ", this.PosProfileList);
+      console.log("bin list       => ", this.binList);
+      console.log("tabList        => ", this.tabList);
+      console.log("selected Tab   => ", this.selectedTab);
     }
     prepare_container() {
       this.wrapper.append('<link rel="stylesheet" type="text/css" href="/assets/pos_ar/css/selectorBox.css">');
@@ -88,6 +91,7 @@
       this.selected_item_cart = new pos_ar.PointOfSale.pos_selected_item_cart(
         this.$rightSection,
         this.selectedItemMap,
+        this.selectedItemMaps,
         this.selectedField,
         (item) => {
           this.onSelectedItemClick(item);
@@ -125,10 +129,12 @@
         item.quantity = 1;
         item.amount = this.getItemPrice(item.name);
         this.selectedItemMap.set(item.name, item);
+        this.selectedItemMaps.get("tab1").set(item.name, item);
       } else {
         const existingItem = this.selectedItemMap.get(item.name);
         existingItem.quantity += 1;
         this.selectedItemMap.set(item.name, existingItem);
+        this.selectedItemMaps.get("tab1").set(item.name, existingItem);
       }
       this.selected_item_cart.calculateNetTotal();
       this.selected_item_cart.calculateQnatity();
@@ -182,10 +188,12 @@
       if (field == "quantity") {
         this.selectedItem.quantity = value;
         this.selectedItemMap.set(this.selectedItem.name, this.selectedItem);
+        this.selectedItemMaps.get("tab1").set(this.selectedItem.name, this.selectedItem);
         this.selected_item_cart.refreshSelectedItem();
       } else if (field == "rate") {
         this.selectedItem.amount = value;
         this.selectedItemMap.set(this.selectedItem.name, this.selectedItem);
+        this.selectedItemMaps.get("tab1").set(this.selectedItem.name, this.selectedItem);
         this.selected_item_cart.refreshSelectedItem();
       } else if (field == "") {
       }
@@ -419,13 +427,15 @@
 
   // ../pos_ar/pos_ar/pos_ar/page/pos/pos_selected_item_cart.js
   pos_ar.PointOfSale.pos_selected_item_cart = class {
-    constructor(wrapper, selectedItemMap, selectedField, onSelectedItemClick, onKeyPressed, onCheckoutClick) {
+    constructor(wrapper, selectedItemMap, selectedItemMaps, selectedField, onSelectedItemClick, onKeyPressed, onCheckoutClick) {
       this.wrapper = wrapper;
       this.selected_item_map = selectedItemMap;
+      this.selected_item_maps = selectedItemMaps;
       this.selected_field = selectedField;
       this.on_key_pressed = onKeyPressed;
       this.on_checkout_click = onCheckoutClick;
       this.on_selected_item_click = onSelectedItemClick;
+      console.log("selected map : ", this.selected_item_maps);
       this.start_work();
     }
     start_work() {
@@ -507,6 +517,7 @@
     refreshTabs() {
     }
     refreshSelectedItem() {
+      console.log("new selected map :::", this.selected_item_maps);
       const selectedItemsContainer = document.getElementById("selectedItemsContainer");
       selectedItemsContainer.innerHTML = "";
       this.selected_item_map.forEach((item, itemId) => {
@@ -992,4 +1003,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.OFGS3MUM.js.map
+//# sourceMappingURL=pos.bundle.DYFS6737.js.map

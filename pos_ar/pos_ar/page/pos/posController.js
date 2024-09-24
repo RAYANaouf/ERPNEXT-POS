@@ -6,20 +6,23 @@ pos_ar.PointOfSale.Controller = class {
                 this.wrapper = $(wrapper).find(".layout-main-section");
                 this.page    = wrapper.page ;
                 //logic variable
-                this.customersList    = []
-                this.itemGroupList    = []
-                this.itemList         = []
-                this.itemPrices       = []
-                this.priceLists       = []
-                this.selectedItemMap  = new Map();
-                this.warehouseList    = []
-                this.PosProfileList   = []
-                this.binList          = []
-                this.tabList          = ["C1"]
+                this.customersList     = []
+                this.itemGroupList     = []
+                this.itemList          = []
+                this.itemPrices        = []
+                this.priceLists        = []
+                this.selectedItemMap   = new Map();
+                this.selectedItemMaps  = new Map([
+							["tab1" , new Map()]
+						])
+                this.warehouseList     = []
+                this.PosProfileList    = []
+                this.binList           = []
+                this.tabList           = ["C1"]
 
-                this.selectedItem     = {}
-                this.selectedField    = {}
-                this.selectedTab      = this.tabList[0]
+                this.selectedItem      = {}
+                this.selectedField     = {}
+                this.selectedTab       = this.tabList[0]
 
 
                 this.start_app();
@@ -41,16 +44,16 @@ pos_ar.PointOfSale.Controller = class {
                 this.PosProfileList = await this.fetchPosProfileList()
                 this.binList        = await this.fetchBinList()
 
-                console.log("customersList : " , this.customersList )
-                console.log("itemGroupList : " , this.itemGroupList )
-                console.log("itemList : "      , this.itemList      )
-                console.log("itemPrices : "    , this.itemPrices    )
-                console.log("priceLists : "    , this.priceLists    )
-                console.log("warehouseList : " , this.warehouseList )
-                console.log("POSProfileList : ", this.PosProfileList)
-                console.log("bin list : "      , this.binList       )
-                console.log("tabList  : "      , this.tabList       )
-                console.log("selected Tab : "  , this.selectedTab   )
+                console.log("customersList => " , this.customersList )
+                console.log("itemGroupList => " , this.itemGroupList )
+                console.log("itemList      => " , this.itemList      )
+                console.log("itemPrices    => " , this.itemPrices    )
+                console.log("priceLists    => " , this.priceLists    )
+                console.log("warehouseList => " , this.warehouseList )
+                console.log("POSProfileList => ", this.PosProfileList)
+                console.log("bin list       => ", this.binList       )
+                console.log("tabList        => ", this.tabList       )
+                console.log("selected Tab   => ", this.selectedTab   )
         }
 
 
@@ -107,6 +110,7 @@ pos_ar.PointOfSale.Controller = class {
 		this.selected_item_cart  = new pos_ar.PointOfSale.pos_selected_item_cart(
 									this.$rightSection ,
 									this.selectedItemMap,
+									this.selectedItemMaps,
 									this.selectedField,
 									item => {
 										this.onSelectedItemClick(item)
@@ -152,11 +156,13 @@ pos_ar.PointOfSale.Controller = class {
 			item.quantity = 1 ;
 			item.amount   = this.getItemPrice(item.name);
 			this.selectedItemMap.set( item.name  , item);
+			this.selectedItemMaps.get("tab1").set( item.name , item )
 		}
 		else{
 			const existingItem = this.selectedItemMap.get(item.name);
 			existingItem.quantity += 1 ;
 			this.selectedItemMap.set( item.name  , existingItem);
+			this.selectedItemMaps.get("tab1").set( item.name , existingItem);
 		}
 
 		this.selected_item_cart.calculateNetTotal();
@@ -253,12 +259,14 @@ pos_ar.PointOfSale.Controller = class {
 		if( field ==  "quantity" ){
 			this.selectedItem.quantity = value;
 			this.selectedItemMap.set(this.selectedItem.name , this.selectedItem)
+			this.selectedItemMaps.get("tab1").set(this.selectedItem.name , this.selectedItem)
 			//redrawing
 			this.selected_item_cart.refreshSelectedItem();
 		}
 		else if( field ==  "rate" ){
 			this.selectedItem.amount = value;
 			this.selectedItemMap.set(this.selectedItem.name , this.selectedItem)
+			this.selectedItemMaps.get("tab1").set( this.selectedItem.name , this.selectedItem  )
 			//redrawing
 			this.selected_item_cart.refreshSelectedItem();
 		}

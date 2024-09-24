@@ -3,19 +3,23 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 
 
 	constructor(
-		wrapper ,
-		selectedItemMap,
-		selectedField,
+		wrapper          ,
+		selectedItemMap  ,
+		selectedItemMaps ,
+		selectedField    ,
 		onSelectedItemClick,
-		onKeyPressed,
-		onCheckoutClick,
+		onKeyPressed     ,
+		onCheckoutClick  ,
 	){
-		this.wrapper = wrapper;
-		this.selected_item_map      = selectedItemMap ;
-		this.selected_field         = selectedField   ;
-		this.on_key_pressed         = onKeyPressed    ;
-		this.on_checkout_click      = onCheckoutClick ;
-		this.on_selected_item_click = onSelectedItemClick;
+		this.wrapper                 = wrapper;
+		this.selected_item_map       = selectedItemMap ;
+		this.selected_item_maps      = selectedItemMaps;
+		this.selected_field          = selectedField   ;
+		this.on_key_pressed          = onKeyPressed    ;
+		this.on_checkout_click       = onCheckoutClick ;
+		this.on_selected_item_click  = onSelectedItemClick;
+
+		console.log("selected map : " , this.selected_item_maps)
 
 		this.start_work();
 	}
@@ -135,6 +139,8 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 
 	refreshSelectedItem(){
 
+
+		console.log("new selected map :::" , this.selected_item_maps)
 
 		const selectedItemsContainer = document.getElementById("selectedItemsContainer");
 		selectedItemsContainer.innerHTML = "";
