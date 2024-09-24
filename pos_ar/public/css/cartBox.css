@@ -11,7 +11,7 @@
 #RightSection #tabs div.tab{
 	padding    : 4px 12px 4px 12px ;
 	margin     : 0px 6px 0px 0px ;
-	background : #FFFFFF ;
+	background : #f9f9f9 ;
 	border        : 2.5px solid #c0c0c0 ;
 	border-bottom : none ;
 	border-radius : 12px 12px 0px 0px  ;
@@ -22,7 +22,11 @@
 	bottom        : -2px              ;
 
 }
-
+#RightSection #tabs div.tab.selected{
+	background : #ffffff;
+	border        : 2.5px solid #ac6500 ;
+	border-bottom : none ;
+}
 #RightSection #tabs #addTabBtn{
 	cursor : pointer ; 
 }
@@ -31,7 +35,7 @@
 	background : #f0f0f0;
 }
 #RightSection #tabs div.tab:hover{
-	background    : #e0e0e0 ; 
+	background    : #ffffff ; 
 }
 
 #RightSection #CartBox{

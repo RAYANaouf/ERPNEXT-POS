@@ -11,7 +11,6 @@ pos_ar.PointOfSale.Controller = class {
                 this.itemList          = []
                 this.itemPrices        = []
                 this.priceLists        = []
-                this.selectedItemMap   = new Map();
                 this.selectedItemMaps  = new Map([
 							["C1" , new Map()]
 						])
@@ -108,7 +107,6 @@ pos_ar.PointOfSale.Controller = class {
         init_selected_item(){
 		this.selected_item_cart  = new pos_ar.PointOfSale.pos_selected_item_cart(
 									this.$rightSection ,
-									this.selectedItemMap,
 									this.selectedItemMaps,
 									this.selectedTab,
 									this.selectedField,
@@ -152,18 +150,27 @@ pos_ar.PointOfSale.Controller = class {
 
 	itemClick_selector(item){
 
-		if(!this.selectedItemMap.has(item.name)){
+
+
+		console.log("old ===> " , this.selectedItemMaps )
+
+		console.log("updated ===> " , this.selectedItemMaps.get(this.selectedTab.tabName).has(item.name) )
+
+
+		if(!this.selectedItemMaps.get(this.selectedTab.tabName).has(item.name)){
 			item.quantity = 1 ;
 			item.amount   = this.getItemPrice(item.name);
-			this.selectedItemMap.set( item.name  , item);
 			this.selectedItemMaps.get(this.selectedTab.tabName).set( item.name , item )
 		}
 		else{
-			const existingItem = this.selectedItemMap.get(item.name);
+			const existingItem = this.selectedItemMaps.get(this.selectedTab.tabName).get(item.name);
 			existingItem.quantity += 1 ;
-			this.selectedItemMap.set( item.name  , existingItem);
 			this.selectedItemMaps.get(this.selectedTab.tabName).set( item.name , existingItem);
 		}
+
+
+		console.log("updated ===> " , this.selectedItemMaps )
+
 
 		this.selected_item_cart.calculateNetTotal();
 		this.selected_item_cart.calculateQnatity();
@@ -258,14 +265,12 @@ pos_ar.PointOfSale.Controller = class {
 
 		if( field ==  "quantity" ){
 			this.selectedItem.quantity = value;
-			this.selectedItemMap.set(this.selectedItem.name , this.selectedItem)
 			this.selectedItemMaps.get(this.selectedTab.tabName).set(this.selectedItem.name , this.selectedItem)
 			//redrawing
 			this.selected_item_cart.refreshSelectedItem();
 		}
 		else if( field ==  "rate" ){
 			this.selectedItem.amount = value;
-			this.selectedItemMap.set(this.selectedItem.name , this.selectedItem)
 			this.selectedItemMaps.get(this.selectedTab.tabName).set( this.selectedItem.name , this.selectedItem  )
 			//redrawing
 			this.selected_item_cart.refreshSelectedItem();

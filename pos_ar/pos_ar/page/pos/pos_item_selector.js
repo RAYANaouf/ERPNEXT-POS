@@ -9,7 +9,6 @@ pos_ar.PointOfSale.pos_item_selector = class {
 		item_prices,
 		onItemClick
 	){
-		console.log("pos_item_selector class is working !")
 		this.wrapper     = wrapper;
 		this.item_list   = item_list;
 		this.item_group_list = item_group_list;
@@ -76,11 +75,6 @@ pos_ar.PointOfSale.pos_item_selector = class {
 
                 	itemBox.addEventListener('click' , event => {
 				this.on_item_click(item);
-                        	//itemClick(item);
-                        	//setSelectedItem();
-                        	//calculateNetTotal();
-                        	//calculateQnatity();
-                        	//calculateGrandTotal();
                 	});
 
 

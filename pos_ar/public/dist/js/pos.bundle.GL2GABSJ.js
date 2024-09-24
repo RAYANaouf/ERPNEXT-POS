@@ -9,7 +9,6 @@
       this.itemList = [];
       this.itemPrices = [];
       this.priceLists = [];
-      this.selectedItemMap = /* @__PURE__ */ new Map();
       this.selectedItemMaps = /* @__PURE__ */ new Map([
         ["C1", /* @__PURE__ */ new Map()]
       ]);
@@ -89,7 +88,6 @@
     init_selected_item() {
       this.selected_item_cart = new pos_ar.PointOfSale.pos_selected_item_cart(
         this.$rightSection,
-        this.selectedItemMap,
         this.selectedItemMaps,
         this.selectedTab,
         this.selectedField,
@@ -125,17 +123,18 @@
       );
     }
     itemClick_selector(item) {
-      if (!this.selectedItemMap.has(item.name)) {
+      console.log("old ===> ", this.selectedItemMaps);
+      console.log("updated ===> ", this.selectedItemMaps.get(this.selectedTab.tabName).has(item.name));
+      if (!this.selectedItemMaps.get(this.selectedTab.tabName).has(item.name)) {
         item.quantity = 1;
         item.amount = this.getItemPrice(item.name);
-        this.selectedItemMap.set(item.name, item);
         this.selectedItemMaps.get(this.selectedTab.tabName).set(item.name, item);
       } else {
-        const existingItem = this.selectedItemMap.get(item.name);
+        const existingItem = this.selectedItemMaps.get(this.selectedTab.tabName).get(item.name);
         existingItem.quantity += 1;
-        this.selectedItemMap.set(item.name, existingItem);
         this.selectedItemMaps.get(this.selectedTab.tabName).set(item.name, existingItem);
       }
+      console.log("updated ===> ", this.selectedItemMaps);
       this.selected_item_cart.calculateNetTotal();
       this.selected_item_cart.calculateQnatity();
       this.selected_item_cart.calculateGrandTotal();
@@ -187,12 +186,10 @@
       }
       if (field == "quantity") {
         this.selectedItem.quantity = value;
-        this.selectedItemMap.set(this.selectedItem.name, this.selectedItem);
         this.selectedItemMaps.get(this.selectedTab.tabName).set(this.selectedItem.name, this.selectedItem);
         this.selected_item_cart.refreshSelectedItem();
       } else if (field == "rate") {
         this.selectedItem.amount = value;
-        this.selectedItemMap.set(this.selectedItem.name, this.selectedItem);
         this.selectedItemMaps.get(this.selectedTab.tabName).set(this.selectedItem.name, this.selectedItem);
         this.selected_item_cart.refreshSelectedItem();
       } else if (field == "") {
@@ -307,7 +304,6 @@
   // ../pos_ar/pos_ar/pos_ar/page/pos/pos_item_selector.js
   pos_ar.PointOfSale.pos_item_selector = class {
     constructor(wrapper, item_list, item_group_list, item_prices, onItemClick) {
-      console.log("pos_item_selector class is working !");
       this.wrapper = wrapper;
       this.item_list = item_list;
       this.item_group_list = item_group_list;
@@ -427,9 +423,8 @@
 
   // ../pos_ar/pos_ar/pos_ar/page/pos/pos_selected_item_cart.js
   pos_ar.PointOfSale.pos_selected_item_cart = class {
-    constructor(wrapper, selectedItemMap, selectedItemMaps, selectedTab, selectedField, onSelectedItemClick, onKeyPressed, onCheckoutClick) {
+    constructor(wrapper, selectedItemMaps, selectedTab, selectedField, onSelectedItemClick, onKeyPressed, onCheckoutClick) {
       this.wrapper = wrapper;
-      this.selected_item_map = selectedItemMap;
       this.selected_item_maps = selectedItemMaps;
       this.selected_tab = selectedTab;
       this.selected_field = selectedField;
@@ -518,8 +513,22 @@
     refreshTabs() {
       this.tabs_container.empty();
       for (let key of this.selected_item_maps.keys()) {
-        this.tabs_container.append(`<div class="tab">${key}</div>`);
+        if (key == this.selected_tab.tabName) {
+          this.tabs_container.append(`<div class="tab selected">${key}</div>`);
+        } else {
+          this.tabs_container.append(`<div class="tab">${key}</div>`);
+        }
       }
+      this.tabs_container.find(".tab").on("click", (event2) => {
+        const clickedTab = $(event2.target).text();
+        this.selected_tab.tabName = clickedTab;
+        this.refreshTabs();
+        this.refreshSelectedItem();
+        this.calculateNetTotal();
+        this.calculateQnatity();
+        this.calculateGrandTotal();
+        console.log("clicked tab ==> ", clickedTab);
+      });
     }
     refreshSelectedItem() {
       const selectedItemsContainer = document.getElementById("selectedItemsContainer");
@@ -671,7 +680,7 @@
     }
     calculateNetTotal() {
       let netTotal = 0;
-      this.selected_item_map.forEach((value, key) => {
+      this.selected_item_maps.get(this.selected_tab.tabName).forEach((value, key) => {
         netTotal += value.quantity * value.amount;
       });
       const netTotal_HTML = document.getElementById("netTotalValue");
@@ -679,7 +688,7 @@
     }
     calculateQnatity() {
       let quantity = 0;
-      this.selected_item_map.forEach((value, key) => {
+      this.selected_item_maps.get(this.selected_tab.tabName).forEach((value, key) => {
         quantity += value.quantity;
       });
       const totalQuantity_HTML = document.getElementById("totalQuantityValue");
@@ -687,7 +696,7 @@
     }
     calculateGrandTotal() {
       let grandTotal = 0;
-      this.selected_item_map.forEach((value, key) => {
+      this.selected_item_maps.get(this.selected_tab.tabName).forEach((value, key) => {
         grandTotal += value.quantity * value.amount;
       });
       const grandTotal_HTML = document.getElementById("grandTotalValue");
@@ -1011,4 +1020,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.QOG4U4XP.js.map
+//# sourceMappingURL=pos.bundle.GL2GABSJ.js.map

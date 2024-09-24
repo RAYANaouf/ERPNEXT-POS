@@ -4,7 +4,6 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 
 	constructor(
 		wrapper          ,
-		selectedItemMap  ,
 		selectedItemMaps ,
 		selectedTab      ,
 		selectedField    ,
@@ -13,7 +12,6 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 		onCheckoutClick  ,
 	){
 		this.wrapper                 = wrapper;
-		this.selected_item_map       = selectedItemMap ;
 		this.selected_item_maps      = selectedItemMaps;
 		this.selected_tab            = selectedTab     ;
 		this.selected_field          = selectedField   ;
@@ -141,8 +139,28 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 		this.tabs_container.empty()
 
 		for(let key of this.selected_item_maps.keys() ){
-			this.tabs_container.append(`<div class="tab">${key}</div>`)
+			if(key == this.selected_tab.tabName){
+				this.tabs_container.append(`<div class="tab selected">${key}</div>`)
+			}
+			else{
+				this.tabs_container.append(`<div class="tab">${key}</div>`)
+			}
 		}
+
+		this.tabs_container.find(".tab").on('click' , (event)=>{
+			const clickedTab = $(event.target).text()
+
+			this.selected_tab.tabName = clickedTab
+
+			//update UI
+			this.refreshTabs();
+			this.refreshSelectedItem();
+			this.calculateNetTotal();
+			this.calculateQnatity();
+			this.calculateGrandTotal();
+
+			console.log("clicked tab ==> " , clickedTab)
+		})
 	}
 
 	refreshSelectedItem(){
@@ -363,7 +381,7 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 
 	calculateNetTotal(){
 		let netTotal = 0;
-		this.selected_item_map.forEach((value,key) =>{
+		this.selected_item_maps.get(this.selected_tab.tabName).forEach((value,key) =>{
 			netTotal += value.quantity * value.amount
 		})
 
@@ -373,7 +391,7 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 
 	calculateQnatity(){
 		let quantity = 0;
-		this.selected_item_map.forEach((value,key) =>{
+		this.selected_item_maps.get(this.selected_tab.tabName).forEach((value,key) =>{
 			quantity += value.quantity
 		})
 
@@ -383,7 +401,7 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 
 	calculateGrandTotal(){
 		let grandTotal = 0;
-		this.selected_item_map.forEach((value,key) =>{
+		this.selected_item_maps.get(this.selected_tab.tabName).forEach((value,key) =>{
 			grandTotal += value.quantity * value.amount
 		})
 
