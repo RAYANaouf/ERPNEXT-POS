@@ -16,10 +16,9 @@
       this.warehouseList = [];
       this.PosProfileList = [];
       this.binList = [];
-      this.tabList = ["C1"];
       this.selectedItem = {};
       this.selectedField = {};
-      this.selectedTab = this.tabList[0];
+      this.selectedTab = { "tabName": "C1" };
       this.start_app();
     }
     async start_app() {
@@ -129,12 +128,12 @@
         item.quantity = 1;
         item.amount = this.getItemPrice(item.name);
         this.selectedItemMap.set(item.name, item);
-        this.selectedItemMaps.get("tab1").set(item.name, item);
+        this.selectedItemMaps.get(this.selectedTab.tabName).set(item.name, item);
       } else {
         const existingItem = this.selectedItemMap.get(item.name);
         existingItem.quantity += 1;
         this.selectedItemMap.set(item.name, existingItem);
-        this.selectedItemMaps.get("tab1").set(item.name, existingItem);
+        this.selectedItemMaps.get(this.selectedTab.tabName).set(item.name, existingItem);
       }
       this.selected_item_cart.calculateNetTotal();
       this.selected_item_cart.calculateQnatity();
@@ -188,12 +187,12 @@
       if (field == "quantity") {
         this.selectedItem.quantity = value;
         this.selectedItemMap.set(this.selectedItem.name, this.selectedItem);
-        this.selectedItemMaps.get("tab1").set(this.selectedItem.name, this.selectedItem);
+        this.selectedItemMaps.get(this.selectedTab.tabName).set(this.selectedItem.name, this.selectedItem);
         this.selected_item_cart.refreshSelectedItem();
       } else if (field == "rate") {
         this.selectedItem.amount = value;
         this.selectedItemMap.set(this.selectedItem.name, this.selectedItem);
-        this.selectedItemMaps.get("tab1").set(this.selectedItem.name, this.selectedItem);
+        this.selectedItemMaps.get(this.selectedTab.tabName).set(this.selectedItem.name, this.selectedItem);
         this.selected_item_cart.refreshSelectedItem();
       } else if (field == "") {
       }
@@ -1006,4 +1005,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.SHP7MX26.js.map
+//# sourceMappingURL=pos.bundle.JISCJKOC.js.map
