@@ -60,8 +60,6 @@
       console.log("warehouseList => ", this.warehouseList);
       console.log("POSProfileList => ", this.PosProfileList);
       console.log("bin list       => ", this.binList);
-      console.log("tabList        => ", this.tabList);
-      console.log("selected Tab   => ", this.selectedTab);
     }
     prepare_container() {
       this.wrapper.append('<link rel="stylesheet" type="text/css" href="/assets/pos_ar/css/selectorBox.css">');
@@ -164,7 +162,6 @@
       this.selected_item_cart.refreshSelectedItem();
     }
     onSelectedItemClick(item) {
-      let me = this;
       Object.assign(this.selectedItem, item);
       this.item_details.show_cart();
       this.selected_item_cart.showKeyboard();
@@ -231,6 +228,13 @@
       }
     }
     setListeners() {
+      console.log("test (window) ==> ", window);
+      window.addEventListener("offline", function() {
+        frappe.msgprint("you lose the connection (offline mode)");
+      });
+      window.addEventListener("online", function() {
+        frappe.msgprint("the connection is back (online mode)");
+      });
     }
     getItemPrice(itemId) {
       const price = this.itemPrices.find((itemPrice) => itemPrice.item_code == itemId);
@@ -1048,4 +1052,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.XOOJYLES.js.map
+//# sourceMappingURL=pos.bundle.EUXROEHU.js.map

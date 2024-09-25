@@ -51,8 +51,6 @@ pos_ar.PointOfSale.Controller = class {
                 console.log("warehouseList => " , this.warehouseList )
                 console.log("POSProfileList => ", this.PosProfileList)
                 console.log("bin list       => ", this.binList       )
-                console.log("tabList        => ", this.tabList       )
-                console.log("selected Tab   => ", this.selectedTab   )
         }
 
 
@@ -187,8 +185,6 @@ pos_ar.PointOfSale.Controller = class {
 
 	onSelectedItemClick(item){
 
-		let me = this
-
 		Object.assign(this.selectedItem , item)
 
 
@@ -305,8 +301,14 @@ pos_ar.PointOfSale.Controller = class {
 	/****************************  listeners *******************************/
 
 	setListeners(){
+		console.log("test (window) ==> " , window)
+		window.addEventListener('offline' , function(){
+			frappe.msgprint('you lose the connection (offline mode)')
+		})
 
-
+		window.addEventListener('online' , function(){
+			frappe.msgprint('the connection is back (online mode)')
+		})
 	}
 	/*****************************  tools  **********************************/
 	getItemPrice(itemId){
