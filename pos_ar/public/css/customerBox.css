@@ -15,9 +15,46 @@
 
 }
 
+#RightSection #CustomerBox #toggleButtonLabel{
+	margin-right : 8px ;
+}
+
+#RightSection #CustomerBox #toggleButton{
+	width  : 40px ;
+	height : 25px ;
+	margin-right  : 16px    ;
+	background    : #f5f5f5 ;
+	border        : 2px solid #cccccc ;
+	border-radius : 10px    ;
+
+	position   : relative ;
+	cursor     : pointer  ;
+
+	transition : border 0.4s ease ;
+}
+
+#RightSection #CustomerBox #toggleButton:hover{
+	background    : #e5e5e5 ;	
+}
+
+#RightSection #CustomerBox #toggleButtonBall{
+	width         : 15px     ;
+	height        : 15px     ;
+	margin        : 0px 3px  ;
+	background    : #d0d0d0  ;
+	border-radius : 100%     ;
+
+	position      : absolute ;
+	left          : 0px      ;
+
+	transition : left 0.4s ease , background 0.4s ease  ;
+
+}
+
 #RightSection #CustomerBox #CustomerInput{
-        width   : 100% ;
-        margin  : 0px 16px;
+        margin    : 0px 16px ;
+	
+	flex-grow : 1        ;
 }
 
 
