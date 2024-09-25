@@ -21,6 +21,7 @@
     constructor(wrapper) {
       this.wrapper = $(wrapper).find(".layout-main-section");
       this.page = wrapper.page;
+      console.log(`Rayan im heeeeeeeeeeeeeeeeeeeere path: ${window.location.pathname}`);
       this.customersList = [];
       this.itemGroupList = [];
       this.itemList = [];
@@ -249,11 +250,12 @@
       console.log("Service Worker supported");
       window.addEventListener("DOMContentLoaded", () => {
         console.log("Window loaded!");
-        navigator.serviceWorker.register("sw.js").then((reg) => console.log("Service Worker registered successfully.")).catch((err) => console.log(`Service Worker registration failed: ${err}`));
+        navigator.serviceWorker.register("./sw.js").then((reg) => console.log("Service Worker registered successfully.")).catch((err) => console.log(`Service Worker registration failed: ${err}`));
       });
+      this.sw = new pos_ar.PointOfSale.Sw();
       if (document.readyState === "complete") {
         console.log("DOM was already loaded");
-        navigator.serviceWorker.register("sw.js").then((reg) => console.log("Service Worker registered successfully.")).catch((err) => console.log(`Service Worker registration failed: ${err}`));
+        navigator.serviceWorker.register("app/pos_ar/public/js/sw.js").then((reg) => console.log("Service Worker registered successfully.")).catch((err) => console.log(`Service Worker registration failed: ${err}`));
       }
     }
     async fetchCustomers() {
@@ -1090,5 +1092,12 @@
       this.cart.css("display", "none");
     }
   };
+
+  // ../pos_ar/pos_ar/pos_ar/page/pos/sw.js
+  pos_ar.PointOfSale.Sw = class {
+    constructor() {
+      console.log(`Im SW I'm heeeeeeeeeeeeeeeeeeeere path: ${window.location.pathname}`);
+    }
+  };
 })();
-//# sourceMappingURL=pos.bundle.EYKP5FIJ.js.map
+//# sourceMappingURL=pos.bundle.PY3BIGD3.js.map

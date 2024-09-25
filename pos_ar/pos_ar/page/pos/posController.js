@@ -5,7 +5,10 @@ pos_ar.PointOfSale.Controller = class {
 		//principales variable
                 this.wrapper = $(wrapper).find(".layout-main-section");
                 this.page    = wrapper.page ;
-                //logic variable
+
+		console.log(`Rayan im heeeeeeeeeeeeeeeeeeeere path: ${window.location.pathname}`);
+
+		//logic variable
                 this.customersList     = []
                 this.itemGroupList     = []
                 this.itemList          = []
@@ -331,20 +334,24 @@ pos_ar.PointOfSale.Controller = class {
  		window.addEventListener('DOMContentLoaded', () => {
 		console.log("Window loaded!");
 		navigator.serviceWorker
-			.register('sw.js')
+			.register('./sw.js')
 			.then(reg => console.log("Service Worker registered successfully."))
 			.catch(err => console.log(`Service Worker registration failed: ${err}`));
 		});
 
 
+		this.sw = new pos_ar.PointOfSale.Sw()
+
 		// Additionally, check if DOM is already loaded
 		if (document.readyState === 'complete') {
 			console.log("DOM was already loaded");
 			navigator.serviceWorker
-				.register('sw.js')
+				.register('app/pos_ar/public/js/sw.js')
 				.then(reg => console.log("Service Worker registered successfully."))
 				.catch(err => console.log(`Service Worker registration failed: ${err}`));
 		}
+
+
 	}
 
         /*********************  get data functions ******************************/
