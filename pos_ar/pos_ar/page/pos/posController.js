@@ -30,6 +30,7 @@ pos_ar.PointOfSale.Controller = class {
 		await  this.prepare_app_defaults();
 		this.prepare_container();
                 this.prepare_components();
+		this.setListeners();
 	}
 
         async prepare_app_defaults(){
@@ -301,7 +302,12 @@ pos_ar.PointOfSale.Controller = class {
 		}
 	}
 
+	/****************************  listeners *******************************/
 
+	setListeners(){
+
+
+	}
 	/*****************************  tools  **********************************/
 	getItemPrice(itemId){
 		const price = this.itemPrices.find(itemPrice => itemPrice.item_code == itemId)

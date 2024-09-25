@@ -41,6 +41,7 @@
       await this.prepare_app_defaults();
       this.prepare_container();
       this.prepare_components();
+      this.setListeners();
     }
     async prepare_app_defaults() {
       this.customersList = await this.fetchCustomers();
@@ -228,6 +229,8 @@
         console.log("you press :::", key, " action ::: ", action, "while the selected field is : ", this.selectedField);
         this.item_details.addToField(this.selectedField.field_name, key);
       }
+    }
+    setListeners() {
     }
     getItemPrice(itemId) {
       const price = this.itemPrices.find((itemPrice) => itemPrice.item_code == itemId);
@@ -1045,4 +1048,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.VQQ45OKJ.js.map
+//# sourceMappingURL=pos.bundle.XOOJYLES.js.map
