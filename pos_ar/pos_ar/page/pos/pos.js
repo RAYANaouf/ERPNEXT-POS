@@ -7,8 +7,6 @@ frappe.pages['pos'].on_page_load = function(wrapper) {
 		single_column: true
 	});
 
-	//$(frappe.render_template("pos" , {} )).appendTo(page.body);
-
 	frappe.require([
 		"pos.bundle.js"
 		], function() {
@@ -17,9 +15,10 @@ frappe.pages['pos'].on_page_load = function(wrapper) {
 		//window.cur_pos = wrapper.pos ;
 	});
 
-	//main();
 
 }
+
+
 /*
 
 let customersList    = []

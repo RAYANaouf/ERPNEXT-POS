@@ -42,6 +42,7 @@
       this.prepare_container();
       this.prepare_components();
       this.setListeners();
+      this.checkServiceWorker();
     }
     async prepare_app_defaults() {
       this.customersList = await this.fetchCustomers();
@@ -239,6 +240,21 @@
     getItemPrice(itemId) {
       const price = this.itemPrices.find((itemPrice) => itemPrice.item_code == itemId);
       return price ? price.price_list_rate : 0;
+    }
+    checkServiceWorker() {
+      if (!("serviceWorker" in navigator)) {
+        console.log("Service Worker isn't supported!");
+        return;
+      }
+      console.log("Service Worker supported");
+      window.addEventListener("DOMContentLoaded", () => {
+        console.log("Window loaded!");
+        navigator.serviceWorker.register("sw.js").then((reg) => console.log("Service Worker registered successfully.")).catch((err) => console.log(`Service Worker registration failed: ${err}`));
+      });
+      if (document.readyState === "complete") {
+        console.log("DOM was already loaded");
+        navigator.serviceWorker.register("sw.js").then((reg) => console.log("Service Worker registered successfully.")).catch((err) => console.log(`Service Worker registration failed: ${err}`));
+      }
     }
     async fetchCustomers() {
       try {
@@ -1075,4 +1091,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.6YZYYNSL.js.map
+//# sourceMappingURL=pos.bundle.EYKP5FIJ.js.map
