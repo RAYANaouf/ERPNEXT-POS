@@ -4,16 +4,24 @@ pos_ar.PointOfSale.pos_payment_cart = class{
 
 	constructor(
 		wrapper,
+		selectedPaymentMythod,
 		onClose
 	){
 		this.wrapper = wrapper;
+		this.selected_payment_method = selectedPaymentMythod;
 		this.on_close_cart = onClose;
 
-		this.prepare_payment_cart();
-		console.log("hello from payment cart")
+		this.start_work();
 	}
 
 
+	/****************************************  UI ***********************************************/
+
+
+	start_work(){
+		this.prepare_payment_cart();
+		this.setListeners()
+	}
 	prepare_payment_cart(){
 		this.wrapper.append('<div id="paymentMethodCart" class="columnBox align_center"></div>')
 
@@ -42,6 +50,8 @@ pos_ar.PointOfSale.pos_payment_cart = class{
 		this.cart_content_top_section.append('<div id="cashBox"><div id="cashBoxTitle" class="title">Cash</div><input type="float" id="cachInput" ></div>')
 		this.cart_content_top_section.append('<div id="redeemLoyaltyPoints"><div id="redeemLoyaltyPointsTitle" class="title">Redeem Loyalty Points</div><input type="float" id="RedeemLayoutPointsInput" disabled></div>')
 
+		this.cashBox = this.cart_content_top_section.find("#cashBox")
+
 		this.cart_content_bottom_section.append('<h4>Additional Information</h4>')
 
 		this.cart_footer.append('<div id="paymentDetailsContainer" class="rowBox align_center"></div>');
@@ -66,5 +76,21 @@ pos_ar.PointOfSale.pos_payment_cart = class{
 		this.cart.css('display' , 'none');
 	}
 
+
+
+	/****************************************  UI ***********************************************/
+
+	setListeners(){
+		this.cashBox.on('click' , (event)=>{
+			this.selected_payment_method.methodName = "cash"
+
+			if(this.selected_payment_method.methodName == "cash"){
+				this.cashBox.addClass('selected')
+			}
+			else{
+				this.cashBox.removeClass('selected')
+			}
+		})
+	}
 
 }

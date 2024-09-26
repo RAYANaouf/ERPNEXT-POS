@@ -46,6 +46,15 @@
         border-radius : 12px ;
 }
 
+
+#cashBox:hover{
+        border : 3px solid #cccccc;	
+}
+
+#cashBox.selected{
+        border : 3px solid #ac6500;	
+}
+
 #cashBox .title{
         padding     : 0px 0px 16px 0px ;
 

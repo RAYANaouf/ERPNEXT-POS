@@ -21,10 +21,10 @@ pos_ar.PointOfSale.Controller = class {
                 this.PosProfileList    = []
                 this.binList           = []
 
-                this.selectedItem      = {}
-                this.selectedField     = {}
-                this.selectedTab       = {"tabName" : "C1"}
-
+                this.selectedItem          = {}
+                this.selectedField         = {}
+                this.selectedTab           = {"tabName" : "C1"}
+		this.selectedPaymentMethod = {"methodName" : ""}
 
                 this.start_app();
         }
@@ -147,6 +147,7 @@ pos_ar.PointOfSale.Controller = class {
         init_paymentCart(){
 		this.payment_cart = new pos_ar.PointOfSale.pos_payment_cart(
 									this.$leftSection,
+									this.selectedPaymentMethod,
 									this.onClose_payment_cart.bind(this)
 								)
         }

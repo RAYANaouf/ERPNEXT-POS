@@ -36,6 +36,7 @@
       this.selectedItem = {};
       this.selectedField = {};
       this.selectedTab = { "tabName": "C1" };
+      this.selectedPaymentMethod = { "methodName": "" };
       this.start_app();
     }
     async start_app() {
@@ -141,6 +142,7 @@
     init_paymentCart() {
       this.payment_cart = new pos_ar.PointOfSale.pos_payment_cart(
         this.$leftSection,
+        this.selectedPaymentMethod,
         this.onClose_payment_cart.bind(this)
       );
     }
@@ -1052,11 +1054,15 @@
 
   // ../pos_ar/pos_ar/pos_ar/page/pos/pos_payment_cart.js
   pos_ar.PointOfSale.pos_payment_cart = class {
-    constructor(wrapper, onClose) {
+    constructor(wrapper, selectedPaymentMythod, onClose) {
       this.wrapper = wrapper;
+      this.selected_payment_method = selectedPaymentMythod;
       this.on_close_cart = onClose;
+      this.start_work();
+    }
+    start_work() {
       this.prepare_payment_cart();
-      console.log("hello from payment cart");
+      this.setListeners();
     }
     prepare_payment_cart() {
       this.wrapper.append('<div id="paymentMethodCart" class="columnBox align_center"></div>');
@@ -1078,6 +1084,7 @@
       this.cart_content_bottom_section = this.cart_content.find("#paymentContentBottomSection");
       this.cart_content_top_section.append('<div id="cashBox"><div id="cashBoxTitle" class="title">Cash</div><input type="float" id="cachInput" ></div>');
       this.cart_content_top_section.append('<div id="redeemLoyaltyPoints"><div id="redeemLoyaltyPointsTitle" class="title">Redeem Loyalty Points</div><input type="float" id="RedeemLayoutPointsInput" disabled></div>');
+      this.cashBox = this.cart_content_top_section.find("#cashBox");
       this.cart_content_bottom_section.append("<h4>Additional Information</h4>");
       this.cart_footer.append('<div id="paymentDetailsContainer" class="rowBox align_center"></div>');
       this.cart_footer.append('<button type="button" id="completeOrderBtn">Complete Order</button>');
@@ -1095,6 +1102,16 @@
     hideCart() {
       this.cart.css("display", "none");
     }
+    setListeners() {
+      this.cashBox.on("click", (event2) => {
+        this.selected_payment_method.methodName = "cash";
+        if (this.selected_payment_method.methodName == "cash") {
+          this.cashBox.addClass("selected");
+        } else {
+          this.cashBox.removeClass("selected");
+        }
+      });
+    }
   };
 
   // ../pos_ar/pos_ar/pos_ar/page/pos/sw.js
@@ -1104,4 +1121,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.PXNA3NVB.js.map
+//# sourceMappingURL=pos.bundle.N2FRICAV.js.map
