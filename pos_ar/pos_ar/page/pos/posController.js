@@ -111,7 +111,8 @@ pos_ar.PointOfSale.Controller = class {
 		this.selected_item_cart  = new pos_ar.PointOfSale.pos_selected_item_cart(
 									this.$rightSection ,
 									this.selectedItemMaps,
-									this.selectedTab,
+									this.selectedTab  ,
+									this.selectedItem ,
 									this.selectedField,
 									item => {
 										this.onSelectedItemClick(item)
@@ -206,6 +207,7 @@ pos_ar.PointOfSale.Controller = class {
 
 		//refresh data
 		this.item_details.refreshDate(item);
+
 	}
 
 	onCheckout(){
@@ -251,7 +253,6 @@ pos_ar.PointOfSale.Controller = class {
 
 
 	onInput( event , field , value){
-		console.log("the field => " , field  , "change with value => " , value);
 
 		if(event == "focus" || event == "blur"){
 			if(event == "focus")
@@ -270,13 +271,13 @@ pos_ar.PointOfSale.Controller = class {
 
 		if( field ==  "quantity" ){
 			this.selectedItem.quantity = value;
-			this.selectedItemMaps.get(this.selectedTab.tabName).set(this.selectedItem.name , this.selectedItem)
+			this.selectedItemMaps.get(this.selectedTab.tabName).set( this.selectedItem.name , Object.assign({},this.selectedItem) )
 			//redrawing
 			this.selected_item_cart.refreshSelectedItem();
 		}
 		else if( field ==  "rate" ){
 			this.selectedItem.amount = value;
-			this.selectedItemMaps.get(this.selectedTab.tabName).set( this.selectedItem.name , this.selectedItem  )
+			this.selectedItemMaps.get(this.selectedTab.tabName).set( this.selectedItem.name , Object.assign({},this.selectedItem)  )
 			//redrawing
 			this.selected_item_cart.refreshSelectedItem();
 		}
@@ -346,7 +347,7 @@ pos_ar.PointOfSale.Controller = class {
 		if (document.readyState === 'complete') {
 			console.log("DOM was already loaded");
 			navigator.serviceWorker
-				.register('app/pos_ar/public/js/sw.js')
+				.register('../assets/pos_ar/public/js/sw.js')
 				.then(reg => console.log("Service Worker registered successfully."))
 				.catch(err => console.log(`Service Worker registration failed: ${err}`));
 		}

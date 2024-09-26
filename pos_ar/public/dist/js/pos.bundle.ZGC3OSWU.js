@@ -108,6 +108,7 @@
         this.$rightSection,
         this.selectedItemMaps,
         this.selectedTab,
+        this.selectedItem,
         this.selectedField,
         (item) => {
           this.onSelectedItemClick(item);
@@ -195,7 +196,6 @@
       this.payment_cart.hideCart();
     }
     onInput(event2, field, value) {
-      console.log("the field => ", field, "change with value => ", value);
       if (event2 == "focus" || event2 == "blur") {
         if (event2 == "focus")
           Object.assign(this.selectedField, { field_name: field });
@@ -208,11 +208,11 @@
       }
       if (field == "quantity") {
         this.selectedItem.quantity = value;
-        this.selectedItemMaps.get(this.selectedTab.tabName).set(this.selectedItem.name, this.selectedItem);
+        this.selectedItemMaps.get(this.selectedTab.tabName).set(this.selectedItem.name, Object.assign({}, this.selectedItem));
         this.selected_item_cart.refreshSelectedItem();
       } else if (field == "rate") {
         this.selectedItem.amount = value;
-        this.selectedItemMaps.get(this.selectedTab.tabName).set(this.selectedItem.name, this.selectedItem);
+        this.selectedItemMaps.get(this.selectedTab.tabName).set(this.selectedItem.name, Object.assign({}, this.selectedItem));
         this.selected_item_cart.refreshSelectedItem();
       } else if (field == "") {
       }
@@ -255,7 +255,7 @@
       this.sw = new pos_ar.PointOfSale.Sw();
       if (document.readyState === "complete") {
         console.log("DOM was already loaded");
-        navigator.serviceWorker.register("app/pos_ar/public/js/sw.js").then((reg) => console.log("Service Worker registered successfully.")).catch((err) => console.log(`Service Worker registration failed: ${err}`));
+        navigator.serviceWorker.register("../assets/pos_ar/public/js/sw.js").then((reg) => console.log("Service Worker registered successfully.")).catch((err) => console.log(`Service Worker registration failed: ${err}`));
       }
     }
     async fetchCustomers() {
@@ -493,10 +493,11 @@
 
   // ../pos_ar/pos_ar/pos_ar/page/pos/pos_selected_item_cart.js
   pos_ar.PointOfSale.pos_selected_item_cart = class {
-    constructor(wrapper, selectedItemMaps, selectedTab, selectedField, onSelectedItemClick, onTabClick, onKeyPressed, onCheckoutClick) {
+    constructor(wrapper, selectedItemMaps, selectedTab, selectedItem, selectedField, onSelectedItemClick, onTabClick, onKeyPressed, onCheckoutClick) {
       this.wrapper = wrapper;
       this.selected_item_maps = selectedItemMaps;
       this.selected_tab = selectedTab;
+      this.selected_item = selectedItem;
       this.selected_field = selectedField;
       this.on_key_pressed = onKeyPressed;
       this.on_checkout_click = onCheckoutClick;
@@ -639,6 +640,8 @@
         rightGroup.classList.add("rowBox", "align_center", "rightGroup");
         itemElement.appendChild(rightGroup);
         itemElement.classList.add("rowBox", "align_center", "row_sbtw", "ItemElement", "pointer");
+        if (itemId == this.selected_item.name)
+          itemElement.classList.add("selected");
         itemElement.addEventListener("click", (event2) => {
           console.log("we are click");
           this.makeItemHighlight(itemElement);
@@ -1100,4 +1103,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.PY3BIGD3.js.map
+//# sourceMappingURL=pos.bundle.ZGC3OSWU.js.map
