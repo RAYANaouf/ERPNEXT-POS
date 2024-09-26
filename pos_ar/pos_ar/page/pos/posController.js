@@ -221,9 +221,8 @@ pos_ar.PointOfSale.Controller = class {
 		this.item_details.hide_cart();
 		this.selected_item_cart.hideKeyboard();
 
-		//change display
+		//change displayk
 		this.selected_item_cart.setKeyboardOrientation("landscape");
-
 	}
 
 	onClose_details(){
@@ -260,7 +259,6 @@ pos_ar.PointOfSale.Controller = class {
 			if(event == "blur")
 				Object.assign(this.selectedField , {field_name : null})
 
-			console.log('selected field => ' , this.selectedField , "selected_field => " , this.item_details.selected_field)
 			this.item_details.makeSelectedFieldHighlighted()
 			this.selected_item_cart.makeSelectedButtonHighlighted();
 
@@ -297,8 +295,11 @@ pos_ar.PointOfSale.Controller = class {
 		else if(action == "discount"){
 			this.item_details.requestFocus("discount")
 		}
+		else if(action == "remove"){
+			this.selectedItemMaps.get(this.selectedTab.tabName).delete(this.selectedItem.name)
+			this.selected_item_cart.refreshSelectedItem();
+		}
 		else if(action == "addToField"){
-			console.log("you press :::" , key , " action ::: " , action , "while the selected field is : " , this.selectedField)
 			this.item_details.addToField(this.selectedField.field_name , key)
 		}
 	}
