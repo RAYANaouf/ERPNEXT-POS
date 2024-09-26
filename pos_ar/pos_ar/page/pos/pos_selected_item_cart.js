@@ -6,6 +6,7 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 		wrapper          ,
 		selectedItemMaps ,
 		selectedTab      ,
+		selectedItem     ,
 		selectedField    ,
 		onSelectedItemClick,
 		onTabClick       ,
@@ -15,6 +16,7 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 		this.wrapper                 = wrapper;
 		this.selected_item_maps      = selectedItemMaps;
 		this.selected_tab            = selectedTab     ;
+		this.selected_item           = selectedItem    ;
 		this.selected_field          = selectedField   ;
 		this.on_key_pressed          = onKeyPressed    ;
 		this.on_checkout_click       = onCheckoutClick ;
@@ -225,14 +227,12 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 
 			//item
 			itemElement.classList.add("rowBox" , "align_center" , "row_sbtw" , "ItemElement" , "pointer")
+			if(itemId == this.selected_item.name)
+				itemElement.classList.add("selected")
 			itemElement.addEventListener("click" , event =>{
 				console.log("we are click")
 				this.makeItemHighlight(itemElement)
 				this.on_selected_item_click(item);
-				//expose the item as selected one
-				//selectedItem = item
-				//makeItemHighlight(itemElement);
-				//renderItemDetailsCart(item);
 			})
 
 			selectedItemsContainer.appendChild(itemElement);

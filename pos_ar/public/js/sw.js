@@ -1,4 +1,4 @@
-pos_ar.PointOfSale.Sw = class {
+class Sw {
 
         constructor(){
                 console.log(`Im SW I'm heeeeeeeeeeeeeeeeeeeere path: ${window.location.pathname}`);
