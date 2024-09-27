@@ -4,12 +4,20 @@ pos_ar.PointOfSale.pos_payment_cart = class{
 
 	constructor(
 		wrapper,
+		selectedItemMap,
 		selectedPaymentMythod,
 		onClose
 	){
 		this.wrapper = wrapper;
+		this.selected_item_map = selectedItemMap;
 		this.selected_payment_method = selectedPaymentMythod;
 		this.on_close_cart = onClose;
+
+
+		//local
+		this.grand_total = 0 ;
+		this.paid_amount = 0 ;
+		this.to_change   = 0 ;
 
 		this.start_work();
 	}
@@ -61,11 +69,11 @@ pos_ar.PointOfSale.pos_payment_cart = class{
 		this.cart_footer.append('<button type="button" id="completeOrderBtn">Complete Order</button>');
 
 		this.payment_details = this.cart_footer.find('#paymentDetailsContainer')
-		this.payment_details.append('<div id="paymentGrandTotal" class="columnBox"><div id="paymentGrandTotalTitle" class="rowBox centerItem">Grand Total</div><div id="paymentGrandTotalValue"  class="rowBox centerItem"> ...DA  </div></div>')
+		this.payment_details.append(`<div id="paymentGrandTotal" class="columnBox"><div id="paymentGrandTotalTitle" class="rowBox centerItem">Grand Total</div><div id="paymentGrandTotalValue"  class="rowBox centerItem"> ${this.grand_total} DA  </div></div>`)
 		this.payment_details.append('<hr>')
-		this.payment_details.append('<div id="paymentPaidAmount" class="columnBox"><div id="paymentPaidAmountTitle" class="rowBox centerItem">Paid Amount</div><div id="paimentPaidAmountValue"  class="rowBox centerItem"> ...DA </div></div>')
+		this.payment_details.append(`<div id="paymentPaidAmount" class="columnBox"><div id="paymentPaidAmountTitle" class="rowBox centerItem">Paid Amount</div><div id="paimentPaidAmountValue"  class="rowBox centerItem"> ${this.paid_amount} DA </div></div>`)
 		this.payment_details.append('<hr>')
-		this.payment_details.append('<div id="paymentToChange" class="columnBox"><div id="paimentToChangeTitle" class="rowBox centerItem">To Change</div><div id="paimentToBePaidValue"  class="rowBox centerItem"> ...DA </div></div>')
+		this.payment_details.append(`<div id="paymentToChange" class="columnBox"><div id="paimentToChangeTitle" class="rowBox centerItem">To Change</div><div id="paimentToBePaidValue"  class="rowBox centerItem"> ${this.to_change}DA </div></div>`)
 
 	}
 
@@ -107,6 +115,11 @@ pos_ar.PointOfSale.pos_payment_cart = class{
 			this.redeemLoyaltyBox.addClass('selected')
 
 		})
+	}
+
+
+	calculateGrandTotal(){
+		return 0 ;
 	}
 
 }

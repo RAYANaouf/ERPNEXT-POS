@@ -147,6 +147,7 @@ pos_ar.PointOfSale.Controller = class {
         init_paymentCart(){
 		this.payment_cart = new pos_ar.PointOfSale.pos_payment_cart(
 									this.$leftSection,
+									this.selectedItemMaps.get(this.selectedTab),
 									this.selectedPaymentMethod,
 									this.onClose_payment_cart.bind(this)
 								)

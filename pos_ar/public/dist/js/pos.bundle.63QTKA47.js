@@ -142,6 +142,7 @@
     init_paymentCart() {
       this.payment_cart = new pos_ar.PointOfSale.pos_payment_cart(
         this.$leftSection,
+        this.selectedItemMaps.get(this.selectedTab),
         this.selectedPaymentMethod,
         this.onClose_payment_cart.bind(this)
       );
@@ -1057,10 +1058,14 @@
 
   // ../pos_ar/pos_ar/pos_ar/page/pos/pos_payment_cart.js
   pos_ar.PointOfSale.pos_payment_cart = class {
-    constructor(wrapper, selectedPaymentMythod, onClose) {
+    constructor(wrapper, selectedItemMap, selectedPaymentMythod, onClose) {
       this.wrapper = wrapper;
+      this.selected_item_map = selectedItemMap;
       this.selected_payment_method = selectedPaymentMythod;
       this.on_close_cart = onClose;
+      this.grand_total = 0;
+      this.paid_amount = 0;
+      this.to_change = 0;
       this.start_work();
     }
     start_work() {
@@ -1095,11 +1100,11 @@
       this.cart_footer.append('<div id="paymentDetailsContainer" class="rowBox align_center"></div>');
       this.cart_footer.append('<button type="button" id="completeOrderBtn">Complete Order</button>');
       this.payment_details = this.cart_footer.find("#paymentDetailsContainer");
-      this.payment_details.append('<div id="paymentGrandTotal" class="columnBox"><div id="paymentGrandTotalTitle" class="rowBox centerItem">Grand Total</div><div id="paymentGrandTotalValue"  class="rowBox centerItem"> ...DA  </div></div>');
+      this.payment_details.append(`<div id="paymentGrandTotal" class="columnBox"><div id="paymentGrandTotalTitle" class="rowBox centerItem">Grand Total</div><div id="paymentGrandTotalValue"  class="rowBox centerItem"> ${this.grand_total} DA  </div></div>`);
       this.payment_details.append("<hr>");
-      this.payment_details.append('<div id="paymentPaidAmount" class="columnBox"><div id="paymentPaidAmountTitle" class="rowBox centerItem">Paid Amount</div><div id="paimentPaidAmountValue"  class="rowBox centerItem"> ...DA </div></div>');
+      this.payment_details.append(`<div id="paymentPaidAmount" class="columnBox"><div id="paymentPaidAmountTitle" class="rowBox centerItem">Paid Amount</div><div id="paimentPaidAmountValue"  class="rowBox centerItem"> ${this.paid_amount} DA </div></div>`);
       this.payment_details.append("<hr>");
-      this.payment_details.append('<div id="paymentToChange" class="columnBox"><div id="paimentToChangeTitle" class="rowBox centerItem">To Change</div><div id="paimentToBePaidValue"  class="rowBox centerItem"> ...DA </div></div>');
+      this.payment_details.append(`<div id="paymentToChange" class="columnBox"><div id="paimentToChangeTitle" class="rowBox centerItem">To Change</div><div id="paimentToBePaidValue"  class="rowBox centerItem"> ${this.to_change}DA </div></div>`);
     }
     showCart() {
       console.log("show payment cart");
@@ -1128,6 +1133,9 @@
         this.redeemLoyaltyBox.addClass("selected");
       });
     }
+    calculateGrandTotal() {
+      return 0;
+    }
   };
 
   // ../pos_ar/pos_ar/pos_ar/page/pos/sw.js
@@ -1137,4 +1145,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.IUNGFSJE.js.map
+//# sourceMappingURL=pos.bundle.63QTKA47.js.map
