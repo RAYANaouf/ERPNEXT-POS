@@ -276,6 +276,9 @@ else if(keyContent == "." && !selectedField.value.includes(".")){
 			else if(value[value.length-1] == "."){
 				event.target.value = value.slice(0,-1);
 			}
+			else if(value[value.length-1] == " "){
+				event.target.value = value.slice(0,-1);
+			}
 			else if(isNaN(value[value.length-1])){
 				event.target.value = value.slice(0,-1);
 			}

@@ -972,6 +972,8 @@
           event2.target.value = value;
         } else if (value[value.length - 1] == ".") {
           event2.target.value = value.slice(0, -1);
+        } else if (value[value.length - 1] == " ") {
+          event2.target.value = value.slice(0, -1);
         } else if (isNaN(value[value.length - 1])) {
           event2.target.value = value.slice(0, -1);
         } else {
@@ -1138,6 +1140,57 @@
         this.onTimeBox.removeClass("selected");
         this.redeemLoyaltyBox.addClass("selected");
       });
+      this.cashBox.find("#cachInput").on("input", (event2) => {
+        const value = event2.target.value;
+        if (value.length == 0) {
+          event2.target.value = 0;
+        } else if (!value.slice(0, -1).includes(".") && value[value.length - 1] == ".") {
+          event2.target.value = value;
+        } else if (value[value.length - 1] == ".") {
+          event2.target.value = value.slice(0, -1);
+        } else if (value[value.length - 1] == " ") {
+          event2.target.value = value.slice(0, -1);
+        } else if (isNaN(value[value.length - 1])) {
+          event2.target.value = value.slice(0, -1);
+        } else {
+          event2.target.value = value;
+        }
+        console.log("input", event2.target.value);
+      });
+      this.onTimeBox.find("#paymentOnTimeInput").on("input", (event2) => {
+        const value = event2.target.value;
+        if (value.length == 0) {
+          event2.target.value = 0;
+        } else if (!value.slice(0, -1).includes(".") && value[value.length - 1] == ".") {
+          event2.target.value = value;
+        } else if (value[value.length - 1] == ".") {
+          event2.target.value = value.slice(0, -1);
+        } else if (value[value.length - 1] == " ") {
+          event2.target.value = value.slice(0, -1);
+        } else if (isNaN(value[value.length - 1])) {
+          event2.target.value = value.slice(0, -1);
+        } else {
+          event2.target.value = value;
+        }
+        console.log("input", event2.target.value);
+      });
+      this.redeemLoyaltyBox.find("#RedeemLayoutPointsInput").on("input", (event2) => {
+        const value = event2.target.value;
+        if (value.length == 0) {
+          event2.target.value = 0;
+        } else if (!value.slice(0, -1).includes(".") && value[value.length - 1] == ".") {
+          event2.target.value = value;
+        } else if (value[value.length - 1] == ".") {
+          event2.target.value = value.slice(0, -1);
+        } else if (value[value.length - 1] == " ") {
+          event2.target.value = value.slice(0, -1);
+        } else if (isNaN(value[value.length - 1])) {
+          event2.target.value = value.slice(0, -1);
+        } else {
+          event2.target.value = value;
+        }
+        console.log("input", event2.target.value);
+      });
     }
     calculateGrandTotal() {
       this.grand_amount = 0;
@@ -1155,4 +1208,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.N5TVRIU7.js.map
+//# sourceMappingURL=pos.bundle.7SAABVSR.js.map

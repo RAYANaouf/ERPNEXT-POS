@@ -28,12 +28,12 @@ pos_ar.PointOfSale.pos_payment_cart = class{
 
 	/****************************************  UI ***********************************************/
 
-
 	start_work(){
 		this.prepare_payment_cart();
 		this.calculateGrandTotal()
 		this.setListeners()
 	}
+
 	prepare_payment_cart(){
 		this.wrapper.append('<div id="paymentMethodCart" class="columnBox align_center"></div>')
 
@@ -93,7 +93,7 @@ pos_ar.PointOfSale.pos_payment_cart = class{
 
 
 
-	/****************************************  UI ***********************************************/
+	/****************************************  listeners  ***********************************************/
 
 	setListeners(){
 		this.cashBox.on('click' , (event)=>{
@@ -119,6 +119,77 @@ pos_ar.PointOfSale.pos_payment_cart = class{
 			this.redeemLoyaltyBox.addClass('selected')
 
 		})
+
+		//inputs
+		this.cashBox.find('#cachInput').on('input' , (event)=>{
+			const value = event.target.value;
+			if(value.length == 0){
+				event.target.value = 0
+			}
+			else if (!value.slice(0,-1).includes(".")  && value[value.length-1] == "."){
+				event.target.value = value
+			}
+			else if(value[value.length-1] == "."){
+				event.target.value = value.slice(0,-1);
+			}
+			else if(value[value.length-1] == " "){
+				event.target.value = value.slice(0,-1);
+			}
+			else if(isNaN(value[value.length-1])){
+				event.target.value = value.slice(0,-1);
+			}
+			else{
+				event.target.value = value
+			}
+			console.log("input" , event.target.value)
+		})
+
+		this.onTimeBox.find('#paymentOnTimeInput').on('input' , (event)=>{
+			const value = event.target.value;
+			if(value.length == 0){
+				event.target.value = 0
+			}
+			else if (!value.slice(0,-1).includes(".")  && value[value.length-1] == "."){
+				event.target.value = value
+			}
+			else if(value[value.length-1] == "."){
+				event.target.value = value.slice(0,-1);
+			}
+			else if(value[value.length-1] == " "){
+				event.target.value = value.slice(0,-1);
+			}
+			else if(isNaN(value[value.length-1])){
+				event.target.value = value.slice(0,-1);
+			}
+			else{
+				event.target.value = value
+			}
+			console.log("input" , event.target.value)
+		})
+
+		this.redeemLoyaltyBox.find('#RedeemLayoutPointsInput').on('input' , (event)=>{
+			const value = event.target.value;
+			if(value.length == 0){
+				event.target.value = 0
+			}
+			else if (!value.slice(0,-1).includes(".")  && value[value.length-1] == "."){
+				event.target.value = value
+			}
+			else if(value[value.length-1] == "."){
+				event.target.value = value.slice(0,-1);
+			}
+			else if(value[value.length-1] == " "){
+				event.target.value = value.slice(0,-1);
+			}
+			else if(isNaN(value[value.length-1])){
+				event.target.value = value.slice(0,-1);
+			}
+			else{
+				event.target.value = value
+			}
+			console.log("input" , event.target.value)
+		})
+
 	}
 
 
