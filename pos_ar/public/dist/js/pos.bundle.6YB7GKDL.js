@@ -1197,6 +1197,7 @@
         } else if (value[value.length - 1] == " ") {
           event2.target.value = value.slice(0, -1);
         } else if (isNaN(value[value.length - 1])) {
+          console.log("===}> ", value[value.length - 1]);
           event2.target.value = value.slice(0, -1);
         } else {
           event2.target.value = value;
@@ -1212,7 +1213,8 @@
       this.payment_details.find("#paymentGrandTotalValue").text(`${this.grand_amount} DA`);
     }
     calculateToChange() {
-      this.to_change = this.paid_amount - this.grand_total;
+      this.to_change = this.paid_amount - this.grand_amount;
+      console.log("paid  ", this.paid_amount, " - ", this.grand_amount, " = ", this.to_change);
       this.payment_details.find("#paimentToChangeValue").text(`${this.to_change} DA`);
     }
     refreshPaidAmount() {
@@ -1227,4 +1229,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.DNMCA2BJ.js.map
+//# sourceMappingURL=pos.bundle.6YB7GKDL.js.map

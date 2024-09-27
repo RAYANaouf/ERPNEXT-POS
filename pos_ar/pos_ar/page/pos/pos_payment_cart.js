@@ -201,6 +201,7 @@ pos_ar.PointOfSale.pos_payment_cart = class{
 				event.target.value = value.slice(0,-1);
 			}
 			else if(isNaN(value[value.length-1])){
+				console.log("===}> " , value[value.length-1])
 				event.target.value = value.slice(0,-1);
 			}
 			else{
@@ -224,7 +225,8 @@ pos_ar.PointOfSale.pos_payment_cart = class{
 	}
 
 	calculateToChange(){
-		this.to_change = this.paid_amount - this.grand_total
+		this.to_change = (this.paid_amount - this.grand_amount)
+		console.log("paid  " ,this.paid_amount , " - " , this.grand_amount , " = "  ,   this.to_change)
 		this.payment_details.find('#paimentToChangeValue').text(`${this.to_change} DA`)
 	}
 
