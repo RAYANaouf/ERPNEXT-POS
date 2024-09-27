@@ -5,13 +5,15 @@ pos_ar.PointOfSale.pos_payment_cart = class{
 	constructor(
 		wrapper,
 		selectedItemMap,
+		selectedTab,
 		selectedPaymentMythod,
 		onClose
 	){
-		this.wrapper = wrapper;
-		this.selected_item_map = selectedItemMap;
+		this.wrapper                 = wrapper;
+		this.selected_item_map       = selectedItemMap;
+		this.selected_tab            = selectedTab;
 		this.selected_payment_method = selectedPaymentMythod;
-		this.on_close_cart = onClose;
+		this.on_close_cart           = onClose;
 
 		console.log('map #$%^&*' , this.selectedItemMap)
 
@@ -124,7 +126,7 @@ pos_ar.PointOfSale.pos_payment_cart = class{
 
 		this.grand_amount = 0 ;
 
-		this.selected_item_map.forEach((value,key)=>{
+		this.selected_item_map.get(this.selected_tab.tabName).forEach((value,key)=>{
 			this.grand_amount += value.quantity * value.amount
 		})
 

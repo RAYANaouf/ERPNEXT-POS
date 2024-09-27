@@ -143,7 +143,8 @@
       console.log("im heeeeeeeeeeeeer @#$%^&*(*&^%$##$%^&*()^%$#@");
       this.payment_cart = new pos_ar.PointOfSale.pos_payment_cart(
         this.$leftSection,
-        this.selectedItemMaps.get(this.selectedTab.tabName),
+        this.selectedItemMaps,
+        this.selectedTab,
         this.selectedPaymentMethod,
         this.onClose_payment_cart.bind(this)
       );
@@ -1060,9 +1061,10 @@
 
   // ../pos_ar/pos_ar/pos_ar/page/pos/pos_payment_cart.js
   pos_ar.PointOfSale.pos_payment_cart = class {
-    constructor(wrapper, selectedItemMap, selectedPaymentMythod, onClose) {
+    constructor(wrapper, selectedItemMap, selectedTab, selectedPaymentMythod, onClose) {
       this.wrapper = wrapper;
       this.selected_item_map = selectedItemMap;
+      this.selected_tab = selectedTab;
       this.selected_payment_method = selectedPaymentMythod;
       this.on_close_cart = onClose;
       console.log("map #$%^&*", this.selectedItemMap);
@@ -1139,7 +1141,7 @@
     }
     calculateGrandTotal() {
       this.grand_amount = 0;
-      this.selected_item_map.forEach((value, key) => {
+      this.selected_item_map.get(this.selected_tab.tabName).forEach((value, key) => {
         this.grand_amount += value.quantity * value.amount;
       });
       this.payment_details.find("#paymentGrandTotalValue").text(`${this.grand_amount} DA`);
@@ -1153,4 +1155,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.OUBN6MCK.js.map
+//# sourceMappingURL=pos.bundle.N5TVRIU7.js.map

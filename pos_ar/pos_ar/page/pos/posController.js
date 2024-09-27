@@ -148,7 +148,8 @@ pos_ar.PointOfSale.Controller = class {
 		console.log("im heeeeeeeeeeeeer @#$%^&*(*&^%$##$%^&*()^%$#@")
 		this.payment_cart = new pos_ar.PointOfSale.pos_payment_cart(
 									this.$leftSection,
-									this.selectedItemMaps.get(this.selectedTab.tabName),
+									this.selectedItemMaps,
+									this.selectedTab,
 									this.selectedPaymentMethod,
 									this.onClose_payment_cart.bind(this)
 								)
