@@ -59,9 +59,9 @@ pos_ar.PointOfSale.pos_payment_cart = class{
 		this.cart_content_top_section    = this.cart_content.find('#paymentContentTopSection')
 		this.cart_content_bottom_section = this.cart_content.find('#paymentContentBottomSection')
 
-		this.cart_content_top_section.append('<div id="cashBox" class="paymentMethodBox"><div id="cashBoxTitle" class="title">Cash</div><input type="float" id="cachInput" ></div>')
-		this.cart_content_top_section.append('<div id="paymentOnTimeBox" class="paymentMethodBox"><div id="paymentOnTimeBoxTitle" class="title">On Time</div><input type="float" id="paymentOnTimeInput" ></div>')
-		this.cart_content_top_section.append('<div id="redeemLoyaltyPoints" class="paymentMethodBox"><div id="redeemLoyaltyPointsTitle" class="title">Redeem Loyalty Points</div><input type="float" id="RedeemLayoutPointsInput" disabled></div>')
+		this.cart_content_top_section.append('<div id="cashBox" class="paymentMethodBox"><div id="cashBoxTitle" class="title">Cash</div><input type="float" id="cachInput" value="0"  ></div>')
+		this.cart_content_top_section.append('<div id="paymentOnTimeBox" class="paymentMethodBox"><div id="paymentOnTimeBoxTitle" class="title">On Time</div><input type="float" id="paymentOnTimeInput" value="0" ></div>')
+		this.cart_content_top_section.append('<div id="redeemLoyaltyPoints" class="paymentMethodBox"><div id="redeemLoyaltyPointsTitle" class="title">Redeem Loyalty Points</div><input type="float" id="RedeemLayoutPointsInput" value="0" disabled></div>')
 
 		this.cashBox          = this.cart_content_top_section.find("#cashBox")
 		this.onTimeBox        = this.cart_content_top_section.find("#paymentOnTimeBox")
@@ -77,7 +77,7 @@ pos_ar.PointOfSale.pos_payment_cart = class{
 		this.payment_details.append('<hr>')
 		this.payment_details.append(`<div id="paymentPaidAmount" class="columnBox"><div id="paymentPaidAmountTitle" class="rowBox centerItem">Paid Amount</div><div id="paimentPaidAmountValue"  class="rowBox centerItem"> 0 DA </div></div>`)
 		this.payment_details.append('<hr>')
-		this.payment_details.append(`<div id="paymentToChange" class="columnBox"><div id="paimentToChangeTitle" class="rowBox centerItem">To Change</div><div id="paimentToBePaidValue"  class="rowBox centerItem"> ${this.to_change}DA </div></div>`)
+		this.payment_details.append(`<div id="paymentToChange" class="columnBox"><div id="paimentToChangeTitle" class="rowBox centerItem">To Change</div><div id="paimentToChangeValue"  class="rowBox centerItem"> ${this.to_change}DA </div></div>`)
 
 	}
 
@@ -155,6 +155,7 @@ pos_ar.PointOfSale.pos_payment_cart = class{
 
 			this.paid_amount = event.target.value;
 			this.refreshPaidAmount();
+			this.calculateToChange();
 			console.log("input" , event.target.value)
 		})
 
@@ -181,6 +182,7 @@ pos_ar.PointOfSale.pos_payment_cart = class{
 
 			this.paid_amount = event.target.value;
 			this.refreshPaidAmount();
+			this.calculateToChange();
 			console.log("input" , event.target.value)
 		})
 
@@ -221,8 +223,13 @@ pos_ar.PointOfSale.pos_payment_cart = class{
 		this.payment_details.find('#paymentGrandTotalValue').text(`${this.grand_amount} DA`)
 	}
 
+	calculateToChange(){
+		this.to_change = this.paid_amount - this.grand_total
+		this.payment_details.find('#paimentToChangeValue').text(`${this.to_change} DA`)
+	}
+
 	refreshPaidAmount(){
-		this.payment_details.find('#paimentPaidAmountValue').text(`${this.paid_amount}`)
+		this.payment_details.find('#paimentPaidAmountValue').text(`${this.paid_amount} DA`)
 	}
 
 }
