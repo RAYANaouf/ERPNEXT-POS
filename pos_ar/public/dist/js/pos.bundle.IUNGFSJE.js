@@ -180,8 +180,9 @@
       this.payment_cart.showCart();
       this.item_selector.hideCart();
       this.item_details.hide_cart();
-      this.selected_item_cart.hideKeyboard();
       this.selected_item_cart.setKeyboardOrientation("landscape");
+      this.selected_item_cart.cleanHeighlight();
+      this.selected_item_cart.showKeyboard();
     }
     onClose_details() {
       console.log("onClose callback 002");
@@ -196,6 +197,8 @@
       this.item_selector.showCart();
       this.item_details.hide_cart();
       this.payment_cart.hideCart();
+      this.selected_item_cart.setKeyboardOrientation("portrait");
+      this.selected_item_cart.cleanHeighlight();
     }
     onInput(event2, field, value) {
       if (event2 == "focus" || event2 == "blur") {
@@ -1082,9 +1085,12 @@
       this.cart_content.append('<div id="paymentContentBottomSection" class="columnBox"></div>');
       this.cart_content_top_section = this.cart_content.find("#paymentContentTopSection");
       this.cart_content_bottom_section = this.cart_content.find("#paymentContentBottomSection");
-      this.cart_content_top_section.append('<div id="cashBox"><div id="cashBoxTitle" class="title">Cash</div><input type="float" id="cachInput" ></div>');
-      this.cart_content_top_section.append('<div id="redeemLoyaltyPoints"><div id="redeemLoyaltyPointsTitle" class="title">Redeem Loyalty Points</div><input type="float" id="RedeemLayoutPointsInput" disabled></div>');
+      this.cart_content_top_section.append('<div id="cashBox" class="paymentMethodBox"><div id="cashBoxTitle" class="title">Cash</div><input type="float" id="cachInput" ></div>');
+      this.cart_content_top_section.append('<div id="paymentOnTimeBox" class="paymentMethodBox"><div id="paymentOnTimeBoxTitle" class="title">On Time</div><input type="float" id="paymentOnTimeInput" ></div>');
+      this.cart_content_top_section.append('<div id="redeemLoyaltyPoints" class="paymentMethodBox"><div id="redeemLoyaltyPointsTitle" class="title">Redeem Loyalty Points</div><input type="float" id="RedeemLayoutPointsInput" disabled></div>');
       this.cashBox = this.cart_content_top_section.find("#cashBox");
+      this.onTimeBox = this.cart_content_top_section.find("#paymentOnTimeBox");
+      this.redeemLoyaltyBox = this.cart_content_top_section.find("#redeemLoyaltyPoints");
       this.cart_content_bottom_section.append("<h4>Additional Information</h4>");
       this.cart_footer.append('<div id="paymentDetailsContainer" class="rowBox align_center"></div>');
       this.cart_footer.append('<button type="button" id="completeOrderBtn">Complete Order</button>');
@@ -1093,7 +1099,7 @@
       this.payment_details.append("<hr>");
       this.payment_details.append('<div id="paymentPaidAmount" class="columnBox"><div id="paymentPaidAmountTitle" class="rowBox centerItem">Paid Amount</div><div id="paimentPaidAmountValue"  class="rowBox centerItem"> ...DA </div></div>');
       this.payment_details.append("<hr>");
-      this.payment_details.append('<div id="paymentToBePaid" class="columnBox"><div id="paimentToBePaidTitle" class="rowBox centerItem">To Be Paid</div><div id="paimentToBePaidValue"  class="rowBox centerItem"> ...DA </div></div>');
+      this.payment_details.append('<div id="paymentToChange" class="columnBox"><div id="paimentToChangeTitle" class="rowBox centerItem">To Change</div><div id="paimentToBePaidValue"  class="rowBox centerItem"> ...DA </div></div>');
     }
     showCart() {
       console.log("show payment cart");
@@ -1105,11 +1111,21 @@
     setListeners() {
       this.cashBox.on("click", (event2) => {
         this.selected_payment_method.methodName = "cash";
-        if (this.selected_payment_method.methodName == "cash") {
-          this.cashBox.addClass("selected");
-        } else {
-          this.cashBox.removeClass("selected");
-        }
+        this.cashBox.addClass("selected");
+        this.onTimeBox.removeClass("selected");
+        this.redeemLoyaltyBox.removeClass("selected");
+      });
+      this.onTimeBox.on("click", (event2) => {
+        this.selected_payment_method.methodName = "onTime";
+        this.cashBox.removeClass("selected");
+        this.onTimeBox.addClass("selected");
+        this.redeemLoyaltyBox.removeClass("selected");
+      });
+      this.redeemLoyaltyBox.on("click", (event2) => {
+        this.selected_payment_method.methodName = "redeemLoyalty";
+        this.cashBox.removeClass("selected");
+        this.onTimeBox.removeClass("selected");
+        this.redeemLoyaltyBox.addClass("selected");
       });
     }
   };
@@ -1121,4 +1137,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.N2FRICAV.js.map
+//# sourceMappingURL=pos.bundle.IUNGFSJE.js.map

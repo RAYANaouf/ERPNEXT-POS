@@ -220,10 +220,12 @@ pos_ar.PointOfSale.Controller = class {
 		//hide
 		this.item_selector.hideCart();
 		this.item_details.hide_cart();
-		this.selected_item_cart.hideKeyboard();
 
 		//change displayk
 		this.selected_item_cart.setKeyboardOrientation("landscape");
+		this.selected_item_cart.cleanHeighlight();
+		this.selected_item_cart.showKeyboard();
+
 	}
 
 	onClose_details(){
@@ -246,9 +248,18 @@ pos_ar.PointOfSale.Controller = class {
 	}
 
 	onClose_payment_cart(){
+
+		//show
 		this.item_selector.showCart();
+
+		//hide
 		this.item_details.hide_cart();
 		this.payment_cart.hideCart();
+
+		//update ui
+		this.selected_item_cart.setKeyboardOrientation("portrait");
+		this.selected_item_cart.cleanHeighlight();
+
 	}
 
 

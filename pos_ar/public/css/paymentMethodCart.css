@@ -36,33 +36,35 @@
         margin : 0px 0px 16px 0px ;
 }
 
-#cashBox{
+
+.paymentMethodBox{
         height  : 100px ;
-        width   : 50%   ;
-        margin  : 6px 16px ;
         padding : 12px  ;
+        margin  : 6px 16px ;
+
+	flex-grow : 1 ;
 
         border : 2px solid #eeeeee;
         border-radius : 12px ;
 }
-
-
-#cashBox:hover{
-        border : 3px solid #cccccc;	
-}
-
-#cashBox.selected{
-        border : 3px solid #ac6500;	
-}
-
-#cashBox .title{
+.paymentMethodBox .title{
         padding     : 0px 0px 16px 0px ;
 
         color       : #777777 ;
         font-size   : 16px    ;
         font-weight : 400     ;
-
+	
 }
+
+
+.paymentMethodBox:hover{
+        border : 3px solid #cccccc;	
+}
+
+.paymentMethodBox.selected{
+        border : 3px solid #ac6500;	
+}
+
 
 #LeftSection #paymentMethodCart #paymentMethodContent #paymentContentBottomSection{
         width : 100% ;
@@ -70,24 +72,7 @@
 
 
 
-#redeemLoyaltyPoints{
-        height : 100px ;
-        width  : 50%   ;
-        margin : 6px 16px ;
-        padding : 12px  ;
 
-        border : 2px solid #eeeeee;
-        border-radius : 12px ;
-}
-
-#redeemLoyaltyPoints .title{
-
-        padding     : 0px 0px 16px 0px ;
-
-        color     : #777777 ;
-        font-size : 16px    ;
-        font-weight : 400     ;
-}
 
 #LeftSection #paymentMethodCart #paymentDetailsContainer{
         width      : 80%      ;
