@@ -145,9 +145,10 @@ pos_ar.PointOfSale.Controller = class {
 	}
 
         init_paymentCart(){
+		console.log("im heeeeeeeeeeeeer @#$%^&*(*&^%$##$%^&*()^%$#@")
 		this.payment_cart = new pos_ar.PointOfSale.pos_payment_cart(
 									this.$leftSection,
-									this.selectedItemMaps.get(this.selectedTab),
+									this.selectedItemMaps.get(this.selectedTab.tabName),
 									this.selectedPaymentMethod,
 									this.onClose_payment_cart.bind(this)
 								)
@@ -223,6 +224,7 @@ pos_ar.PointOfSale.Controller = class {
 		this.item_details.hide_cart();
 
 		//change displayk
+		this.payment_cart.calculateGrandTotal()
 		this.selected_item_cart.setKeyboardOrientation("landscape");
 		this.selected_item_cart.cleanHeighlight();
 		this.selected_item_cart.showKeyboard();

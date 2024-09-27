@@ -13,6 +13,7 @@ pos_ar.PointOfSale.pos_payment_cart = class{
 		this.selected_payment_method = selectedPaymentMythod;
 		this.on_close_cart = onClose;
 
+		console.log('map #$%^&*' , this.selectedItemMap)
 
 		//local
 		this.grand_total = 0 ;
@@ -28,6 +29,7 @@ pos_ar.PointOfSale.pos_payment_cart = class{
 
 	start_work(){
 		this.prepare_payment_cart();
+		this.calculateGrandTotal()
 		this.setListeners()
 	}
 	prepare_payment_cart(){
@@ -69,7 +71,7 @@ pos_ar.PointOfSale.pos_payment_cart = class{
 		this.cart_footer.append('<button type="button" id="completeOrderBtn">Complete Order</button>');
 
 		this.payment_details = this.cart_footer.find('#paymentDetailsContainer')
-		this.payment_details.append(`<div id="paymentGrandTotal" class="columnBox"><div id="paymentGrandTotalTitle" class="rowBox centerItem">Grand Total</div><div id="paymentGrandTotalValue"  class="rowBox centerItem"> ${this.grand_total} DA  </div></div>`)
+		this.payment_details.append('<div class="columnBox"><div id="paymentGrandTotalTitle" class="rowBox centerItem">Grand Total</div><div id="paymentGrandTotalValue" class="rowBox centerItem"></div></div>')
 		this.payment_details.append('<hr>')
 		this.payment_details.append(`<div id="paymentPaidAmount" class="columnBox"><div id="paymentPaidAmountTitle" class="rowBox centerItem">Paid Amount</div><div id="paimentPaidAmountValue"  class="rowBox centerItem"> ${this.paid_amount} DA </div></div>`)
 		this.payment_details.append('<hr>')
@@ -119,7 +121,14 @@ pos_ar.PointOfSale.pos_payment_cart = class{
 
 
 	calculateGrandTotal(){
-		return 0 ;
+
+		this.grand_amount = 0 ;
+
+		this.selected_item_map.forEach((value,key)=>{
+			this.grand_amount += value.quantity * value.amount
+		})
+
+		this.payment_details.find('#paymentGrandTotalValue').text(`${this.grand_amount} DA`)
 	}
 
 }
