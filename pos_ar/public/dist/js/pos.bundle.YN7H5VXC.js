@@ -1110,7 +1110,7 @@
       this.payment_details = this.cart_footer.find("#paymentDetailsContainer");
       this.payment_details.append('<div class="columnBox"><div id="paymentGrandTotalTitle" class="rowBox centerItem">Grand Total</div><div id="paymentGrandTotalValue" class="rowBox centerItem"></div></div>');
       this.payment_details.append("<hr>");
-      this.payment_details.append(`<div id="paymentPaidAmount" class="columnBox"><div id="paymentPaidAmountTitle" class="rowBox centerItem">Paid Amount</div><div id="paimentPaidAmountValue"  class="rowBox centerItem"> ${this.paid_amount} DA </div></div>`);
+      this.payment_details.append(`<div id="paymentPaidAmount" class="columnBox"><div id="paymentPaidAmountTitle" class="rowBox centerItem">Paid Amount</div><div id="paimentPaidAmountValue"  class="rowBox centerItem"> 0 DA </div></div>`);
       this.payment_details.append("<hr>");
       this.payment_details.append(`<div id="paymentToChange" class="columnBox"><div id="paimentToChangeTitle" class="rowBox centerItem">To Change</div><div id="paimentToBePaidValue"  class="rowBox centerItem"> ${this.to_change}DA </div></div>`);
     }
@@ -1127,18 +1127,24 @@
         this.cashBox.addClass("selected");
         this.onTimeBox.removeClass("selected");
         this.redeemLoyaltyBox.removeClass("selected");
+        this.paid_amount = this.cashBox.find("#cachInput").val();
+        this.refreshPaidAmount();
       });
       this.onTimeBox.on("click", (event2) => {
         this.selected_payment_method.methodName = "onTime";
         this.cashBox.removeClass("selected");
         this.onTimeBox.addClass("selected");
         this.redeemLoyaltyBox.removeClass("selected");
+        this.paid_amount = this.onTimeBox.find("#paymentOnTimeInput").val();
+        this.refreshPaidAmount();
       });
       this.redeemLoyaltyBox.on("click", (event2) => {
         this.selected_payment_method.methodName = "redeemLoyalty";
         this.cashBox.removeClass("selected");
         this.onTimeBox.removeClass("selected");
         this.redeemLoyaltyBox.addClass("selected");
+        this.paid_amount = 0;
+        this.refreshPaidAmount();
       });
       this.cashBox.find("#cachInput").on("input", (event2) => {
         const value = event2.target.value;
@@ -1155,6 +1161,8 @@
         } else {
           event2.target.value = value;
         }
+        this.paid_amount = event2.target.value;
+        this.refreshPaidAmount();
         console.log("input", event2.target.value);
       });
       this.onTimeBox.find("#paymentOnTimeInput").on("input", (event2) => {
@@ -1172,6 +1180,8 @@
         } else {
           event2.target.value = value;
         }
+        this.paid_amount = event2.target.value;
+        this.refreshPaidAmount();
         console.log("input", event2.target.value);
       });
       this.redeemLoyaltyBox.find("#RedeemLayoutPointsInput").on("input", (event2) => {
@@ -1199,6 +1209,9 @@
       });
       this.payment_details.find("#paymentGrandTotalValue").text(`${this.grand_amount} DA`);
     }
+    refreshPaidAmount() {
+      this.payment_details.find("#paimentPaidAmountValue").text(`${this.paid_amount}`);
+    }
   };
 
   // ../pos_ar/pos_ar/pos_ar/page/pos/sw.js
@@ -1208,4 +1221,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.7SAABVSR.js.map
+//# sourceMappingURL=pos.bundle.YN7H5VXC.js.map
