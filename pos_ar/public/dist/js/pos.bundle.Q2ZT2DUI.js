@@ -37,6 +37,7 @@
       this.selectedField = {};
       this.selectedTab = { "tabName": "C1" };
       this.selectedPaymentMethod = { "methodName": "" };
+      this.posInvoices = /* @__PURE__ */ new Map();
       this.start_app();
     }
     async start_app() {
@@ -1229,4 +1230,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.6YB7GKDL.js.map
+//# sourceMappingURL=pos.bundle.Q2ZT2DUI.js.map

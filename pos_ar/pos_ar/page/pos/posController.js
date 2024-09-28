@@ -26,6 +26,11 @@ pos_ar.PointOfSale.Controller = class {
                 this.selectedTab           = {"tabName" : "C1"}
 		this.selectedPaymentMethod = {"methodName" : ""}
 
+
+
+		//pos invoice
+		this.posInvoices = new Map();
+
                 this.start_app();
         }
 
