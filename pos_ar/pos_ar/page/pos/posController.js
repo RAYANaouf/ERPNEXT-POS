@@ -6,8 +6,6 @@ pos_ar.PointOfSale.Controller = class {
                 this.wrapper = $(wrapper).find(".layout-main-section");
                 this.page    = wrapper.page ;
 
-		console.log(`Rayan im heeeeeeeeeeeeeeeeeeeere path: ${window.location.pathname}`);
-
 		//logic variable
                 this.customersList     = []
                 this.itemGroupList     = []
@@ -109,7 +107,8 @@ pos_ar.PointOfSale.Controller = class {
 
 	init_customer_box(){
 		this.customer_box  = new pos_ar.PointOfSale.pos_customer_box(
-									this.$rightSection
+									this.$rightSection,
+									this.customersList
 									)
 	}
         init_selected_item(){
@@ -328,14 +327,29 @@ pos_ar.PointOfSale.Controller = class {
 
 
 	onCompleteOrder(){
+
+		let items = []
+
+		this.selectedItemMaps.get(this.selectedTab.tabName).forEach((value,key) =>{
+			console.log("the key : " , key , " value : " , value)
+			let newItem = {
+				item_name : value.name,
+				uom       : value.stock_uom,
+				rate      : value.amount,
+				qty       : value.quantity
+			}
+
+			items.push(newItem)
+		})
+
 		this.sellInvoices.set(
 				this.selectedTab.tabName , {
-				customer   : this.selectedCustomer.id,
-				posProfile : this.selectedPosProfile.id,
-				items      : [s]
+				"customer"   : this.customersList[0].name,
+				//posProfile : this.selectedPosProfile.id,
+				"items"      : items
 		});
 
-		console.log("posInvoice ==> " , this.posInvoices);
+		console.log("posInvoice ==> " , this.sellInvoices);
 	}
 
 	/****************************  listeners *******************************/

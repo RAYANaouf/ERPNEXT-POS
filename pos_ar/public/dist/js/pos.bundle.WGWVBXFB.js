@@ -21,7 +21,6 @@
     constructor(wrapper) {
       this.wrapper = $(wrapper).find(".layout-main-section");
       this.page = wrapper.page;
-      console.log(`Rayan im heeeeeeeeeeeeeeeeeeeere path: ${window.location.pathname}`);
       this.customersList = [];
       this.itemGroupList = [];
       this.itemList = [];
@@ -102,7 +101,8 @@
     }
     init_customer_box() {
       this.customer_box = new pos_ar.PointOfSale.pos_customer_box(
-        this.$rightSection
+        this.$rightSection,
+        this.customersList
       );
     }
     init_selected_item() {
@@ -242,15 +242,25 @@
       }
     }
     onCompleteOrder() {
+      let items = [];
+      this.selectedItemMaps.get(this.selectedTab.tabName).forEach((value, key) => {
+        console.log("the key : ", key, " value : ", value);
+        let newItem = {
+          item_name: value.name,
+          uom: value.stock_uom,
+          rate: value.amount,
+          qty: value.quantity
+        };
+        items.push(newItem);
+      });
       this.sellInvoices.set(
         this.selectedTab.tabName,
         {
-          customer: this.selectedCustomer.id,
-          posProfile: this.selectedPosProfile.id,
-          items: [s]
+          "customer": this.customersList[0].name,
+          "items": items
         }
       );
-      console.log("posInvoice ==> ", this.posInvoices);
+      console.log("posInvoice ==> ", this.sellInvoices);
     }
     setListeners() {
       console.log("test (window) ==> ", window);
@@ -479,13 +489,15 @@
 
   // ../pos_ar/pos_ar/pos_ar/page/pos/pos_customer_box.js
   pos_ar.PointOfSale.pos_customer_box = class {
-    constructor(wrapper) {
+    constructor(wrapper, customersList) {
       this.wrapper = wrapper;
+      this.customers_list = customersList;
       this.online = true;
       this.start_work();
     }
     start_work() {
       this.prepare_customer_box();
+      this.setCustomersInList();
       this.setListeners();
     }
     prepare_customer_box() {
@@ -495,6 +507,16 @@
       this.customerBox.append('<datalist id="CustomerList"></datalist>');
       this.customerBox.append('<div id="toggleButtonLabel">Offline Mode </div>');
       this.customerBox.append('<div id="toggleButton" class="rowBox align_center" > <div id="toggleButtonBall" ></div>  </div>');
+    }
+    setCustomersInList() {
+      const customerList_html = document.getElementById("CustomerList");
+      customerList_html.innerHTML = "";
+      this.customers_list.forEach((customer) => {
+        const option = document.createElement("option");
+        option.value = customer.name;
+        option.textContent = customer.customer_name;
+        customerList_html.appendChild(option);
+      });
     }
     setListeners() {
       this.customerBox.find("#toggleButton").on("click", (event2) => {
@@ -1083,7 +1105,6 @@
       this.selected_payment_method = selectedPaymentMythod;
       this.on_close_cart = onClose;
       this.on_complete = onComplete;
-      console.log("ahaaaaaaaaaaaaaaaaahaha", this.selectedItemMap);
       this.grand_total = 0;
       this.paid_amount = 0;
       this.to_change = 0;
@@ -1253,4 +1274,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.GGW46TDN.js.map
+//# sourceMappingURL=pos.bundle.WGWVBXFB.js.map

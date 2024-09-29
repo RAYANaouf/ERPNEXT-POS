@@ -2,9 +2,13 @@
 pos_ar.PointOfSale.pos_customer_box = class{
 
 	constructor(
-		wrapper
+		wrapper,
+		customersList,
 	){
-		this.wrapper = wrapper ;
+		this.wrapper        = wrapper ;
+		this.customers_list = customersList ;
+
+		//local
 		this.online  = true    ;
 
 
@@ -14,8 +18,9 @@ pos_ar.PointOfSale.pos_customer_box = class{
 
 
 	start_work(){
-		this.prepare_customer_box()
-		this.setListeners()
+		this.prepare_customer_box();
+		this.setCustomersInList();
+		this.setListeners();
 	}
 
 	prepare_customer_box(){
@@ -28,6 +33,19 @@ pos_ar.PointOfSale.pos_customer_box = class{
 		this.customerBox.append('<div id="toggleButtonLabel">Offline Mode </div>')
 		this.customerBox.append('<div id="toggleButton" class="rowBox align_center" > <div id="toggleButtonBall" ></div>  </div>')
 
+	}
+
+	setCustomersInList(){
+
+		const customerList_html = document.getElementById("CustomerList");
+		customerList_html.innerHTML = "" ;
+
+		this.customers_list.forEach(customer =>{
+			const option = document.createElement("option");
+			option.value = customer.name;
+			option.textContent = customer.customer_name;
+			customerList_html.appendChild(option);
+		})
 	}
 
 	setListeners(){

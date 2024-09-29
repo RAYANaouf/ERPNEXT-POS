@@ -17,8 +17,6 @@ pos_ar.PointOfSale.pos_payment_cart = class{
 		this.on_close_cart           = onClose;
 		this.on_complete             = onComplete;
 
-		console.log('ahaaaaaaaaaaaaaaaaahaha' , this.selectedItemMap)
-
 		//local
 		this.grand_total = 0 ;
 		this.paid_amount = 0 ;
@@ -219,7 +217,7 @@ pos_ar.PointOfSale.pos_payment_cart = class{
 			()=>{/*yes*/
 				this.on_complete()
 			},()=>{
-
+				
 			})
 		})
 
