@@ -375,20 +375,35 @@ pos_ar.PointOfSale.Controller = class {
 
 	onSync(){
 
+		//calculate amount
+		let all_tabs = Array.from(this.sellInvoices.keys())
+		console.log("keys===> " , all_tabs , "data ==*> " , this.sellInvoices)
+
 		try{
-			frappe.db.insert({
-				'doctype'     : "Sales Invoice",
-				'customer'    :  this.sellInvoices.get('C1').customer,
-				'pos_profile' : this.sellInvoices.get('C1').pos_profile,
-				'items'       : this.sellInvoices.get('C1').items,
-				'paid_amount' : 1000,
-				'outstanding_amount' : 0,
-				'status'      : "Paid",
-				'docstatus'   : 1
-			}).then(r => {
-				console.log(r)
-			}).catch(err =>{
-				console.log(err)
+			all_tabs.forEach(tab =>{
+				//calculate the paid_amount
+				let paid_amount = 0 ;
+				this.sellInvoices.get(tab).items.forEach(item =>{
+					paid_amount += item.rate * item.qty
+				})
+
+				console.log("paid" , paid_amount)
+
+				frappe.db.insert({
+					'doctype'     : "Sales Invoice",
+					'customer'    : this.sellInvoices.get(tab).customer,
+					'pos_profile' : this.sellInvoices.get(tab).pos_profile,
+					'items'       : this.sellInvoices.get(tab).items,
+					'paid_amount' : paid_amount,
+					'outstanding_amount' : 0,
+					'status'      : "Paid",
+					'docstatus'   : 1
+				}).then(r => {
+					console.log(r)
+				}).catch(err =>{
+					console.log(err)
+				})
+
 			})
 		}
 		catch(err){
