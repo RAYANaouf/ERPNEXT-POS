@@ -28,8 +28,8 @@ pos_ar.PointOfSale.Controller = class {
 
 
 
-		//pos invoice
-		this.posInvoices = new Map();
+		//sell invoice
+		this.sellInvoices = new Map();
 
                 this.start_app();
         }
@@ -156,7 +156,8 @@ pos_ar.PointOfSale.Controller = class {
 									this.selectedItemMaps,
 									this.selectedTab,
 									this.selectedPaymentMethod,
-									this.onClose_payment_cart.bind(this)
+									this.onClose_payment_cart.bind(this),
+									this.onCompleteOrder.bind(this)
 								)
         }
 
@@ -323,6 +324,18 @@ pos_ar.PointOfSale.Controller = class {
 		else if(action == "addToField"){
 			this.item_details.addToField(this.selectedField.field_name , key)
 		}
+	}
+
+
+	onCompleteOrder(){
+		this.sellInvoices.set(
+				this.selectedTab.tabName , {
+				customer   : this.selectedCustomer.id,
+				posProfile : this.selectedPosProfile.id,
+				items      : [s]
+		});
+
+		console.log("posInvoice ==> " , this.posInvoices);
 	}
 
 	/****************************  listeners *******************************/

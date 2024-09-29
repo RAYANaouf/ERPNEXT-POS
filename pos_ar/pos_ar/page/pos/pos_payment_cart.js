@@ -7,15 +7,17 @@ pos_ar.PointOfSale.pos_payment_cart = class{
 		selectedItemMap,
 		selectedTab,
 		selectedPaymentMythod,
-		onClose
+		onClose,
+		onComplete
 	){
 		this.wrapper                 = wrapper;
 		this.selected_item_map       = selectedItemMap;
 		this.selected_tab            = selectedTab;
 		this.selected_payment_method = selectedPaymentMythod;
 		this.on_close_cart           = onClose;
+		this.on_complete             = onComplete;
 
-		console.log('map #$%^&*' , this.selectedItemMap)
+		console.log('ahaaaaaaaaaaaaaaaaahaha' , this.selectedItemMap)
 
 		//local
 		this.grand_total = 0 ;
@@ -29,6 +31,7 @@ pos_ar.PointOfSale.pos_payment_cart = class{
 	/****************************************  UI ***********************************************/
 
 	start_work(){
+
 		this.prepare_payment_cart();
 		this.calculateGrandTotal()
 		this.setListeners()
@@ -96,6 +99,7 @@ pos_ar.PointOfSale.pos_payment_cart = class{
 	/****************************************  listeners  ***********************************************/
 
 	setListeners(){
+
 		this.cashBox.on('click' , (event)=>{
 			this.selected_payment_method.methodName = "cash"
 			this.cashBox.addClass('selected')
@@ -209,6 +213,16 @@ pos_ar.PointOfSale.pos_payment_cart = class{
 			}
 			console.log("input" , event.target.value)
 		})
+
+		this.cart_footer.find("#completeOrderBtn").on('click' , (event)=>{
+			frappe.confirm('Submit the invoice ?',
+			()=>{/*yes*/
+				this.on_complete()
+			},()=>{
+
+			})
+		})
+
 
 	}
 

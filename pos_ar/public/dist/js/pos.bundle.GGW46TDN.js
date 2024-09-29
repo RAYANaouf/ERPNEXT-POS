@@ -37,7 +37,7 @@
       this.selectedField = {};
       this.selectedTab = { "tabName": "C1" };
       this.selectedPaymentMethod = { "methodName": "" };
-      this.posInvoices = /* @__PURE__ */ new Map();
+      this.sellInvoices = /* @__PURE__ */ new Map();
       this.start_app();
     }
     async start_app() {
@@ -147,7 +147,8 @@
         this.selectedItemMaps,
         this.selectedTab,
         this.selectedPaymentMethod,
-        this.onClose_payment_cart.bind(this)
+        this.onClose_payment_cart.bind(this),
+        this.onCompleteOrder.bind(this)
       );
     }
     itemClick_selector(item) {
@@ -239,6 +240,17 @@
       } else if (action == "addToField") {
         this.item_details.addToField(this.selectedField.field_name, key);
       }
+    }
+    onCompleteOrder() {
+      this.sellInvoices.set(
+        this.selectedTab.tabName,
+        {
+          customer: this.selectedCustomer.id,
+          posProfile: this.selectedPosProfile.id,
+          items: [s]
+        }
+      );
+      console.log("posInvoice ==> ", this.posInvoices);
     }
     setListeners() {
       console.log("test (window) ==> ", window);
@@ -1064,13 +1076,14 @@
 
   // ../pos_ar/pos_ar/pos_ar/page/pos/pos_payment_cart.js
   pos_ar.PointOfSale.pos_payment_cart = class {
-    constructor(wrapper, selectedItemMap, selectedTab, selectedPaymentMythod, onClose) {
+    constructor(wrapper, selectedItemMap, selectedTab, selectedPaymentMythod, onClose, onComplete) {
       this.wrapper = wrapper;
       this.selected_item_map = selectedItemMap;
       this.selected_tab = selectedTab;
       this.selected_payment_method = selectedPaymentMythod;
       this.on_close_cart = onClose;
-      console.log("map #$%^&*", this.selectedItemMap);
+      this.on_complete = onComplete;
+      console.log("ahaaaaaaaaaaaaaaaaahaha", this.selectedItemMap);
       this.grand_total = 0;
       this.paid_amount = 0;
       this.to_change = 0;
@@ -1205,6 +1218,16 @@
         }
         console.log("input", event2.target.value);
       });
+      this.cart_footer.find("#completeOrderBtn").on("click", (event2) => {
+        frappe.confirm(
+          "Submit the invoice ?",
+          () => {
+            this.on_complete();
+          },
+          () => {
+          }
+        );
+      });
     }
     calculateGrandTotal() {
       this.grand_amount = 0;
@@ -1230,4 +1253,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.Q2ZT2DUI.js.map
+//# sourceMappingURL=pos.bundle.GGW46TDN.js.map
