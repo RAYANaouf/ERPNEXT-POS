@@ -55,8 +55,6 @@ pos_ar.PointOfSale.pos_customer_box = class{
 		this.customerBox.find('#toggleButton').on('click' , (event)=>{
 			this.online = !this.online
 
-
-
 			if(this.online){
 				console.log(this.online)
 				this.customerBox.find('#toggleButtonBall').css('left' , '0px')
@@ -73,7 +71,7 @@ pos_ar.PointOfSale.pos_customer_box = class{
 			}
 		})
 
-		this.customerBox.find('#suncBtn').on('click' , (event)=>{
+		this.customerBox.find('#syncBtn').on('click' , (event)=>{
 			this.on_sync();
 		})
 

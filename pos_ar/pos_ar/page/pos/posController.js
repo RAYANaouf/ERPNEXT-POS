@@ -335,9 +335,10 @@ pos_ar.PointOfSale.Controller = class {
 		this.selectedItemMaps.get(this.selectedTab.tabName).forEach((value,key) =>{
 			console.log("the key : " , key , " value : " , value)
 			let newItem = {
-				item_name : value.name,
-				rate      : value.amount,
-				qty       : value.quantity
+				'item_name' : value.name,
+				'rate'      : value.amount,
+				'qty'       : value.quantity,
+				'income_account' : this.PosProfileList[0].income_account
 			}
 
 			items.push(newItem)
@@ -373,9 +374,27 @@ pos_ar.PointOfSale.Controller = class {
 	}
 
 	onSync(){
-		/*frappe.db.insert(
-			doctype : "Sales Invoice"
-		)*/
+
+		try{
+			frappe.db.insert({
+				'doctype'     : "Sales Invoice",
+				'customer'    :  this.sellInvoices.get('C1').customer,
+				'pos_profile' : this.sellInvoices.get('C1').pos_profile,
+				'items'       : this.sellInvoices.get('C1').items,
+				'paid_amount' : 1000,
+				'outstanding_amount' : 0,
+				'status'      : "Paid",
+				'docstatus'   : 1
+			}).then(r => {
+				console.log(r)
+			}).catch(err =>{
+				console.log(err)
+			})
+		}
+		catch(err){
+			console.log("err ==> " , err)
+		}
+		console.log("clicked4");
 	}
 
 	/****************************  listeners *******************************/
@@ -460,7 +479,7 @@ pos_ar.PointOfSale.Controller = class {
         async fetchItems() {
                 try {
                         return await frappe.db.get_list('Item', {
-                                fields: ['name', 'item_name' , 'image' , 'item_group' , 'stock_uom'  ],
+                                fields: ['name', 'item_name' , 'image' , 'item_group' , 'stock_uom' ],
                                 filters: {}
                         })
                 } catch (error) {
@@ -510,7 +529,7 @@ pos_ar.PointOfSale.Controller = class {
         async fetchPosProfileList(){
                 try{
                         return await frappe.db.get_list('POS Profile' , {
-                                fields  : ['name' , 'warehouse'],
+                                fields  : ['name' , 'warehouse' , 'income_account'],
                                 filters : {}
                         })
                 }
