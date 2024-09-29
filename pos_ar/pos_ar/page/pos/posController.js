@@ -378,6 +378,12 @@ pos_ar.PointOfSale.Controller = class {
 		//calculate amount
 		let all_tabs = Array.from(this.sellInvoices.keys())
 
+		if(all_tabs.length == 0){
+			console.log("here")
+			return;
+			console.log("here acheived")
+
+		}
 		try{
 			all_tabs.forEach(tab =>{
 				//calculate the paid_amount
@@ -429,7 +435,8 @@ pos_ar.PointOfSale.Controller = class {
 		catch(err){
 			console.log("err ==> " , err)
 		}
-		console.log("clicked4");
+
+		console.log("we are here now")
 	}
 
 	/****************************  listeners *******************************/

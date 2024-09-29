@@ -278,6 +278,11 @@
     }
     onSync() {
       let all_tabs = Array.from(this.sellInvoices.keys());
+      if (all_tabs.length == 0) {
+        console.log("here");
+        return;
+        console.log("here acheived");
+      }
       try {
         all_tabs.forEach((tab) => {
           let paid_amount = 0;
@@ -324,7 +329,7 @@
       } catch (err) {
         console.log("err ==> ", err);
       }
-      console.log("clicked4");
+      console.log("we are here now");
     }
     setListeners() {
       console.log("test (window) ==> ", window);
@@ -1352,4 +1357,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.QWBNFM53.js.map
+//# sourceMappingURL=pos.bundle.BKVTIGCQ.js.map
