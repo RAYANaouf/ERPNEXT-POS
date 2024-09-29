@@ -30,7 +30,7 @@ pos_ar.PointOfSale.pos_customer_box = class{
 		this.customerBox = this.wrapper.find('#CustomerBox');
 		this.customerBox.append('<input list="CustomerList"  id="CustomerInput" name="Customer" placeHolder="Enter the customer">')
 		this.customerBox.append('<datalist id="CustomerList"></datalist>')
-		this.customerBox.append('<div id="suncBtn">Sync</div>')
+		this.customerBox.append('<div id="syncBtn">Sync</div>')
 		this.customerBox.append('<div id="toggleButtonLabel">Offline Mode </div>')
 		this.customerBox.append('<div id="toggleButton" class="rowBox align_center" > <div id="toggleButtonBall" ></div>  </div>')
 

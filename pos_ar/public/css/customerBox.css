@@ -15,6 +15,24 @@
 
 }
 
+
+#RightSection #syncBtn{
+
+	padding : 4px 10px ;
+	margin-right : 16px ;  
+	border  : 2px solid #ac6500;
+	border-radius : 10px ;
+	
+	cursor : pointer ;	
+}
+
+#RightSection #syncBtn:hover{
+
+	border  : 2px solid #6a3e00;
+	color   : white ;
+	background : #ac6500 ; 
+}
+
 #RightSection #CustomerBox #toggleButtonLabel{
 	margin-right : 8px ;
 }

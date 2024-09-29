@@ -373,9 +373,9 @@ pos_ar.PointOfSale.Controller = class {
 	}
 
 	onSync(){
-		frappe.db.insert(
+		/*frappe.db.insert(
 			doctype : "Sales Invoice"
-		)
+		)*/
 	}
 
 	/****************************  listeners *******************************/
