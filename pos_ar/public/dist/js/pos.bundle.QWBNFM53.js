@@ -278,7 +278,6 @@
     }
     onSync() {
       let all_tabs = Array.from(this.sellInvoices.keys());
-      console.log("keys===> ", all_tabs, "data ==*> ", this.sellInvoices);
       try {
         all_tabs.forEach((tab) => {
           let paid_amount = 0;
@@ -296,7 +295,28 @@
             "status": "Paid",
             "docstatus": 1
           }).then((r) => {
-            console.log(r);
+            console.log(r, "name=====,.,.,.>>>", r.name);
+            frappe.db.insert({
+              "doctype": "Payment Entry",
+              "payment_type": "Receive",
+              "party_type": "Customer",
+              "party": this.sellInvoices.get(tab).customer,
+              "paid_amount": paid_amount,
+              "received_amount": paid_amount,
+              "docstatus": 1,
+              "paid_to": "Cash - MS",
+              "references": [{
+                "reference_doctype": "Sales Invoice",
+                "reference_name": r.name,
+                "total_amount": r.paid_amount,
+                "outstanding_amount": 0,
+                "allocated_amount": r.paid_amount
+              }]
+            }).then((result) => {
+              console.log("final res : ", result);
+            }).catch((err) => {
+              console.log(err);
+            });
           }).catch((err) => {
             console.log(err);
           });
@@ -1332,4 +1352,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.63LFYBKV.js.map
+//# sourceMappingURL=pos.bundle.QWBNFM53.js.map
