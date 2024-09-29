@@ -4,13 +4,13 @@ pos_ar.PointOfSale.pos_customer_box = class{
 	constructor(
 		wrapper,
 		customersList,
+		onSync
 	){
 		this.wrapper        = wrapper ;
 		this.customers_list = customersList ;
-
+		this.on_sync        = onSync ;
 		//local
 		this.online  = true    ;
-
 
 		this.start_work();
 	}
@@ -30,10 +30,12 @@ pos_ar.PointOfSale.pos_customer_box = class{
 		this.customerBox = this.wrapper.find('#CustomerBox');
 		this.customerBox.append('<input list="CustomerList"  id="CustomerInput" name="Customer" placeHolder="Enter the customer">')
 		this.customerBox.append('<datalist id="CustomerList"></datalist>')
+		this.customerBox.append('<div id="suncBtn">Sync</div>')
 		this.customerBox.append('<div id="toggleButtonLabel">Offline Mode </div>')
 		this.customerBox.append('<div id="toggleButton" class="rowBox align_center" > <div id="toggleButtonBall" ></div>  </div>')
 
 	}
+
 
 	setCustomersInList(){
 
@@ -69,6 +71,10 @@ pos_ar.PointOfSale.pos_customer_box = class{
 				this.customerBox.find('#toggleButton').css('border' , '2px solid  #6a3e00')
 
 			}
+		})
+
+		this.customerBox.find('#suncBtn').on('click' , (event)=>{
+			this.on_sync();
 		})
 
 	}

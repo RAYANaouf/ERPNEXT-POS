@@ -102,7 +102,8 @@
     init_customer_box() {
       this.customer_box = new pos_ar.PointOfSale.pos_customer_box(
         this.$rightSection,
-        this.customersList
+        this.customersList,
+        this.onSync.bind(this)
       );
     }
     init_selected_item() {
@@ -205,6 +206,7 @@
       this.payment_cart.hideCart();
       this.selected_item_cart.setKeyboardOrientation("portrait");
       this.selected_item_cart.cleanHeighlight();
+      this.selected_item_cart.hideKeyboard();
     }
     onInput(event2, field, value) {
       if (event2 == "focus" || event2 == "blur") {
@@ -247,7 +249,6 @@
         console.log("the key : ", key, " value : ", value);
         let newItem = {
           item_name: value.name,
-          uom: value.stock_uom,
           rate: value.amount,
           qty: value.quantity
         };
@@ -257,10 +258,24 @@
         this.selectedTab.tabName,
         {
           "customer": this.customersList[0].name,
+          "pos_profile": this.PosProfileList[0].name,
           "items": items
         }
       );
+      this.selectedItemMaps.delete(this.selectedTab.tabName);
+      let tabs = Array.from(this.selectedItemMaps.keys());
+      console.log("log ==>", tabs);
+      if (tabs.length > 0) {
+        this.selectedTab.tabName = tabs[0];
+        this.selected_item_cart.refreshTabs();
+        this.selected_item_cart.refreshSelectedItem();
+      } else {
+        this.selected_item_cart.createNewTab();
+      }
+      this.onClose_payment_cart();
       console.log("posInvoice ==> ", this.sellInvoices);
+    }
+    onSync() {
     }
     setListeners() {
       console.log("test (window) ==> ", window);
@@ -489,9 +504,10 @@
 
   // ../pos_ar/pos_ar/pos_ar/page/pos/pos_customer_box.js
   pos_ar.PointOfSale.pos_customer_box = class {
-    constructor(wrapper, customersList) {
+    constructor(wrapper, customersList, onSync) {
       this.wrapper = wrapper;
       this.customers_list = customersList;
+      this.on_sync = onSync;
       this.online = true;
       this.start_work();
     }
@@ -505,6 +521,7 @@
       this.customerBox = this.wrapper.find("#CustomerBox");
       this.customerBox.append('<input list="CustomerList"  id="CustomerInput" name="Customer" placeHolder="Enter the customer">');
       this.customerBox.append('<datalist id="CustomerList"></datalist>');
+      this.customerBox.append('<div id="suncBtn">Sync</div>');
       this.customerBox.append('<div id="toggleButtonLabel">Offline Mode </div>');
       this.customerBox.append('<div id="toggleButton" class="rowBox align_center" > <div id="toggleButtonBall" ></div>  </div>');
     }
@@ -532,6 +549,9 @@
           this.customerBox.find("#toggleButtonBall").css("background", "#ac6500");
           this.customerBox.find("#toggleButton").css("border", "2px solid  #6a3e00");
         }
+      });
+      this.customerBox.find("#suncBtn").on("click", (event2) => {
+        this.on_sync();
       });
     }
   };
@@ -651,6 +671,8 @@
     refreshSelectedItem() {
       const selectedItemsContainer = document.getElementById("selectedItemsContainer");
       selectedItemsContainer.innerHTML = "";
+      console.log("debuging ", this.selected_tab);
+      console.log("selected map ", this.selected_item_maps);
       this.selected_item_maps.get(this.selected_tab.tabName).forEach((item, itemId) => {
         const itemElement = document.createElement("div");
         const leftGroup = document.createElement("div");
@@ -697,6 +719,13 @@
       this.calculateNetTotal();
       this.calculateQnatity();
       this.calculateGrandTotal();
+    }
+    createNewTab() {
+      this.counter += 1;
+      this.selected_item_maps.set(`C${this.counter}`, /* @__PURE__ */ new Map());
+      this.selected_tab.tabName = `C${this.counter}`;
+      this.refreshTabs();
+      this.refreshSelectedItem();
     }
     showKeyboard() {
       this.editSelectedItem.css("display", "flex");
@@ -1274,4 +1303,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.WGWVBXFB.js.map
+//# sourceMappingURL=pos.bundle.G2HUH4D2.js.map

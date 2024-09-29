@@ -107,8 +107,9 @@ pos_ar.PointOfSale.Controller = class {
 
 	init_customer_box(){
 		this.customer_box  = new pos_ar.PointOfSale.pos_customer_box(
-									this.$rightSection,
-									this.customersList
+									this.$rightSection ,
+									this.customersList ,
+									this.onSync.bind(this)
 									)
 	}
         init_selected_item(){
@@ -268,6 +269,7 @@ pos_ar.PointOfSale.Controller = class {
 		//update ui
 		this.selected_item_cart.setKeyboardOrientation("portrait");
 		this.selected_item_cart.cleanHeighlight();
+		this.selected_item_cart.hideKeyboard()
 
 	}
 
@@ -334,7 +336,6 @@ pos_ar.PointOfSale.Controller = class {
 			console.log("the key : " , key , " value : " , value)
 			let newItem = {
 				item_name : value.name,
-				uom       : value.stock_uom,
 				rate      : value.amount,
 				qty       : value.quantity
 			}
@@ -345,11 +346,36 @@ pos_ar.PointOfSale.Controller = class {
 		this.sellInvoices.set(
 				this.selectedTab.tabName , {
 				"customer"   : this.customersList[0].name,
-				//posProfile : this.selectedPosProfile.id,
+				"pos_profile": this.PosProfileList[0].name,
 				"items"      : items
 		});
 
+		this.selectedItemMaps.delete(this.selectedTab.tabName)
+
+		//tabs
+		let tabs = Array.from(this.selectedItemMaps.keys())
+		console.log("log ==>" , tabs)
+
+		//if there are still tabs it will just set the first as selected
+		//otherwise it will create one using the selected_item_cart class and set it as selected
+		if(tabs.length > 0){
+			this.selectedTab.tabName = tabs[0]
+			this.selected_item_cart.refreshTabs();
+			this.selected_item_cart.refreshSelectedItem();
+		}
+		else{
+			this.selected_item_cart.createNewTab();
+		}
+
+		this.onClose_payment_cart()
+
 		console.log("posInvoice ==> " , this.sellInvoices);
+	}
+
+	onSync(){
+		frappe.db.insert(
+			doctype : "Sales Invoice"
+		)
 	}
 
 	/****************************  listeners *******************************/

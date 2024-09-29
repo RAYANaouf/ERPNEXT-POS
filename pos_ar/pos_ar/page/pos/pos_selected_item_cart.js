@@ -175,6 +175,9 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 		const selectedItemsContainer = document.getElementById("selectedItemsContainer");
 		selectedItemsContainer.innerHTML = "";
 
+		console.log("debuging " , this.selected_tab)
+		console.log("selected map " , this.selected_item_maps)
+
 		this.selected_item_maps.get(this.selected_tab.tabName).forEach((item,itemId) =>{
 			const itemElement   = document.createElement("div");
 			const leftGroup     = document.createElement("div");
@@ -244,6 +247,15 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 		this.calculateGrandTotal();
 	}
 
+	createNewTab(){
+			this.counter += 1 ;
+			this.selected_item_maps.set(`C${this.counter}` , new Map())
+			this.selected_tab.tabName = `C${this.counter}`
+
+			//update UI
+			this.refreshTabs()
+			this.refreshSelectedItem()
+	}
 
 	showKeyboard(){
 		this.editSelectedItem.css('display','flex')
