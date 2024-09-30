@@ -213,6 +213,19 @@ pos_ar.PointOfSale.pos_payment_cart = class{
 		})
 
 		this.cart_footer.find("#completeOrderBtn").on('click' , (event)=>{
+			console.log("grand total ==> " , this.grand_total , "the paid amount ==> " , this.paid_amount)
+			if(this.grand_total > this.paid_amount){
+				frappe.warn(
+					'Paid amount is less than the Total!',
+					'Please set the correct paid amount value',
+					()=>{
+					},
+					'Done',
+					true
+				)
+				return;
+			}
+
 			frappe.confirm('Submit the invoice ?',
 			()=>{/*yes*/
 				this.on_complete()
@@ -227,18 +240,18 @@ pos_ar.PointOfSale.pos_payment_cart = class{
 
 	calculateGrandTotal(){
 
-		this.grand_amount = 0 ;
+		this.grand_total = 0 ;
 
 		this.selected_item_map.get(this.selected_tab.tabName).forEach((value,key)=>{
-			this.grand_amount += value.quantity * value.amount
+			this.grand_total += value.quantity * value.amount
 		})
 
-		this.payment_details.find('#paymentGrandTotalValue').text(`${this.grand_amount} DA`)
+		this.payment_details.find('#paymentGrandTotalValue').text(`${this.grand_total} DA`)
 	}
 
 	calculateToChange(){
-		this.to_change = (this.paid_amount - this.grand_amount)
-		console.log("paid  " ,this.paid_amount , " - " , this.grand_amount , " = "  ,   this.to_change)
+		this.to_change = (this.paid_amount - this.grand_total)
+		console.log("paid  " ,this.paid_amount , " - " , this.grand_total , " = "  ,   this.to_change)
 		this.payment_details.find('#paimentToChangeValue').text(`${this.to_change} DA`)
 	}
 

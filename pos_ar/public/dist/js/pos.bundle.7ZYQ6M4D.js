@@ -327,6 +327,13 @@
               console.log("final res : ", result);
               if (counter == all_tabs.length) {
                 frappe.hide_progress();
+                frappe.show_alert(
+                  {
+                    message: __("Hi, Sync process is done."),
+                    indicator: "green"
+                  },
+                  5
+                );
               }
             }).catch((err) => {
               console.log(err);
@@ -383,7 +390,7 @@
     async fetchItemGroups() {
       try {
         return await frappe.db.get_list("Item Group", {
-          fields: ["name", "item_group_name"],
+          fields: ["name", "item_group_name", "parent_item_group", "is_group"],
           filters: {}
         });
       } catch (error) {
@@ -551,11 +558,34 @@
       });
     }
     getItemByItemGroup(item_group) {
+      let groups = [];
+      let getChild = (grp) => {
+        groups.push(grp);
+        this.item_group_list.forEach((g) => {
+          if (g.parent_item_group == grp) {
+            groups.push(g);
+            if (g.is_group) {
+              getChild(g.name);
+            }
+          }
+        });
+      };
+      getChild(item_group);
       let filtredItemList = [];
-      this.item_list.forEach((item) => {
-        if (item.item_group == item_group) {
-          filtredItemList.push(item);
-        }
+      let getFiltredItems = (group) => {
+        this.item_list.forEach((item) => {
+          console.log("item =*> ", item);
+          console.log("item.item_group =*> ", item.item_group);
+          if (item.item_group == group) {
+            console.log("we are here");
+            filtredItemList.push(item);
+          }
+        });
+      };
+      console.log("all list : ", groups);
+      groups.forEach((group) => {
+        console.log("group : ", group);
+        getFiltredItems(group.name);
       });
       return filtredItemList;
     }
@@ -1332,6 +1362,18 @@
         console.log("input", event2.target.value);
       });
       this.cart_footer.find("#completeOrderBtn").on("click", (event2) => {
+        console.log("grand total ==> ", this.grand_total, "the paid amount ==> ", this.paid_amount);
+        if (this.grand_total > this.paid_amount) {
+          frappe.warn(
+            "Paid amount is less than the Total!",
+            "Please set the correct paid amount value",
+            () => {
+            },
+            "Done",
+            true
+          );
+          return;
+        }
         frappe.confirm(
           "Submit the invoice ?",
           () => {
@@ -1343,15 +1385,15 @@
       });
     }
     calculateGrandTotal() {
-      this.grand_amount = 0;
+      this.grand_total = 0;
       this.selected_item_map.get(this.selected_tab.tabName).forEach((value, key) => {
-        this.grand_amount += value.quantity * value.amount;
+        this.grand_total += value.quantity * value.amount;
       });
-      this.payment_details.find("#paymentGrandTotalValue").text(`${this.grand_amount} DA`);
+      this.payment_details.find("#paymentGrandTotalValue").text(`${this.grand_total} DA`);
     }
     calculateToChange() {
-      this.to_change = this.paid_amount - this.grand_amount;
-      console.log("paid  ", this.paid_amount, " - ", this.grand_amount, " = ", this.to_change);
+      this.to_change = this.paid_amount - this.grand_total;
+      console.log("paid  ", this.paid_amount, " - ", this.grand_total, " = ", this.to_change);
       this.payment_details.find("#paimentToChangeValue").text(`${this.to_change} DA`);
     }
     refreshPaidAmount() {
@@ -1366,4 +1408,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.GFB3WB6E.js.map
+//# sourceMappingURL=pos.bundle.7ZYQ6M4D.js.map

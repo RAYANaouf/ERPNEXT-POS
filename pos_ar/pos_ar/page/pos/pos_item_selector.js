@@ -132,14 +132,49 @@ pos_ar.PointOfSale.pos_item_selector = class {
 	//**************** tools method ****************************//
 	getItemByItemGroup(item_group){
 
+
+		let groups = [];
+
+		let getChild = (grp)=>{
+			groups.push(grp);
+			this.item_group_list.forEach(g=>{
+				if(g.parent_item_group == grp){
+					groups.push(g)
+					if(g.is_group){
+						getChild(g.name)
+					}
+				}
+			})
+		};
+
+
+		getChild(item_group);
+
+
 		let filtredItemList = [];
-		this.item_list.forEach(item =>{
-			if(item.item_group == item_group){
-				filtredItemList.push(item);
-			}
+
+		let getFiltredItems = (group)=>{
+			this.item_list.forEach(item =>{
+				console.log("item =*> " , item)
+				console.log("item.item_group =*> " , item.item_group)
+				if(item.item_group == group){
+					console.log("we are here")
+					filtredItemList.push(item);
+				}
+			})
+		}
+
+		console.log("all list : " , groups  )
+
+		groups.forEach(group =>{
+			console.log("group : " , group );
+			getFiltredItems(group.name);
 		})
+
+
 		return filtredItemList;
 	}
+
 
 	getItemPrice(itemId){
 		const price = this.item_prices.find(itemPrice => itemPrice.item_code == itemId)

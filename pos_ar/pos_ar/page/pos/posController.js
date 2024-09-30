@@ -253,8 +253,6 @@ pos_ar.PointOfSale.Controller = class {
 		this.selected_item_cart.setKeyboardOrientation("portrait");
 		this.selected_item_cart.cleanHeighlight();
 
-
-
 	}
 
 	onClose_payment_cart(){
@@ -287,7 +285,6 @@ pos_ar.PointOfSale.Controller = class {
 
 			return;
 		}
-
 
 
 		if( field ==  "quantity" ){
@@ -435,6 +432,11 @@ pos_ar.PointOfSale.Controller = class {
 						console.log("final res : " , result)
 						if(counter == all_tabs.length){
 							frappe.hide_progress();
+							frappe.show_alert({
+									message:__('Hi, Sync process is done.'),
+									indicator:'green'
+								},
+								5);
 						}
 					}).catch(err =>{
 						console.log(err)
@@ -522,7 +524,7 @@ pos_ar.PointOfSale.Controller = class {
         async fetchItemGroups() {
                 try {
                         return await frappe.db.get_list('Item Group', {
-                                fields: ['name', 'item_group_name' ],
+                                fields: ['name', 'item_group_name' , 'parent_item_group' , 'is_group' ],
                                 filters: {}
                         })
                 } catch (error) {
