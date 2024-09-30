@@ -255,6 +255,8 @@
         };
         items.push(newItem);
       });
+      if (items.length == 0)
+        return;
       this.sellInvoices.set(
         this.selectedTab.tabName,
         {
@@ -284,6 +286,8 @@
         console.log("here acheived");
       }
       try {
+        frappe.show_progress("Syncing Invoices...", 0, all_tabs.length, "syncing");
+        let counter = 0;
         all_tabs.forEach((tab) => {
           let paid_amount = 0;
           this.sellInvoices.get(tab).items.forEach((item) => {
@@ -318,7 +322,12 @@
                 "allocated_amount": r.paid_amount
               }]
             }).then((result) => {
+              counter += 1;
+              frappe.show_progress("Syncing Invoices...", counter, all_tabs.length, "syncing");
               console.log("final res : ", result);
+              if (counter == all_tabs.length) {
+                frappe.hide_progress();
+              }
             }).catch((err) => {
               console.log(err);
             });
@@ -1357,4 +1366,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.BKVTIGCQ.js.map
+//# sourceMappingURL=pos.bundle.GFB3WB6E.js.map

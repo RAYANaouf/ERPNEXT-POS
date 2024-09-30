@@ -344,6 +344,9 @@ pos_ar.PointOfSale.Controller = class {
 			items.push(newItem)
 		})
 
+		if(items.length ==0)
+			return
+
 		this.sellInvoices.set(
 				this.selectedTab.tabName , {
 				"customer"   : this.customersList[0].name,
@@ -385,6 +388,11 @@ pos_ar.PointOfSale.Controller = class {
 
 		}
 		try{
+			//progress
+			frappe.show_progress('Syncing Invoices...' , 0 , all_tabs.length , 'syncing')
+
+			let counter = 0 ;
+
 			all_tabs.forEach(tab =>{
 				//calculate the paid_amount
 				let paid_amount = 0 ;
@@ -422,7 +430,12 @@ pos_ar.PointOfSale.Controller = class {
 							'allocated_amount'  : r.paid_amount
 						}]
 					}).then(result =>{
+						counter += 1 ;
+						frappe.show_progress('Syncing Invoices...' , counter , all_tabs.length , 'syncing')
 						console.log("final res : " , result)
+						if(counter == all_tabs.length){
+							frappe.hide_progress();
+						}
 					}).catch(err =>{
 						console.log(err)
 					})
