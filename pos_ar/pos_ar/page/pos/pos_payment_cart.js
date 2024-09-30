@@ -214,29 +214,45 @@ pos_ar.PointOfSale.pos_payment_cart = class{
 
 		this.cart_footer.find("#completeOrderBtn").on('click' , (event)=>{
 			console.log("grand total ==> " , this.grand_total , "the paid amount ==> " , this.paid_amount)
-			if(this.grand_total > this.paid_amount){
+			if(this.grand_total > this.paid_amount ){
+				console.log("here we go 1")
 				frappe.warn(
 					'Paid amount is less than the Total!',
 					'Please set the correct paid amount value',
 					()=>{
 					},
 					'Done',
-					true
+					false
 				)
 				return;
+			}
+			else if(this.grand_total == 0){
+				console.log("here we go 2")
+				frappe.warn(
+					'No item',
+					'Please select some items.',
+					()=>{
+					},
+					'Done',
+					false
+				)
+				return;
+
 			}
 
 			frappe.confirm('Submit the invoice ?',
 			()=>{/*yes*/
 				this.on_complete()
 			},()=>{
-				
+
 			})
 		})
 
 
 	}
 
+
+	/************************************ tools  ***************************************/
 
 	calculateGrandTotal(){
 
@@ -247,6 +263,8 @@ pos_ar.PointOfSale.pos_payment_cart = class{
 		})
 
 		this.payment_details.find('#paymentGrandTotalValue').text(`${this.grand_total} DA`)
+
+		this.generateProposedPaidAmount(this.grand_total);
 	}
 
 	calculateToChange(){
@@ -257,6 +275,19 @@ pos_ar.PointOfSale.pos_payment_cart = class{
 
 	refreshPaidAmount(){
 		this.payment_details.find('#paimentPaidAmountValue').text(`${this.paid_amount} DA`)
+	}
+
+
+	generateProposedPaidAmount(total){
+		const money = [10,20,50,100,200,500,1000,2000];
+		let counter = 0;
+		let pointer = 7;
+
+		while( counter < total ){
+			counter += money[pointer]
+		}
+
+		console.log("counter : " , counter)
 	}
 
 }

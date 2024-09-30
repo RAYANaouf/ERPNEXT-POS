@@ -373,15 +373,15 @@ pos_ar.PointOfSale.Controller = class {
 		console.log("posInvoice ==> " , this.sellInvoices);
 	}
 
+
 	onSync(){
 
 		//calculate amount
 		let all_tabs = Array.from(this.sellInvoices.keys())
 
 		if(all_tabs.length == 0){
-			console.log("here")
+			frappe.throw('nothing to sync')
 			return;
-			console.log("here acheived")
 
 		}
 		try{
@@ -409,12 +409,14 @@ pos_ar.PointOfSale.Controller = class {
 					'status'      : "Paid",
 					'docstatus'   : 1
 				}).then(r => {
-					console.log(r , "name=====,.,.,.>>>" , r.name)
+					//delete the sale invoice from the map
+					this.sellInvoices.delete(tab)
+					console.log(r)
 					frappe.db.insert({
 						'doctype'         : "Payment Entry",
 						'payment_type'    : 'Receive',
 						'party_type'      : 'Customer',
-						'party'           : this.sellInvoices.get(tab).customer,
+						'party'           : r.customer,
 						'paid_amount'     : paid_amount,
 						'received_amount' : paid_amount,
 						'docstatus'       : 1,

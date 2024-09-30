@@ -281,9 +281,8 @@
     onSync() {
       let all_tabs = Array.from(this.sellInvoices.keys());
       if (all_tabs.length == 0) {
-        console.log("here");
+        frappe.throw("nothing to sync");
         return;
-        console.log("here acheived");
       }
       try {
         frappe.show_progress("Syncing Invoices...", 0, all_tabs.length, "syncing");
@@ -304,12 +303,13 @@
             "status": "Paid",
             "docstatus": 1
           }).then((r) => {
-            console.log(r, "name=====,.,.,.>>>", r.name);
+            this.sellInvoices.delete(tab);
+            console.log(r);
             frappe.db.insert({
               "doctype": "Payment Entry",
               "payment_type": "Receive",
               "party_type": "Customer",
-              "party": this.sellInvoices.get(tab).customer,
+              "party": r.customer,
               "paid_amount": paid_amount,
               "received_amount": paid_amount,
               "docstatus": 1,
@@ -1360,13 +1360,25 @@
       this.cart_footer.find("#completeOrderBtn").on("click", (event2) => {
         console.log("grand total ==> ", this.grand_total, "the paid amount ==> ", this.paid_amount);
         if (this.grand_total > this.paid_amount) {
+          console.log("here we go 1");
           frappe.warn(
             "Paid amount is less than the Total!",
             "Please set the correct paid amount value",
             () => {
             },
             "Done",
-            true
+            false
+          );
+          return;
+        } else if (this.grand_total == 0) {
+          console.log("here we go 2");
+          frappe.warn(
+            "No item",
+            "Please select some items.",
+            () => {
+            },
+            "Done",
+            false
           );
           return;
         }
@@ -1386,6 +1398,7 @@
         this.grand_total += value.quantity * value.amount;
       });
       this.payment_details.find("#paymentGrandTotalValue").text(`${this.grand_total} DA`);
+      this.generateProposedPaidAmount(this.grand_total);
     }
     calculateToChange() {
       this.to_change = this.paid_amount - this.grand_total;
@@ -1394,6 +1407,15 @@
     }
     refreshPaidAmount() {
       this.payment_details.find("#paimentPaidAmountValue").text(`${this.paid_amount} DA`);
+    }
+    generateProposedPaidAmount(total) {
+      const money = [10, 20, 50, 100, 200, 500, 1e3, 2e3];
+      let counter = 0;
+      let pointer = 7;
+      while (counter < total) {
+        counter += money[pointer];
+      }
+      console.log("counter : ", counter);
     }
   };
 
@@ -1404,4 +1426,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.I4JNIZE2.js.map
+//# sourceMappingURL=pos.bundle.5T4AU6ZD.js.map
