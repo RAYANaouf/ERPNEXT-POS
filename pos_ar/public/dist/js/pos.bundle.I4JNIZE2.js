@@ -479,6 +479,7 @@
     start_item_selector() {
       this.prepare_select_box();
       this.setItemGroupsInList();
+      this.setItemInFlow(this.getItemByItemGroup(""));
       this.setListeners();
     }
     prepare_select_box() {
@@ -563,7 +564,7 @@
         groups.push(grp);
         this.item_group_list.forEach((g) => {
           if (g.parent_item_group == grp) {
-            groups.push(g);
+            groups.push(g.name);
             if (g.is_group) {
               getChild(g.name);
             }
@@ -574,18 +575,13 @@
       let filtredItemList = [];
       let getFiltredItems = (group) => {
         this.item_list.forEach((item) => {
-          console.log("item =*> ", item);
-          console.log("item.item_group =*> ", item.item_group);
           if (item.item_group == group) {
-            console.log("we are here");
             filtredItemList.push(item);
           }
         });
       };
-      console.log("all list : ", groups);
       groups.forEach((group) => {
-        console.log("group : ", group);
-        getFiltredItems(group.name);
+        getFiltredItems(group);
       });
       return filtredItemList;
     }
@@ -1408,4 +1404,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.7ZYQ6M4D.js.map
+//# sourceMappingURL=pos.bundle.I4JNIZE2.js.map
