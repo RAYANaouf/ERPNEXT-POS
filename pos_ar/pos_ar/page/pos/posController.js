@@ -368,13 +368,14 @@ pos_ar.PointOfSale.Controller = class {
 		let items = []
 
 		this.selectedItemMaps.get(this.selectedTab.tabName).forEach((value,key) =>{
-			console.log("the key : " , key , " value : " , value)
+			console.log("the key ==> " , key , " value ==> " , value)
 			let newItem = {
 				'item_name'           : value.name,
 				'rate'                : value.amount,
 				'qty'                 : value.quantity,
 				'discount_percentage' : value.discount_percentage,
 				'discount_amount'     : value.discount_amount,
+				'warehouse'           : this.PosProfileList[0].warehouse,
 				'income_account'      : this.PosProfileList[0].income_account
 			}
 
@@ -395,7 +396,6 @@ pos_ar.PointOfSale.Controller = class {
 
 		//tabs
 		let tabs = Array.from(this.selectedItemMaps.keys())
-		console.log("log ==>" , tabs)
 
 		//if there are still tabs it will just set the first as selected
 		//otherwise it will create one using the selected_item_cart class and set it as selected
@@ -442,64 +442,44 @@ pos_ar.PointOfSale.Controller = class {
 				console.log("paid" , paid_amount)
 
 				frappe.db.insert({
-					'doctype'     : "Sales Invoice",
-					'customer'    : this.sellInvoices.get(tab).customer,
-					'pos_profile' : this.sellInvoices.get(tab).pos_profile,
-					'items'       : this.sellInvoices.get(tab).items,
-					'paid_amount' : paid_amount,
-					'outstanding_amount' : 0,
-					'status'      : "Paid",
-					'docstatus'   : 1
+					'doctype'      : "Sales Invoice",
+					'customer'     : this.sellInvoices.get(tab).customer    ,
+					'pos_profile'  : this.sellInvoices.get(tab).pos_profile ,
+					'items'        : this.sellInvoices.get(tab).items       ,
+					'paid_amount'  : paid_amount,
+					'outstanding_amount' : 0 ,
+					'is_pos'       : 1       ,
+					'payments'     :[{
+						'mode_of_payment' : 'Cash',
+						'amount'          : paid_amount
+					}],
+					'update_stock' : 1       ,
+					'docstatus'    : 1
 				}).then(r => {
 					this.sellInvoices.delete(tab)
 
-					frappe.db.insert({
-						'doctype'         : "Payment Entry",
-						'payment_type'    : 'Receive',
-						'party_type'      : 'Customer',
-						'mode_of_payment' : 'Cash',
-						'party'           : r.customer,
-						'paid_amount'     : paid_amount,
-						'received_amount' : paid_amount,
-						'docstatus'       : 1,
-						'paid_to'         : 'Cash - MS',
-						'references'      : [{
-							'reference_doctype' : 'Sales Invoice',
-							'reference_name'    : r.name,
-							'total_amount'      : r.paid_amount,
-							'outstanding_amount': 0,
-							'allocated_amount'  : r.paid_amount
-						}]
-					}).then(result =>{
+					counter += 1 ;
+					seccess += 1 ;
 
-						console.log(result)
-
-						counter += 1 ;
-						seccess += 1 ;
+					frappe.show_progress('Syncing Invoices...' , counter , all_tabs.length , 'syncing')
 
 
-						frappe.show_progress('Syncing Invoices...' , counter , all_tabs.length , 'syncing')
-
-						console.log("final res : " , result)
-
-						if(counter == all_tabs.length){
-							frappe.hide_progress();
-							if(failure == 0){
-								frappe.show_alert({
-										message:__(`Hi, Sync process is done ${seccess}/${counter}`),
-										indicator:'green'
-									},
-									5);
-							}
-							else{
-								frappe.throw(`Sync process : ${failure} out of ${counter}. Process incomplete.`)
-							}
+					if(counter == all_tabs.length){
+						frappe.hide_progress();
+						if(failure == 0){
+							frappe.show_alert({
+									message:__(`Hi, Sync process is done ${seccess}/${counter}`),
+									indicator:'green'
+								},
+								5);
 						}
-					}).catch(err =>{
-						counter += 1 ;
-						failure += 1 ;
-						console.log(err);
-					})
+						else{
+							frappe.throw(`Sync process : ${failure} out of ${counter}. Process incomplete.`)
+						}
+					}
+
+
+
 				}).catch(err =>{
 					counter += 1 ;
 					failure += 1 ;
