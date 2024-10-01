@@ -285,7 +285,8 @@
           "item_name": value.name,
           "rate": value.amount,
           "qty": value.quantity,
-          "discount_percentage": value.discount,
+          "discount_percentage": value.discount_percentage,
+          "discount_amount": value.discount_amount,
           "income_account": this.PosProfileList[0].income_account
         };
         items.push(newItem);
@@ -345,6 +346,7 @@
               "doctype": "Payment Entry",
               "payment_type": "Receive",
               "party_type": "Customer",
+              "mode_of_payment": "Cash",
               "party": r.customer,
               "paid_amount": paid_amount,
               "received_amount": paid_amount,
@@ -358,6 +360,7 @@
                 "allocated_amount": r.paid_amount
               }]
             }).then((result) => {
+              console.log(result);
               counter += 1;
               seccess += 1;
               frappe.show_progress("Syncing Invoices...", counter, all_tabs.length, "syncing");
@@ -1515,4 +1518,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.YGHLXYO7.js.map
+//# sourceMappingURL=pos.bundle.MPIOETXC.js.map

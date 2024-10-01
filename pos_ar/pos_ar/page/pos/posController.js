@@ -370,11 +370,12 @@ pos_ar.PointOfSale.Controller = class {
 		this.selectedItemMaps.get(this.selectedTab.tabName).forEach((value,key) =>{
 			console.log("the key : " , key , " value : " , value)
 			let newItem = {
-				'item_name' : value.name,
-				'rate'      : value.amount,
-				'qty'       : value.quantity,
-				'discount_percentage' : value.discount,
-				'income_account' : this.PosProfileList[0].income_account
+				'item_name'           : value.name,
+				'rate'                : value.amount,
+				'qty'                 : value.quantity,
+				'discount_percentage' : value.discount_percentage,
+				'discount_amount'     : value.discount_amount,
+				'income_account'      : this.PosProfileList[0].income_account
 			}
 
 			items.push(newItem)
@@ -456,6 +457,7 @@ pos_ar.PointOfSale.Controller = class {
 						'doctype'         : "Payment Entry",
 						'payment_type'    : 'Receive',
 						'party_type'      : 'Customer',
+						'mode_of_payment' : 'Cash',
 						'party'           : r.customer,
 						'paid_amount'     : paid_amount,
 						'received_amount' : paid_amount,
@@ -469,6 +471,8 @@ pos_ar.PointOfSale.Controller = class {
 							'allocated_amount'  : r.paid_amount
 						}]
 					}).then(result =>{
+
+						console.log(result)
 
 						counter += 1 ;
 						seccess += 1 ;
