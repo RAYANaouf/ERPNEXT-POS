@@ -24,8 +24,6 @@ pos_ar.PointOfSale.Controller = class {
                 this.selectedTab           = {"tabName" : "C1"}
 		this.selectedPaymentMethod = {"methodName" : ""}
 
-
-
 		//sell invoice
 		this.sellInvoices = new Map();
 
@@ -163,7 +161,7 @@ pos_ar.PointOfSale.Controller = class {
 
 
 
-        /*********************  callbacks functions ******************************/
+        /*********************  callbacks functions ******************************/discount_percentage
 
 	itemClick_selector(item){
 
@@ -273,7 +271,7 @@ pos_ar.PointOfSale.Controller = class {
 
 
 	onInput( event , field , value){
-
+		console.log("item " , this.selectedItem )
 		if(event == "focus" || event == "blur"){
 			if(event == "focus")
 				Object.assign(this.selectedField , {field_name : field})
@@ -285,7 +283,6 @@ pos_ar.PointOfSale.Controller = class {
 
 			return;
 		}
-
 
 		if( field ==  "quantity" ){
 			this.selectedItem.quantity = value;
@@ -299,8 +296,9 @@ pos_ar.PointOfSale.Controller = class {
 			//redrawing
 			this.selected_item_cart.refreshSelectedItem();
 		}
-		else if( field == ""){
-			
+		else if( field == "discount"){
+			this.selectedItem.discount = value;
+			this.selectedItemMaps.get(this.selectedTab.tabName).set( this.selectedItem.name , Object.assign({},this.selectedItem)  )
 		}
 
 	}
@@ -335,6 +333,7 @@ pos_ar.PointOfSale.Controller = class {
 				'item_name' : value.name,
 				'rate'      : value.amount,
 				'qty'       : value.quantity,
+				'discount_percentage' : value.discount,
 				'income_account' : this.PosProfileList[0].income_account
 			}
 
@@ -389,6 +388,8 @@ pos_ar.PointOfSale.Controller = class {
 			frappe.show_progress('Syncing Invoices...' , 0 , all_tabs.length , 'syncing')
 
 			let counter = 0 ;
+			let failure = 0 ;
+			let seccess = 0 ;
 
 			all_tabs.forEach(tab =>{
 				//calculate the paid_amount
@@ -409,9 +410,8 @@ pos_ar.PointOfSale.Controller = class {
 					'status'      : "Paid",
 					'docstatus'   : 1
 				}).then(r => {
-					//delete the sale invoice from the map
 					this.sellInvoices.delete(tab)
-					console.log(r)
+
 					frappe.db.insert({
 						'doctype'         : "Payment Entry",
 						'payment_type'    : 'Receive',
@@ -429,21 +429,36 @@ pos_ar.PointOfSale.Controller = class {
 							'allocated_amount'  : r.paid_amount
 						}]
 					}).then(result =>{
+
 						counter += 1 ;
+						seccess += 1 ;
+
+
 						frappe.show_progress('Syncing Invoices...' , counter , all_tabs.length , 'syncing')
+
 						console.log("final res : " , result)
+
 						if(counter == all_tabs.length){
 							frappe.hide_progress();
-							frappe.show_alert({
-									message:__('Hi, Sync process is done.'),
-									indicator:'green'
-								},
-								5);
+							if(failure == 0){
+								frappe.show_alert({
+										message:__(`Hi, Sync process is done ${seccess}/${counter}`),
+										indicator:'green'
+									},
+									5);
+							}
+							else{
+								frappe.throw(`Sync process : ${failure} out of ${counter}. Process incomplete.`)
+							}
 						}
 					}).catch(err =>{
-						console.log(err)
+						counter += 1 ;
+						failure += 1 ;
+						console.log(err);
 					})
 				}).catch(err =>{
+					counter += 1 ;
+					failure += 1 ;
 					console.log(err)
 				})
 

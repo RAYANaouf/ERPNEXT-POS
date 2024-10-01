@@ -373,11 +373,14 @@ else if(keyContent == "." && !selectedField.value.includes(".")){
 				return
 			}
 
-			if(newDiscount < 100)
+			//console.log("condition ==> " , newDiscount<100 )
+			if(newDiscount < 100){
 				this.on_input( "input" , "discount" , newDiscount)
-			else
+			}
+			else{
+				event.target.value = 100
 				this.on_input( "input" , "discount" , 100)
-
+			}
 
 		})
 

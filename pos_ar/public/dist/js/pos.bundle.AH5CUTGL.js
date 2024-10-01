@@ -15,10 +15,15 @@
       }
     return a;
   };
+  var __publicField = (obj, key, value) => {
+    __defNormalProp(obj, typeof key !== "symbol" ? key + "" : key, value);
+    return value;
+  };
 
   // ../pos_ar/pos_ar/pos_ar/page/pos/posController.js
   pos_ar.PointOfSale.Controller = class {
     constructor(wrapper) {
+      __publicField(this, "discount_percentage");
       this.wrapper = $(wrapper).find(".layout-main-section");
       this.page = wrapper.page;
       this.customersList = [];
@@ -209,6 +214,7 @@
       this.selected_item_cart.hideKeyboard();
     }
     onInput(event2, field, value) {
+      console.log("item ", this.selectedItem);
       if (event2 == "focus" || event2 == "blur") {
         if (event2 == "focus")
           Object.assign(this.selectedField, { field_name: field });
@@ -226,7 +232,9 @@
         this.selectedItem.amount = value;
         this.selectedItemMaps.get(this.selectedTab.tabName).set(this.selectedItem.name, Object.assign({}, this.selectedItem));
         this.selected_item_cart.refreshSelectedItem();
-      } else if (field == "") {
+      } else if (field == "discount") {
+        this.selectedItem.discount = value;
+        this.selectedItemMaps.get(this.selectedTab.tabName).set(this.selectedItem.name, Object.assign({}, this.selectedItem));
       }
     }
     onKeyPressed(action, key) {
@@ -251,6 +259,7 @@
           "item_name": value.name,
           "rate": value.amount,
           "qty": value.quantity,
+          "discount_percentage": value.discount,
           "income_account": this.PosProfileList[0].income_account
         };
         items.push(newItem);
@@ -287,6 +296,8 @@
       try {
         frappe.show_progress("Syncing Invoices...", 0, all_tabs.length, "syncing");
         let counter = 0;
+        let failure = 0;
+        let seccess = 0;
         all_tabs.forEach((tab) => {
           let paid_amount = 0;
           this.sellInvoices.get(tab).items.forEach((item) => {
@@ -304,7 +315,6 @@
             "docstatus": 1
           }).then((r) => {
             this.sellInvoices.delete(tab);
-            console.log(r);
             frappe.db.insert({
               "doctype": "Payment Entry",
               "payment_type": "Receive",
@@ -323,22 +333,31 @@
               }]
             }).then((result) => {
               counter += 1;
+              seccess += 1;
               frappe.show_progress("Syncing Invoices...", counter, all_tabs.length, "syncing");
               console.log("final res : ", result);
               if (counter == all_tabs.length) {
                 frappe.hide_progress();
-                frappe.show_alert(
-                  {
-                    message: __("Hi, Sync process is done."),
-                    indicator: "green"
-                  },
-                  5
-                );
+                if (failure == 0) {
+                  frappe.show_alert(
+                    {
+                      message: __(`Hi, Sync process is done ${seccess}/${counter}`),
+                      indicator: "green"
+                    },
+                    5
+                  );
+                } else {
+                  frappe.throw(`Sync process : ${failure} out of ${counter}. Process incomplete.`);
+                }
               }
             }).catch((err) => {
+              counter += 1;
+              failure += 1;
               console.log(err);
             });
           }).catch((err) => {
+            counter += 1;
+            failure += 1;
             console.log(err);
           });
         });
@@ -1192,10 +1211,12 @@
           console.warn("Invalide discount value");
           return;
         }
-        if (newDiscount < 100)
+        if (newDiscount < 100) {
           this.on_input("input", "discount", newDiscount);
-        else
+        } else {
+          event2.target.value = 100;
           this.on_input("input", "discount", 100);
+        }
       });
       this.discountInput.on("focus", (event2) => {
         this.on_input("focus", "discount", null);
@@ -1426,4 +1447,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.5T4AU6ZD.js.map
+//# sourceMappingURL=pos.bundle.AH5CUTGL.js.map
