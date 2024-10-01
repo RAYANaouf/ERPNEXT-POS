@@ -84,6 +84,7 @@ pos_ar.PointOfSale.pos_item_details = class{
 		this.c2 = this.details_all.find('#itemDetails_C2')
 		this.c2.append('<div class="columnBox"><label for="itemDetailsUomInput">UOM *</label><input type="text" id="itemDetailsUomInput"  disabled></div>')
 		this.c2.append('<div class="columnBox"><label for="detailsPriceList">Price List *</label><input list="detailsPriceList" id="detailsItemPriceListInput" class ="rowBox align_center pointerCursor"><datalist id="detailsPriceList"><option>fetching Price Lists ...</option></datalist></div>')
+		this.c2.append('<div class="columnBox"><label for="itemDetailsDiscountMontantInput">Discount (montant)</label><input type="float" id="itemDetailsDiscountMontantInput" class="pointerCursor"></div>')
 		this.c2.append('<div class="columnBox"><label for="itemDetailsPriceListRateInput">Price List Rate</label><input type="text" id="itemDetailsPriceListRateInput" disabled></div>')
 
 
@@ -98,10 +99,11 @@ pos_ar.PointOfSale.pos_item_details = class{
 		const warehouse     = document.getElementById("detailsItemWarehouse");
 		const itemGroup     = document.getElementById("detailsItemGroup");
 
-		const quantity  = document.getElementById("itemDetailsQuantityInput");
-		const rate      = document.getElementById("itemDetailsRateInput");
-		const discount  = document.getElementById("itemDetailsDiscountInput");
-		const available = document.getElementById("itemDetailsAvailableInput");
+		const quantity             = document.getElementById("itemDetailsQuantityInput");
+		const rate                 = document.getElementById("itemDetailsRateInput");
+		const discount_percentage  = document.getElementById("itemDetailsDiscountInput");
+		const discount_amount      = document.getElementById("itemDetailsDiscountMontantInput");
+		const available            = document.getElementById("itemDetailsAvailableInput");
 
 		const uom           = document.getElementById("itemDetailsUomInput");
 		const priceList     = document.getElementById("detailsItemPriceListInput");
@@ -135,7 +137,9 @@ pos_ar.PointOfSale.pos_item_details = class{
 		rate.value = item.amount
 
 		//discount
-		discount.value = 0.00
+		discount_amount.value     = item.discount_amount ?? 0.00;
+		discount_percentage.value = item.discount_percentage ?? 0.00;
+
 
 		//available
 		available.value = this.getQtyInWarehouse(item.name ,  this.warehouse)
@@ -188,7 +192,7 @@ pos_ar.PointOfSale.pos_item_details = class{
 			this.c1.find('#itemDetailsRateInput').addClass('selected')
 			this.c1.find('#itemDetailsDiscountInput').removeClass('selected')
 		}
-		else if(this.selected_field.field_name == "discount"){
+		else if(this.selected_field.field_name == "discount_percentage"){
 			this.c1.find('#itemDetailsQuantityInput').removeClass('selected')
 			this.c1.find('#itemDetailsRateInput').removeClass('selected')
 			this.c1.find('#itemDetailsDiscountInput').addClass('selected')
@@ -209,8 +213,11 @@ pos_ar.PointOfSale.pos_item_details = class{
 		else if(field == "rate"){
 			this.c1.find('#itemDetailsRateInput').focus();
 		}
-		else if(field == "discount"){
+		else if(field == "discount_percentage"){
 			this.c1.find('#itemDetailsDiscountInput').focus();
+		}
+		else if(field == "discount_amount"){
+			this.c1.find('#itemDetailsDiscountMontantInput').focus();
 		}
 	}
 
@@ -242,7 +249,16 @@ else if(keyContent == "." && !selectedField.value.includes(".")){
 					return currentValue + value
 			})
 		}
-		else if(field == "discount"){
+		else if(field == "discount_percentage"){
+			this.c1.find('#itemDetailsDiscountInput').val( (index,currentValue) =>{
+				if(value == "." && currentValue.includes("."))
+					return currentValue
+				else
+					return currentValue + value
+			})
+
+		}
+		else if(field == "discount_amount"){
 			this.c1.find('#itemDetailsDiscountInput').val( (index,currentValue) =>{
 				if(value == "." && currentValue.includes("."))
 					return currentValue
@@ -258,10 +274,10 @@ else if(keyContent == "." && !selectedField.value.includes(".")){
 
 	setDetailsFieldsListeners(){
 
-		this.quantityInput = this.c1.find('#itemDetailsQuantityInput')
-		this.rateInput     = this.c1.find('#itemDetailsRateInput')
-		this.discountInput = this.c1.find('#itemDetailsDiscountInput')
-
+		this.quantityInput        = this.c1.find('#itemDetailsQuantityInput')
+		this.rateInput            = this.c1.find('#itemDetailsRateInput')
+		this.discountInput        = this.c1.find('#itemDetailsDiscountInput')
+		this.discountMontantInput = this.c2.find('#itemDetailsDiscountMontantInput')
 
 		//quantity input
 		this.quantityInput.on('input' , (event)=>{
@@ -346,6 +362,8 @@ else if(keyContent == "." && !selectedField.value.includes(".")){
 		})
 
 
+
+
 		//discount field listener
 		this.discountInput.on('input' , (event)=>{
 			const value = event.target.value ;
@@ -366,7 +384,9 @@ else if(keyContent == "." && !selectedField.value.includes(".")){
 				event.target.value = value ;
 			}
 
-			let newDiscount = parseFloat(this.discountInput.val());
+			let newDiscount = this.discountInput.val();
+
+			console.log("the new value " , newDiscount)
 
 			if(isNaN(newDiscount)){
 				console.warn("Invalide discount value")
@@ -375,21 +395,63 @@ else if(keyContent == "." && !selectedField.value.includes(".")){
 
 			//console.log("condition ==> " , newDiscount<100 )
 			if(newDiscount < 100){
-				this.on_input( "input" , "discount" , newDiscount)
+				this.on_input( "input" , "discount_percentage" , newDiscount)
 			}
 			else{
-				event.target.value = 100
-				this.on_input( "input" , "discount" , 100)
+				event.target.value = 100;
+				this.on_input( "input" , "discount_percentage" , 100)
 			}
 
 		})
 
 		this.discountInput.on('focus' , (event)=>{
-			this.on_input( "focus" , "discount" , null)
+			this.on_input( "focus" , "discount_percentage" , null)
 		})
 
 		this.discountInput.on('blur' , (event)=>{
-			this.on_input( "blur" , "discount" , null)
+			this.on_input( "blur" , "discount_percentage" , null)
+		})
+
+
+		//discount field listener
+		this.discountMontantInput.on('input' , (event)=>{
+			const value = event.target.value ;
+
+			if(value.length == 0){
+				event.target.value = 0;
+			}
+			else if(!value.slice(0,-1).includes(".")  && value[value.length-1] == "."){
+				event.target.value = value;
+			}
+			else if(value[value.length-1] == "."){
+				event.target.value = value.slice(0,-1);
+			}
+			else if(isNaN(value[value.length-1])){
+				event.target.value = value.slice(0,-1);
+			}
+			else{
+				event.target.value = value ;
+			}
+
+			let newDiscount = this.discountMontantInput.val();
+
+			if(isNaN(newDiscount)){
+				console.warn("Invalide discount value")
+				return
+			}
+
+			//console.log("condition ==> " , newDiscount<100 )
+			this.on_input( "input" , "discount_amount" , newDiscount)
+
+		})
+
+		this.discountMontantInput.on('focus' , (event)=>{
+			console.log("we are here")
+			this.on_input( "focus" , "discount_amount" , null)
+		})
+
+		this.discountMontantInput.on('blur' , (event)=>{
+			this.on_input( "blur" , "discount_amount" , null)
 		})
 
 	}

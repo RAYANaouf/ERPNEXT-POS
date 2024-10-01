@@ -271,6 +271,7 @@ pos_ar.PointOfSale.Controller = class {
 
 
 	onInput( event , field , value){
+		console.log("field : " , field)
 		//console.log("item " , this.selectedItem )
 		if(event == "focus" || event == "blur"){
 			if(event == "focus")
@@ -296,18 +297,49 @@ pos_ar.PointOfSale.Controller = class {
 			//redrawing
 			this.selected_item_cart.refreshSelectedItem();
 		}
-		else if( field == "discount"){
+		else if( field == "discount_percentage"){
 
 			//recalculate the rate
 			let oldRate = this.getItemPrice(this.selectedItem.name);
-			let newRate = oldRate - (oldRate * (value/100))
-			this.selectedItem.discount = value;
-			this.selectedItem.amount   = newRate;
+			let montant = oldRate * (value / 100)
+			let newRate = oldRate - montant
 
-			console.log("selected Item ==> " , this.selectedItem.name , " old rate ==> " , oldRate , " new Rate ==> " , newRate)
+			console.log("old price : " , oldRate , "discount % : " , value , "discount montant : "  , montant , " new Price " , newRate )
+			this.selectedItem.discount_percentage = value;
+			this.selectedItem.discount_amount     = montant;
+			this.selectedItem.amount              = newRate;
+
 			this.selectedItemMaps.get(this.selectedTab.tabName).set( this.selectedItem.name , Object.assign({},this.selectedItem)  )
 			//redrawing
 			this.selected_item_cart.refreshSelectedItem();
+			this.item_details.refreshDate(this.selectedItem);
+		}
+		else if( field == "discount_amount"){
+
+			//recalculate the rate
+			let oldRate = this.getItemPrice(this.selectedItem.name);
+			let persent = ((value * 100) / oldRate).toFixed(2);
+			let montant = value;
+
+			//prevent negatif result
+			if(persent > 100){
+				persent = 100 ;
+			}
+			if(value > oldRate){
+				montant = oldRate;
+			}
+			let newRate = oldRate - montant
+
+			console.log("old price : " , oldRate , "discount % : " , persent , "discount montant : "  , montant , " new Price " , newRate )
+			this.selectedItem.discount_percentage = persent;
+			this.selectedItem.discount_amount     = montant;
+			this.selectedItem.amount              = newRate;
+
+			this.selectedItemMaps.get(this.selectedTab.tabName).set( this.selectedItem.name , Object.assign({},this.selectedItem)  )
+			//redrawing
+			this.selected_item_cart.refreshSelectedItem();
+			this.item_details.refreshDate(this.selectedItem);
+
 		}
 	}
 

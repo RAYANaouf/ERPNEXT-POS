@@ -214,6 +214,7 @@
       this.selected_item_cart.hideKeyboard();
     }
     onInput(event2, field, value) {
+      console.log("field : ", field);
       if (event2 == "focus" || event2 == "blur") {
         if (event2 == "focus")
           Object.assign(this.selectedField, { field_name: field });
@@ -231,14 +232,35 @@
         this.selectedItem.amount = value;
         this.selectedItemMaps.get(this.selectedTab.tabName).set(this.selectedItem.name, Object.assign({}, this.selectedItem));
         this.selected_item_cart.refreshSelectedItem();
-      } else if (field == "discount") {
+      } else if (field == "discount_percentage") {
         let oldRate = this.getItemPrice(this.selectedItem.name);
-        let newRate = oldRate - oldRate * (value / 100);
-        this.selectedItem.discount = value;
+        let montant = oldRate * (value / 100);
+        let newRate = oldRate - montant;
+        console.log("old price : ", oldRate, "discount % : ", value, "discount montant : ", montant, " new Price ", newRate);
+        this.selectedItem.discount_percentage = value;
+        this.selectedItem.discount_amount = montant;
         this.selectedItem.amount = newRate;
-        console.log("selected Item ==> ", this.selectedItem.name, " old rate ==> ", oldRate, " new Rate ==> ", newRate);
         this.selectedItemMaps.get(this.selectedTab.tabName).set(this.selectedItem.name, Object.assign({}, this.selectedItem));
         this.selected_item_cart.refreshSelectedItem();
+        this.item_details.refreshDate(this.selectedItem);
+      } else if (field == "discount_amount") {
+        let oldRate = this.getItemPrice(this.selectedItem.name);
+        let persent = (value * 100 / oldRate).toFixed(2);
+        let montant = value;
+        if (persent > 100) {
+          persent = 100;
+        }
+        if (value > oldRate) {
+          montant = oldRate;
+        }
+        let newRate = oldRate - montant;
+        console.log("old price : ", oldRate, "discount % : ", persent, "discount montant : ", montant, " new Price ", newRate);
+        this.selectedItem.discount_percentage = persent;
+        this.selectedItem.discount_amount = montant;
+        this.selectedItem.amount = newRate;
+        this.selectedItemMaps.get(this.selectedTab.tabName).set(this.selectedItem.name, Object.assign({}, this.selectedItem));
+        this.selected_item_cart.refreshSelectedItem();
+        this.item_details.refreshDate(this.selectedItem);
       }
     }
     onKeyPressed(action, key) {
@@ -1033,9 +1055,11 @@
       this.c2 = this.details_all.find("#itemDetails_C2");
       this.c2.append('<div class="columnBox"><label for="itemDetailsUomInput">UOM *</label><input type="text" id="itemDetailsUomInput"  disabled></div>');
       this.c2.append('<div class="columnBox"><label for="detailsPriceList">Price List *</label><input list="detailsPriceList" id="detailsItemPriceListInput" class ="rowBox align_center pointerCursor"><datalist id="detailsPriceList"><option>fetching Price Lists ...</option></datalist></div>');
+      this.c2.append('<div class="columnBox"><label for="itemDetailsDiscountMontantInput">Discount (montant)</label><input type="float" id="itemDetailsDiscountMontantInput" class="pointerCursor"></div>');
       this.c2.append('<div class="columnBox"><label for="itemDetailsPriceListRateInput">Price List Rate</label><input type="text" id="itemDetailsPriceListRateInput" disabled></div>');
     }
     refreshDate(item) {
+      var _a, _b;
       console.log("start ref");
       const imageContainer = document.getElementById("detailsItemImage");
       const name = document.getElementById("detailsItemName");
@@ -1043,7 +1067,8 @@
       const itemGroup = document.getElementById("detailsItemGroup");
       const quantity = document.getElementById("itemDetailsQuantityInput");
       const rate = document.getElementById("itemDetailsRateInput");
-      const discount = document.getElementById("itemDetailsDiscountInput");
+      const discount_percentage = document.getElementById("itemDetailsDiscountInput");
+      const discount_amount = document.getElementById("itemDetailsDiscountMontantInput");
       const available = document.getElementById("itemDetailsAvailableInput");
       const uom = document.getElementById("itemDetailsUomInput");
       const priceList = document.getElementById("detailsItemPriceListInput");
@@ -1065,7 +1090,8 @@
       name.classList.add("rowBox", "align_center");
       quantity.value = item.quantity;
       rate.value = item.amount;
-      discount.value = 0;
+      discount_amount.value = (_a = item.discount_amount) != null ? _a : 0;
+      discount_percentage.value = (_b = item.discount_percentage) != null ? _b : 0;
       available.value = this.getQtyInWarehouse(item.name, this.warehouse);
       uom.value = item.stock_uom;
       priceList.value = this.price_lists[0].price_list_name;
@@ -1092,7 +1118,7 @@
         this.c1.find("#itemDetailsQuantityInput").removeClass("selected");
         this.c1.find("#itemDetailsRateInput").addClass("selected");
         this.c1.find("#itemDetailsDiscountInput").removeClass("selected");
-      } else if (this.selected_field.field_name == "discount") {
+      } else if (this.selected_field.field_name == "discount_percentage") {
         this.c1.find("#itemDetailsQuantityInput").removeClass("selected");
         this.c1.find("#itemDetailsRateInput").removeClass("selected");
         this.c1.find("#itemDetailsDiscountInput").addClass("selected");
@@ -1107,8 +1133,10 @@
         this.c1.find("#itemDetailsQuantityInput").focus();
       } else if (field == "rate") {
         this.c1.find("#itemDetailsRateInput").focus();
-      } else if (field == "discount") {
+      } else if (field == "discount_percentage") {
         this.c1.find("#itemDetailsDiscountInput").focus();
+      } else if (field == "discount_amount") {
+        this.c1.find("#itemDetailsDiscountMontantInput").focus();
       }
     }
     addToField(field, value) {
@@ -1127,7 +1155,14 @@
           else
             return currentValue + value;
         });
-      } else if (field == "discount") {
+      } else if (field == "discount_percentage") {
+        this.c1.find("#itemDetailsDiscountInput").val((index, currentValue) => {
+          if (value == "." && currentValue.includes("."))
+            return currentValue;
+          else
+            return currentValue + value;
+        });
+      } else if (field == "discount_amount") {
         this.c1.find("#itemDetailsDiscountInput").val((index, currentValue) => {
           if (value == "." && currentValue.includes("."))
             return currentValue;
@@ -1140,6 +1175,7 @@
       this.quantityInput = this.c1.find("#itemDetailsQuantityInput");
       this.rateInput = this.c1.find("#itemDetailsRateInput");
       this.discountInput = this.c1.find("#itemDetailsDiscountInput");
+      this.discountMontantInput = this.c2.find("#itemDetailsDiscountMontantInput");
       this.quantityInput.on("input", (event2) => {
         const value = event2.target.value;
         if (value.length == 0) {
@@ -1210,23 +1246,51 @@
         } else {
           event2.target.value = value;
         }
-        let newDiscount = parseFloat(this.discountInput.val());
+        let newDiscount = this.discountInput.val();
+        console.log("the new value ", newDiscount);
         if (isNaN(newDiscount)) {
           console.warn("Invalide discount value");
           return;
         }
         if (newDiscount < 100) {
-          this.on_input("input", "discount", newDiscount);
+          this.on_input("input", "discount_percentage", newDiscount);
         } else {
           event2.target.value = 100;
-          this.on_input("input", "discount", 100);
+          this.on_input("input", "discount_percentage", 100);
         }
       });
       this.discountInput.on("focus", (event2) => {
-        this.on_input("focus", "discount", null);
+        this.on_input("focus", "discount_percentage", null);
       });
       this.discountInput.on("blur", (event2) => {
-        this.on_input("blur", "discount", null);
+        this.on_input("blur", "discount_percentage", null);
+      });
+      this.discountMontantInput.on("input", (event2) => {
+        const value = event2.target.value;
+        if (value.length == 0) {
+          event2.target.value = 0;
+        } else if (!value.slice(0, -1).includes(".") && value[value.length - 1] == ".") {
+          event2.target.value = value;
+        } else if (value[value.length - 1] == ".") {
+          event2.target.value = value.slice(0, -1);
+        } else if (isNaN(value[value.length - 1])) {
+          event2.target.value = value.slice(0, -1);
+        } else {
+          event2.target.value = value;
+        }
+        let newDiscount = this.discountMontantInput.val();
+        if (isNaN(newDiscount)) {
+          console.warn("Invalide discount value");
+          return;
+        }
+        this.on_input("input", "discount_amount", newDiscount);
+      });
+      this.discountMontantInput.on("focus", (event2) => {
+        console.log("we are here");
+        this.on_input("focus", "discount_amount", null);
+      });
+      this.discountMontantInput.on("blur", (event2) => {
+        this.on_input("blur", "discount_amount", null);
       });
     }
     getItemPrice(itemId) {
@@ -1451,4 +1515,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.XO2BCMQH.js.map
+//# sourceMappingURL=pos.bundle.YGHLXYO7.js.map
