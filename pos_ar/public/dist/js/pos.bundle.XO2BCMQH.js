@@ -214,7 +214,6 @@
       this.selected_item_cart.hideKeyboard();
     }
     onInput(event2, field, value) {
-      console.log("item ", this.selectedItem);
       if (event2 == "focus" || event2 == "blur") {
         if (event2 == "focus")
           Object.assign(this.selectedField, { field_name: field });
@@ -233,8 +232,13 @@
         this.selectedItemMaps.get(this.selectedTab.tabName).set(this.selectedItem.name, Object.assign({}, this.selectedItem));
         this.selected_item_cart.refreshSelectedItem();
       } else if (field == "discount") {
+        let oldRate = this.getItemPrice(this.selectedItem.name);
+        let newRate = oldRate - oldRate * (value / 100);
         this.selectedItem.discount = value;
+        this.selectedItem.amount = newRate;
+        console.log("selected Item ==> ", this.selectedItem.name, " old rate ==> ", oldRate, " new Rate ==> ", newRate);
         this.selectedItemMaps.get(this.selectedTab.tabName).set(this.selectedItem.name, Object.assign({}, this.selectedItem));
+        this.selected_item_cart.refreshSelectedItem();
       }
     }
     onKeyPressed(action, key) {
@@ -1447,4 +1451,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.AH5CUTGL.js.map
+//# sourceMappingURL=pos.bundle.XO2BCMQH.js.map

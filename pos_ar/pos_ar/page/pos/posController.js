@@ -271,7 +271,7 @@ pos_ar.PointOfSale.Controller = class {
 
 
 	onInput( event , field , value){
-		console.log("item " , this.selectedItem )
+		//console.log("item " , this.selectedItem )
 		if(event == "focus" || event == "blur"){
 			if(event == "focus")
 				Object.assign(this.selectedField , {field_name : field})
@@ -297,10 +297,18 @@ pos_ar.PointOfSale.Controller = class {
 			this.selected_item_cart.refreshSelectedItem();
 		}
 		else if( field == "discount"){
-			this.selectedItem.discount = value;
-			this.selectedItemMaps.get(this.selectedTab.tabName).set( this.selectedItem.name , Object.assign({},this.selectedItem)  )
-		}
 
+			//recalculate the rate
+			let oldRate = this.getItemPrice(this.selectedItem.name);
+			let newRate = oldRate - (oldRate * (value/100))
+			this.selectedItem.discount = value;
+			this.selectedItem.amount   = newRate;
+
+			console.log("selected Item ==> " , this.selectedItem.name , " old rate ==> " , oldRate , " new Rate ==> " , newRate)
+			this.selectedItemMaps.get(this.selectedTab.tabName).set( this.selectedItem.name , Object.assign({},this.selectedItem)  )
+			//redrawing
+			this.selected_item_cart.refreshSelectedItem();
+		}
 	}
 
 	onKeyPressed( action  , key){
