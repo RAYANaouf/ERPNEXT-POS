@@ -373,6 +373,7 @@ pos_ar.PointOfSale.Controller = class {
 				'item_name'           : value.name,
 				'rate'                : value.amount,
 				'qty'                 : value.quantity,
+				'description'         : "empty",
 				'discount_percentage' : value.discount_percentage,
 				'discount_amount'     : value.discount_amount,
 				'warehouse'           : this.PosProfileList[0].warehouse,
@@ -442,7 +443,7 @@ pos_ar.PointOfSale.Controller = class {
 				console.log("paid" , paid_amount)
 
 				frappe.db.insert({
-					'doctype'      : "Sales Invoice",
+					'doctype'      : "POS Invoice",
 					'customer'     : this.sellInvoices.get(tab).customer    ,
 					'pos_profile'  : this.sellInvoices.get(tab).pos_profile ,
 					'items'        : this.sellInvoices.get(tab).items       ,
