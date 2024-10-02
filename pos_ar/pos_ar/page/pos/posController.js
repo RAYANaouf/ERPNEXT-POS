@@ -410,15 +410,22 @@ pos_ar.PointOfSale.Controller = class {
 
 		this.selectedItemMaps.get(this.selectedTab.tabName).forEach((value,key) =>{
 			console.log("the key ==> " , key , " value ==> " , value)
+			// we still didnt implement the price_list_rate and base_price_list_rate
+			// same thing with actual_qty refering to the stock quantity
 			let newItem = {
-				'item_name'           : value.name,
-				'rate'                : value.amount,
-				'qty'                 : value.quantity,
-				'description'         : "empty",
-				'discount_percentage' : value.discount_percentage,
-				'discount_amount'     : value.discount_amount,
-				'warehouse'           : this.PosProfileList[0].warehouse,
-				'income_account'      : this.PosProfileList[0].income_account
+				'item_name'               : value.name,
+				'item_code'               : value.name,
+				'rate'                    : value.amount,
+				'qty'                     : value.quantity,
+				'description'             : value.name,
+				'image'                   : value.image,
+				'expense_account'         : 'Cost of Goods Sold - MS',
+				'use_serial_batch_fields' : 1,
+				'discount_percentage'     : value.discount_percentage,
+				'discount_amount'         : value.discount_amount,
+				'warehouse'               : this.PosProfileList[0].warehouse,
+				'income_account'          : this.PosProfileList[0].income_account,
+				'item_tax_rate'           : {}
 			}
 
 			items.push(newItem)
