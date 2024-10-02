@@ -102,7 +102,7 @@
             "status": "Open",
             "user": frappe.session.user
           },
-          fields: ["name", "status"],
+          fields: ["name", "period_start_date"],
           limit: 1
         });
         if (r.length === 0) {
@@ -363,9 +363,12 @@
         let counter = 0;
         let failure = 0;
         let seccess = 0;
+        let invoices = [];
         all_tabs.forEach((tab) => {
           let paid_amount = 0;
+          let totalQty = 0;
           this.sellInvoices.get(tab).items.forEach((item) => {
+            totalQty += item.qty;
             paid_amount += item.rate * item.qty;
           });
           console.log("paid", paid_amount);
@@ -387,11 +390,25 @@
             "update_stock": 1,
             "docstatus": 1
           }).then((r) => {
+            invoices.push(r.name);
+            console.log("invoices => ", invoices);
             this.sellInvoices.delete(tab);
             counter += 1;
             seccess += 1;
             frappe.show_progress("Syncing Invoices...", counter, all_tabs.length, "syncing");
             if (counter == all_tabs.length) {
+              frappe.db.insert({
+                "doctype": "POS Closing Entry",
+                "period_start_date": this.POSOpeningEntry.period_start_date,
+                "pos_opening_entry": this.POSOpeningEntry.name,
+                "docstatus": 1,
+                "grand_total": paid_amount,
+                "net_total": paid_amount,
+                "total_quantity": totalQty,
+                "invoices": invoices
+              }).then((result) => {
+                console.log("result =>>", result);
+              });
               frappe.hide_progress();
               if (failure == 0) {
                 frappe.show_alert(
@@ -1539,4 +1556,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.QFG2KUMP.js.map
+//# sourceMappingURL=pos.bundle.65LTAJAA.js.map

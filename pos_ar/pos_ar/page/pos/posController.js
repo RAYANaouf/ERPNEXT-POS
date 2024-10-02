@@ -103,7 +103,7 @@ pos_ar.PointOfSale.Controller = class {
 						'status'      : 'Open',
 						'user'        : frappe.session.user
 					},
-					fields  : ['name' , 'status'],
+					fields  : ['name' , 'period_start_date'],
 					limit   : 1 // we only need the most recent one
 				});
 			if(r.length === 0){
@@ -477,19 +477,23 @@ pos_ar.PointOfSale.Controller = class {
 			//progress
 			frappe.show_progress('Syncing Invoices...' , 0 , all_tabs.length , 'syncing')
 
-			let counter = 0 ;
-			let failure = 0 ;
-			let seccess = 0 ;
+			let counter  = 0  ;
+			let failure  = 0  ;
+			let seccess  = 0  ;
+			let invoices = [] ;
 
 			all_tabs.forEach(tab =>{
 				//calculate the paid_amount
 				let paid_amount = 0 ;
+				let totalQty    = 0 ;
 				this.sellInvoices.get(tab).items.forEach(item =>{
+					totalQty    += item.qty
 					paid_amount += item.rate * item.qty
 				})
 
 				console.log("paid" , paid_amount)
-
+				// we still didnt implement the  base_paid_amount and amount_eligible_for_commission
+				//_seen  value in deafault pos ==>  ["Administrator"]. i think it is an array.
 				frappe.db.insert({
 					'doctype'      : "POS Invoice",
 					'customer'     : this.sellInvoices.get(tab).customer    ,
@@ -508,6 +512,9 @@ pos_ar.PointOfSale.Controller = class {
 					'update_stock' : 1       ,
 					'docstatus'    : 1
 				}).then(r => {
+					console.log("r : " , r)
+					invoices.push({'pos_invoice' : r.name , 'customer' : r.customer )
+					console.log("invoices => " , invoices)
 					this.sellInvoices.delete(tab)
 
 					counter += 1 ;
@@ -515,8 +522,20 @@ pos_ar.PointOfSale.Controller = class {
 
 					frappe.show_progress('Syncing Invoices...' , counter , all_tabs.length , 'syncing')
 
-
 					if(counter == all_tabs.length){
+
+						frappe.db.insert({
+							'doctype'           : 'POS Closing Entry',
+							'period_start_date' : this.POSOpeningEntry.period_start_date,
+							'pos_opening_entry' : this.POSOpeningEntry.name,
+							'docstatus'         : 1,
+							'grand_total'       : paid_amount,
+							'net_total'         : paid_amount,
+							'total_quantity'    : totalQty,
+							'invoices'          : invoices
+						}).then(result =>{
+							console.log("result =>>" , result)
+						})
 						frappe.hide_progress();
 						if(failure == 0){
 							frappe.show_alert({
