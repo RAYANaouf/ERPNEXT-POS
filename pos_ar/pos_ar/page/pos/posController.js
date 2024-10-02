@@ -25,7 +25,8 @@ pos_ar.PointOfSale.Controller = class {
 		this.selectedPaymentMethod = {"methodName" : ""}
 
 		//sell invoice
-		this.sellInvoices = new Map();
+		this.sellInvoices    = new Map();
+		this.POSOpeningEntry = {}
 
                 this.start_app();
         }
@@ -33,9 +34,8 @@ pos_ar.PointOfSale.Controller = class {
 	 async start_app(){
 		await  this.prepare_app_defaults();
 		this.prepare_container();
-                this.prepare_components();
+                await  this.prepare_components();
 		this.setListeners();
-		this.checkServiceWorker()
 	}
 
         async prepare_app_defaults(){
@@ -74,14 +74,55 @@ pos_ar.PointOfSale.Controller = class {
                 this.$components_wrapper = this.wrapper.find("#MainContainer");
         }
 
-        prepare_components(){
-                this.set_right_and_left_sections();
-                this.init_item_selector();
-		this.init_customer_box();
-		this.init_selected_item();
-		this.init_item_details();
-                this.init_paymentCart();
+        async prepare_components(){
+		const hasPOSEntry = await this.checkForPOSEntry();
+
+		console.log("debug : " , hasPOSEntry , "the condition ==> " , hasPOSEntry == false);
+		if( hasPOSEntry == false ){
+			console.log("at if  : " , hasPOSEntry);
+			return;
+		}
+		else{
+			console.log("at else  : " , hasPOSEntry);
+
+	                this.set_right_and_left_sections();
+        	        this.init_item_selector();
+			this.init_customer_box();
+			this.init_selected_item();
+			this.init_item_details();
+                	this.init_paymentCart();
+		}
         }
+
+	async checkForPOSEntry(){
+
+		try{
+			const r = await frappe.db.get_list('POS Opening Entry' , {
+					filters :{
+						'pos_profile' : this.PosProfileList[0].name,
+						'status'      : 'Open',
+						'user'        : frappe.session.user
+					},
+					fields  : ['name' , 'status'],
+					limit   : 1 // we only need the most recent one
+				});
+			if(r.length === 0){
+				frappe.throw('No POS Opening Emtry found for that POS Profile for the current user. ')
+				return false;
+			}
+			//copy data
+			Object.assign(this.POSOpeningEntry ,  r[0])
+			console.log("==> " , this.POSOpeningEntry)
+
+			return true;
+
+		}catch(error){
+			console.error('error occured : ' , error);
+			frappe.throw('Error checking for POS Opening Entry.')
+			return false;
+		}
+
+	}
 
         set_right_and_left_sections(){
                 this.$components_wrapper.append('<div id="LeftSection" class="columnBox"></div>')
@@ -448,6 +489,9 @@ pos_ar.PointOfSale.Controller = class {
 					'pos_profile'  : this.sellInvoices.get(tab).pos_profile ,
 					'items'        : this.sellInvoices.get(tab).items       ,
 					'paid_amount'  : paid_amount,
+					'amount_eligible_for_commission' : paid_amount,
+					'write_off_account': this.PosProfileList[0].write_off_account,
+					'write_off_cost_center': this.PosProfileList[0].write_off_cost_center,
 					'outstanding_amount' : 0 ,
 					'is_pos'       : 1       ,
 					'payments'     :[{
@@ -628,7 +672,7 @@ pos_ar.PointOfSale.Controller = class {
         async fetchPosProfileList(){
                 try{
                         return await frappe.db.get_list('POS Profile' , {
-                                fields  : ['name' , 'warehouse' , 'income_account'],
+                                fields  : ['name' , 'warehouse' , 'income_account' , 'write_off_account' , 'write_off_cost_center'],
                                 filters : {}
                         })
                 }
