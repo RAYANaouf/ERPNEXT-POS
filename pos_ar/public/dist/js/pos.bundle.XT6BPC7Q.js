@@ -363,7 +363,7 @@
         let counter = 0;
         let failure = 0;
         let seccess = 0;
-        let invoices = [];
+        let invoicesRef = [];
         all_tabs.forEach((tab) => {
           let paid_amount = 0;
           let totalQty = 0;
@@ -390,8 +390,9 @@
             "update_stock": 1,
             "docstatus": 1
           }).then((r) => {
-            invoices.push(r.name);
-            console.log("invoices => ", invoices);
+            console.log("r : ", r);
+            invoicesRef.push({ "pos_invoice": r.name, "customer": r.customer });
+            console.log("invoices => ", invoicesRef);
             this.sellInvoices.delete(tab);
             counter += 1;
             seccess += 1;
@@ -405,7 +406,7 @@
                 "grand_total": paid_amount,
                 "net_total": paid_amount,
                 "total_quantity": totalQty,
-                "invoices": invoices
+                "pos_transactions": invoicesRef
               }).then((result) => {
                 console.log("result =>>", result);
               });
@@ -1556,4 +1557,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.65LTAJAA.js.map
+//# sourceMappingURL=pos.bundle.XT6BPC7Q.js.map

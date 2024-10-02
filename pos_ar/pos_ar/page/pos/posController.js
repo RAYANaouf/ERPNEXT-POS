@@ -477,10 +477,10 @@ pos_ar.PointOfSale.Controller = class {
 			//progress
 			frappe.show_progress('Syncing Invoices...' , 0 , all_tabs.length , 'syncing')
 
-			let counter  = 0  ;
-			let failure  = 0  ;
-			let seccess  = 0  ;
-			let invoices = [] ;
+			let counter     = 0  ;
+			let failure     = 0  ;
+			let seccess     = 0  ;
+			let invoicesRef = [] ;
 
 			all_tabs.forEach(tab =>{
 				//calculate the paid_amount
@@ -513,8 +513,8 @@ pos_ar.PointOfSale.Controller = class {
 					'docstatus'    : 1
 				}).then(r => {
 					console.log("r : " , r)
-					invoices.push({'pos_invoice' : r.name , 'customer' : r.customer )
-					console.log("invoices => " , invoices)
+					invoicesRef.push({'pos_invoice' : r.name , 'customer' : r.customer } )
+					console.log("invoices => " , invoicesRef)
 					this.sellInvoices.delete(tab)
 
 					counter += 1 ;
@@ -532,7 +532,7 @@ pos_ar.PointOfSale.Controller = class {
 							'grand_total'       : paid_amount,
 							'net_total'         : paid_amount,
 							'total_quantity'    : totalQty,
-							'invoices'          : invoices
+							'pos_transactions'  : invoicesRef
 						}).then(result =>{
 							console.log("result =>>" , result)
 						})
