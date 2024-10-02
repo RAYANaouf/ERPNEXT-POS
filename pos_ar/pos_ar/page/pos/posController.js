@@ -534,9 +534,15 @@ pos_ar.PointOfSale.Controller = class {
 							'total_quantity'    : totalQty,
 							'pos_transactions'  : invoicesRef
 						}).then(result =>{
+							frappe.hide_progress();
+							this.prepare_components();
+							console.log("result =>>" , result)
+						}).catch(error =>{
+							failure += 1 ;
+							frappe.hide_progress();
 							console.log("result =>>" , result)
 						})
-						frappe.hide_progress();
+
 						if(failure == 0){
 							frappe.show_alert({
 									message:__(`Hi, Sync process is done ${seccess}/${counter}`),
