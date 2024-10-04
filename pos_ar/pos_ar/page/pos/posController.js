@@ -70,7 +70,6 @@ pos_ar.PointOfSale.Controller = class {
                 this.wrapper.append('<link rel="stylesheet" type="text/css" href="/assets/pos_ar/css/cartBox.css">')
 
                 this.wrapper.append('<div id="MainContainer" class="rowBox"></div>');
-
                 this.$components_wrapper = this.wrapper.find("#MainContainer");
         }
 
@@ -107,7 +106,7 @@ pos_ar.PointOfSale.Controller = class {
 					limit   : 1 // we only need the most recent one
 				});
 			if(r.length === 0){
-				frappe.throw('No POS Opening Emtry found for that POS Profile for the current user. ')
+				this.create_opening_voucher();
 				return false;
 			}
 			//copy data
@@ -123,6 +122,116 @@ pos_ar.PointOfSale.Controller = class {
 		}
 
 	}
+
+
+
+
+	create_opening_voucher() {
+		const me = this;
+		const table_fields = [
+			{
+				fieldname: "mode_of_payment",
+				fieldtype: "Link",
+				in_list_view: 1,
+				label: "Mode of Payment",
+				options: "Mode of Payment",
+				reqd: 1,
+			},
+			{
+				fieldname: "opening_amount",
+				fieldtype: "Currency",
+				in_list_view: 1,
+				label: "Opening Amount",
+				options: "company:company_currency",
+				change: function () {
+					dialog.fields_dict.balance_details.df.data.some((d) => {
+						if (d.idx == this.doc.idx) {
+							d.opening_amount = this.value;
+							dialog.fields_dict.balance_details.grid.refresh();
+							return true;
+						}
+					});
+				},
+			},
+		];
+
+		const fetch_pos_payment_methods = () => {
+			const pos_profile = dialog.fields_dict.pos_profile.get_value();
+			if (!pos_profile) return;
+			frappe.db.get_doc("POS Profile", pos_profile).then(({ payments }) => {
+				dialog.fields_dict.balance_details.df.data = [];
+				payments.forEach((pay) => {
+					const { mode_of_payment } = pay;
+					dialog.fields_dict.balance_details.df.data.push({ mode_of_payment, opening_amount: "0" });
+				});
+				dialog.fields_dict.balance_details.grid.refresh();
+			});
+		};
+		const dialog = new frappe.ui.Dialog({
+			title: __("Create POS Opening Entry"),
+			static: true,
+			fields: [
+				{
+					fieldtype: "Link",
+					label: __("Company"),
+					default: frappe.defaults.get_default("company"),
+					options: "Company",
+					fieldname: "company",
+					reqd: 1,
+				},
+				{
+					fieldtype: "Link",
+					label: __("POS Profile"),
+					options: "POS Profile",
+					fieldname: "pos_profile",
+					reqd: 1,
+					get_query: () => pos_profile_query(),
+					onchange: () => fetch_pos_payment_methods(),
+				},
+				{
+					fieldname: "balance_details",
+					fieldtype: "Table",
+					label: "Opening Balance Details",
+					cannot_add_rows: false,
+					in_place_edit: true,
+					reqd: 1,
+					data: [],
+					fields: table_fields,
+				},
+			],
+			primary_action: async function ({ company, pos_profile, balance_details }) {
+				if (!balance_details.length) {
+					frappe.show_alert({
+						message: __("Please add Mode of payments and opening balance details."),
+						indicator: "red",
+					});
+					return frappe.utils.play_sound("error");
+				}
+
+				// filter balance details for empty rows
+				balance_details = balance_details.filter((d) => d.mode_of_payment);
+
+				const method = "erpnext.selling.page.point_of_sale.point_of_sale.create_opening_voucher";
+				const res = await frappe.call({
+					method,
+					args: { pos_profile, company, balance_details },
+					freeze: true,
+				});
+				!res.exc && me.prepare_app_defaults(res.message);
+				dialog.hide();
+			},
+			primary_action_label: __("Submit"),
+		});
+		dialog.show();
+		const pos_profile_query = () => {
+			return {
+				query: "erpnext.accounts.doctype.pos_profile.pos_profile.pos_profile_query",
+				filters: { company: dialog.fields_dict.company.get_value() },
+			};
+		};
+	}
+
+
 
         set_right_and_left_sections(){
                 this.$components_wrapper.append('<div id="LeftSection" class="columnBox"></div>')
