@@ -84,8 +84,8 @@ pos_ar.PointOfSale.pos_payment_cart = class{
 
 
 	showCart(){
-		console.log('show payment cart')
 		this.cart.css('display' , 'flex');
+		this.clearData();
 	}
 
 	hideCart(){
@@ -93,7 +93,18 @@ pos_ar.PointOfSale.pos_payment_cart = class{
 	}
 
 
+	clearData(){
+		this.grand_total = 0 ;
+		this.paid_amount = 0 ;
+		this.to_change   = 0 ;
 
+		this.cashBox.find('#cachInput').val(0)
+
+		this.calculateGrandTotal();
+		this.calculateToChange();
+		this.refreshPaidAmount();
+
+	}
 	/****************************************  listeners  ***********************************************/
 
 	setListeners(){
@@ -253,7 +264,6 @@ pos_ar.PointOfSale.pos_payment_cart = class{
 
 
 	/************************************ tools  ***************************************/
-
 	calculateGrandTotal(){
 
 		this.grand_total = 0 ;
