@@ -28,12 +28,17 @@ pos_ar.PointOfSale.Controller = class {
 		this.sellInvoices    = new Map();
 		this.POSOpeningEntry = {}
 
+		//not implemented yet
+		this.company            = {};
+		this.balance_details    = {};
+		this.selectedPOSProfile = {};
+
                 this.start_app();
         }
 
 	 async start_app(){
-		await  this.prepare_app_defaults();
 		this.prepare_container();
+		await  this.prepare_app_defaults();
                 await  this.prepare_components();
 		this.setListeners();
 	}
@@ -218,6 +223,15 @@ pos_ar.PointOfSale.Controller = class {
 					freeze: true,
 				});
 				!res.exc && me.prepare_app_defaults(res.message);
+
+				console.log("====> " , pos_profile , "\\" , company , "\\" , balance_details , "=-=> " , res ,  "====>" , {'name' : res.message.name , 'period_start_date' : res.message.period_start_date}  )
+
+				Object.assign(me.selectedPOSProfile ,  pos_profile     )
+				Object.assign(me.company            ,  company         )
+				Object.assign(me.balance_details    ,  balance_details )
+				Object.assign(me.POSOpeningEntry    ,  {'name' : res.message.name , 'period_start_date' : res.message.period_start_date} )
+
+				console.log("we are here ==> " , me.POSOpeningEntry)
 				dialog.hide();
 			},
 			primary_action_label: __("Submit"),
@@ -649,6 +663,7 @@ pos_ar.PointOfSale.Controller = class {
 						}).catch(error =>{
 							failure += 1 ;
 							frappe.hide_progress();
+							this.POSOpeningEntry = {}
 							console.log("result =>>" , result)
 						})
 
