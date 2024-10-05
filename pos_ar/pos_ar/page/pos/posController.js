@@ -39,11 +39,21 @@ pos_ar.PointOfSale.Controller = class {
 	 async start_app(){
 		this.prepare_container();
 		await  this.prepare_app_defaults();
+		await  this.checkForPOSEntry()
                 await  this.prepare_components();
 		this.setListeners();
 	}
 
-        async prepare_app_defaults(){
+
+	async refreshApp(){
+		console.log("refresh")
+		this.$components_wrapper.text('');
+		await  this.checkForPOSEntry()
+                await  this.prepare_components();
+		this.setListeners();
+	}
+
+	async prepare_app_defaults(){
                 this.customersList  = await this.fetchCustomers()
                 this.itemGroupList  = await this.fetchItemGroups()
                 this.itemList       = await this.fetchItems()
@@ -78,25 +88,14 @@ pos_ar.PointOfSale.Controller = class {
                 this.$components_wrapper = this.wrapper.find("#MainContainer");
         }
 
-        async prepare_components(){
-		const hasPOSEntry = await this.checkForPOSEntry();
-
-		console.log("debug : " , hasPOSEntry , "the condition ==> " , hasPOSEntry == false);
-		if( hasPOSEntry == false ){
-			console.log("at if  : " , hasPOSEntry);
-			return;
-		}
-		else{
-			console.log("at else  : " , hasPOSEntry);
-
-	                this.set_right_and_left_sections();
-        	        this.init_item_selector();
-			this.init_customer_box();
-			this.init_selected_item();
-			this.init_item_details();
-                	this.init_paymentCart();
-		}
-        }
+	prepare_components(){
+		this.set_right_and_left_sections();
+		this.init_item_selector();
+		this.init_customer_box();
+		this.init_selected_item();
+		this.init_item_details();
+		this.init_paymentCart();
+	}
 
 	async checkForPOSEntry(){
 
@@ -224,15 +223,13 @@ pos_ar.PointOfSale.Controller = class {
 				});
 				!res.exc && me.prepare_app_defaults(res.message);
 
-				console.log("====> " , pos_profile , "\\" , company , "\\" , balance_details , "=-=> " , res ,  "====>" , {'name' : res.message.name , 'period_start_date' : res.message.period_start_date}  )
-
 				Object.assign(me.selectedPOSProfile ,  pos_profile     )
 				Object.assign(me.company            ,  company         )
 				Object.assign(me.balance_details    ,  balance_details )
 				Object.assign(me.POSOpeningEntry    ,  {'name' : res.message.name , 'period_start_date' : res.message.period_start_date} )
 
-				console.log("we are here ==> " , me.POSOpeningEntry)
 				dialog.hide();
+
 			},
 			primary_action_label: __("Submit"),
 		});
@@ -658,7 +655,7 @@ pos_ar.PointOfSale.Controller = class {
 							'pos_transactions'  : invoicesRef
 						}).then(result =>{
 							frappe.hide_progress();
-							this.prepare_components();
+							this.refreshApp();
 							console.log("result =>>" , result)
 						}).catch(error =>{
 							failure += 1 ;
