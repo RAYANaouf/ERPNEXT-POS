@@ -1,22 +1,22 @@
 /*****************  erpnext page style  **************************/
 
 /*make the body width biger*/
-.container.page-body{
+[data-route = "pos"] .container.page-body{
 	width : 95%  ; 
 	max-width : 95%  ; 
 }
 
 /*hide the top bar of the page*/
-.sticky-top{
+[data-route = "pos"] .sticky-top{
 	display : none ;
 }
 
 /*hide the top bar of the page*/
-.page-head{
+[data-route = "pos"] .page-head{
 	display : none;
 }
 
-.content{
+[data-route = "pos"] .content{
 	background : #fff6d2 ;
 }
 
