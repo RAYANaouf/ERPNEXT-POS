@@ -706,6 +706,9 @@ pos_ar.PointOfSale.Controller = class {
 		voucher.user              = frappe.session.user  ;
 		voucher.posting_date      = frappe.datetime.now_date();
 		voucher.posting_time      = frappe.datetime.now_time();
+
+		
+
 		frappe.set_route("Form", "POS Closing Entry", voucher.name);
 
 		//delete the open entry because you create the closing entr,
@@ -713,8 +716,6 @@ pos_ar.PointOfSale.Controller = class {
 		//it will try to fetch an open pos entry if there is no one opening,
 		//it will force the user to create one.
 		this.POSOpeningEntry.name = ''
-
-
 
 
 	}
