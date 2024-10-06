@@ -37,9 +37,13 @@ pos_ar.PointOfSale.pos_customer_box = class{
 		this.menu.append('<div id="menuItemsContainer"     class="columnBox">');
 
 		this.menuItemsContainer = this.actionContainer.find('#menuItemsContainer')
-		this.menuItemsContainer.append('<div class="menuItem">Recent POS Invoices</div>')
-		this.menuItemsContainer.append('<div class="menuItem">Close the POS</div>')
-		this.menuItemsContainer.append('<div class="menuItem">Setting</div>')
+		this.menuItemsContainer.append('<div id="posInvoiceMenuItem" class="menuItem">Recent POS Invoices</div>')
+		this.menuItemsContainer.append('<div id="closePosMenuItem"   class="menuItem">Close the POS</div>')
+		this.menuItemsContainer.append('<div id="settingMenuItem"    class="menuItem">Setting</div>')
+
+		this.pos_invoices = menuItemsContainer.find('#posInvoiceMenuItem')
+		this.close_pos    = menuItemsContainer.find('#closePosMenuItem')
+		this.setting      = menuItemsContainer.find('#settingMenuItem')
 
 		this.customerBox = this.actionContainer.find('#CustomerBox');
 		this.customerBox.append('<input list="CustomerList"  id="CustomerInput" name="Customer" placeHolder="Enter the customer">')
@@ -86,6 +90,10 @@ pos_ar.PointOfSale.pos_customer_box = class{
 		})
 
 		this.customerBox.find('#syncBtn').on('click' , (event)=>{
+			this.on_sync();
+		})
+
+		this.close_pos.on('click' , (event)=>{
 			this.on_sync();
 		})
 
