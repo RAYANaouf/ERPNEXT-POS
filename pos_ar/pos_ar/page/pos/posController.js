@@ -106,7 +106,7 @@ pos_ar.PointOfSale.Controller = class {
 						'status'      : 'Open',
 						'user'        : frappe.session.user
 					},
-					fields  : ['name' , 'period_start_date'],
+					fields  : ['name' , 'period_start_date' , 'company'],
 					limit   : 1 // we only need the most recent one
 				});
 			if(r.length === 0){
@@ -226,7 +226,7 @@ pos_ar.PointOfSale.Controller = class {
 				//Object.assign(me.selectedPOSProfile ,  pos_profile     )
 				//Object.assign(me.company            ,  company         )
 				Object.assign(me.balance_details    ,  balance_details )
-				Object.assign(me.POSOpeningEntry    ,  {'name' : res.message.name , 'period_start_date' : res.message.period_start_date} )
+				Object.assign(me.POSOpeningEntry    ,  {'name' : res.message.name , 'period_start_date' : res.message.period_start_date , 'company' : res.message.company } )
 
 				me.company.name = company ;
 				me.selectedPOSProfile.name = pos_profile ;
