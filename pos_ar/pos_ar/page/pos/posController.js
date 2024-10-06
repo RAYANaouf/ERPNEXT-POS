@@ -261,7 +261,8 @@ pos_ar.PointOfSale.Controller = class {
 		this.customer_box  = new pos_ar.PointOfSale.pos_customer_box(
 									this.$rightSection ,
 									this.customersList ,
-									this.onSync.bind(this)
+									this.onSync.bind(this),
+									this.onClosePOS.bind(this)
 									)
 	}
         init_selected_item(){
@@ -516,6 +517,7 @@ pos_ar.PointOfSale.Controller = class {
 		}
 	}
 
+
 	onKeyPressed( action  , key){
 		if(action == "quantity"){
 			this.item_details.requestFocus("quantity")
@@ -609,7 +611,12 @@ pos_ar.PointOfSale.Controller = class {
 		let all_tabs = Array.from(this.sellInvoices.keys())
 
 		if(all_tabs.length == 0){
-			frappe.throw('nothing to sync')
+			// with options
+			frappe.msgprint({
+				title: __('Sync Complete'),
+				indicator: 'green',
+				message: __('All data is already synchronized.')
+			});
 			return;
 
 		}
@@ -664,33 +671,8 @@ pos_ar.PointOfSale.Controller = class {
 					frappe.show_progress('Syncing Invoices...' , counter , all_tabs.length , 'syncing')
 
 					if(counter == all_tabs.length){
-
-						let voucher               = frappe.model.get_new_doc("POS Closing Entry");
-						voucher.pos_opening_entry = this.POSOpeningEntry.name;
-						voucher.pos_profile       = this.POSOpeningEntry.pos_profile;
-						voucher.company           = this.POSOpeningEntry.company ;
-						voucher.user              = frappe.session.user  ;
-						voucher.posting_date      = frappe.datetime.now_date();
-						voucher.posting_time      = frappe.datetime.now_time();
-						frappe.set_route("Form", "POS Closing Entry", voucher.name);
-
-
-						this.POSOpeningEntry.name = ''
-
-
-						if(failure == 0){
-							frappe.show_alert({
-									message:__(`Hi, Sync process is done ${seccess}/${counter}`),
-									indicator:'green'
-								},
-								5);
-						}
-						else{
-							frappe.throw(`Sync process : ${failure} out of ${counter}. Process incomplete.`)
-						}
+						frappe.hide_progress();
 					}
-
-
 
 				}).catch(err =>{
 					counter += 1 ;
@@ -705,6 +687,37 @@ pos_ar.PointOfSale.Controller = class {
 		}
 
 	}
+
+
+	onClosePOS(){
+
+		let all_tabs = Array.from(this.sellInvoices.keys())
+		//check if you still have an invoice to sync
+		if(all_tabs.length > 0){
+			frappe.throw(__(`you have ${all_tabs.length} invoice to sync first.`))
+		}
+
+		//otherwise you can close the voucher
+		let voucher               = frappe.model.get_new_doc("POS Closing Entry");
+		voucher.pos_opening_entry = this.POSOpeningEntry.name;
+		voucher.pos_profile       = this.POSOpeningEntry.pos_profile;
+		voucher.company           = this.POSOpeningEntry.company ;
+		voucher.user              = frappe.session.user  ;
+		voucher.posting_date      = frappe.datetime.now_date();
+		voucher.posting_time      = frappe.datetime.now_time();
+		frappe.set_route("Form", "POS Closing Entry", voucher.name);
+
+		//delete the open entry because you create the closing entr,
+		//that my the user submited it, so when the code find its name empty,
+		//it will try to fetch an open pos entry if there is no one opening,
+		//it will force the user to create one.
+		this.POSOpeningEntry.name = ''
+
+
+
+
+	}
+
 
 	/****************************  listeners *******************************/
 

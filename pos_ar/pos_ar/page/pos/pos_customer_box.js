@@ -4,11 +4,14 @@ pos_ar.PointOfSale.pos_customer_box = class{
 	constructor(
 		wrapper,
 		customersList,
-		onSync
+		onSync,
+		onClosePOS
 	){
 		this.wrapper        = wrapper ;
 		this.customers_list = customersList ;
 		this.on_sync        = onSync ;
+		this.on_close_pos   = onClosePOS;
+
 		//local
 		this.online  = true    ;
 		this.show_menu = false ;
@@ -49,8 +52,6 @@ pos_ar.PointOfSale.pos_customer_box = class{
 		this.customerBox.append('<input list="CustomerList"  id="CustomerInput" name="Customer" placeHolder="Enter the customer">')
 		this.customerBox.append('<datalist id="CustomerList"></datalist>')
 		this.customerBox.append('<div id="syncBtn">Sync</div>')
-		this.customerBox.append('<div id="toggleButtonLabel">Offline Mode </div>')
-		this.customerBox.append('<div id="toggleButton" class="rowBox align_center" > <div id="toggleButtonBall" ></div>  </div>')
 
 	}
 
@@ -70,31 +71,12 @@ pos_ar.PointOfSale.pos_customer_box = class{
 
 	setListeners(){
 
-		this.customerBox.find('#toggleButton').on('click' , (event)=>{
-			this.online = !this.online
-
-			if(this.online){
-				console.log(this.online)
-				this.customerBox.find('#toggleButtonBall').css('left' , '0px')
-				this.customerBox.find('#toggleButtonBall').css('background' , '#d0d0d0')
-				this.customerBox.find('#toggleButton').css('border' , '2px solid #cccccc')
-			}
-			else{
-				console.log(this.online)
-
-				this.customerBox.find('#toggleButtonBall').css('left' , '15px')
-				this.customerBox.find('#toggleButtonBall').css('background' , '#ac6500')
-				this.customerBox.find('#toggleButton').css('border' , '2px solid  #6a3e00')
-
-			}
-		})
-
 		this.customerBox.find('#syncBtn').on('click' , (event)=>{
 			this.on_sync();
 		})
 
 		this.close_pos.on('click' , (event)=>{
-			this.on_sync();
+			this.on_close_pos();
 		})
 
 		this.menu.on('click' , (event)=>{
