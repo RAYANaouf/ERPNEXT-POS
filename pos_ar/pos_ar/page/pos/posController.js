@@ -552,6 +552,7 @@ pos_ar.PointOfSale.Controller = class {
 				'qty'                     : value.quantity,
 				'description'             : value.name,
 				'image'                   : value.image,
+				'expense_account'         : 'Cost of Goods Sold - MS',
 				'use_serial_batch_fields' : 1,
 				'discount_percentage'     : value.discount_percentage,
 				'discount_amount'         : value.discount_amount,
