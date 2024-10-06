@@ -218,7 +218,7 @@ pos_ar.PointOfSale.Controller = class {
 				});
 				!res.exc && me.prepare_app_defaults(res.message);
 
-				Object.assign(me.POSOpeningEntry    ,  {'name' : res.message.name , 'pos_profile' ,  'period_start_date' : res.message.period_start_date , 'company' : res.message.company } )
+				Object.assign(me.POSOpeningEntry    ,  {'name' : res.message.name , 'pos_profile' : res.message.pos_profile ,  'period_start_date' : res.message.period_start_date , 'company' : res.message.company } )
 
 				dialog.hide();
 
@@ -518,6 +518,7 @@ pos_ar.PointOfSale.Controller = class {
 
 	onCompleteOrder(){
 
+
 		let items = []
 
 		this.selectedItemMaps.get(this.selectedTab.tabName).forEach((value,key) =>{
@@ -577,6 +578,12 @@ pos_ar.PointOfSale.Controller = class {
 
 	onSync(){
 
+		if(this.POSOpeningEntry.name == '' ){
+			this.checkForPOSEntry();
+			return;
+		}
+
+
 		//calculate amount
 		let all_tabs = Array.from(this.sellInvoices.keys())
 
@@ -624,9 +631,8 @@ pos_ar.PointOfSale.Controller = class {
 					'update_stock' : 1       ,
 					'docstatus'    : 1
 				}).then(r => {
-					console.log("r : " , r)
+
 					invoicesRef.push({'pos_invoice' : r.name , 'customer' : r.customer } )
-					console.log("invoices => " , invoicesRef)
 					this.sellInvoices.delete(tab)
 
 					counter += 1 ;
@@ -641,12 +647,12 @@ pos_ar.PointOfSale.Controller = class {
 						voucher.pos_profile       = this.POSOpeningEntry.pos_profile;
 						voucher.company           = this.POSOpeningEntry.company ;
 						voucher.user              = frappe.session.user  ;
-						voucher.period_end_date   = frappe.datetime.now_datetime();
 						voucher.posting_date      = frappe.datetime.now_date();
 						voucher.posting_time      = frappe.datetime.now_time();
 						frappe.set_route("Form", "POS Closing Entry", voucher.name);
 
 
+						this.POSOpeningEntry.name = ''
 
 
 						if(failure == 0){
@@ -760,7 +766,7 @@ pos_ar.PointOfSale.Controller = class {
                 try {
                         return await frappe.db.get_list('Item', {
                                 fields: ['name', 'item_name' , 'image' , 'item_group' , 'stock_uom' ],
-                                filters: {}
+                                filters: { disabled : 0 }
                         })
                 } catch (error) {
                         console.error('Error fetching Item Group :', error);
