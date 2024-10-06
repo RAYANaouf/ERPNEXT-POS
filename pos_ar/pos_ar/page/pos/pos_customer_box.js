@@ -24,10 +24,22 @@ pos_ar.PointOfSale.pos_customer_box = class{
 	}
 
 	prepare_customer_box(){
-		this.wrapper.append('<div id="CustomerBox" class="rowBox align_center">');
+
+		this.wrapper.append('<div id="ActionsContainerBox" class="rowBox align_center">');
+		this.actionContainer = this.wrapper.find('#ActionsContainerBox');
+
+		this.actionContainer.append('<div id="CustomerBox" class="rowBox align_center">');
+		this.actionContainer.append('<div id="MenuBox"     class="rowBox centerItem">');
 
 
-		this.customerBox = this.wrapper.find('#CustomerBox');
+		this.menu = this.actionContainer.find('#MenuBox')
+		this.menu.append('<img src="/assets/pos_ar/images/menu.png" alt="Menu" id="MenuBtn" >')
+		this.menu.append('<div id="menuItemsContainer"     class="columnBox">');
+
+		this.menuItemsContainer = this.actionContainer.find('#menuItemsContainer')
+
+
+		this.customerBox = this.actionContainer.find('#CustomerBox');
 		this.customerBox.append('<input list="CustomerList"  id="CustomerInput" name="Customer" placeHolder="Enter the customer">')
 		this.customerBox.append('<datalist id="CustomerList"></datalist>')
 		this.customerBox.append('<div id="syncBtn">Sync</div>')
