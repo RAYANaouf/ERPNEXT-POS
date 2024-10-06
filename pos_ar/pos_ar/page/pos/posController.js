@@ -28,11 +28,6 @@ pos_ar.PointOfSale.Controller = class {
 		this.sellInvoices    = new Map();
 		this.POSOpeningEntry = {}
 
-		//not implemented yet
-		this.company            = {};
-		this.balance_details    = {};
-		this.selectedPOSProfile = {};
-
                 this.start_app();
         }
 
@@ -106,7 +101,7 @@ pos_ar.PointOfSale.Controller = class {
 						'status'      : 'Open',
 						'user'        : frappe.session.user
 					},
-					fields  : ['name' , 'period_start_date' , 'company'],
+					fields  : ['name' , 'pos_profile' ,'period_start_date' , 'company'],
 					limit   : 1 // we only need the most recent one
 				});
 			if(r.length === 0){
@@ -223,16 +218,7 @@ pos_ar.PointOfSale.Controller = class {
 				});
 				!res.exc && me.prepare_app_defaults(res.message);
 
-				//Object.assign(me.selectedPOSProfile ,  pos_profile     )
-				//Object.assign(me.company            ,  company         )
-				Object.assign(me.balance_details    ,  balance_details )
-				Object.assign(me.POSOpeningEntry    ,  {'name' : res.message.name , 'period_start_date' : res.message.period_start_date , 'company' : res.message.company } )
-
-				me.company.name = company ;
-				me.selectedPOSProfile.name = pos_profile ;
-
-				console.log("the company : " , company );
-
+				Object.assign(me.POSOpeningEntry    ,  {'name' : res.message.name , 'pos_profile' ,  'period_start_date' : res.message.period_start_date , 'company' : res.message.company } )
 
 				dialog.hide();
 
@@ -650,64 +636,15 @@ pos_ar.PointOfSale.Controller = class {
 
 					if(counter == all_tabs.length){
 
-						/*frappe.db.insert({
-							'doctype'           : 'POS Closing Entry',
-							'period_start_date' : this.POSOpeningEntry.period_start_date,
-							'pos_opening_entry' : this.POSOpeningEntry.name,
-							'docstatus'         : 0,
-						}).then(result =>{
-							frappe.hide_progress();
-							//this.refreshApp();
-
-							// Redirect to the newly created POS Closing Entry
-							frappe.set_route("Form", "POS Closing Entry", result.name).then(()=>{
-								frappe.after_ajax(()=>{
-									console.log("im inside!!!")
-
-
-									frappe.model.with_doc("POS Closing Entry", result.name, (frm) => {
-										console.log("frm => " , frm)
-										// Set the pos_opening_entry field programmatically
-										frm.set_value("pos_opening_entry", this.POSOpeningEntry.name);
-										// Refresh the pos_opening_entry field to trigger related logic
-										frm.refresh_field("pos_opening_entry");
-
-										// Manually trigger fetch logic, if it's not automatically triggered
-										frappe.ui.form.trigger("POS Closing Entry", "pos_opening_entry");
-									});
-
-								})
-							})
-
-						}).catch(error =>{
-							failure += 1 ;
-							frappe.hide_progress();
-							this.POSOpeningEntry = {}
-							console.error("err => " , error )
-							console.log("result =>>" , result)
-						})*/
-
-
-
-						console.log("pos profile : " , this.selectedPOSProfile)
-						console.log("company : " , this.company)
-
-
-						let voucher = frappe.model.get_new_doc("POS Closing Entry");
-						voucher.pos_profile = this.selectedPOSProfile.name;
-						voucher.user = frappe.session.user  ;
-						voucher.company = this.company.name ;
+						let voucher               = frappe.model.get_new_doc("POS Closing Entry");
 						voucher.pos_opening_entry = this.POSOpeningEntry.name;
-						voucher.period_end_date = frappe.datetime.now_datetime();
-						voucher.posting_date = frappe.datetime.now_date();
-						voucher.posting_time = frappe.datetime.now_time();
+						voucher.pos_profile       = this.POSOpeningEntry.pos_profile;
+						voucher.company           = this.POSOpeningEntry.company ;
+						voucher.user              = frappe.session.user  ;
+						voucher.period_end_date   = frappe.datetime.now_datetime();
+						voucher.posting_date      = frappe.datetime.now_date();
+						voucher.posting_time      = frappe.datetime.now_time();
 						frappe.set_route("Form", "POS Closing Entry", voucher.name);
-
-
-
-						//voucher.pos_profile = this.PosProfileList[0].name;
-						//voucher.user = frappe.session.user;
-						//voucher.company = this.frm.doc.company;
 
 
 

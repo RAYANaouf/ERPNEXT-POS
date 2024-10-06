@@ -210,7 +210,6 @@
             freeze: true
           });
           !res.exc && me.prepare_app_defaults(res.message);
-          Object.assign(me.balance_details, balance_details);
           Object.assign(me.POSOpeningEntry, { "name": res.message.name, "period_start_date": res.message.period_start_date, "company": res.message.company });
           me.company.name = company;
           me.selectedPOSProfile.name = pos_profile;
@@ -507,12 +506,10 @@
             seccess += 1;
             frappe.show_progress("Syncing Invoices...", counter, all_tabs.length, "syncing");
             if (counter == all_tabs.length) {
-              console.log("pos profile : ", this.selectedPOSProfile);
-              console.log("company : ", this.company);
               let voucher = frappe.model.get_new_doc("POS Closing Entry");
               voucher.pos_profile = this.selectedPOSProfile.name;
               voucher.user = frappe.session.user;
-              voucher.company = this.company.name;
+              voucher.company = this.POSOpeningEntry.company;
               voucher.pos_opening_entry = this.POSOpeningEntry.name;
               voucher.period_end_date = frappe.datetime.now_datetime();
               voucher.posting_date = frappe.datetime.now_date();
@@ -1673,4 +1670,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.HNFRNXSB.js.map
+//# sourceMappingURL=pos.bundle.LKGT7EJF.js.map
