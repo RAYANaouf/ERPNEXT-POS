@@ -29,18 +29,34 @@
 
 #RightSection #MenuBox #menuItemsContainer{
 
-	width      : 100px ;
-	height     : 100px ;
-	background : white ; 
-	border-radius : 12px ;     
+	width      : max-content ;
+	background : white    ; 
+	border-radius : 12px  ;     
 
+        border          : 2px solid #c0c0c0 ;
+        box-shadow: rgba(100, 100, 111, 0.2) 0px 2px 15px 0px;
+
+
+	cursor     : pointer  ;
+
+	overflow   : hidden   ;
+	visibility : hidden   ;
+	opacity    : 0        ;
 	position   : absolute ; 
 	bottom     : 0 ;
 	right      : 0 ;
 	transform  : translateY(110%);
+	transition : opacity 0.5s  ease ;
 
 }
 
+#RightSection #MenuBox #menuItemsContainer .menuItem{
+	padding : 8px 6px 8px 6px ;
+}
+
+#RightSection #MenuBox #menuItemsContainer .menuItem:hover{
+	background : #f0f0f0 ;
+}
 
 
 #RightSection #CustomerBox{

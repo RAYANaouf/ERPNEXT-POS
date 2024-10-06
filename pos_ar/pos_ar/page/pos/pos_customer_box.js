@@ -11,7 +11,7 @@ pos_ar.PointOfSale.pos_customer_box = class{
 		this.on_sync        = onSync ;
 		//local
 		this.online  = true    ;
-
+		this.show_menu = false ;
 		this.start_work();
 	}
 
@@ -37,7 +37,9 @@ pos_ar.PointOfSale.pos_customer_box = class{
 		this.menu.append('<div id="menuItemsContainer"     class="columnBox">');
 
 		this.menuItemsContainer = this.actionContainer.find('#menuItemsContainer')
-
+		this.menuItemsContainer.append('<div class="menuItem">Recent POS Invoices</div>')
+		this.menuItemsContainer.append('<div class="menuItem">Close the POS</div>')
+		this.menuItemsContainer.append('<div class="menuItem">Setting</div>')
 
 		this.customerBox = this.actionContainer.find('#CustomerBox');
 		this.customerBox.append('<input list="CustomerList"  id="CustomerInput" name="Customer" placeHolder="Enter the customer">')
@@ -85,6 +87,21 @@ pos_ar.PointOfSale.pos_customer_box = class{
 
 		this.customerBox.find('#syncBtn').on('click' , (event)=>{
 			this.on_sync();
+		})
+
+		this.menu.on('click' , (event)=>{
+
+			if(this.show_menu){
+				this.show_menu = !this.show_menu
+				this.menuItemsContainer.css('visibility' , 'hidden')
+				this.menuItemsContainer.css('opacity' , '0')
+			}
+			else{
+				this.show_menu = !this.show_menu
+				this.menuItemsContainer.css('visibility' , 'visible')
+				this.menuItemsContainer.css('opacity' , '1')
+			}
+
 		})
 
 	}

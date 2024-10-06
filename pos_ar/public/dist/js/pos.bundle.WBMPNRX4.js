@@ -784,6 +784,7 @@
       this.customers_list = customersList;
       this.on_sync = onSync;
       this.online = true;
+      this.show_menu = false;
       this.start_work();
     }
     start_work() {
@@ -800,6 +801,9 @@
       this.menu.append('<img src="/assets/pos_ar/images/menu.png" alt="Menu" id="MenuBtn" >');
       this.menu.append('<div id="menuItemsContainer"     class="columnBox">');
       this.menuItemsContainer = this.actionContainer.find("#menuItemsContainer");
+      this.menuItemsContainer.append('<div class="menuItem">Recent POS Invoices</div>');
+      this.menuItemsContainer.append('<div class="menuItem">Close the POS</div>');
+      this.menuItemsContainer.append('<div class="menuItem">Setting</div>');
       this.customerBox = this.actionContainer.find("#CustomerBox");
       this.customerBox.append('<input list="CustomerList"  id="CustomerInput" name="Customer" placeHolder="Enter the customer">');
       this.customerBox.append('<datalist id="CustomerList"></datalist>');
@@ -834,6 +838,17 @@
       });
       this.customerBox.find("#syncBtn").on("click", (event2) => {
         this.on_sync();
+      });
+      this.menu.on("click", (event2) => {
+        if (this.show_menu) {
+          this.show_menu = !this.show_menu;
+          this.menuItemsContainer.css("visibility", "hidden");
+          this.menuItemsContainer.css("opacity", "0");
+        } else {
+          this.show_menu = !this.show_menu;
+          this.menuItemsContainer.css("visibility", "visible");
+          this.menuItemsContainer.css("opacity", "1");
+        }
       });
     }
   };
@@ -1672,4 +1687,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.47GKWERI.js.map
+//# sourceMappingURL=pos.bundle.WBMPNRX4.js.map
