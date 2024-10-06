@@ -675,7 +675,6 @@ pos_ar.PointOfSale.Controller = class {
 			console.log("err ==> " , err)
 		}
 
-		console.log("we are here now")
 	}
 
 	/****************************  listeners *******************************/
