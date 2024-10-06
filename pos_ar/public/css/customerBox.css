@@ -32,11 +32,11 @@
 	width      : max-content ;
 	background : white    ; 
 	border-radius : 12px  ;     
-
         border          : 2px solid #c0c0c0 ;
         box-shadow: rgba(100, 100, 111, 0.2) 0px 2px 15px 0px;
 
 
+	z-index    : 20       ;
 	cursor     : pointer  ;
 
 	overflow   : hidden   ;

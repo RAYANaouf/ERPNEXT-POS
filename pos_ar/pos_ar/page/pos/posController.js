@@ -90,6 +90,7 @@ pos_ar.PointOfSale.Controller = class {
 		this.init_selected_item();
 		this.init_item_details();
 		this.init_paymentCart();
+		this.init_historyCart();
 	}
 
 	async checkForPOSEntry(){
@@ -312,9 +313,28 @@ pos_ar.PointOfSale.Controller = class {
 								)
         }
 
+        init_historyCart(){
+		console.log("im heeeeeeeeeeeeer @#$%^&*(*&^%$##$%^&*()^%$#@")
+		this.history_cart = new pos_ar.PointOfSale.pos_history(
+								)
+        }
+
 
 
         /*********************  callbacks functions ******************************/discount_percentage
+
+
+	showHistory(){
+
+
+		//hide
+		this.item_selector.hideCart();
+		this.payment_cart.hideCart();
+		this.item_details.hide_cart();
+
+
+	}
+
 
 	itemClick_selector(item){
 
