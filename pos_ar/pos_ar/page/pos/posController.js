@@ -654,7 +654,6 @@ pos_ar.PointOfSale.Controller = class {
 					'docstatus'    : 1
 				}).then(r => {
 
-					console.
 
 					invoicesRef.push({'pos_invoice' : r.name , 'customer' : r.customer } )
 					this.sellInvoices.delete(tab)

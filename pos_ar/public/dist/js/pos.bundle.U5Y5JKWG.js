@@ -508,7 +508,7 @@
             "update_stock": 1,
             "docstatus": 1
           }).then((r) => {
-            console.invoicesRef.push({ "pos_invoice": r.name, "customer": r.customer });
+            invoicesRef.push({ "pos_invoice": r.name, "customer": r.customer });
             this.sellInvoices.delete(tab);
             counter += 1;
             seccess += 1;
@@ -1712,4 +1712,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.ULM57HBO.js.map
+//# sourceMappingURL=pos.bundle.U5Y5JKWG.js.map
