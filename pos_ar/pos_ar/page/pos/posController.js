@@ -571,7 +571,8 @@ pos_ar.PointOfSale.Controller = class {
 				this.selectedTab.tabName , {
 				"customer"   : this.customersList[0].name,
 				"pos_profile": this.PosProfileList[0].name,
-				"items"      : items
+				"items"      : items,
+				"creation_time": frappe.datetime.now_datetime()
 		});
 
 		this.selectedItemMaps.delete(this.selectedTab.tabName)
