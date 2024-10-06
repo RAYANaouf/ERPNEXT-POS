@@ -552,7 +552,6 @@ pos_ar.PointOfSale.Controller = class {
 				'qty'                     : value.quantity,
 				'description'             : value.name,
 				'image'                   : value.image,
-				'expense_account'         : 'Cost of Goods Sold - MS',
 				'use_serial_batch_fields' : 1,
 				'discount_percentage'     : value.discount_percentage,
 				'discount_amount'         : value.discount_amount,
@@ -639,6 +638,7 @@ pos_ar.PointOfSale.Controller = class {
 					'customer'     : this.sellInvoices.get(tab).customer    ,
 					'pos_profile'  : this.sellInvoices.get(tab).pos_profile ,
 					'items'        : this.sellInvoices.get(tab).items       ,
+					'creation_time': this.sellInvoices.get(tab).creation_time,
 					'paid_amount'  : paid_amount,
 					'amount_eligible_for_commission' : paid_amount,
 					'write_off_account': this.PosProfileList[0].write_off_account,
@@ -652,6 +652,8 @@ pos_ar.PointOfSale.Controller = class {
 					'update_stock' : 1       ,
 					'docstatus'    : 1
 				}).then(r => {
+
+					console.
 
 					invoicesRef.push({'pos_invoice' : r.name , 'customer' : r.customer } )
 					this.sellInvoices.delete(tab)
