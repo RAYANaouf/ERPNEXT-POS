@@ -41,9 +41,9 @@ pos_ar.PointOfSale.pos_customer_box = class{
 		this.menuItemsContainer.append('<div id="closePosMenuItem"   class="menuItem">Close the POS</div>')
 		this.menuItemsContainer.append('<div id="settingMenuItem"    class="menuItem">Setting</div>')
 
-		this.pos_invoices = menuItemsContainer.find('#posInvoiceMenuItem')
-		this.close_pos    = menuItemsContainer.find('#closePosMenuItem')
-		this.setting      = menuItemsContainer.find('#settingMenuItem')
+		this.pos_invoices = this.menuItemsContainer.find('#posInvoiceMenuItem')
+		this.close_pos    = this.menuItemsContainer.find('#closePosMenuItem')
+		this.setting      = this.menuItemsContainer.find('#settingMenuItem')
 
 		this.customerBox = this.actionContainer.find('#CustomerBox');
 		this.customerBox.append('<input list="CustomerList"  id="CustomerInput" name="Customer" placeHolder="Enter the customer">')
