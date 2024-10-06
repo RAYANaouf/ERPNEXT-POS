@@ -577,6 +577,8 @@ pos_ar.PointOfSale.Controller = class {
 				"creation_time": frappe.datetime.now_datetime()
 		});
 
+		this.customer_box.setNotSynced();
+
 		this.selectedItemMaps.delete(this.selectedTab.tabName)
 
 		//tabs
@@ -601,6 +603,7 @@ pos_ar.PointOfSale.Controller = class {
 
 	onSync(){
 
+
 		if(this.POSOpeningEntry.name == '' ){
 			this.checkForPOSEntry();
 			return;
@@ -620,73 +623,71 @@ pos_ar.PointOfSale.Controller = class {
 			return;
 
 		}
-		try{
-			//progress
-			frappe.show_progress('Syncing Invoices...' , 0 , all_tabs.length , 'syncing')
 
-			let counter     = 0  ;
-			let failure     = 0  ;
-			let seccess     = 0  ;
-			let invoicesRef = [] ;
+		//progress
+		frappe.show_progress('Syncing Invoices...' , 0 , all_tabs.length , 'syncing')
 
-			all_tabs.forEach(tab =>{
-				//calculate the paid_amount
-				let paid_amount = 0 ;
-				let totalQty    = 0 ;
-				this.sellInvoices.get(tab).items.forEach(item =>{
-					totalQty    += item.qty
-					paid_amount += item.rate * item.qty
-				})
+		let counter     = 0  ;
+		let failure     = 0  ;
+		let seccess     = 0  ;
+		let invoicesRef = [] ;
 
-				console.log("paid" , paid_amount)
-				// we still didnt implement the  base_paid_amount and amount_eligible_for_commission
-				//_seen  value in deafault pos ==>  ["Administrator"]. i think it is an array.
-				frappe.db.insert({
-					'doctype'      : "POS Invoice",
-					'customer'     : this.sellInvoices.get(tab).customer    ,
-					'pos_profile'  : this.sellInvoices.get(tab).pos_profile ,
-					'items'        : this.sellInvoices.get(tab).items       ,
-					'creation_time': this.sellInvoices.get(tab).creation_time,
-					'paid_amount'  : paid_amount,
-					'amount_eligible_for_commission' : paid_amount,
-					'write_off_account': this.PosProfileList[0].write_off_account,
-					'write_off_cost_center': this.PosProfileList[0].write_off_cost_center,
-					'outstanding_amount' : 0 ,
-					'is_pos'       : 1       ,
-					'payments'     :[{
-						'mode_of_payment' : 'Cash',
-						'amount'          : paid_amount
-					}],
-					'update_stock' : 1       ,
-					'docstatus'    : 1
-				}).then(r => {
-
-
-					invoicesRef.push({'pos_invoice' : r.name , 'customer' : r.customer } )
-					this.sellInvoices.delete(tab)
-
-					counter += 1 ;
-					seccess += 1 ;
-
-					frappe.show_progress('Syncing Invoices...' , counter , all_tabs.length , 'syncing')
-
-					if(counter == all_tabs.length){
-						frappe.hide_progress();
-					}
-
-				}).catch(err =>{
-					counter += 1 ;
-					failure += 1 ;
-					console.log(err)
-				})
-
+		all_tabs.forEach(tab =>{
+			//calculate the paid_amount
+			let paid_amount = 0 ;
+			let totalQty    = 0 ;
+			this.sellInvoices.get(tab).items.forEach(item =>{
+				totalQty    += item.qty
+				paid_amount += item.rate * item.qty
 			})
-		}
-		catch(err){
-			console.log("err ==> " , err)
-		}
 
+			console.log("paid" , paid_amount)
+			// we still didnt implement the  base_paid_amount and amount_eligible_for_commission
+			//_seen  value in deafault pos ==>  ["Administrator"]. i think it is an array.
+			frappe.db.insert({
+				'doctype'      : "POS Invoice",
+				'customer'     : this.sellInvoices.get(tab).customer    ,
+				'pos_profile'  : this.sellInvoices.get(tab).pos_profile ,
+				'items'        : this.sellInvoices.get(tab).items       ,
+				'creation_time': this.sellInvoices.get(tab).creation_time,
+				'paid_amount'  : paid_amount,
+				'amount_eligible_for_commission' : paid_amount,
+				'write_off_account': this.PosProfileList[0].write_off_account,
+				'write_off_cost_center': this.PosProfileList[0].write_off_cost_center,
+				'outstanding_amount' : 0 ,
+				'is_pos'       : 1       ,
+				'payments'     :[{
+					'mode_of_payment' : 'Cash',
+					'amount'          : paid_amount
+				}],
+				'update_stock' : 1       ,
+				'docstatus'    : 1
+			}).then(r => {
+
+
+				invoicesRef.push({'pos_invoice' : r.name , 'customer' : r.customer } )
+				this.sellInvoices.delete(tab)
+
+				counter += 1 ;
+
+				frappe.show_progress('Syncing Invoices...' , counter , all_tabs.length , 'syncing')
+
+				if(counter == all_tabs.length){
+					console.log("it should close the progress dialog")
+					frappe.hide_progress();
+					this.customer_box.setSynced();
+				}
+
+
+			}).catch(err =>{
+				counter += 1 ;
+				failure += 1 ;
+				console.log(err)
+			})
+
+		})
 	}
+
 
 
 	onClosePOS(){

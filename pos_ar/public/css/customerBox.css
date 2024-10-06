@@ -76,7 +76,7 @@
 }
 
 
-#RightSection #syncBtn{
+#RightSection #syncBtn.NotSynced{
 
 	padding : 4px 10px ;
 	margin-right : 16px ;  
@@ -86,11 +86,25 @@
 	cursor : pointer ;	
 }
 
-#RightSection #syncBtn:hover{
+#RightSection #syncBtn.Synced{
+
+	padding : 4px 10px ;
+	margin-right : 16px ;  
+	border  : 2px solid green;
+	border-radius : 10px ;
+	
+	cursor : pointer ;	
+}
+
+#RightSection #syncBtn.NotSynced:hover{
 
 	border  : 2px solid #6a3e00;
 	color   : white ;
 	background : #ac6500 ; 
+}
+
+#RightSection #syncBtn.Synced:hover{
+	border  : 4px solid green;
 }
 
 #RightSection #CustomerBox #toggleButtonLabel{

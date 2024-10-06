@@ -51,8 +51,9 @@ pos_ar.PointOfSale.pos_customer_box = class{
 		this.customerBox = this.actionContainer.find('#CustomerBox');
 		this.customerBox.append('<input list="CustomerList"  id="CustomerInput" name="Customer" placeHolder="Enter the customer">')
 		this.customerBox.append('<datalist id="CustomerList"></datalist>')
-		this.customerBox.append('<div id="syncBtn">Sync</div>')
+		this.customerBox.append('<div id="syncBtn" class="Synced">Sync</div>')
 
+		this.sync_btn = this.customerBox.find('#syncBtn')
 	}
 
 
@@ -94,6 +95,16 @@ pos_ar.PointOfSale.pos_customer_box = class{
 
 		})
 
+	}
+
+	setSynced(){
+		this.sync_btn.addClass('Synced')
+		this.sync_btn.removeClass('NotSynced')
+	}
+
+	setNotSynced(){
+		this.sync_btn.addClass('NotSynced')
+		this.sync_btn.removeClass('Synced')
 	}
 
 }
