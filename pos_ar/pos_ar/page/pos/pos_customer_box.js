@@ -5,12 +5,14 @@ pos_ar.PointOfSale.pos_customer_box = class{
 		wrapper,
 		customersList,
 		onSync,
-		onClosePOS
+		onClosePOS,
+		onHistoryClick
 	){
-		this.wrapper        = wrapper ;
-		this.customers_list = customersList ;
-		this.on_sync        = onSync ;
-		this.on_close_pos   = onClosePOS;
+		this.wrapper          = wrapper ;
+		this.customers_list   = customersList ;
+		this.on_sync          = onSync ;
+		this.on_close_pos     = onClosePOS;
+		this.on_history_click = onHistoryClick;
 
 		//local
 		this.online  = true    ;
@@ -70,6 +72,19 @@ pos_ar.PointOfSale.pos_customer_box = class{
 		})
 	}
 
+	//show and hide
+	hideActionBar(){
+		this.customerBox.css('display' , 'none');
+		this.actionContainer.css('flex-direction' , 'row-reverse')
+	}
+
+	showActionBar(){
+		this.customerBox.css('display' , 'flex');
+		this.actionContainer.css('flex-direction' , 'row')
+	}
+
+
+
 	setListeners(){
 
 		this.customerBox.find('#syncBtn').on('click' , (event)=>{
@@ -78,6 +93,10 @@ pos_ar.PointOfSale.pos_customer_box = class{
 
 		this.close_pos.on('click' , (event)=>{
 			this.on_close_pos();
+		})
+
+		this.pos_invoices.on('click' , (event)=>{
+			this.on_history_click();
 		})
 
 		this.menu.on('click' , (event)=>{
@@ -106,5 +125,9 @@ pos_ar.PointOfSale.pos_customer_box = class{
 		this.sync_btn.addClass('NotSynced')
 		this.sync_btn.removeClass('Synced')
 	}
+
+
+
+
 
 }

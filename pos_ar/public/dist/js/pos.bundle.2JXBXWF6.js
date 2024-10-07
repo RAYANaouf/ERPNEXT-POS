@@ -68,6 +68,10 @@
       this.warehouseList = await this.fetchWarehouseList();
       this.PosProfileList = await this.fetchPosProfileList();
       this.binList = await this.fetchBinList();
+      if (this.PosProfileList.length == 0) {
+        frappe.set_route("Form", "POS Profile");
+        return;
+      }
       console.log("customersList => ", this.customersList);
       console.log("itemGroupList => ", this.itemGroupList);
       console.log("itemList      => ", this.itemList);
@@ -244,7 +248,8 @@
         this.$rightSection,
         this.customersList,
         this.onSync.bind(this),
-        this.onClosePOS.bind(this)
+        this.onClosePOS.bind(this),
+        this.onHistoryClick.bind(this)
       );
     }
     init_selected_item() {
@@ -296,11 +301,6 @@
     init_historyCart() {
       console.log("im heeeeeeeeeeeeer @#$%^&*(*&^%$##$%^&*()^%$#@");
       this.history_cart = new pos_ar.PointOfSale.pos_history();
-    }
-    showHistory() {
-      this.item_selector.hideCart();
-      this.payment_cart.hideCart();
-      this.item_details.hide_cart();
     }
     itemClick_selector(item) {
       const itemCloned = __spreadValues({}, item);
@@ -356,7 +356,13 @@
       this.payment_cart.hideCart();
       this.selected_item_cart.setKeyboardOrientation("portrait");
       this.selected_item_cart.cleanHeighlight();
-      this.selected_item_cart.hideKeyboard();
+    }
+    onHistoryClick() {
+      this.payment_cart.hideCart();
+      this.item_details.hide_cart();
+      this.item_selector.hideCart();
+      this.selected_item_cart.hideCart();
+      this.customer_box.hideActionBar();
     }
     onInput(event2, field, value) {
       console.log("field : ", field);
@@ -643,7 +649,7 @@
       try {
         return await frappe.db.get_list("POS Profile", {
           fields: ["name", "warehouse", "income_account", "write_off_account", "write_off_cost_center"],
-          filters: {}
+          filters: { disabled: 0 }
         });
       } catch (error) {
         console.error("Error fetching Warehouse list : ", error);
@@ -654,7 +660,8 @@
       try {
         return await frappe.db.get_list("Bin", {
           fields: ["actual_qty", "item_code", "warehouse"],
-          filters: {}
+          filters: {},
+          limit: 1
         });
       } catch (error) {
         console.error("Error fetching Bin list : ", error);
@@ -790,11 +797,12 @@
 
   // ../pos_ar/pos_ar/pos_ar/page/pos/pos_customer_box.js
   pos_ar.PointOfSale.pos_customer_box = class {
-    constructor(wrapper, customersList, onSync, onClosePOS) {
+    constructor(wrapper, customersList, onSync, onClosePOS, onHistoryClick) {
       this.wrapper = wrapper;
       this.customers_list = customersList;
       this.on_sync = onSync;
       this.on_close_pos = onClosePOS;
+      this.on_history_click = onHistoryClick;
       this.online = true;
       this.show_menu = false;
       this.start_work();
@@ -835,12 +843,23 @@
         customerList_html.appendChild(option);
       });
     }
+    hideActionBar() {
+      this.customerBox.css("display", "none");
+      this.actionContainer.css("flex-direction", "row-reverse");
+    }
+    showActionBar() {
+      this.customerBox.css("display", "flex");
+      this.actionContainer.css("flex-direction", "row");
+    }
     setListeners() {
       this.customerBox.find("#syncBtn").on("click", (event2) => {
         this.on_sync();
       });
       this.close_pos.on("click", (event2) => {
         this.on_close_pos();
+      });
+      this.pos_invoices.on("click", (event2) => {
+        this.on_history_click();
       });
       this.menu.on("click", (event2) => {
         if (this.show_menu) {
@@ -1086,6 +1105,10 @@
         rateButton.removeClass("selected");
         discountButton.removeClass("selected");
       }
+    }
+    hideCart() {
+      this.tabs_bar.css("display", "none");
+      this.cartBox.css("display", "none");
     }
     setButtonsListeners() {
       const key_0 = this.buttonsContainer.find("#key_0");
@@ -1705,4 +1728,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.EQ5GKUEX.js.map
+//# sourceMappingURL=pos.bundle.2JXBXWF6.js.map

@@ -58,6 +58,13 @@ pos_ar.PointOfSale.Controller = class {
                 this.PosProfileList = await this.fetchPosProfileList()
                 this.binList        = await this.fetchBinList()
 
+
+		if(this.PosProfileList.length == 0){
+			frappe.set_route("Form", "POS Profile");
+			return;
+		}
+
+
                 console.log("customersList => " , this.customersList )
                 console.log("itemGroupList => " , this.itemGroupList )
                 console.log("itemList      => " , this.itemList      )
@@ -262,7 +269,8 @@ pos_ar.PointOfSale.Controller = class {
 									this.$rightSection ,
 									this.customersList ,
 									this.onSync.bind(this),
-									this.onClosePOS.bind(this)
+									this.onClosePOS.bind(this),
+									this.onHistoryClick.bind(this)
 									)
 	}
         init_selected_item(){
@@ -323,18 +331,6 @@ pos_ar.PointOfSale.Controller = class {
 
 
         /*********************  callbacks functions ******************************/discount_percentage
-
-
-	showHistory(){
-
-
-		//hide
-		this.item_selector.hideCart();
-		this.payment_cart.hideCart();
-		this.item_details.hide_cart();
-
-
-	}
 
 
 	itemClick_selector(item){
@@ -439,10 +435,19 @@ pos_ar.PointOfSale.Controller = class {
 		//update ui
 		this.selected_item_cart.setKeyboardOrientation("portrait");
 		this.selected_item_cart.cleanHeighlight();
-		this.selected_item_cart.hideKeyboard()
 
 	}
 
+	onHistoryClick(){
+
+		//hide
+		this.payment_cart.hideCart();
+		this.item_details.hide_cart();
+		this.item_selector.hideCart();
+		this.selected_item_cart.hideCart();
+		this.customer_box.hideActionBar();
+
+	}
 
 	onInput( event , field , value){
 		console.log("field : " , field)
@@ -854,7 +859,7 @@ pos_ar.PointOfSale.Controller = class {
                 try{
                         return await frappe.db.get_list('POS Profile' , {
                                 fields  : ['name' , 'warehouse' , 'income_account' , 'write_off_account' , 'write_off_cost_center'],
-                                filters : {}
+                                filters : { disabled : 0}
                         })
                 }
                 catch(error){
@@ -868,7 +873,8 @@ pos_ar.PointOfSale.Controller = class {
                 try{
                         return await frappe.db.get_list('Bin' , {
                                 fields  : ['actual_qty' , 'item_code' , 'warehouse'],
-                                filters : {}
+                                filters : { },
+				limit   : 1
                         })
                 }
                 catch(error){
