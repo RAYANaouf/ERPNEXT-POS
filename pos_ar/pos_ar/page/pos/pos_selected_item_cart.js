@@ -312,7 +312,7 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 			rateButton.addClass('selected')
 			discountButton.removeClass('selected')
 		}
-		else if(this.selected_field.field_name == "discount"){
+		else if(this.selected_field.field_name == "discount_percentage"){
 			quantityButton.removeClass('selected')
 			rateButton.removeClass('selected')
 			discountButton.addClass('selected')

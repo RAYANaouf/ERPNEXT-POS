@@ -28,6 +28,10 @@ pos_ar.PointOfSale.Controller = class {
 		this.sellInvoices    = new Map();
 		this.POSOpeningEntry = {}
 
+		this.grandTotal = 0 ;
+		this.paidAmount = 0 ;
+		this.toChange   = 0 ;
+
                 this.start_app();
         }
 
@@ -310,6 +314,7 @@ pos_ar.PointOfSale.Controller = class {
 								)
 	}
 
+
         init_paymentCart(){
 		console.log("im heeeeeeeeeeeeer @#$%^&*(*&^%$##$%^&*()^%$#@")
 		this.payment_cart = new pos_ar.PointOfSale.pos_payment_cart(
@@ -317,8 +322,14 @@ pos_ar.PointOfSale.Controller = class {
 									this.selectedItemMaps,
 									this.selectedTab,
 									this.selectedPaymentMethod,
+									this.grandTotal,
+									this.paidAmount,
+									this.toChange,
 									this.onClose_payment_cart.bind(this),
-									this.onCompleteOrder.bind(this)
+									this.onCompleteOrder.bind(this),
+									(event , field , value) =>{
+										this.onInput(event , field , value);
+									},
 								)
         }
 
@@ -330,7 +341,7 @@ pos_ar.PointOfSale.Controller = class {
 
 
 
-        /*********************  callbacks functions ******************************/discount_percentage
+        /*********************  callbacks functions ******************************/
 
 
 	itemClick_selector(item){
@@ -389,7 +400,6 @@ pos_ar.PointOfSale.Controller = class {
 	}
 
 	onCheckout(){
-		console.log("here we are on callback 02 " , this.item_details)
 
 		//show
 		this.payment_cart.showCart();
@@ -407,7 +417,6 @@ pos_ar.PointOfSale.Controller = class {
 	}
 
 	onClose_details(){
-		console.log("onClose callback 002")
 
 		//show
 		this.item_selector.showCart();
@@ -431,6 +440,7 @@ pos_ar.PointOfSale.Controller = class {
 		//hide
 		this.item_details.hide_cart();
 		this.payment_cart.hideCart();
+		this.selected_item_cart.hideKeyboard();
 
 		//update ui
 		this.selected_item_cart.setKeyboardOrientation("portrait");
@@ -450,7 +460,6 @@ pos_ar.PointOfSale.Controller = class {
 	}
 
 	onInput( event , field , value){
-		console.log("field : " , field)
 		//console.log("item " , this.selectedItem )
 		if(event == "focus" || event == "blur"){
 			if(event == "focus")
@@ -483,7 +492,6 @@ pos_ar.PointOfSale.Controller = class {
 			let montant = oldRate * (value / 100)
 			let newRate = oldRate - montant
 
-			console.log("old price : " , oldRate , "discount % : " , value , "discount montant : "  , montant , " new Price " , newRate )
 			this.selectedItem.discount_percentage = value;
 			this.selectedItem.discount_amount     = montant;
 			this.selectedItem.amount              = newRate;
@@ -509,7 +517,6 @@ pos_ar.PointOfSale.Controller = class {
 			}
 			let newRate = oldRate - montant
 
-			console.log("old price : " , oldRate , "discount % : " , persent , "discount montant : "  , montant , " new Price " , newRate )
 			this.selectedItem.discount_percentage = persent;
 			this.selectedItem.discount_amount     = montant;
 			this.selectedItem.amount              = newRate;
@@ -518,6 +525,11 @@ pos_ar.PointOfSale.Controller = class {
 			//redrawing
 			this.selected_item_cart.refreshSelectedItem();
 			this.item_details.refreshDate(this.selectedItem);
+
+		}
+		else if( field == "cash"){
+
+			
 
 		}
 	}
@@ -531,11 +543,14 @@ pos_ar.PointOfSale.Controller = class {
 			this.item_details.requestFocus("rate")
 		}
 		else if(action == "discount"){
-			this.item_details.requestFocus("discount")
+			this.item_details.requestFocus("discount_percentage")
 		}
 		else if(action == "remove"){
 			this.selectedItemMaps.get(this.selectedTab.tabName).delete(this.selectedItem.name)
 			this.selected_item_cart.refreshSelectedItem();
+		}
+		else if(action == "cash"){
+
 		}
 		else if(action == "addToField"){
 			this.item_details.addToField(this.selectedField.field_name , key)
@@ -548,7 +563,6 @@ pos_ar.PointOfSale.Controller = class {
 		let items = []
 
 		this.selectedItemMaps.get(this.selectedTab.tabName).forEach((value,key) =>{
-			console.log("the key ==> " , key , " value ==> " , value)
 			// we still didnt implement the price_list_rate and base_price_list_rate
 			// same thing with actual_qty refering to the stock quantity
 			let newItem = {
@@ -601,7 +615,6 @@ pos_ar.PointOfSale.Controller = class {
 
 		this.onClose_payment_cart()
 
-		console.log("posInvoice ==> " , this.sellInvoices);
 	}
 
 
@@ -646,7 +659,6 @@ pos_ar.PointOfSale.Controller = class {
 				paid_amount += item.rate * item.qty
 			})
 
-			console.log("paid" , paid_amount)
 			// we still didnt implement the  base_paid_amount and amount_eligible_for_commission
 			//_seen  value in deafault pos ==>  ["Administrator"]. i think it is an array.
 			frappe.db.insert({
@@ -677,7 +689,6 @@ pos_ar.PointOfSale.Controller = class {
 				frappe.show_progress('Syncing Invoices...' , counter , all_tabs.length , 'syncing')
 
 				if(counter == all_tabs.length){
-					console.log("it should close the progress dialog")
 					frappe.hide_progress();
 					this.customer_box.setSynced();
 				}
@@ -686,7 +697,6 @@ pos_ar.PointOfSale.Controller = class {
 			}).catch(err =>{
 				counter += 1 ;
 				failure += 1 ;
-				console.log(err)
 			})
 
 		})
@@ -711,7 +721,6 @@ pos_ar.PointOfSale.Controller = class {
 		voucher.posting_date      = frappe.datetime.now_date();
 		voucher.posting_time      = frappe.datetime.now_time();
 
-		
 
 		frappe.set_route("Form", "POS Closing Entry", voucher.name);
 
@@ -728,7 +737,6 @@ pos_ar.PointOfSale.Controller = class {
 	/****************************  listeners *******************************/
 
 	setListeners(){
-		console.log("test (window) ==> " , window)
 		window.addEventListener('offline' , function(){
 			frappe.msgprint('you lose the connection (offline mode)')
 		})
@@ -747,15 +755,12 @@ pos_ar.PointOfSale.Controller = class {
 
 		// Check if service workers are supported
 		if (!('serviceWorker' in navigator)) {
-			console.log("Service Worker isn't supported!");
 			return;
 		}
 
-		console.log("Service Worker supported");
 
 		// Register the service worker on window load
  		window.addEventListener('DOMContentLoaded', () => {
-		console.log("Window loaded!");
 		navigator.serviceWorker
 			.register('./sw.js')
 			.then(reg => console.log("Service Worker registered successfully."))

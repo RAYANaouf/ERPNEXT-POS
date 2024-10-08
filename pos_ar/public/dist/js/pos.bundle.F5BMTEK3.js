@@ -15,15 +15,10 @@
       }
     return a;
   };
-  var __publicField = (obj, key, value) => {
-    __defNormalProp(obj, typeof key !== "symbol" ? key + "" : key, value);
-    return value;
-  };
 
   // ../pos_ar/pos_ar/pos_ar/page/pos/posController.js
   pos_ar.PointOfSale.Controller = class {
     constructor(wrapper) {
-      __publicField(this, "discount_percentage");
       this.wrapper = $(wrapper).find(".layout-main-section");
       this.page = wrapper.page;
       this.customersList = [];
@@ -44,6 +39,9 @@
       this.selectedCustomer = { "name": "" };
       this.sellInvoices = /* @__PURE__ */ new Map();
       this.POSOpeningEntry = {};
+      this.grandTotal = 0;
+      this.paidAmount = 0;
+      this.toChange = 0;
       this.start_app();
     }
     async start_app() {
@@ -295,8 +293,14 @@
         this.selectedItemMaps,
         this.selectedTab,
         this.selectedPaymentMethod,
+        this.grandTotal,
+        this.paidAmount,
+        this.toChange,
         this.onClose_payment_cart.bind(this),
-        this.onCompleteOrder.bind(this)
+        this.onCompleteOrder.bind(this),
+        (event2, field, value) => {
+          this.onInput(event2, field, value);
+        }
       );
     }
     init_historyCart() {
@@ -333,7 +337,6 @@
       this.item_details.refreshDate(item);
     }
     onCheckout() {
-      console.log("here we are on callback 02 ", this.item_details);
       this.payment_cart.showCart();
       this.item_selector.hideCart();
       this.item_details.hide_cart();
@@ -343,7 +346,6 @@
       this.selected_item_cart.showKeyboard();
     }
     onClose_details() {
-      console.log("onClose callback 002");
       this.item_selector.showCart();
       this.payment_cart.hideCart();
       this.item_details.hide_cart();
@@ -355,6 +357,7 @@
       this.item_selector.showCart();
       this.item_details.hide_cart();
       this.payment_cart.hideCart();
+      this.selected_item_cart.hideKeyboard();
       this.selected_item_cart.setKeyboardOrientation("portrait");
       this.selected_item_cart.cleanHeighlight();
     }
@@ -366,7 +369,6 @@
       this.customer_box.hideActionBar();
     }
     onInput(event2, field, value) {
-      console.log("field : ", field);
       if (event2 == "focus" || event2 == "blur") {
         if (event2 == "focus")
           Object.assign(this.selectedField, { field_name: field });
@@ -388,7 +390,6 @@
         let oldRate = this.getItemPrice(this.selectedItem.name);
         let montant = oldRate * (value / 100);
         let newRate = oldRate - montant;
-        console.log("old price : ", oldRate, "discount % : ", value, "discount montant : ", montant, " new Price ", newRate);
         this.selectedItem.discount_percentage = value;
         this.selectedItem.discount_amount = montant;
         this.selectedItem.amount = newRate;
@@ -406,13 +407,13 @@
           montant = oldRate;
         }
         let newRate = oldRate - montant;
-        console.log("old price : ", oldRate, "discount % : ", persent, "discount montant : ", montant, " new Price ", newRate);
         this.selectedItem.discount_percentage = persent;
         this.selectedItem.discount_amount = montant;
         this.selectedItem.amount = newRate;
         this.selectedItemMaps.get(this.selectedTab.tabName).set(this.selectedItem.name, Object.assign({}, this.selectedItem));
         this.selected_item_cart.refreshSelectedItem();
         this.item_details.refreshDate(this.selectedItem);
+      } else if (field == "cash") {
       }
     }
     onKeyPressed(action, key) {
@@ -421,10 +422,11 @@
       } else if (action == "rate") {
         this.item_details.requestFocus("rate");
       } else if (action == "discount") {
-        this.item_details.requestFocus("discount");
+        this.item_details.requestFocus("discount_percentage");
       } else if (action == "remove") {
         this.selectedItemMaps.get(this.selectedTab.tabName).delete(this.selectedItem.name);
         this.selected_item_cart.refreshSelectedItem();
+      } else if (action == "cash") {
       } else if (action == "addToField") {
         this.item_details.addToField(this.selectedField.field_name, key);
       }
@@ -432,7 +434,6 @@
     onCompleteOrder() {
       let items = [];
       this.selectedItemMaps.get(this.selectedTab.tabName).forEach((value, key) => {
-        console.log("the key ==> ", key, " value ==> ", value);
         let newItem = {
           "item_name": value.name,
           "item_code": value.name,
@@ -472,7 +473,6 @@
         this.selected_item_cart.createNewTab();
       }
       this.onClose_payment_cart();
-      console.log("posInvoice ==> ", this.sellInvoices);
     }
     onSync() {
       if (this.POSOpeningEntry.name == "") {
@@ -500,7 +500,6 @@
           totalQty += item.qty;
           paid_amount += item.rate * item.qty;
         });
-        console.log("paid", paid_amount);
         frappe.db.insert({
           "doctype": "POS Invoice",
           "customer": this.sellInvoices.get(tab).customer,
@@ -525,14 +524,12 @@
           counter += 1;
           frappe.show_progress("Syncing Invoices...", counter, all_tabs.length, "syncing");
           if (counter == all_tabs.length) {
-            console.log("it should close the progress dialog");
             frappe.hide_progress();
             this.customer_box.setSynced();
           }
         }).catch((err) => {
           counter += 1;
           failure += 1;
-          console.log(err);
         });
       });
     }
@@ -552,7 +549,6 @@
       this.POSOpeningEntry.name = "";
     }
     setListeners() {
-      console.log("test (window) ==> ", window);
       window.addEventListener("offline", function() {
         frappe.msgprint("you lose the connection (offline mode)");
       });
@@ -566,12 +562,9 @@
     }
     checkServiceWorker() {
       if (!("serviceWorker" in navigator)) {
-        console.log("Service Worker isn't supported!");
         return;
       }
-      console.log("Service Worker supported");
       window.addEventListener("DOMContentLoaded", () => {
-        console.log("Window loaded!");
         navigator.serviceWorker.register("./sw.js").then((reg) => console.log("Service Worker registered successfully.")).catch((err) => console.log(`Service Worker registration failed: ${err}`));
       });
       this.sw = new pos_ar.PointOfSale.Sw();
@@ -1097,7 +1090,7 @@
         quantityButton.removeClass("selected");
         rateButton.addClass("selected");
         discountButton.removeClass("selected");
-      } else if (this.selected_field.field_name == "discount") {
+      } else if (this.selected_field.field_name == "discount_percentage") {
         quantityButton.removeClass("selected");
         rateButton.removeClass("selected");
         discountButton.addClass("selected");
@@ -1503,13 +1496,14 @@
 
   // ../pos_ar/pos_ar/pos_ar/page/pos/pos_payment_cart.js
   pos_ar.PointOfSale.pos_payment_cart = class {
-    constructor(wrapper, selectedItemMap, selectedTab, selectedPaymentMythod, onClose, onComplete) {
+    constructor(wrapper, selectedItemMap, selectedTab, selectedPaymentMythod, onClose, onComplete, onInput) {
       this.wrapper = wrapper;
       this.selected_item_map = selectedItemMap;
       this.selected_tab = selectedTab;
       this.selected_payment_method = selectedPaymentMythod;
       this.on_close_cart = onClose;
       this.on_complete = onComplete;
+      this.on_input = onInput;
       this.grand_total = 0;
       this.paid_amount = 0;
       this.to_change = 0;
@@ -1614,6 +1608,9 @@
         this.refreshPaidAmount();
         this.calculateToChange();
         console.log("input", event2.target.value);
+      });
+      this.cashBox.find("#cachInput").on("focus", (event2) => {
+        this.input("focus", "cash", null);
       });
       this.onTimeBox.find("#paymentOnTimeInput").on("input", (event2) => {
         const value = event2.target.value;
@@ -1736,4 +1733,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.3W7UM4FC.js.map
+//# sourceMappingURL=pos.bundle.F5BMTEK3.js.map

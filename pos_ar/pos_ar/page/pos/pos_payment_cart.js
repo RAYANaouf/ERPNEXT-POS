@@ -8,7 +8,8 @@ pos_ar.PointOfSale.pos_payment_cart = class{
 		selectedTab,
 		selectedPaymentMythod,
 		onClose,
-		onComplete
+		onComplete,
+		onInput
 	){
 		this.wrapper                 = wrapper;
 		this.selected_item_map       = selectedItemMap;
@@ -16,6 +17,7 @@ pos_ar.PointOfSale.pos_payment_cart = class{
 		this.selected_payment_method = selectedPaymentMythod;
 		this.on_close_cart           = onClose;
 		this.on_complete             = onComplete;
+		this.on_input                = onInput;
 
 		//local
 		this.grand_total = 0 ;
@@ -146,6 +148,8 @@ pos_ar.PointOfSale.pos_payment_cart = class{
 
 		//inputs
 		this.cashBox.find('#cachInput').on('input' , (event)=>{
+
+
 			const value = event.target.value;
 			if(value.length == 0){
 				event.target.value = 0
@@ -170,6 +174,10 @@ pos_ar.PointOfSale.pos_payment_cart = class{
 			this.refreshPaidAmount();
 			this.calculateToChange();
 			console.log("input" , event.target.value)
+		})
+
+		this.cashBox.find('#cachInput').on('focus' , (event)=>{
+			this.input('focus' , 'cash' , null)
 		})
 
 		this.onTimeBox.find('#paymentOnTimeInput').on('input' , (event)=>{
