@@ -7,22 +7,20 @@ pos_ar.PointOfSale.pos_payment_cart = class{
 		selectedItemMap,
 		selectedTab,
 		selectedPaymentMythod,
+		invoiceData,
 		onClose,
 		onComplete,
 		onInput
 	){
-		this.wrapper                 = wrapper;
+		this.wrapper                 = wrapper     ;
 		this.selected_item_map       = selectedItemMap;
-		this.selected_tab            = selectedTab;
+		this.selected_tab            = selectedTab ;
 		this.selected_payment_method = selectedPaymentMythod;
-		this.on_close_cart           = onClose;
-		this.on_complete             = onComplete;
-		this.on_input                = onInput;
+		this.invoice_data            = invoiceData ;
+		this.on_close_cart           = onClose     ;
+		this.on_complete             = onComplete  ;
+		this.on_input                = onInput     ;
 
-		//local
-		this.grand_total = 0 ;
-		this.paid_amount = 0 ;
-		this.to_change   = 0 ;
 
 		this.start_work();
 	}
@@ -80,7 +78,7 @@ pos_ar.PointOfSale.pos_payment_cart = class{
 		this.payment_details.append('<hr>')
 		this.payment_details.append(`<div id="paymentPaidAmount" class="columnBox"><div id="paymentPaidAmountTitle" class="rowBox centerItem">Paid Amount</div><div id="paimentPaidAmountValue"  class="rowBox centerItem"> 0 DA </div></div>`)
 		this.payment_details.append('<hr>')
-		this.payment_details.append(`<div id="paymentToChange" class="columnBox"><div id="paimentToChangeTitle" class="rowBox centerItem">To Change</div><div id="paimentToChangeValue"  class="rowBox centerItem"> ${this.to_change}DA </div></div>`)
+		this.payment_details.append(`<div id="paymentToChange" class="columnBox"><div id="paimentToChangeTitle" class="rowBox centerItem">To Change</div><div id="paimentToChangeValue"  class="rowBox centerItem"> ${this.toChange}DA </div></div>`)
 
 	}
 
@@ -96,9 +94,10 @@ pos_ar.PointOfSale.pos_payment_cart = class{
 
 
 	clearData(){
-		this.grand_total = 0 ;
-		this.paid_amount = 0 ;
-		this.to_change   = 0 ;
+
+		this.invoice_data.grandTotal = 0 ;
+		this.invoice_data.paidAmount = 0 ;
+		this.invoice_data.toChange = 0 ;
 
 		this.cashBox.find('#cachInput').val(0)
 
@@ -107,6 +106,19 @@ pos_ar.PointOfSale.pos_payment_cart = class{
 		this.refreshPaidAmount();
 
 	}
+
+
+	refreshData(){
+		console.log("refreshing data")
+
+		this.cashBox.find('#cachInput').val(this.invoice_data.paidAmount)
+
+		this.calculateGrandTotal();
+		this.calculateToChange();
+		this.refreshPaidAmount();
+
+	}
+
 	/****************************************  listeners  ***********************************************/
 
 	setListeners(){
@@ -118,7 +130,7 @@ pos_ar.PointOfSale.pos_payment_cart = class{
 			this.redeemLoyaltyBox.removeClass('selected')
 
 			//refresh UI
-			this.paid_amount = this.cashBox.find('#cachInput').val()
+			this.invoice_data.paidAmount = this.cashBox.find('#cachInput').val()
 			this.refreshPaidAmount();
 		})
 
@@ -129,7 +141,7 @@ pos_ar.PointOfSale.pos_payment_cart = class{
 			this.redeemLoyaltyBox.removeClass('selected')
 
 			//refresh UI
-			this.paid_amount = this.onTimeBox.find('#paymentOnTimeInput').val()
+			this.invoice_data.paidAmount = this.onTimeBox.find('#paymentOnTimeInput').val()
 			this.refreshPaidAmount();
 
 		})
@@ -141,7 +153,7 @@ pos_ar.PointOfSale.pos_payment_cart = class{
 			this.redeemLoyaltyBox.addClass('selected')
 
 			//refresh UI
-			this.paid_amount = 0;
+			this.invoice_data.paidAmount = 0 ;
 			this.refreshPaidAmount();
 
 		})
@@ -149,6 +161,7 @@ pos_ar.PointOfSale.pos_payment_cart = class{
 		//inputs
 		this.cashBox.find('#cachInput').on('input' , (event)=>{
 
+			console.log("we are here 1:)");
 
 			const value = event.target.value;
 			if(value.length == 0){
@@ -170,14 +183,14 @@ pos_ar.PointOfSale.pos_payment_cart = class{
 				event.target.value = value
 			}
 
-			this.paid_amount = event.target.value;
+			this.invoice_data.paidAmount = event.target.value;
 			this.refreshPaidAmount();
 			this.calculateToChange();
 			console.log("input" , event.target.value)
 		})
 
 		this.cashBox.find('#cachInput').on('focus' , (event)=>{
-			this.input('focus' , 'cash' , null)
+			this.on_input('focus' , 'cash' , null)
 		})
 
 		this.onTimeBox.find('#paymentOnTimeInput').on('input' , (event)=>{
@@ -201,7 +214,7 @@ pos_ar.PointOfSale.pos_payment_cart = class{
 				event.target.value = value
 			}
 
-			this.paid_amount = event.target.value;
+			this.invoice_data.paidAmount = event.target.value;
 			this.refreshPaidAmount();
 			this.calculateToChange();
 			console.log("input" , event.target.value)
@@ -231,9 +244,10 @@ pos_ar.PointOfSale.pos_payment_cart = class{
 			console.log("input" , event.target.value)
 		})
 
+
 		this.cart_footer.find("#completeOrderBtn").on('click' , (event)=>{
-			console.log("grand total ==> " , this.grand_total , "the paid amount ==> " , this.paid_amount)
-			if(this.grand_total > this.paid_amount ){
+			console.log("grand total ==> " , this.invoice_data.grandTotal , "the paid amount ==> " , this.invoice_data.paidAmount)
+			if(this.invoice_data.grandTotal > this.invoice_data.paidAmount ){
 				console.log("here we go 1")
 				frappe.warn(
 					'Paid amount is less than the Total!',
@@ -245,7 +259,7 @@ pos_ar.PointOfSale.pos_payment_cart = class{
 				)
 				return;
 			}
-			else if(this.grand_total == 0){
+			else if(this.invoice_data.grandTotal == 0){
 				console.log("here we go 2")
 				frappe.warn(
 					'No item',
@@ -274,25 +288,26 @@ pos_ar.PointOfSale.pos_payment_cart = class{
 	/************************************ tools  ***************************************/
 	calculateGrandTotal(){
 
-		this.grand_total = 0 ;
+		console.log("invoice data : " ,  this.invoice_data);
+		this.invoice_data.grandTotal = 0 ;
 
 		this.selected_item_map.get(this.selected_tab.tabName).forEach((value,key)=>{
-			this.grand_total += value.quantity * value.amount
+			this.invoice_data.grandTotal += value.quantity * value.amount
 		})
 
-		this.payment_details.find('#paymentGrandTotalValue').text(`${this.grand_total} DA`)
+		this.payment_details.find('#paymentGrandTotalValue').text(`${this.invoice_data.grandTotal} DA`)
 
-		this.generateProposedPaidAmount(this.grand_total);
+		this.generateProposedPaidAmount(this.invoice_data.grandTotal);
 	}
 
 	calculateToChange(){
-		this.to_change = (this.paid_amount - this.grand_total)
-		console.log("paid  " ,this.paid_amount , " - " , this.grand_total , " = "  ,   this.to_change)
-		this.payment_details.find('#paimentToChangeValue').text(`${this.to_change} DA`)
+		this.invoice_data.toChange = (this.invoice_data.paidAmount - this.invoice_data.grandTotal)
+		console.log("paid  " ,this.invoice_data.paidAmount , " - " , this.invoice_data.grandTotal , " = "  ,   this.invoice_data.toChange)
+		this.payment_details.find('#paimentToChangeValue').text(`${this.invoice_data.toChange} DA`)
 	}
 
 	refreshPaidAmount(){
-		this.payment_details.find('#paimentPaidAmountValue').text(`${this.paid_amount} DA`)
+		this.payment_details.find('#paimentPaidAmountValue').text(`${this.invoice_data.paidAmount} DA`)
 	}
 
 

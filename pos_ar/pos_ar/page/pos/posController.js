@@ -28,9 +28,7 @@ pos_ar.PointOfSale.Controller = class {
 		this.sellInvoices    = new Map();
 		this.POSOpeningEntry = {}
 
-		this.grandTotal = 0 ;
-		this.paidAmount = 0 ;
-		this.toChange   = 0 ;
+		this.invoiceData = {grandTotal : 0 , paidAmount : 0 , toChange : 0}
 
                 this.start_app();
         }
@@ -322,9 +320,7 @@ pos_ar.PointOfSale.Controller = class {
 									this.selectedItemMaps,
 									this.selectedTab,
 									this.selectedPaymentMethod,
-									this.grandTotal,
-									this.paidAmount,
-									this.toChange,
+									this.invoiceData,
 									this.onClose_payment_cart.bind(this),
 									this.onCompleteOrder.bind(this),
 									(event , field , value) =>{
@@ -527,15 +523,13 @@ pos_ar.PointOfSale.Controller = class {
 			this.item_details.refreshDate(this.selectedItem);
 
 		}
-		else if( field == "cash"){
-
-			
-
-		}
 	}
 
 
 	onKeyPressed( action  , key){
+
+		console.log("action ::: " , action , " key ::: " , key)
+
 		if(action == "quantity"){
 			this.item_details.requestFocus("quantity")
 		}
@@ -550,10 +544,18 @@ pos_ar.PointOfSale.Controller = class {
 			this.selected_item_cart.refreshSelectedItem();
 		}
 		else if(action == "cash"){
-
+			console.log("action :: " , action , " key :: " , key);
+			this.paid_amount = key;
+			this.payment_cart.refreshData();
 		}
 		else if(action == "addToField"){
-			this.item_details.addToField(this.selectedField.field_name , key)
+			if(this.selectedField.field_name == "cash"){
+				this.invoiceData.paidAmount += key;
+				this.payment_cart.refreshData();
+			}
+			else{
+				this.item_details.addToField(this.selectedField.field_name , key)
+			}
 		}
 	}
 

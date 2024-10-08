@@ -39,9 +39,7 @@
       this.selectedCustomer = { "name": "" };
       this.sellInvoices = /* @__PURE__ */ new Map();
       this.POSOpeningEntry = {};
-      this.grandTotal = 0;
-      this.paidAmount = 0;
-      this.toChange = 0;
+      this.invoiceData = { grandTotal: 0, paidAmount: 0, toChange: 0 };
       this.start_app();
     }
     async start_app() {
@@ -293,9 +291,7 @@
         this.selectedItemMaps,
         this.selectedTab,
         this.selectedPaymentMethod,
-        this.grandTotal,
-        this.paidAmount,
-        this.toChange,
+        this.invoiceData,
         this.onClose_payment_cart.bind(this),
         this.onCompleteOrder.bind(this),
         (event2, field, value) => {
@@ -413,10 +409,10 @@
         this.selectedItemMaps.get(this.selectedTab.tabName).set(this.selectedItem.name, Object.assign({}, this.selectedItem));
         this.selected_item_cart.refreshSelectedItem();
         this.item_details.refreshDate(this.selectedItem);
-      } else if (field == "cash") {
       }
     }
     onKeyPressed(action, key) {
+      console.log("action ::: ", action, " key ::: ", key);
       if (action == "quantity") {
         this.item_details.requestFocus("quantity");
       } else if (action == "rate") {
@@ -427,8 +423,16 @@
         this.selectedItemMaps.get(this.selectedTab.tabName).delete(this.selectedItem.name);
         this.selected_item_cart.refreshSelectedItem();
       } else if (action == "cash") {
+        console.log("action :: ", action, " key :: ", key);
+        this.paid_amount = key;
+        this.payment_cart.refreshData();
       } else if (action == "addToField") {
-        this.item_details.addToField(this.selectedField.field_name, key);
+        if (this.selectedField.field_name == "cash") {
+          this.invoiceData.paidAmount += key;
+          this.payment_cart.refreshData();
+        } else {
+          this.item_details.addToField(this.selectedField.field_name, key);
+        }
       }
     }
     onCompleteOrder() {
@@ -1496,17 +1500,15 @@
 
   // ../pos_ar/pos_ar/pos_ar/page/pos/pos_payment_cart.js
   pos_ar.PointOfSale.pos_payment_cart = class {
-    constructor(wrapper, selectedItemMap, selectedTab, selectedPaymentMythod, onClose, onComplete, onInput) {
+    constructor(wrapper, selectedItemMap, selectedTab, selectedPaymentMythod, invoiceData, onClose, onComplete, onInput) {
       this.wrapper = wrapper;
       this.selected_item_map = selectedItemMap;
       this.selected_tab = selectedTab;
       this.selected_payment_method = selectedPaymentMythod;
+      this.invoice_data = invoiceData;
       this.on_close_cart = onClose;
       this.on_complete = onComplete;
       this.on_input = onInput;
-      this.grand_total = 0;
-      this.paid_amount = 0;
-      this.to_change = 0;
       this.start_work();
     }
     start_work() {
@@ -1546,7 +1548,7 @@
       this.payment_details.append("<hr>");
       this.payment_details.append(`<div id="paymentPaidAmount" class="columnBox"><div id="paymentPaidAmountTitle" class="rowBox centerItem">Paid Amount</div><div id="paimentPaidAmountValue"  class="rowBox centerItem"> 0 DA </div></div>`);
       this.payment_details.append("<hr>");
-      this.payment_details.append(`<div id="paymentToChange" class="columnBox"><div id="paimentToChangeTitle" class="rowBox centerItem">To Change</div><div id="paimentToChangeValue"  class="rowBox centerItem"> ${this.to_change}DA </div></div>`);
+      this.payment_details.append(`<div id="paymentToChange" class="columnBox"><div id="paimentToChangeTitle" class="rowBox centerItem">To Change</div><div id="paimentToChangeValue"  class="rowBox centerItem"> ${this.toChange}DA </div></div>`);
     }
     showCart() {
       this.cart.css("display", "flex");
@@ -1556,10 +1558,17 @@
       this.cart.css("display", "none");
     }
     clearData() {
-      this.grand_total = 0;
-      this.paid_amount = 0;
-      this.to_change = 0;
+      this.invoice_data.grandTotal = 0;
+      this.invoice_data.paidAmount = 0;
+      this.invoice_data.toChange = 0;
       this.cashBox.find("#cachInput").val(0);
+      this.calculateGrandTotal();
+      this.calculateToChange();
+      this.refreshPaidAmount();
+    }
+    refreshData() {
+      console.log("refreshing data");
+      this.cashBox.find("#cachInput").val(this.invoice_data.paidAmount);
       this.calculateGrandTotal();
       this.calculateToChange();
       this.refreshPaidAmount();
@@ -1570,7 +1579,7 @@
         this.cashBox.addClass("selected");
         this.onTimeBox.removeClass("selected");
         this.redeemLoyaltyBox.removeClass("selected");
-        this.paid_amount = this.cashBox.find("#cachInput").val();
+        this.invoice_data.paidAmount = this.cashBox.find("#cachInput").val();
         this.refreshPaidAmount();
       });
       this.onTimeBox.on("click", (event2) => {
@@ -1578,7 +1587,7 @@
         this.cashBox.removeClass("selected");
         this.onTimeBox.addClass("selected");
         this.redeemLoyaltyBox.removeClass("selected");
-        this.paid_amount = this.onTimeBox.find("#paymentOnTimeInput").val();
+        this.invoice_data.paidAmount = this.onTimeBox.find("#paymentOnTimeInput").val();
         this.refreshPaidAmount();
       });
       this.redeemLoyaltyBox.on("click", (event2) => {
@@ -1586,10 +1595,11 @@
         this.cashBox.removeClass("selected");
         this.onTimeBox.removeClass("selected");
         this.redeemLoyaltyBox.addClass("selected");
-        this.paid_amount = 0;
+        this.invoice_data.paidAmount = 0;
         this.refreshPaidAmount();
       });
       this.cashBox.find("#cachInput").on("input", (event2) => {
+        console.log("we are here 1:)");
         const value = event2.target.value;
         if (value.length == 0) {
           event2.target.value = 0;
@@ -1604,13 +1614,13 @@
         } else {
           event2.target.value = value;
         }
-        this.paid_amount = event2.target.value;
+        this.invoice_data.paidAmount = event2.target.value;
         this.refreshPaidAmount();
         this.calculateToChange();
         console.log("input", event2.target.value);
       });
       this.cashBox.find("#cachInput").on("focus", (event2) => {
-        this.input("focus", "cash", null);
+        this.on_input("focus", "cash", null);
       });
       this.onTimeBox.find("#paymentOnTimeInput").on("input", (event2) => {
         const value = event2.target.value;
@@ -1627,7 +1637,7 @@
         } else {
           event2.target.value = value;
         }
-        this.paid_amount = event2.target.value;
+        this.invoice_data.paidAmount = event2.target.value;
         this.refreshPaidAmount();
         this.calculateToChange();
         console.log("input", event2.target.value);
@@ -1651,8 +1661,8 @@
         console.log("input", event2.target.value);
       });
       this.cart_footer.find("#completeOrderBtn").on("click", (event2) => {
-        console.log("grand total ==> ", this.grand_total, "the paid amount ==> ", this.paid_amount);
-        if (this.grand_total > this.paid_amount) {
+        console.log("grand total ==> ", this.invoice_data.grandTotal, "the paid amount ==> ", this.invoice_data.paidAmount);
+        if (this.invoice_data.grandTotal > this.invoice_data.paidAmount) {
           console.log("here we go 1");
           frappe.warn(
             "Paid amount is less than the Total!",
@@ -1663,7 +1673,7 @@
             false
           );
           return;
-        } else if (this.grand_total == 0) {
+        } else if (this.invoice_data.grandTotal == 0) {
           console.log("here we go 2");
           frappe.warn(
             "No item",
@@ -1686,20 +1696,21 @@
       });
     }
     calculateGrandTotal() {
-      this.grand_total = 0;
+      console.log("invoice data : ", this.invoice_data);
+      this.invoice_data.grandTotal = 0;
       this.selected_item_map.get(this.selected_tab.tabName).forEach((value, key) => {
-        this.grand_total += value.quantity * value.amount;
+        this.invoice_data.grandTotal += value.quantity * value.amount;
       });
-      this.payment_details.find("#paymentGrandTotalValue").text(`${this.grand_total} DA`);
-      this.generateProposedPaidAmount(this.grand_total);
+      this.payment_details.find("#paymentGrandTotalValue").text(`${this.invoice_data.grandTotal} DA`);
+      this.generateProposedPaidAmount(this.invoice_data.grandTotal);
     }
     calculateToChange() {
-      this.to_change = this.paid_amount - this.grand_total;
-      console.log("paid  ", this.paid_amount, " - ", this.grand_total, " = ", this.to_change);
-      this.payment_details.find("#paimentToChangeValue").text(`${this.to_change} DA`);
+      this.invoice_data.toChange = this.invoice_data.paidAmount - this.invoice_data.grandTotal;
+      console.log("paid  ", this.invoice_data.paidAmount, " - ", this.invoice_data.grandTotal, " = ", this.invoice_data.toChange);
+      this.payment_details.find("#paimentToChangeValue").text(`${this.invoice_data.toChange} DA`);
     }
     refreshPaidAmount() {
-      this.payment_details.find("#paimentPaidAmountValue").text(`${this.paid_amount} DA`);
+      this.payment_details.find("#paimentPaidAmountValue").text(`${this.invoice_data.paidAmount} DA`);
     }
     generateProposedPaidAmount(total) {
       const money = [10, 20, 50, 100, 200, 500, 1e3, 2e3];
@@ -1733,4 +1744,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.F5BMTEK3.js.map
+//# sourceMappingURL=pos.bundle.2X5ZWZXX.js.map
