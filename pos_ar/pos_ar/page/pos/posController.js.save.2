@@ -1,4 +1,5 @@
 
+
 pos_ar.PointOfSale.Controller = class {
         constructor(wrapper) {
 		//principales variable
@@ -20,9 +21,8 @@ pos_ar.PointOfSale.Controller = class {
 
                 this.selectedItem          = {}
                 this.selectedField         = {}
-                this.selectedTab           = {"tabName"    : "C1"}
+                this.selectedTab           = {"tabName" : "C1"}
 		this.selectedPaymentMethod = {"methodName" : ""}
-		this.selectedCustomer      = {"name"       : ""}
 
 		//sell invoice
 		this.sellInvoices    = new Map();
@@ -545,6 +545,7 @@ pos_ar.PointOfSale.Controller = class {
 
 	onCompleteOrder(){
 
+
 		let items = []
 
 		this.selectedItemMaps.get(this.selectedTab.tabName).forEach((value,key) =>{
@@ -618,7 +619,6 @@ pos_ar.PointOfSale.Controller = class {
 		let all_tabs = Array.from(this.sellInvoices.keys())
 
 		if(all_tabs.length == 0){
-
 			// with options
 			frappe.msgprint({
 				title: __('Sync Complete'),
@@ -668,6 +668,7 @@ pos_ar.PointOfSale.Controller = class {
 				'update_stock' : 1       ,
 				'docstatus'    : 1
 			}).then(r => {
+
 
 				invoicesRef.push({'pos_invoice' : r.name , 'customer' : r.customer } )
 				this.sellInvoices.delete(tab)
