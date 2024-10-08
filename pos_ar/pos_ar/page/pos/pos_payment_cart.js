@@ -286,6 +286,24 @@ pos_ar.PointOfSale.pos_payment_cart = class{
 
 
 	/************************************ tools  ***************************************/
+
+
+	handleInput(key){
+
+		console.log("key ::: " , key)
+		let previousValue = this.cashBox.find('#cachInput').val() ;
+
+		// Check if the previous value contains a period (.)
+		if( !previousValue.includes('.') ){
+			// Append the key to the paidAmount if there is no period
+			this.invoice_data.paidAmount += key;
+			// Refresh the payment cart
+			this.refreshData();
+		}
+
+
+	}
+
 	calculateGrandTotal(){
 
 		console.log("invoice data : " ,  this.invoice_data);

@@ -550,8 +550,7 @@ pos_ar.PointOfSale.Controller = class {
 		}
 		else if(action == "addToField"){
 			if(this.selectedField.field_name == "cash"){
-				this.invoiceData.paidAmount += key;
-				this.payment_cart.refreshData();
+				this.payment_cart.handleInput(key);
 			}
 			else{
 				this.item_details.addToField(this.selectedField.field_name , key)
