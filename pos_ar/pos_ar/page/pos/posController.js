@@ -457,7 +457,7 @@ pos_ar.PointOfSale.Controller = class {
 
 	onInput( event , field , value){
 
-		console.log("<<we are in onInpute function >>")
+		console.log("<<we are in onInpute function >>  event : " , event , " field : " , field , " value : " , value)
 
 		//console.log("item " , this.selectedItem )
 		if(event == "focus" || event == "blur"){
@@ -557,8 +557,23 @@ pos_ar.PointOfSale.Controller = class {
 				this.payment_cart.handleInput(key);
 			}
 			else{
-				this.item_details.addToField(this.selectedField.field_name , key)
-				this.selected_item_cart.refreshSelectedItem();
+
+				if( this.selectedField.field_name ==  "quantity" ){
+					this.selectedItem.quantity += key;
+					this.selectedItemMaps.get(this.selectedTab.tabName).set( this.selectedItem.name , Object.assign({},this.selectedItem) );
+					//redrawing
+					this.selected_item_cart.refreshSelectedItem();
+				}
+				else if( this.selectedField.field_name ==  "rate" ){
+					this.selectedItem.amount += key;
+					this.selectedItemMaps.get(this.selectedTab.tabName).set( this.selectedItem.name , Object.assign({},this.selectedItem)  );
+					//redrawing
+					this.selected_item_cart.refreshSelectedItem();
+				}
+
+				console.log("field : " , this.selectedField.field_name );
+				this.item_details.addToField(this.selectedField.field_name , key);
+				//this.selected_item_cart.refreshSelectedItem();
 			}
 		}
 	}
