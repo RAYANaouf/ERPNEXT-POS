@@ -456,6 +456,9 @@ pos_ar.PointOfSale.Controller = class {
 	}
 
 	onInput( event , field , value){
+
+		console.log("<<we are in onInpute function >>")
+
 		//console.log("item " , this.selectedItem )
 		if(event == "focus" || event == "blur"){
 			if(event == "focus")
@@ -484,7 +487,7 @@ pos_ar.PointOfSale.Controller = class {
 		else if( field == "discount_percentage"){
 
 			//recalculate the rate
-			let oldRate = this.getItemPrice(this.selectedItem.name);
+			let oldRate = this.selectedItem.amount;
 			let montant = oldRate * (value / 100)
 			let newRate = oldRate - montant
 
@@ -500,7 +503,7 @@ pos_ar.PointOfSale.Controller = class {
 		else if( field == "discount_amount"){
 
 			//recalculate the rate
-			let oldRate = this.getItemPrice(this.selectedItem.name);
+			let oldRate = this.selectedItem.amount;
 			let persent = ((value * 100) / oldRate).toFixed(2);
 			let montant = value;
 
@@ -528,6 +531,7 @@ pos_ar.PointOfSale.Controller = class {
 
 	onKeyPressed( action  , key){
 
+		console.log("<<we are in onKeyPressed function >>")
 		console.log("action ::: " , action , " key ::: " , key)
 
 		if(action == "quantity"){
@@ -554,6 +558,7 @@ pos_ar.PointOfSale.Controller = class {
 			}
 			else{
 				this.item_details.addToField(this.selectedField.field_name , key)
+				this.selected_item_cart.refreshSelectedItem();
 			}
 		}
 	}
@@ -659,8 +664,8 @@ pos_ar.PointOfSale.Controller = class {
 				paid_amount += item.rate * item.qty
 			})
 
-			// we still didnt implement the  base_paid_amount and amount_eligible_for_commission
-			//_seen  value in deafault pos ==>  ["Administrator"]. i think it is an array.
+			// we still didnt implement the  base_paid_amount and amount_eligible_for_commissionseen
+			// value in deafault pos ==>  ["Administrator"]. i think it is an array.
 			frappe.db.insert({
 				'doctype'      : "POS Invoice",
 				'customer'     : this.sellInvoices.get(tab).customer    ,
