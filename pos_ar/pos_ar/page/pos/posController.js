@@ -627,7 +627,6 @@ pos_ar.PointOfSale.Controller = class {
 			return;
 		}
 
-
 		//calculate amount
 		let all_tabs = Array.from(this.sellInvoices.keys())
 
