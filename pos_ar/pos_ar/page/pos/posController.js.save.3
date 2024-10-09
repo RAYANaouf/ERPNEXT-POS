@@ -570,6 +570,23 @@ pos_ar.PointOfSale.Controller = class {
 					//redrawing
 					this.selected_item_cart.refreshSelectedItem();
 				}
+				else if( field == "discount_percentage"){
+
+					//recalculate the rate
+					let oldRate = this.selectedItem.amount;
+					let montant = oldRate * (value / 100)
+					let newRate = oldRate - montant
+
+					this.selectedItem.discount_percentage = value;
+					this.selectedItem.discount_amount     = montant;
+					this.selectedItem.amount              = newRate;
+
+					this.selectedItemMaps.get(this.selectedTab.tabName).set( this.selectedItem.name , Object.assign({},this.selectedItem)  )
+					//redrawing
+					this.selected_item_cart.refreshSelectedItem();
+					this.item_details.refreshDate(this.selectedItem);
+				}
+
 
 				console.log("field : " , this.selectedField.field_name );
 				this.item_details.addToField(this.selectedField.field_name , key);
@@ -809,8 +826,7 @@ pos_ar.PointOfSale.Controller = class {
                 try {
                         return await frappe.db.get_list('Customer', {
                                 fields: ['name', 'customer_name' ],
-                                filters: {},
-				limit : 100000
+                                filters: {}
                         })
                 } catch (error) {
                         console.error('Error fetching customers:', error);
@@ -822,8 +838,7 @@ pos_ar.PointOfSale.Controller = class {
                 try {
                         return await frappe.db.get_list('Item Group', {
                                 fields: ['name', 'item_group_name' , 'parent_item_group' , 'is_group' ],
-                                filters: {},
-				limit : 100000
+                                filters: {}
                         })
                 } catch (error) {
                         console.error('Error fetching Item Group :', error);
@@ -835,8 +850,7 @@ pos_ar.PointOfSale.Controller = class {
                 try {
                         return await frappe.db.get_list('Item', {
                                 fields: ['name', 'item_name' , 'image' , 'item_group' , 'stock_uom' ],
-                                filters: { disabled : 0 },
-				limit : 100000
+                                filters: { disabled : 0 }
                         })
                 } catch (error) {
                         console.error('Error fetching Item Group :', error);
@@ -848,8 +862,7 @@ pos_ar.PointOfSale.Controller = class {
                 try {
                         return await frappe.db.get_list('Item Price', {
                                 fields: ['name', 'item_code' , 'item_name' , 'price_list', 'price_list_rate' ],
-                                filters: { price_list : "Standard Selling"},
-				limit : 100000
+                                filters: { price_list : "Standard Selling"}
                         })
                 } catch (error) {
                         console.error('Error fetching Item Group :', error);
@@ -861,8 +874,7 @@ pos_ar.PointOfSale.Controller = class {
                 try {
                         return await frappe.db.get_list('Price List', {
                                 fields: ['name', 'price_list_name' , 'currency' ],
-                                filters: {selling : 1 },
-				limit : 100000
+                                filters: {selling : 1 }
                        })
                 } catch (error) {
                         console.error('Error fetching Item Group :', error);
@@ -875,8 +887,7 @@ pos_ar.PointOfSale.Controller = class {
                 try{
                         return await frappe.db.get_list('Warehouse' , {
                                 fields  : ['name' , 'warehouse_name'],
-                                filters : {},
-				limit : 100000
+                                filters : {}
                         })
                 }
                 catch(error){
@@ -889,8 +900,7 @@ pos_ar.PointOfSale.Controller = class {
                 try{
                         return await frappe.db.get_list('POS Profile' , {
                                 fields  : ['name' , 'warehouse' , 'income_account' , 'write_off_account' , 'write_off_cost_center'],
-                                filters : { disabled : 0},
-				limit : 100000
+                                filters : { disabled : 0}
                         })
                 }
                 catch(error){

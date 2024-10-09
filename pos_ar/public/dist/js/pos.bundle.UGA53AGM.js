@@ -592,7 +592,8 @@
       try {
         return await frappe.db.get_list("Customer", {
           fields: ["name", "customer_name"],
-          filters: {}
+          filters: {},
+          limit: 1e5
         });
       } catch (error) {
         console.error("Error fetching customers:", error);
@@ -603,7 +604,8 @@
       try {
         return await frappe.db.get_list("Item Group", {
           fields: ["name", "item_group_name", "parent_item_group", "is_group"],
-          filters: {}
+          filters: {},
+          limit: 1e5
         });
       } catch (error) {
         console.error("Error fetching Item Group :", error);
@@ -614,7 +616,8 @@
       try {
         return await frappe.db.get_list("Item", {
           fields: ["name", "item_name", "image", "item_group", "stock_uom"],
-          filters: { disabled: 0 }
+          filters: { disabled: 0 },
+          limit: 1e5
         });
       } catch (error) {
         console.error("Error fetching Item Group :", error);
@@ -625,7 +628,8 @@
       try {
         return await frappe.db.get_list("Item Price", {
           fields: ["name", "item_code", "item_name", "price_list", "price_list_rate"],
-          filters: { price_list: "Standard Selling" }
+          filters: { price_list: "Standard Selling" },
+          limit: 1e5
         });
       } catch (error) {
         console.error("Error fetching Item Group :", error);
@@ -636,7 +640,8 @@
       try {
         return await frappe.db.get_list("Price List", {
           fields: ["name", "price_list_name", "currency"],
-          filters: { selling: 1 }
+          filters: { selling: 1 },
+          limit: 1e5
         });
       } catch (error) {
         console.error("Error fetching Item Group :", error);
@@ -647,7 +652,8 @@
       try {
         return await frappe.db.get_list("Warehouse", {
           fields: ["name", "warehouse_name"],
-          filters: {}
+          filters: {},
+          limit: 1e5
         });
       } catch (error) {
         console.error("Error fetching Warehouse list : ", error);
@@ -658,7 +664,8 @@
       try {
         return await frappe.db.get_list("POS Profile", {
           fields: ["name", "warehouse", "income_account", "write_off_account", "write_off_cost_center"],
-          filters: { disabled: 0 }
+          filters: { disabled: 0 },
+          limit: 1e5
         });
       } catch (error) {
         console.error("Error fetching Warehouse list : ", error);
@@ -1763,4 +1770,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.UIXQ3KK3.js.map
+//# sourceMappingURL=pos.bundle.UGA53AGM.js.map
