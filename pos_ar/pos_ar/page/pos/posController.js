@@ -39,6 +39,7 @@ pos_ar.PointOfSale.Controller = class {
 		await  this.checkForPOSEntry()
                 await  this.prepare_components();
 		this.setListeners();
+		new pos_ar.PointOfSale.pos_db();
 	}
 
 

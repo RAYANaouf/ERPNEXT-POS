@@ -48,6 +48,7 @@
       await this.checkForPOSEntry();
       await this.prepare_components();
       this.setListeners();
+      new pos_ar.PointOfSale.pos_db();
     }
     async refreshApp() {
       console.log("refresh");
@@ -1763,11 +1764,17 @@
     }
   };
 
-  // ../pos_ar/pos_ar/pos_ar/page/pos/sw.js
-  pos_ar.PointOfSale.Sw = class {
+  // ../pos_ar/pos_ar/pos_ar/page/pos/pos_db.js
+  pos_ar.PointOfSale.pos_db = class POSDatabase {
     constructor() {
-      console.log(`Im SW I'm heeeeeeeeeeeeeeeeeeeere path: ${window.location.pathname}`);
+      this.dbName = "POSDB";
+      this.dbVersion = 1;
+      this.db = null;
+      this.openDatabase();
+    }
+    openDatabase() {
+      console.log("db opend successfuly");
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.UGA53AGM.js.map
+//# sourceMappingURL=pos.bundle.FXYXMQJG.js.map
