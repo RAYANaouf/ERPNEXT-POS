@@ -2,7 +2,7 @@ pos_ar.PointOfSale.pos_db  = class POSDatabase {
 
 	constructor() {
 		this.dbName = 'POSDB';
-		this.dbVersion = 1;
+		this.dbVersion = 4;
 		this.db = null;
 
 		this.openDatabase()
@@ -11,6 +11,43 @@ pos_ar.PointOfSale.pos_db  = class POSDatabase {
 
 	openDatabase(){
 		console.log("db opend successfuly")
+		// Let us open our database
+		const request = window.indexedDB.open("MyTestDatabase", this.dbVersion);
+		console.log("request : " , request)
+
+		request.onerror = (event) => {
+			// Do something with request.error!
+			console.log(" there is an error : " , request.error)
+		};
+
+		request.onsuccess = (event) => {
+			// Do something with request.result!
+			this.db = event.target.result;
+			this.setupDatabase()
+			console.log(" the db is opend successefully : " , event.target.result)
+		};
+
+ 		request.onupgradeneeded = (event) => {
+		 	const db = event.target.result;
+
+			// Create object stores (tables)
+			if (!db.objectStoreNames.contains('items')) {
+				db.createObjectStore('items', { keyPath: 'name' });
+			}
+			if (!db.objectStoreNames.contains('customers')) {
+				db.createObjectStore('customers', { keyPath: 'name' });
+			}
+		};
+	}
+
+
+
+	setupDatabase(){
+		this.db.onerror = (event) => {
+			// Generic error handler for all errors targeted at this database's
+			// requests!
+			console.error(`Database error: ${event.target.error?.message}`);
+		};
 	}
 
 }

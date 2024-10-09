@@ -1768,13 +1768,38 @@
   pos_ar.PointOfSale.pos_db = class POSDatabase {
     constructor() {
       this.dbName = "POSDB";
-      this.dbVersion = 1;
+      this.dbVersion = 4;
       this.db = null;
       this.openDatabase();
     }
     openDatabase() {
       console.log("db opend successfuly");
+      const request = window.indexedDB.open("MyTestDatabase", this.dbVersion);
+      console.log("request : ", request);
+      request.onerror = (event2) => {
+        console.log(" there is an error : ", request.error);
+      };
+      request.onsuccess = (event2) => {
+        this.db = event2.target.result;
+        this.setupDatabase();
+        console.log(" the db is opend successefully : ", event2.target.result);
+      };
+      request.onupgradeneeded = (event2) => {
+        const db = event2.target.result;
+        if (!db.objectStoreNames.contains("items")) {
+          db.createObjectStore("items", { keyPath: "name" });
+        }
+        if (!db.objectStoreNames.contains("customers")) {
+          db.createObjectStore("customers", { keyPath: "name" });
+        }
+      };
+    }
+    setupDatabase() {
+      this.db.onerror = (event2) => {
+        var _a;
+        console.error(`Database error: ${(_a = event2.target.error) == null ? void 0 : _a.message}`);
+      };
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.FXYXMQJG.js.map
+//# sourceMappingURL=pos.bundle.BMPYMGV6.js.map
