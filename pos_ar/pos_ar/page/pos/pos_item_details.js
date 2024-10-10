@@ -309,6 +309,77 @@ else if(keyContent == "." && !selectedField.value.includes(".")){
 				return currentValue;
 			})
 		}
+		if(field == "rate"){
+
+			let field = this.c1.find("#itemDetailsRateInput")
+
+			let cursor = field[0].selectionStart;
+
+			console.log(field.val())
+
+			field.val( (index , currentValue) =>{
+
+				console.log("length : " , currentValue , " cursor : " , cursor);
+
+				if( currentValue.length < 0 ){
+					console.log("cnd 1")
+					return 0;
+				}
+				else if( currentValue.length == 1){
+					console.log("cnd 2")
+					return 0 ;
+				}
+				else if( cursor == 0 ){
+					console.log("cnd 3")
+					return currentValue;
+				}
+				else if( cursor == currentValue.length){
+					console.log("cnd 4")
+					return currentValue.slice(0 , cursor-1)
+				}
+				else{
+					console.log("cnd 5")
+					return currentValue.slice(0,cursor-1) + currentValue.slice(cursor)
+				}
+				return currentValue;
+			})
+		}
+		if(field == "discount_percentage"){
+
+			let field = this.c1.find("#itemDetailsDiscountInput")
+
+			let cursor = field[0].selectionStart;
+
+			console.log(field.val())
+
+			field.val( (index , currentValue) =>{
+
+				console.log("length : " , currentValue , " cursor : " , cursor);
+
+				if( currentValue.length < 0 ){
+					console.log("cnd 1")
+					return 0;
+				}
+				else if( currentValue.length == 1){
+					console.log("cnd 2")
+					return 0 ;
+				}
+				else if( cursor == 0 ){
+					console.log("cnd 3")
+					return currentValue;
+				}
+				else if( cursor == currentValue.length){
+					console.log("cnd 4")
+					return currentValue.slice(0 , cursor-1)
+				}
+				else{
+					console.log("cnd 5")
+					return currentValue.slice(0,cursor-1) + currentValue.slice(cursor)
+				}
+				return currentValue;
+			})
+		}
+
 	}
 
 	/**************************  set listener  ****************************/

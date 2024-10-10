@@ -1416,6 +1416,56 @@
           return currentValue;
         });
       }
+      if (field == "rate") {
+        let field2 = this.c1.find("#itemDetailsRateInput");
+        let cursor = field2[0].selectionStart;
+        console.log(field2.val());
+        field2.val((index, currentValue) => {
+          console.log("length : ", currentValue, " cursor : ", cursor);
+          if (currentValue.length < 0) {
+            console.log("cnd 1");
+            return 0;
+          } else if (currentValue.length == 1) {
+            console.log("cnd 2");
+            return 0;
+          } else if (cursor == 0) {
+            console.log("cnd 3");
+            return currentValue;
+          } else if (cursor == currentValue.length) {
+            console.log("cnd 4");
+            return currentValue.slice(0, cursor - 1);
+          } else {
+            console.log("cnd 5");
+            return currentValue.slice(0, cursor - 1) + currentValue.slice(cursor);
+          }
+          return currentValue;
+        });
+      }
+      if (field == "discount_percentage") {
+        let field2 = this.c1.find("#itemDetailsDiscountInput");
+        let cursor = field2[0].selectionStart;
+        console.log(field2.val());
+        field2.val((index, currentValue) => {
+          console.log("length : ", currentValue, " cursor : ", cursor);
+          if (currentValue.length < 0) {
+            console.log("cnd 1");
+            return 0;
+          } else if (currentValue.length == 1) {
+            console.log("cnd 2");
+            return 0;
+          } else if (cursor == 0) {
+            console.log("cnd 3");
+            return currentValue;
+          } else if (cursor == currentValue.length) {
+            console.log("cnd 4");
+            return currentValue.slice(0, cursor - 1);
+          } else {
+            console.log("cnd 5");
+            return currentValue.slice(0, cursor - 1) + currentValue.slice(cursor);
+          }
+          return currentValue;
+        });
+      }
     }
     setDetailsFieldsListeners() {
       this.quantityInput = this.c1.find("#itemDetailsQuantityInput");
@@ -1834,4 +1884,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.2QWDQTE7.js.map
+//# sourceMappingURL=pos.bundle.WCUHL27J.js.map
