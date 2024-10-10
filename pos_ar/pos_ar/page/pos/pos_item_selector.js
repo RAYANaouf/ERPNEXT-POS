@@ -91,7 +91,7 @@ pos_ar.PointOfSale.pos_item_selector = class {
                         	itemImageHolder.classList.add("rowBox");
                         	itemImageHolder.classList.add("centerItem");
                         	const firstLatter = document.createElement("h1");
-                        	firstLatter.textContent = item.name[0];
+                        	firstLatter.textContent = item.item_name[0];
                         	firstLatter.style.color = "#707070";
                         	itemImageHolder.appendChild(firstLatter);
                         	itemBox.appendChild(itemImageHolder);
