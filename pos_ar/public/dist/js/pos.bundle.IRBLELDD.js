@@ -414,6 +414,7 @@
       }
     }
     onKeyPressed(action, key) {
+      var _a;
       console.log("<<we are in onKeyPressed function >>");
       console.log("action ::: ", action, " key ::: ", key);
       if (action == "quantity") {
@@ -426,7 +427,24 @@
         this.selectedItemMaps.get(this.selectedTab.tabName).delete(this.selectedItem.name);
         this.selected_item_cart.refreshSelectedItem();
       } else if (action == "delete") {
-        this.item_details.deleteCharacter();
+        let newValue = this.item_details.deleteCharacter();
+        if (this.selectedField.field_name == "quantity") {
+          this.selectedItem.quantity = newValue;
+          this.selectedItemMaps.get(this.selectedTab.tabName).set(this.selectedItem.name, Object.assign({}, this.selectedItem));
+        } else if (this.selectedField.field_name == "rate") {
+          this.selectedItem.amount = newValue;
+          this.selectedItemMaps.get(this.selectedTab.tabName).set(this.selectedItem.name, Object.assign({}, this.selectedItem));
+        } else if (this.selectedField.field_name == "discount_percentage") {
+          let oldRate = this.selectedItem.amount;
+          let montant = oldRate * (newValue / 100);
+          let newRate = oldRate - montant;
+          this.selectedItem.discount_percentage = newValue;
+          this.selectedItem.discount_amount = montant;
+          this.selectedItem.amount = newRate;
+          this.selectedItemMaps.get(this.selectedTab.tabName).set(this.selectedItem.name, Object.assign({}, this.selectedItem));
+        }
+        this.selected_item_cart.refreshSelectedItem();
+        this.item_details.refreshDate(this.selectedItem);
       } else if (action == "cash") {
         console.log("action :: ", action, " key :: ", key);
         this.paid_amount = key;
@@ -439,13 +457,29 @@
             this.selectedItem.quantity += key;
             this.selectedItemMaps.get(this.selectedTab.tabName).set(this.selectedItem.name, Object.assign({}, this.selectedItem));
             this.selected_item_cart.refreshSelectedItem();
+            this.item_details.refreshDate(this.selectedItem);
           } else if (this.selectedField.field_name == "rate") {
             this.selectedItem.amount += key;
             this.selectedItemMaps.get(this.selectedTab.tabName).set(this.selectedItem.name, Object.assign({}, this.selectedItem));
             this.selected_item_cart.refreshSelectedItem();
+            this.item_details.refreshDate(this.selectedItem);
+          } else if (this.selectedField.field_name == "discount_percentage") {
+            let oldRate = this.selectedItem.amount;
+            let old_percentage = (_a = this.selectedItem.discount_percentage) != null ? _a : 0;
+            let input = `${old_percentage}` + key;
+            let discount_percentage = parseFloat(input);
+            if (discount_percentage > 100) {
+              discount_percentage = 100;
+            }
+            let montant = oldRate * (discount_percentage / 100);
+            let newRate = oldRate - montant;
+            this.selectedItem.discount_percentage = discount_percentage;
+            this.selectedItem.discount_amount = montant;
+            this.selectedItem.amount = newRate;
+            this.selectedItemMaps.get(this.selectedTab.tabName).set(this.selectedItem.name, Object.assign({}, this.selectedItem));
+            this.selected_item_cart.refreshSelectedItem();
+            this.item_details.refreshDate(this.selectedItem);
           }
-          console.log("field : ", this.selectedField.field_name);
-          this.item_details.addToField(this.selectedField.field_name, key);
         }
       }
     }
@@ -1391,6 +1425,7 @@
     }
     deleteCharacter() {
       let field = this.selected_field.field_name;
+      let newValue = 0;
       if (field == "quantity") {
         let field2 = this.c1.find("#itemDetailsQuantityInput");
         let cursor = field2[0].selectionStart;
@@ -1398,22 +1433,21 @@
         field2.val((index, currentValue) => {
           console.log("length : ", currentValue, " cursor : ", cursor);
           if (currentValue.length < 0) {
-            console.log("cnd 1");
+            newValue = 0;
             return 0;
           } else if (currentValue.length == 1) {
-            console.log("cnd 2");
+            newValue = 0;
             return 0;
           } else if (cursor == 0) {
-            console.log("cnd 3");
+            newValue = currentValue;
             return currentValue;
           } else if (cursor == currentValue.length) {
-            console.log("cnd 4");
+            newValue = currentValue.slice(0, cursor - 1);
             return currentValue.slice(0, cursor - 1);
           } else {
-            console.log("cnd 5");
+            newValue = currentValue.slice(0, cursor - 1) + currentValue.slice(cursor);
             return currentValue.slice(0, cursor - 1) + currentValue.slice(cursor);
           }
-          return currentValue;
         });
         setTimeout(() => {
           field2[0].setSelectionRange(cursor - 1, cursor - 1);
@@ -1423,26 +1457,23 @@
       if (field == "rate") {
         let field2 = this.c1.find("#itemDetailsRateInput");
         let cursor = field2[0].selectionStart;
-        console.log(field2.val());
         field2.val((index, currentValue) => {
-          console.log("length : ", currentValue, " cursor : ", cursor);
           if (currentValue.length < 0) {
-            console.log("cnd 1");
+            newValue = 0;
             return 0;
           } else if (currentValue.length == 1) {
-            console.log("cnd 2");
+            newValue = 0;
             return 0;
           } else if (cursor == 0) {
-            console.log("cnd 3");
+            newValue = currentValue;
             return currentValue;
           } else if (cursor == currentValue.length) {
-            console.log("cnd 4");
+            newValue = currentValue.slice(0, cursor - 1);
             return currentValue.slice(0, cursor - 1);
           } else {
-            console.log("cnd 5");
+            newValue = currentValue.slice(0, cursor - 1) + currentValue.slice(cursor);
             return currentValue.slice(0, cursor - 1) + currentValue.slice(cursor);
           }
-          return currentValue;
         });
         setTimeout(() => {
           field2[0].setSelectionRange(cursor - 1, cursor - 1);
@@ -1452,32 +1483,31 @@
       if (field == "discount_percentage") {
         let field2 = this.c1.find("#itemDetailsDiscountInput");
         let cursor = field2[0].selectionStart;
-        console.log(field2.val());
         field2.val((index, currentValue) => {
-          console.log("length : ", currentValue, " cursor : ", cursor);
           if (currentValue.length < 0) {
-            console.log("cnd 1");
+            newValue = 0;
             return 0;
           } else if (currentValue.length == 1) {
-            console.log("cnd 2");
+            newValue = 0;
             return 0;
           } else if (cursor == 0) {
-            console.log("cnd 3");
+            newValue = currentValue;
             return currentValue;
           } else if (cursor == currentValue.length) {
-            console.log("cnd 4");
+            newValue = currentValue.slice(0, cursor - 1);
             return currentValue.slice(0, cursor - 1);
           } else {
-            console.log("cnd 5");
+            newValue = currentValue.slice(0, cursor - 1) + currentValue.slice(cursor);
             return currentValue.slice(0, cursor - 1) + currentValue.slice(cursor);
           }
-          return currentValue;
         });
         setTimeout(() => {
           field2[0].setSelectionRange(cursor - 1, cursor - 1);
           field2[0].focus();
         }, 0);
       }
+      console.log("we reach to here ");
+      return newValue;
     }
     setDetailsFieldsListeners() {
       this.quantityInput = this.c1.find("#itemDetailsQuantityInput");
@@ -1896,4 +1926,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.JXI5BJAK.js.map
+//# sourceMappingURL=pos.bundle.IRBLELDD.js.map

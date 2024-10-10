@@ -549,8 +549,31 @@ pos_ar.PointOfSale.Controller = class {
 			this.selected_item_cart.refreshSelectedItem();
 		}
 		else if(action == "delete"){
-			this.item_details.deleteCharacter();
-			
+			let newValue =  this.item_details.deleteCharacter()
+			if(this.selectedField.field_name == "quantity"){
+				this.selectedItem.quantity = newValue;
+				this.selectedItemMaps.get(this.selectedTab.tabName).set( this.selectedItem.name , Object.assign({},this.selectedItem) );
+			}
+			else if(this.selectedField.field_name == "rate"){
+				this.selectedItem.amount = newValue;
+				this.selectedItemMaps.get(this.selectedTab.tabName).set( this.selectedItem.name , Object.assign({},this.selectedItem)  );
+
+			}
+			else if(this.selectedField.field_name == "discount_percentage"){
+				//recalculate the rate
+				let oldRate = this.selectedItem.amount;
+				let montant = oldRate * (newValue / 100)
+				let newRate = oldRate - montant
+
+				this.selectedItem.discount_percentage = newValue;
+				this.selectedItem.discount_amount     = montant;
+				this.selectedItem.amount              = newRate;
+
+				this.selectedItemMaps.get(this.selectedTab.tabName).set( this.selectedItem.name , Object.assign({},this.selectedItem)  );
+			}
+			this.selected_item_cart.refreshSelectedItem()
+			this.item_details.refreshDate(this.selectedItem);
+
 		}
 		else if(action == "cash"){
 			console.log("action :: " , action , " key :: " , key);
@@ -568,17 +591,41 @@ pos_ar.PointOfSale.Controller = class {
 					this.selectedItemMaps.get(this.selectedTab.tabName).set( this.selectedItem.name , Object.assign({},this.selectedItem) );
 					//redrawing
 					this.selected_item_cart.refreshSelectedItem();
+					this.item_details.refreshDate(this.selectedItem);
 				}
 				else if( this.selectedField.field_name ==  "rate" ){
 					this.selectedItem.amount += key;
 					this.selectedItemMaps.get(this.selectedTab.tabName).set( this.selectedItem.name , Object.assign({},this.selectedItem)  );
 					//redrawing
 					this.selected_item_cart.refreshSelectedItem();
+					this.item_details.refreshDate(this.selectedItem);
+
+				}
+				else if( this.selectedField.field_name ==  "discount_percentage" ){
+					//recalculate the rate
+					let oldRate        = this.selectedItem.amount;
+					let old_percentage = this.selectedItem.discount_percentage ?? 0;
+					let input          = `${old_percentage}` + key ;
+					let discount_percentage = parseFloat(input);
+					if(discount_percentage > 100){
+						discount_percentage = 100;
+					}
+					let montant = oldRate * ( discount_percentage / 100)
+					let newRate = oldRate - montant
+
+
+					this.selectedItem.discount_percentage = (discount_percentage);
+					this.selectedItem.discount_amount     = montant;
+					this.selectedItem.amount              = newRate;
+
+					this.selectedItemMaps.get(this.selectedTab.tabName).set( this.selectedItem.name , Object.assign({},this.selectedItem)  )
+					//redrawing
+					this.selected_item_cart.refreshSelectedItem();
+					this.item_details.refreshDate(this.selectedItem);
+
+
 				}
 
-				console.log("field : " , this.selectedField.field_name );
-				this.item_details.addToField(this.selectedField.field_name , key);
-				//this.selected_item_cart.refreshSelectedItem();
 			}
 		}
 	}

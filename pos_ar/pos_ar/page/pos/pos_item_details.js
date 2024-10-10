@@ -274,6 +274,8 @@ else if(keyContent == "." && !selectedField.value.includes(".")){
 
 		let field = this.selected_field.field_name
 
+		let newValue = 0 ;
+
 		if(field == "quantity"){
 
 			let field = this.c1.find("#itemDetailsQuantityInput")
@@ -287,26 +289,25 @@ else if(keyContent == "." && !selectedField.value.includes(".")){
 				console.log("length : " , currentValue , " cursor : " , cursor);
 
 				if( currentValue.length < 0 ){
-					console.log("cnd 1")
+					newValue = 0 ;
 					return 0;
 				}
 				else if( currentValue.length == 1){
-					console.log("cnd 2")
+					newValue = 0 ;
 					return 0 ;
 				}
 				else if( cursor == 0 ){
-					console.log("cnd 3")
+					newValue = currentValue;
 					return currentValue;
 				}
 				else if( cursor == currentValue.length){
-					console.log("cnd 4")
+					newValue = currentValue.slice(0 , cursor-1)
 					return currentValue.slice(0 , cursor-1)
 				}
 				else{
-					console.log("cnd 5")
+					newValue = currentValue.slice(0,cursor-1) + currentValue.slice(cursor)
 					return currentValue.slice(0,cursor-1) + currentValue.slice(cursor)
 				}
-				return currentValue;
 			})
 
 
@@ -323,33 +324,28 @@ else if(keyContent == "." && !selectedField.value.includes(".")){
 
 			let cursor = field[0].selectionStart;
 
-			console.log(field.val())
-
 			field.val( (index , currentValue) =>{
 
-				console.log("length : " , currentValue , " cursor : " , cursor);
-
 				if( currentValue.length < 0 ){
-					console.log("cnd 1")
+					newValue = 0 ;
 					return 0;
 				}
 				else if( currentValue.length == 1){
-					console.log("cnd 2")
+					newValue = 0 ;
 					return 0 ;
 				}
 				else if( cursor == 0 ){
-					console.log("cnd 3")
+					newValue = currentValue ;
 					return currentValue;
 				}
 				else if( cursor == currentValue.length){
-					console.log("cnd 4")
+					newValue = currentValue.slice(0 , cursor-1) ;
 					return currentValue.slice(0 , cursor-1)
 				}
 				else{
-					console.log("cnd 5")
+					newValue = currentValue.slice(0,cursor-1) + currentValue.slice(cursor)
 					return currentValue.slice(0,cursor-1) + currentValue.slice(cursor)
 				}
-				return currentValue;
 			})
 
 			// Use setTimeout to ensure the new value is set before adjusting cursor
@@ -366,33 +362,28 @@ else if(keyContent == "." && !selectedField.value.includes(".")){
 
 			let cursor = field[0].selectionStart;
 
-			console.log(field.val())
-
 			field.val( (index , currentValue) =>{
 
-				console.log("length : " , currentValue , " cursor : " , cursor);
-
 				if( currentValue.length < 0 ){
-					console.log("cnd 1")
+					newValue = 0 ;
 					return 0;
 				}
 				else if( currentValue.length == 1){
-					console.log("cnd 2")
+					newValue = 0 ;
 					return 0 ;
 				}
 				else if( cursor == 0 ){
-					console.log("cnd 3")
+					newValue = currentValue;
 					return currentValue;
 				}
 				else if( cursor == currentValue.length){
-					console.log("cnd 4")
+					newValue = currentValue.slice(0 , cursor-1);
 					return currentValue.slice(0 , cursor-1)
 				}
 				else{
-					console.log("cnd 5")
+					newValue = currentValue.slice(0,cursor-1) + currentValue.slice(cursor)
 					return currentValue.slice(0,cursor-1) + currentValue.slice(cursor)
 				}
-				return currentValue;
 			})
 
 			// Use setTimeout to ensure the new value is set before adjusting cursor
@@ -403,6 +394,9 @@ else if(keyContent == "." && !selectedField.value.includes(".")){
 
 
 		}
+
+		console.log("we reach to here ")
+		return newValue ;
 
 	}
 
