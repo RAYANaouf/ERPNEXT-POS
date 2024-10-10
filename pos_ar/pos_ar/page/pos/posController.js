@@ -498,11 +498,9 @@ pos_ar.PointOfSale.Controller = class {
 			//recalculate the rate
 			let oldRate = this.selectedItem.amount;
 			let montant = oldRate * (value / 100)
-			let newRate = oldRate - montant
 
 			this.selectedItem.discount_percentage = value;
 			this.selectedItem.discount_amount     = montant;
-			this.selectedItem.amount              = newRate;
 
 			this.selectedItemMaps.get(this.selectedTab.tabName).set( this.selectedItem.name , Object.assign({},this.selectedItem)  )
 			//redrawing
@@ -523,11 +521,9 @@ pos_ar.PointOfSale.Controller = class {
 			if(value > oldRate){
 				montant = oldRate;
 			}
-			let newRate = oldRate - montant
 
 			this.selectedItem.discount_percentage = persent;
 			this.selectedItem.discount_amount     = montant;
-			this.selectedItem.amount              = newRate;
 
 			this.selectedItemMaps.get(this.selectedTab.tabName).set( this.selectedItem.name , Object.assign({},this.selectedItem)  )
 			//redrawing
