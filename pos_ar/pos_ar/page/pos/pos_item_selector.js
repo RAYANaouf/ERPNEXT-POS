@@ -9,11 +9,11 @@ pos_ar.PointOfSale.pos_item_selector = class {
 		item_prices,
 		onItemClick
 	){
-		this.wrapper     = wrapper;
-		this.item_list   = item_list;
+		this.wrapper         = wrapper;
+		this.item_list       = item_list;
 		this.item_group_list = item_group_list;
-		this.item_prices = item_prices;
-		this.on_item_click = onItemClick;
+		this.item_prices     = item_prices;
+		this.on_item_click   = onItemClick;
 
 
 		//class functions invocation
@@ -168,7 +168,11 @@ pos_ar.PointOfSale.pos_item_selector = class {
 		})
 
 
-		return filtredItemList;
+		return filtredItemList.map(item => ({
+			...item,
+			discount_amount : 0,
+			discount_percentage : 0
+		}));
 	}
 
 

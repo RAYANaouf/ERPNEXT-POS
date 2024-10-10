@@ -1,5 +1,7 @@
 (() => {
   var __defProp = Object.defineProperty;
+  var __defProps = Object.defineProperties;
+  var __getOwnPropDescs = Object.getOwnPropertyDescriptors;
   var __getOwnPropSymbols = Object.getOwnPropertySymbols;
   var __hasOwnProp = Object.prototype.hasOwnProperty;
   var __propIsEnum = Object.prototype.propertyIsEnumerable;
@@ -15,6 +17,7 @@
       }
     return a;
   };
+  var __spreadProps = (a, b) => __defProps(a, __getOwnPropDescs(b));
 
   // ../pos_ar/pos_ar/pos_ar/page/pos/posController.js
   pos_ar.PointOfSale.Controller = class {
@@ -305,7 +308,8 @@
       this.history_cart = new pos_ar.PointOfSale.pos_history();
     }
     itemClick_selector(item) {
-      const itemCloned = __spreadValues({}, item);
+      const itemCloned = structuredClone(item);
+      console.log("item clicked : ", itemCloned);
       console.log("old ===> ", this.selectedItemMaps);
       console.log("updated ===> ", this.selectedItemMaps.get(this.selectedTab.tabName).has(itemCloned.name));
       if (!this.selectedItemMaps.get(this.selectedTab.tabName).has(itemCloned.name)) {
@@ -840,7 +844,10 @@
       groups.forEach((group) => {
         getFiltredItems(group);
       });
-      return filtredItemList;
+      return filtredItemList.map((item) => __spreadProps(__spreadValues({}, item), {
+        discount_amount: 0,
+        discount_percentage: 0
+      }));
     }
     getItemPrice(itemId) {
       const price = this.item_prices.find((itemPrice) => itemPrice.item_code == itemId);
@@ -1926,4 +1933,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.IRBLELDD.js.map
+//# sourceMappingURL=pos.bundle.2HNG55Y5.js.map

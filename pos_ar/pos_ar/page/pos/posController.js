@@ -343,7 +343,10 @@ pos_ar.PointOfSale.Controller = class {
 
 	itemClick_selector(item){
 
-		const itemCloned = { ...item }
+		const  itemCloned = structuredClone(item);
+
+		console.log("item clicked : " , itemCloned)
+
 
 		console.log("old ===> " , this.selectedItemMaps )
 
@@ -375,6 +378,7 @@ pos_ar.PointOfSale.Controller = class {
 	}
 
 	onSelectedItemClick(item){
+
 
 		Object.assign(this.selectedItem , item)
 
