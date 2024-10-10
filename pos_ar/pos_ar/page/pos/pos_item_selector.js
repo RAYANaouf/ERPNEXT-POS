@@ -168,11 +168,7 @@ pos_ar.PointOfSale.pos_item_selector = class {
 		})
 
 
-		return filtredItemList.map(item => ({
-			...item,
-			discount_amount : 0,
-			discount_percentage : 0
-		}));
+		return filtredItemList ;
 	}
 
 

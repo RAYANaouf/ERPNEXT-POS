@@ -60,6 +60,9 @@
 	justify-content: center ;
 }
 
+.hideMe{
+	display : none ;
+}
 
 input{
 	height        : 30px     ;

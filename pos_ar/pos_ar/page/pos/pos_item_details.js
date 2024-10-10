@@ -83,7 +83,8 @@ pos_ar.PointOfSale.pos_item_details = class{
 
 		this.c2 = this.details_all.find('#itemDetails_C2')
 		this.c2.append('<div class="columnBox"><label for="itemDetailsUomInput">UOM *</label><input type="text" id="itemDetailsUomInput"  disabled></div>')
-		this.c2.append('<div class="columnBox"><label for="detailsPriceList">Price List *</label><input list="detailsPriceList" id="detailsItemPriceListInput" class ="rowBox align_center pointerCursor"><datalist id="detailsPriceList"><option>fetching Price Lists ...</option></datalist></div>')
+		this.c2.append('<div class="columnBox"><label for="detailsRateWithDescount">Discounted Rate</label>  <input type="text" id="discountedRateInput" disabled>  </div>')
+		this.c2.append('<div class="columnBox hideMe"><label for="detailsPriceList">Price List *</label><input list="detailsPriceList" id="detailsItemPriceListInput" class ="rowBox align_center pointerCursor"><datalist id="detailsPriceList"><option>fetching Price Lists ...</option></datalist></div>')
 		this.c2.append('<div class="columnBox"><label for="itemDetailsDiscountMontantInput">Discount (montant)</label><input type="float" id="itemDetailsDiscountMontantInput" class="pointerCursor"></div>')
 		this.c2.append('<div class="columnBox"><label for="itemDetailsPriceListRateInput">Price List Rate</label><input type="text" id="itemDetailsPriceListRateInput" disabled></div>')
 
@@ -101,6 +102,7 @@ pos_ar.PointOfSale.pos_item_details = class{
 
 		const quantity             = document.getElementById("itemDetailsQuantityInput");
 		const rate                 = document.getElementById("itemDetailsRateInput");
+		const discountedRate       = document.getElementById("discountedRateInput");
 		const discount_percentage  = document.getElementById("itemDetailsDiscountInput");
 		const discount_amount      = document.getElementById("itemDetailsDiscountMontantInput");
 		const available            = document.getElementById("itemDetailsAvailableInput");
@@ -135,6 +137,7 @@ pos_ar.PointOfSale.pos_item_details = class{
 
 		//rate
 		rate.value = item.amount
+		discountedRate.value = item.amount - item.discount_amount
 
 		//discount
 		discount_amount.value     = item.discount_amount ?? 0.00;

@@ -345,7 +345,9 @@ pos_ar.PointOfSale.Controller = class {
 
 		const  itemCloned = structuredClone(item);
 
-		console.log("item clicked : " , itemCloned)
+
+		itemCloned.discount_amount     = 0;
+		itemCloned.discount_percentage = 0;
 
 
 		console.log("old ===> " , this.selectedItemMaps )
@@ -354,8 +356,10 @@ pos_ar.PointOfSale.Controller = class {
 
 
 		if(!this.selectedItemMaps.get(this.selectedTab.tabName).has(itemCloned.name)){
-			itemCloned.quantity = 1 ;
-			itemCloned.amount   = this.getItemPrice(itemCloned.name);
+			itemCloned.quantity            = 1 ;
+			itemCloned.discount_amount     = 0 ;
+			itemCloned.discount_percentage = 0 ;
+			itemCloned.amount              = this.getItemPrice(itemCloned.name);
 			this.selectedItemMaps.get(this.selectedTab.tabName).set( itemCloned.name , itemCloned )
 		}
 		else{

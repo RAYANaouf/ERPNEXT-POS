@@ -1,24 +1,4 @@
 (() => {
-  var __defProp = Object.defineProperty;
-  var __defProps = Object.defineProperties;
-  var __getOwnPropDescs = Object.getOwnPropertyDescriptors;
-  var __getOwnPropSymbols = Object.getOwnPropertySymbols;
-  var __hasOwnProp = Object.prototype.hasOwnProperty;
-  var __propIsEnum = Object.prototype.propertyIsEnumerable;
-  var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
-  var __spreadValues = (a, b) => {
-    for (var prop in b || (b = {}))
-      if (__hasOwnProp.call(b, prop))
-        __defNormalProp(a, prop, b[prop]);
-    if (__getOwnPropSymbols)
-      for (var prop of __getOwnPropSymbols(b)) {
-        if (__propIsEnum.call(b, prop))
-          __defNormalProp(a, prop, b[prop]);
-      }
-    return a;
-  };
-  var __spreadProps = (a, b) => __defProps(a, __getOwnPropDescs(b));
-
   // ../pos_ar/pos_ar/pos_ar/page/pos/posController.js
   pos_ar.PointOfSale.Controller = class {
     constructor(wrapper) {
@@ -309,11 +289,14 @@
     }
     itemClick_selector(item) {
       const itemCloned = structuredClone(item);
-      console.log("item clicked : ", itemCloned);
+      itemCloned.discount_amount = 0;
+      itemCloned.discount_percentage = 0;
       console.log("old ===> ", this.selectedItemMaps);
       console.log("updated ===> ", this.selectedItemMaps.get(this.selectedTab.tabName).has(itemCloned.name));
       if (!this.selectedItemMaps.get(this.selectedTab.tabName).has(itemCloned.name)) {
         itemCloned.quantity = 1;
+        itemCloned.discount_amount = 0;
+        itemCloned.discount_percentage = 0;
         itemCloned.amount = this.getItemPrice(itemCloned.name);
         this.selectedItemMaps.get(this.selectedTab.tabName).set(itemCloned.name, itemCloned);
       } else {
@@ -844,10 +827,7 @@
       groups.forEach((group) => {
         getFiltredItems(group);
       });
-      return filtredItemList.map((item) => __spreadProps(__spreadValues({}, item), {
-        discount_amount: 0,
-        discount_percentage: 0
-      }));
+      return filtredItemList;
     }
     getItemPrice(itemId) {
       const price = this.item_prices.find((itemPrice) => itemPrice.item_code == itemId);
@@ -1313,7 +1293,8 @@
       this.details_all.append('<div id="itemDetails_C2" class="columnBox"></div>');
       this.c2 = this.details_all.find("#itemDetails_C2");
       this.c2.append('<div class="columnBox"><label for="itemDetailsUomInput">UOM *</label><input type="text" id="itemDetailsUomInput"  disabled></div>');
-      this.c2.append('<div class="columnBox"><label for="detailsPriceList">Price List *</label><input list="detailsPriceList" id="detailsItemPriceListInput" class ="rowBox align_center pointerCursor"><datalist id="detailsPriceList"><option>fetching Price Lists ...</option></datalist></div>');
+      this.c2.append('<div class="columnBox"><label for="detailsRateWithDescount">Discounted Rate</label>  <input type="text" id="discountedRateInput" disabled>  </div>');
+      this.c2.append('<div class="columnBox hideMe"><label for="detailsPriceList">Price List *</label><input list="detailsPriceList" id="detailsItemPriceListInput" class ="rowBox align_center pointerCursor"><datalist id="detailsPriceList"><option>fetching Price Lists ...</option></datalist></div>');
       this.c2.append('<div class="columnBox"><label for="itemDetailsDiscountMontantInput">Discount (montant)</label><input type="float" id="itemDetailsDiscountMontantInput" class="pointerCursor"></div>');
       this.c2.append('<div class="columnBox"><label for="itemDetailsPriceListRateInput">Price List Rate</label><input type="text" id="itemDetailsPriceListRateInput" disabled></div>');
     }
@@ -1326,6 +1307,7 @@
       const itemGroup = document.getElementById("detailsItemGroup");
       const quantity = document.getElementById("itemDetailsQuantityInput");
       const rate = document.getElementById("itemDetailsRateInput");
+      const discountedRate = document.getElementById("discountedRateInput");
       const discount_percentage = document.getElementById("itemDetailsDiscountInput");
       const discount_amount = document.getElementById("itemDetailsDiscountMontantInput");
       const available = document.getElementById("itemDetailsAvailableInput");
@@ -1349,6 +1331,7 @@
       name.classList.add("rowBox", "align_center");
       quantity.value = item.quantity;
       rate.value = item.amount;
+      discountedRate.value = item.amount - item.discount_amount;
       discount_amount.value = (_a = item.discount_amount) != null ? _a : 0;
       discount_percentage.value = (_b = item.discount_percentage) != null ? _b : 0;
       available.value = this.getQtyInWarehouse(item.name, this.warehouse);
@@ -1933,4 +1916,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.2HNG55Y5.js.map
+//# sourceMappingURL=pos.bundle.JQF4Q5KG.js.map
