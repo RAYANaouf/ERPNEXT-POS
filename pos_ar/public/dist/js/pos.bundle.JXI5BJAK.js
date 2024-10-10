@@ -1415,6 +1415,10 @@
           }
           return currentValue;
         });
+        setTimeout(() => {
+          field2[0].setSelectionRange(cursor - 1, cursor - 1);
+          field2[0].focus();
+        }, 0);
       }
       if (field == "rate") {
         let field2 = this.c1.find("#itemDetailsRateInput");
@@ -1440,6 +1444,10 @@
           }
           return currentValue;
         });
+        setTimeout(() => {
+          field2[0].setSelectionRange(cursor - 1, cursor - 1);
+          field2[0].focus();
+        }, 0);
       }
       if (field == "discount_percentage") {
         let field2 = this.c1.find("#itemDetailsDiscountInput");
@@ -1465,6 +1473,10 @@
           }
           return currentValue;
         });
+        setTimeout(() => {
+          field2[0].setSelectionRange(cursor - 1, cursor - 1);
+          field2[0].focus();
+        }, 0);
       }
     }
     setDetailsFieldsListeners() {
@@ -1884,4 +1896,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.WCUHL27J.js.map
+//# sourceMappingURL=pos.bundle.JXI5BJAK.js.map

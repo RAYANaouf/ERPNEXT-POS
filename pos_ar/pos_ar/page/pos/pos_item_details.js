@@ -308,6 +308,14 @@ else if(keyContent == "." && !selectedField.value.includes(".")){
 				}
 				return currentValue;
 			})
+
+
+			// Use setTimeout to ensure the new value is set before adjusting cursor
+			setTimeout(() => {
+				field[0].setSelectionRange(cursor - 1, cursor - 1); // Move cursor back after deletion
+				field[0].focus(); // Ensure the input is focused
+			}, 0);
+
 		}
 		if(field == "rate"){
 
@@ -343,6 +351,14 @@ else if(keyContent == "." && !selectedField.value.includes(".")){
 				}
 				return currentValue;
 			})
+
+			// Use setTimeout to ensure the new value is set before adjusting cursor
+			setTimeout(() => {
+				field[0].setSelectionRange(cursor - 1, cursor - 1); // Move cursor back after deletion
+				field[0].focus(); // Ensure the input is focused
+			}, 0);
+
+
 		}
 		if(field == "discount_percentage"){
 
@@ -378,6 +394,14 @@ else if(keyContent == "." && !selectedField.value.includes(".")){
 				}
 				return currentValue;
 			})
+
+			// Use setTimeout to ensure the new value is set before adjusting cursor
+			setTimeout(() => {
+				field[0].setSelectionRange(cursor - 1, cursor - 1); // Move cursor back after deletion
+				field[0].focus(); // Ensure the input is focused
+			}, 0);
+
+
 		}
 
 	}
