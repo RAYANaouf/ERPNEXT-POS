@@ -169,8 +169,8 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 		})
 	}
 
-	refreshSelectedItem(){
 
+	refreshSelectedItem(){
 
 		const selectedItemsContainer = document.getElementById("selectedItemsContainer");
 		selectedItemsContainer.innerHTML = "";
@@ -377,6 +377,9 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 				}
 				else if(keyContent == "Remove"){
 					this.on_key_pressed( "remove" , null)
+				}
+				else if(keyContent == "Delete"){
+					this.on_key_pressed( "delete" , null)
 				}
 
 			})

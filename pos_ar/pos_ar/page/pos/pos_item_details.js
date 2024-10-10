@@ -232,7 +232,7 @@ else if(keyContent == "." && !selectedField.value.includes(".")){
 	addToField(field , value){
 
 		console.log('field : ' , field , 'value : ' , value )
-			
+
 		if(field == "quantity"){
 			this.c1.find('#itemDetailsQuantityInput').val( (index,currentValue) =>{
 				if(value == "." && currentValue.includes("."))
@@ -268,6 +268,21 @@ else if(keyContent == "." && !selectedField.value.includes(".")){
 
 		}
 
+	}
+
+	deleteCharacter(){
+
+		let field = this.selected_field.field_name
+		console.log("field : " , this.selected_field)
+
+		if(field == "quantity"){
+			console.log("we are inside")
+
+			let field = this.c1.find("#itemDetailsQuantityInput").val( (index , currentValue)=>{
+				console.log("index : " , index , " currentValue : " , currentValue);
+				return currentValue;
+			})
+		}
 	}
 
 	/**************************  set listener  ****************************/

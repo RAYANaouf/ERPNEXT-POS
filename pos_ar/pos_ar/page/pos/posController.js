@@ -548,6 +548,10 @@ pos_ar.PointOfSale.Controller = class {
 			this.selectedItemMaps.get(this.selectedTab.tabName).delete(this.selectedItem.name)
 			this.selected_item_cart.refreshSelectedItem();
 		}
+		else if(action == "delete"){
+			this.item_details.deleteCharacter();
+			
+		}
 		else if(action == "cash"){
 			console.log("action :: " , action , " key :: " , key);
 			this.paid_amount = key;
