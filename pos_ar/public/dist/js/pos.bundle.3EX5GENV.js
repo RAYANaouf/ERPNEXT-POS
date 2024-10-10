@@ -420,10 +420,14 @@
         } else if (this.selectedField.field_name == "discount_percentage") {
           let oldRate = this.selectedItem.amount;
           let montant = oldRate * (newValue / 100);
-          let newRate = oldRate - montant;
           this.selectedItem.discount_percentage = newValue;
           this.selectedItem.discount_amount = montant;
-          this.selectedItem.amount = newRate;
+          this.selectedItemMaps.get(this.selectedTab.tabName).set(this.selectedItem.name, Object.assign({}, this.selectedItem));
+        } else if (this.selectedField.field_name == "discount_percentage") {
+          let oldRate = this.selectedItem.amount;
+          let montant = oldRate * (newValue / 100);
+          this.selectedItem.discount_percentage = newValue;
+          this.selectedItem.discount_amount = montant;
           this.selectedItemMaps.get(this.selectedTab.tabName).set(this.selectedItem.name, Object.assign({}, this.selectedItem));
         }
         this.selected_item_cart.refreshSelectedItem();
@@ -1912,4 +1916,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.KITPIKE4.js.map
+//# sourceMappingURL=pos.bundle.3EX5GENV.js.map
