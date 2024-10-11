@@ -69,6 +69,7 @@
       this.wrapper.append('<link rel="stylesheet" type="text/css" href="/assets/pos_ar/css/paymentMethodCart.css">');
       this.wrapper.append('<link rel="stylesheet" type="text/css" href="/assets/pos_ar/css/customerBox.css">');
       this.wrapper.append('<link rel="stylesheet" type="text/css" href="/assets/pos_ar/css/cartBox.css">');
+      this.wrapper.append('<link rel="stylesheet" type="text/css" href="/assets/pos_ar/css/historyCarts.css">');
       this.wrapper.append('<div id="MainContainer" class="rowBox"></div>');
       this.$components_wrapper = this.wrapper.find("#MainContainer");
     }
@@ -285,8 +286,9 @@
       );
     }
     init_historyCart() {
-      console.log("im heeeeeeeeeeeeer @#$%^&*(*&^%$##$%^&*()^%$#@");
-      this.history_cart = new pos_ar.PointOfSale.pos_history();
+      this.history_cart = new pos_ar.PointOfSale.pos_history(
+        this.wrapper
+      );
     }
     itemClick_selector(item) {
       const itemCloned = structuredClone(item);
@@ -347,6 +349,8 @@
       this.selected_item_cart.cleanHeighlight();
     }
     onHistoryClick() {
+      console.log("history ::", this.history_cart);
+      this.history_cart.show_cart();
       this.payment_cart.hideCart();
       this.item_details.hide_cart();
       this.item_selector.hideCart();
@@ -1362,11 +1366,9 @@
       this.makeSelectedFieldHighlighted();
     }
     show_cart() {
-      console.log("show 02");
       this.item_details_cart.css("display", "flex");
     }
     hide_cart() {
-      console.log("hide 001");
       this.item_details_cart.css("display", "none");
     }
     makeSelectedFieldHighlighted() {
@@ -1885,14 +1887,26 @@
   // ../pos_ar/pos_ar/pos_ar/page/pos/pos_history.js
   pos_ar.PointOfSale.pos_history = class {
     constructor(wrapper) {
-      console.log("im pos history");
+      this.wrapper = wrapper;
+      this.start_work();
     }
     start_work() {
+      console.log("we are heeeeeeeeeeeeeeeeeeeeeeeere");
       this.prepare_selected_item_cart();
     }
     prepare_selected_item_cart() {
-      this.wrapper.append('<div id="historyContainer"></div>');
-      this.container = this.wrapper.find("#historyContainer");
+      this.wrapper.find("#LeftSection").append('<div id="historyLeftContainer"></div>');
+      this.wrapper.find("#RightSection").append('<div id="historyRightContainer"></div>');
+      this.left_container = this.wrapper.find("#historyLeftContainer");
+      this.right_container = this.wrapper.find("#historyRightContainer");
+    }
+    show_cart() {
+      this.left_container.css("display", "flex");
+      this.right_container.css("display", "flex");
+    }
+    hide_cart() {
+      this.left_container.css("display", "none");
+      this.right_container.css("display", "none");
     }
   };
 
@@ -1964,4 +1978,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.62HZQJGC.js.map
+//# sourceMappingURL=pos.bundle.VFQAQOEN.js.map

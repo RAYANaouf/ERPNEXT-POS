@@ -173,12 +173,10 @@ pos_ar.PointOfSale.pos_item_details = class{
 	}
 
 	show_cart(){
-		console.log('show 02')
 		this.item_details_cart.css("display" , "flex");
 	}
 
 	hide_cart(){
-		console.log('hide 001')
 		this.item_details_cart.css("display" , "none");
 	}
 

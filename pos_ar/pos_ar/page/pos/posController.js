@@ -89,6 +89,7 @@ pos_ar.PointOfSale.Controller = class {
                 this.wrapper.append('<link rel="stylesheet" type="text/css" href="/assets/pos_ar/css/paymentMethodCart.css">')
                 this.wrapper.append('<link rel="stylesheet" type="text/css" href="/assets/pos_ar/css/customerBox.css">')
                 this.wrapper.append('<link rel="stylesheet" type="text/css" href="/assets/pos_ar/css/cartBox.css">')
+                this.wrapper.append('<link rel="stylesheet" type="text/css" href="/assets/pos_ar/css/historyCarts.css">')
 
                 this.wrapper.append('<div id="MainContainer" class="rowBox"></div>');
                 this.$components_wrapper = this.wrapper.find("#MainContainer");
@@ -332,8 +333,8 @@ pos_ar.PointOfSale.Controller = class {
         }
 
         init_historyCart(){
-		console.log("im heeeeeeeeeeeeer @#$%^&*(*&^%$##$%^&*()^%$#@")
 		this.history_cart = new pos_ar.PointOfSale.pos_history(
+									this.wrapper
 								)
         }
 
@@ -455,6 +456,10 @@ pos_ar.PointOfSale.Controller = class {
 	}
 
 	onHistoryClick(){
+
+		console.log("history ::" , this.history_cart)
+		//show
+		this.history_cart.show_cart()
 
 		//hide
 		this.payment_cart.hideCart();
