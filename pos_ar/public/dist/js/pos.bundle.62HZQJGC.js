@@ -23,6 +23,7 @@
       this.sellInvoices = /* @__PURE__ */ new Map();
       this.POSOpeningEntry = {};
       this.invoiceData = { grandTotal: 0, paidAmount: 0, toChange: 0 };
+      this.db = null;
       this.start_app();
     }
     async start_app() {
@@ -31,7 +32,7 @@
       await this.checkForPOSEntry();
       await this.prepare_components();
       this.setListeners();
-      new pos_ar.PointOfSale.pos_db();
+      this.db = new pos_ar.PointOfSale.pos_db();
     }
     async refreshApp() {
       console.log("refresh");
@@ -499,6 +500,23 @@
           "pos_profile": this.PosProfileList[0].name,
           "items": items,
           "creation_time": frappe.datetime.now_datetime()
+        }
+      );
+      const pos_invoice = {
+        tabName: this.selectedTab.tabName,
+        customer: this.customersList[0].name,
+        pos_profile: this.PosProfileList[0].name,
+        items,
+        creation_time: frappe.datetime.now_datetime()
+      };
+      console.log("created pos_invoice ", pos_invoice);
+      this.db.savePosInvoice(
+        pos_invoice,
+        (event2) => {
+          console.log("sucess => ", event2);
+        },
+        (event2) => {
+          console.log("failure => ", event2);
         }
       );
       this.customer_box.setNotSynced();
@@ -1881,8 +1899,8 @@
   // ../pos_ar/pos_ar/pos_ar/page/pos/pos_db.js
   pos_ar.PointOfSale.pos_db = class POSDatabase {
     constructor() {
-      this.dbName = "POSDB";
-      this.dbVersion = 4;
+      this.dbName = "PosDb";
+      this.dbVersion = 13;
       this.db = null;
       this.openDatabase();
     }
@@ -1923,7 +1941,7 @@
           db.createObjectStore("Bin", { keyPath: "name" });
         }
         if (!db.objectStoreNames.contains("POS Invoice")) {
-          db.createObjectStore("Bin", { autoIncrement: true });
+          db.createObjectStore("POS Invoice", { autoIncrement: true });
         }
       };
     }
@@ -1934,11 +1952,11 @@
       };
     }
     savePosInvoice(posInvoice, onSuccess, onFailure) {
-      const transaction = this.db.transaction(["POS Invoice"], "readWrite");
-      const store = this.transaction.objectStore("POS Invoice");
+      const transaction = this.db.transaction(["POS Invoice"], "readwrite");
+      const store = transaction.objectStore("POS Invoice");
       const request = store.add(posInvoice);
       request.onsuccess = (event2) => {
-        onSucess(event2);
+        onSuccess(event2);
       };
       request.onerror = (event2) => {
         onFailure(event2);
@@ -1946,4 +1964,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.5LXDLAUY.js.map
+//# sourceMappingURL=pos.bundle.62HZQJGC.js.map

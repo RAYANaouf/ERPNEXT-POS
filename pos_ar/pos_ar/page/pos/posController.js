@@ -29,6 +29,7 @@ pos_ar.PointOfSale.Controller = class {
 		this.POSOpeningEntry = {}
 
 		this.invoiceData = {grandTotal : 0 , paidAmount : 0 , toChange : 0}
+		this.db          = null;
 
                 this.start_app();
         }
@@ -39,7 +40,7 @@ pos_ar.PointOfSale.Controller = class {
 		await  this.checkForPOSEntry()
                 await  this.prepare_components();
 		this.setListeners();
-		new pos_ar.PointOfSale.pos_db();
+		this.db = new pos_ar.PointOfSale.pos_db();
 	}
 
 
@@ -682,6 +683,26 @@ pos_ar.PointOfSale.Controller = class {
 				"items"      : items,
 				"creation_time": frappe.datetime.now_datetime()
 		});
+
+		const pos_invoice = {
+					tabName       : this.selectedTab.tabName ,
+					customer      : this.customersList[0].name ,
+					pos_profile   : this.PosProfileList[0].name ,
+					items         : items ,
+					creation_time : frappe.datetime.now_datetime()
+				}
+
+		console.log("created pos_invoice " , pos_invoice)
+
+		this.db.savePosInvoice(
+					pos_invoice ,
+					(event) => {
+						console.log("sucess => " , event )
+					},
+					(event) => {
+						console.log("failure => " , event )
+					}
+				)
 
 		this.customer_box.setNotSynced();
 
