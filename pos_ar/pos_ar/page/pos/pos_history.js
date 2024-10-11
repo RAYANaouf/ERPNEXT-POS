@@ -24,6 +24,10 @@ pos_ar.PointOfSale.pos_history = class {
 		this.left_container  = this.wrapper.find('#historyLeftContainer')
 		this.right_container = this.wrapper.find('#historyRightContainer')
 
+		//left
+		this.left_container.append('<div id="historyLeftContainerHeader" class="rowBox align_center" ><h4 class="CartTitle">POS Order</h4></div>')
+
+		this.right_container.append('<div id="historyRightContainerHeader" class="rowBox align_center" ><h4 class="CartTitle">Recent Orders</h4></div>')
 	}
 
 

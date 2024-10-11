@@ -1899,6 +1899,8 @@
       this.wrapper.find("#RightSection").append('<div id="historyRightContainer"></div>');
       this.left_container = this.wrapper.find("#historyLeftContainer");
       this.right_container = this.wrapper.find("#historyRightContainer");
+      this.left_container.append('<div id="historyLeftContainerHeader" class="rowBox align_center" ><h4 class="CartTitle">POS Order</h4></div>');
+      this.right_container.append('<div id="historyRightContainerHeader" class="rowBox align_center" ><h4 class="CartTitle">Recent Orders</h4></div>');
     }
     show_cart() {
       this.left_container.css("display", "flex");
@@ -1978,4 +1980,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.VFQAQOEN.js.map
+//# sourceMappingURL=pos.bundle.WBNT6GBV.js.map
