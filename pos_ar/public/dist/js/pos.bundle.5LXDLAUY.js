@@ -1887,9 +1887,7 @@
       this.openDatabase();
     }
     openDatabase() {
-      console.log("db opend successfuly");
-      const request = window.indexedDB.open("MyTestDatabase", this.dbVersion);
-      console.log("request : ", request);
+      const request = window.indexedDB.open(this.dbName, this.dbVersion);
       request.onerror = (event2) => {
         console.log(" there is an error : ", request.error);
       };
@@ -1900,11 +1898,32 @@
       };
       request.onupgradeneeded = (event2) => {
         const db = event2.target.result;
-        if (!db.objectStoreNames.contains("items")) {
-          db.createObjectStore("items", { keyPath: "name" });
+        if (!db.objectStoreNames.contains("Customer")) {
+          db.createObjectStore("Customer", { keyPath: "name" });
         }
-        if (!db.objectStoreNames.contains("customers")) {
-          db.createObjectStore("customers", { keyPath: "name" });
+        if (!db.objectStoreNames.contains("Item Group")) {
+          db.createObjectStore("Item Group", { keyPath: "name" });
+        }
+        if (!db.objectStoreNames.contains("Item")) {
+          db.createObjectStore("Item", { keyPath: "name" });
+        }
+        if (!db.objectStoreNames.contains("Item Price")) {
+          db.createObjectStore("Item Price", { keyPath: "name" });
+        }
+        if (!db.objectStoreNames.contains("Price List")) {
+          db.createObjectStore("Price List", { keyPath: "name" });
+        }
+        if (!db.objectStoreNames.contains("Warehouse")) {
+          db.createObjectStore("Warehouse", { keyPath: "name" });
+        }
+        if (!db.objectStoreNames.contains("POS Profile")) {
+          db.createObjectStore("POS Profile", { keyPath: "name" });
+        }
+        if (!db.objectStoreNames.contains("Bin")) {
+          db.createObjectStore("Bin", { keyPath: "name" });
+        }
+        if (!db.objectStoreNames.contains("POS Invoice")) {
+          db.createObjectStore("Bin", { autoIncrement: true });
         }
       };
     }
@@ -1914,6 +1933,17 @@
         console.error(`Database error: ${(_a = event2.target.error) == null ? void 0 : _a.message}`);
       };
     }
+    savePosInvoice(posInvoice, onSuccess, onFailure) {
+      const transaction = this.db.transaction(["POS Invoice"], "readWrite");
+      const store = this.transaction.objectStore("POS Invoice");
+      const request = store.add(posInvoice);
+      request.onsuccess = (event2) => {
+        onSucess(event2);
+      };
+      request.onerror = (event2) => {
+        onFailure(event2);
+      };
+    }
   };
 })();
-//# sourceMappingURL=pos.bundle.3EX5GENV.js.map
+//# sourceMappingURL=pos.bundle.5LXDLAUY.js.map
