@@ -3,9 +3,11 @@
 pos_ar.PointOfSale.pos_history = class {
 
 	constructor(
-		wrapper
+		wrapper,
+		db
 	){
 		this.wrapper = wrapper;
+		this.db      = db;
 
 		this.start_work();
 	}
@@ -15,11 +17,19 @@ pos_ar.PointOfSale.pos_history = class {
 	start_work(){
 		console.log("we are heeeeeeeeeeeeeeeeeeeeeeeere")
 		this.prepare_selected_item_cart();
+		this.db.getAllPosInvoice(
+					(result)=>{
+						console.log("the result ::::" , result);
+					},
+					(error) => {
+						console.log(error)
+					}
+					)
 	}
 
 	prepare_selected_item_cart(){
-		this.wrapper.find('#LeftSection').append('<div id="historyLeftContainer"></div>')
-		this.wrapper.find('#RightSection').append('<div id="historyRightContainer"></div>')
+		this.wrapper.find('#LeftSection').append('<div id="historyLeftContainer" class="columnBox"></div>')
+		this.wrapper.find('#RightSection').append('<div id="historyRightContainer" class="columnBox"></div>')
 
 		this.left_container  = this.wrapper.find('#historyLeftContainer')
 		this.right_container = this.wrapper.find('#historyRightContainer')
@@ -28,6 +38,7 @@ pos_ar.PointOfSale.pos_history = class {
 		this.left_container.append('<div id="historyLeftContainerHeader" class="rowBox align_center" ><h4 class="CartTitle">POS Order</h4></div>')
 
 		this.right_container.append('<div id="historyRightContainerHeader" class="rowBox align_center" ><h4 class="CartTitle">Recent Orders</h4></div>')
+		this.right_container.append('<input type="text" id="historyInput" placeholder="Search by invoice id or custumer name">')
 	}
 
 

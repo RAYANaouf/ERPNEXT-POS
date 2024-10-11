@@ -35,12 +35,14 @@ pos_ar.PointOfSale.Controller = class {
         }
 
 	 async start_app(){
+
+		this.db = new pos_ar.PointOfSale.pos_db();
+
 		this.prepare_container();
 		await  this.prepare_app_defaults();
 		await  this.checkForPOSEntry()
                 await  this.prepare_components();
 		this.setListeners();
-		this.db = new pos_ar.PointOfSale.pos_db();
 	}
 
 
@@ -334,7 +336,8 @@ pos_ar.PointOfSale.Controller = class {
 
         init_historyCart(){
 		this.history_cart = new pos_ar.PointOfSale.pos_history(
-									this.wrapper
+									this.wrapper,
+									this.db
 								)
         }
 

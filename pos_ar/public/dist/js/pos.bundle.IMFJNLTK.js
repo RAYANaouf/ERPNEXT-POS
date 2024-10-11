@@ -27,12 +27,12 @@
       this.start_app();
     }
     async start_app() {
+      this.db = new pos_ar.PointOfSale.pos_db();
       this.prepare_container();
       await this.prepare_app_defaults();
       await this.checkForPOSEntry();
       await this.prepare_components();
       this.setListeners();
-      this.db = new pos_ar.PointOfSale.pos_db();
     }
     async refreshApp() {
       console.log("refresh");
@@ -287,7 +287,8 @@
     }
     init_historyCart() {
       this.history_cart = new pos_ar.PointOfSale.pos_history(
-        this.wrapper
+        this.wrapper,
+        this.db
       );
     }
     itemClick_selector(item) {
@@ -1886,21 +1887,31 @@
 
   // ../pos_ar/pos_ar/pos_ar/page/pos/pos_history.js
   pos_ar.PointOfSale.pos_history = class {
-    constructor(wrapper) {
+    constructor(wrapper, db) {
       this.wrapper = wrapper;
+      this.db = db;
       this.start_work();
     }
     start_work() {
       console.log("we are heeeeeeeeeeeeeeeeeeeeeeeere");
       this.prepare_selected_item_cart();
+      this.db.getAllPosInvoice(
+        (result) => {
+          console.log("the result ::::", result);
+        },
+        (error) => {
+          console.log(error);
+        }
+      );
     }
     prepare_selected_item_cart() {
-      this.wrapper.find("#LeftSection").append('<div id="historyLeftContainer"></div>');
-      this.wrapper.find("#RightSection").append('<div id="historyRightContainer"></div>');
+      this.wrapper.find("#LeftSection").append('<div id="historyLeftContainer" class="columnBox"></div>');
+      this.wrapper.find("#RightSection").append('<div id="historyRightContainer" class="columnBox"></div>');
       this.left_container = this.wrapper.find("#historyLeftContainer");
       this.right_container = this.wrapper.find("#historyRightContainer");
       this.left_container.append('<div id="historyLeftContainerHeader" class="rowBox align_center" ><h4 class="CartTitle">POS Order</h4></div>');
       this.right_container.append('<div id="historyRightContainerHeader" class="rowBox align_center" ><h4 class="CartTitle">Recent Orders</h4></div>');
+      this.right_container.append('<input type="text" id="historyInput" placeholder="Search by invoice id or custumer name">');
     }
     show_cart() {
       this.left_container.css("display", "flex");
@@ -1978,6 +1989,25 @@
         onFailure(event2);
       };
     }
+    savePosInvoice(posInvoice, onSuccess, onFailure) {
+      const transaction = this.db.transaction(["POS Invoice"], "readwrite");
+      const store = transaction.objectStore("POS Invoice");
+      const request = store.add(posInvoice);
+      request.onsuccess = (event2) => {
+        onSuccess(event2);
+      };
+      request.onerror = (event2) => {
+        onFailure(event2);
+      };
+    }
+    getAllPosInvoice(onSuccess, onFailure) {
+      const transaction = this.db.transaction(["POS Invoice"], "readwrite");
+      const store = transaction.objectStore("POS Invoice");
+      const result = store.getAll().onsuccess = (event2) => {
+        const value = event2.target.result;
+        onSuccess(value);
+      };
+    }
   };
 })();
-//# sourceMappingURL=pos.bundle.WBNT6GBV.js.map
+//# sourceMappingURL=pos.bundle.IMFJNLTK.js.map

@@ -88,9 +88,33 @@ pos_ar.PointOfSale.pos_db  = class POSDatabase {
 
 	}
 
+	savePosInvoice(posInvoice , onSuccess , onFailure){
+
+		const transaction = this.db.transaction(['POS Invoice'] , "readwrite");
+		const store       = transaction.objectStore('POS Invoice')
+		const request     = store.add(posInvoice)
+
+		request.onsuccess = (event) => {
+			onSuccess(event);
+		};
+
+		request.onerror = (event) => {
+			onFailure(event);
+		};
+
+	}
 
 
 
+
+	getAllPosInvoice(onSuccess , onFailure){
+		const transaction = this.db.transaction(['POS Invoice'] , "readwrite");
+		const store       = transaction.objectStore('POS Invoice');
+		const result      = store.getAll().onsuccess = (event) => {
+			const value = event.target.result
+			onSuccess(value);
+		}
+	}
 
 
 }
