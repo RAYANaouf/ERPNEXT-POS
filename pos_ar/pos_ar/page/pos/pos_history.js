@@ -77,7 +77,28 @@ pos_ar.PointOfSale.pos_history = class {
 
 		this.data.forEach( record => {
 			console.log("record : " , record);
-			this.right_data_container.append(`<div> ${record} </div>`)
+			//this.right_data_container.append(`<div class="posInvoiceContiner"> ${record} </div>`)
+			const posContainer = document.createElement('div');
+			posContainer.classList.add('posInvoiceContiner')
+			const l1           = document.createElement('div')
+			l1.classList.add('l1')
+			const l2           = document.createElement('div')
+			l2.classList.add('l2')
+
+			const posName      = document.createElement('div')
+			posName.classList.add('posName')
+			posName.textContent = record.name
+			const posCost      = document.createElement('div')
+			posCost.classList.add('posCost')
+			posCost.textContent = record.paid_amount
+
+			l1.appendChild(posName)
+			l1.appendChild(posCost)
+
+			posContainer.appendChild(l1)
+			posContainer.appendChild(l2)
+
+			this.right_data_container.append(posContainer);
 		})
 	}
 
