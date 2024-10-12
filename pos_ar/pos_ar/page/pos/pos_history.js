@@ -21,6 +21,7 @@ pos_ar.PointOfSale.pos_history = class {
 					(result)=>{
 						console.log("the result ::::" , result);
 						this.data = result;
+						this.refreshData()
 					},
 					(error) => {
 						console.log(error)
@@ -42,8 +43,16 @@ pos_ar.PointOfSale.pos_history = class {
 		this.left_container.append('<div id="historyLeftContainerHeader" class="rowBox align_center" ><h4 class="CartTitle">POS Order</h4></div>')
 
 		this.right_container.append('<div id="historyRightContainerHeader" class="rowBox align_center" ><h4 class="CartTitle">Recent Orders</h4></div>')
-		this.right_container.append('<input type="text" id="historyInput" placeholder="Search by invoice id or custumer name">')
-		this.right_container.append('<div id="histotyRecentInvoicesContainer"></div>')
+		this.right_container.append('<div id="historyRightSearchContainer" class="rowBox align_center" ></div>');
+
+		this.search_container = this.right_container.find('#historyRightSearchContainer');
+		this.search_container.append('<input list="PosInvoiceTypeList" id="PosInvoiceTypeInput" placeholder="POS Invoice Type">');
+		this.search_container.append('<datalist id="PosInvoiceTypeList"><option value="Draft"><option value="Paid"><option value="Consolidated"></datalist>')
+		this.search_container.append('<input type="text" id="historyInput" placeholder="Search by invoice id or custumer name">');
+
+		this.right_container.append('<div id="histotyRecentInvoicesContainer"></div>');
+
+
 
 		this.right_data_container = this.right_container.find('#histotyRecentInvoicesContainer')
 	}
