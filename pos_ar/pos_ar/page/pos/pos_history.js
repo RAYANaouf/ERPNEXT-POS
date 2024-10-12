@@ -20,12 +20,16 @@ pos_ar.PointOfSale.pos_history = class {
 		this.db.getAllPosInvoice(
 					(result)=>{
 						console.log("the result ::::" , result);
+						this.data = result;
 					},
 					(error) => {
 						console.log(error)
 					}
 					)
 	}
+
+
+	/*************************************    UI    *******************************************************/
 
 	prepare_selected_item_cart(){
 		this.wrapper.find('#LeftSection').append('<div id="historyLeftContainer" class="columnBox"></div>')
@@ -39,6 +43,9 @@ pos_ar.PointOfSale.pos_history = class {
 
 		this.right_container.append('<div id="historyRightContainerHeader" class="rowBox align_center" ><h4 class="CartTitle">Recent Orders</h4></div>')
 		this.right_container.append('<input type="text" id="historyInput" placeholder="Search by invoice id or custumer name">')
+		this.right_container.append('<div id="histotyRecentInvoicesContainer"></div>')
+
+		this.right_data_container = this.right_container.find('#histotyRecentInvoicesContainer')
 	}
 
 
@@ -55,6 +62,14 @@ pos_ar.PointOfSale.pos_history = class {
 	}
 
 
+
+	refreshData(){
+		this.right_data_container.content('')
+
+		this.result.forEach( record => {
+			this.right_data_container.append(`<div> ${record} </div>`)
+		})
+	}
 
 
 }
