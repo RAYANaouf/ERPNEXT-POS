@@ -73,9 +73,10 @@ pos_ar.PointOfSale.pos_history = class {
 
 
 	refreshData(){
-		this.right_data_container.content('')
+		this.right_data_container.html = '';
 
-		this.result.forEach( record => {
+		this.data.forEach( record => {
+			console.log("record : " , record);
 			this.right_data_container.append(`<div> ${record} </div>`)
 		})
 	}

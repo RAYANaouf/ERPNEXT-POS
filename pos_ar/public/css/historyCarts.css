@@ -42,7 +42,15 @@
 
 #historyRightContainer #historyRightContainerHeader{
 	height : 55px ;
-	width  : calc(100% - 32px);
+	width  : calc(100% - 32px) ;
 }
 
 
+#historyRightContainer #historyRightSearchContainer{
+	width  : calc(100%) ;
+}
+
+#historyInput{
+	margin-left : 16px ;
+	flex-grow : 1 ;
+}

@@ -514,9 +514,14 @@
         items,
         creation_time: frappe.datetime.now_datetime()
       };
+      let new_pos_invoice = frappe.model.get_new_doc("POS Invoice");
+      new_pos_invoice.customer = this.customersList[0].name;
+      new_pos_invoice.pos_profile = this.PosProfileList[0].name;
+      new_pos_invoice.items = items;
+      new_pos_invoice.creation_time = frappe.datetime.now_datetime();
       console.log("created pos_invoice ", pos_invoice);
       this.db.savePosInvoice(
-        pos_invoice,
+        new_pos_invoice,
         (event2) => {
           console.log("sucess => ", event2);
         },
@@ -1930,8 +1935,9 @@
       this.right_container.css("display", "none");
     }
     refreshData() {
-      this.right_data_container.content("");
-      this.result.forEach((record) => {
+      this.right_data_container.html = "";
+      this.data.forEach((record) => {
+        console.log("record : ", record);
         this.right_data_container.append(`<div> ${record} </div>`);
       });
     }
@@ -2024,4 +2030,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.PVHBL4DK.js.map
+//# sourceMappingURL=pos.bundle.SQGWCMMC.js.map
