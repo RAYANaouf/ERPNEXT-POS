@@ -1,5 +1,4 @@
-
-
+/******************* left container   ***********************/
 
 #historyLeftContainer{
 
@@ -22,6 +21,13 @@
 	width  : calc(100% - 32px);	
 }
 
+
+
+
+
+
+
+/*********************  right container  *****************************/
 
 #historyRightContainer{
 
@@ -54,3 +60,26 @@
 	margin-left : 16px ;
 	flex-grow : 1 ;
 }
+
+
+
+
+
+/** recent orders containers **/
+#historyRecentInvoicesContainer .posInvoiceContainer{
+
+	margin        : 8px 0px 8px 0 ;
+	padding       : 16px    ;
+	border        : 2px solid #cccccc ;
+	border-radius : 16px    ;
+
+}
+
+#historyRecentInvoicesContainer .posInvoiceContainer .l1{
+	width : 100% ;
+}
+
+#historyRecentInvoicesContainer .posInvoiceContainer div.posName{
+	flex-grow  : 1     ;
+}
+

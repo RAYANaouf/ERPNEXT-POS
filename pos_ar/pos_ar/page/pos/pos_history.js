@@ -50,11 +50,11 @@ pos_ar.PointOfSale.pos_history = class {
 		this.search_container.append('<datalist id="PosInvoiceTypeList"><option value="Draft"><option value="Paid"><option value="Consolidated"></datalist>')
 		this.search_container.append('<input type="text" id="historyInput" placeholder="Search by invoice id or custumer name">');
 
-		this.right_container.append('<div id="histotyRecentInvoicesContainer"></div>');
+		this.right_container.append('<div id="historyRecentInvoicesContainer" ></div>');
 
 
 
-		this.right_data_container = this.right_container.find('#histotyRecentInvoicesContainer')
+		this.right_data_container = this.right_container.find('#historyRecentInvoicesContainer')
 	}
 
 
@@ -78,25 +78,54 @@ pos_ar.PointOfSale.pos_history = class {
 		this.data.forEach( record => {
 			console.log("record : " , record);
 			//this.right_data_container.append(`<div class="posInvoiceContiner"> ${record} </div>`)
+
 			const posContainer = document.createElement('div');
-			posContainer.classList.add('posInvoiceContiner')
+			posContainer.classList.add('posInvoiceContainer')
+			posContainer.classList.add('rowBox')
+			posContainer.classList.add('align_content')
+
+
+
+			//line 1
 			const l1           = document.createElement('div')
 			l1.classList.add('l1')
-			const l2           = document.createElement('div')
-			l2.classList.add('l2')
+			l1.classList.add('rowBox')
+			l1.classList.add('align_content')
+
 
 			const posName      = document.createElement('div')
 			posName.classList.add('posName')
 			posName.textContent = record.name
 			const posCost      = document.createElement('div')
 			posCost.classList.add('posCost')
-			posCost.textContent = record.paid_amount
+			posCost.textContent = record.paid_amount ?? 0 + " DA"
 
 			l1.appendChild(posName)
 			l1.appendChild(posCost)
 
+
+			// line 2
+			const l2           = document.createElement('div')
+			l2.classList.add('l2')
+			l2.classList.add('rowBox')
+			l2.classList.add('align_content')
+
+			const customer = document.createElement('div')
+			const customerLogo  = document.createElement('img')
+			customerLogo.src    = '/assets/pos_ar/images/customer.png' ;
+			customerLogo.width  = 40 ;
+			customerLogo.height = 40 ;
+
+			const customerName       = document.createElement('div')
+			customerName.textContent = record.customer
+
+			customer.appendChild(customerLogo);
+			customer.appendChild(customerName);
+
+			//add all to container
 			posContainer.appendChild(l1)
 			posContainer.appendChild(l2)
+
 
 			this.right_data_container.append(posContainer);
 		})
