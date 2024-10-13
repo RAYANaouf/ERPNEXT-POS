@@ -1903,21 +1903,25 @@
     constructor(wrapper, db) {
       this.wrapper = wrapper;
       this.db = db;
+      this.localPosInvoice = { lastTime: null, pos_invoices: [] };
+      this.filter = "";
+      this.filtered_pos = [];
       this.start_work();
     }
     start_work() {
-      console.log("we are heeeeeeeeeeeeeeeeeeeeeeeere");
       this.prepare_selected_item_cart();
       this.db.getAllPosInvoice(
         (result) => {
           console.log("the result ::::", result);
-          this.data = result;
+          this.localPosInvoice.pos_invoices = result;
+          this.filtered_pos = result;
           this.refreshData();
         },
         (error) => {
           console.log(error);
         }
       );
+      this.setListener();
     }
     prepare_selected_item_cart() {
       this.wrapper.find("#LeftSection").append('<div id="historyLeftContainer" class="columnBox"></div>');
@@ -1930,6 +1934,7 @@
       this.search_container = this.right_container.find("#historyRightSearchContainer");
       this.search_container.append('<input list="PosInvoiceTypeList" id="PosInvoiceTypeInput" placeholder="POS Invoice Type">');
       this.search_container.append('<datalist id="PosInvoiceTypeList"><option value="Draft"><option value="Paid"><option value="Consolidated"></datalist>');
+      this.filter_input = this.search_container.find("#PosInvoiceTypeInput");
       this.search_container.append('<input type="text" id="historyInput" placeholder="Search by invoice id or custumer name">');
       this.right_container.append('<div id="historyRecentInvoicesContainer" ></div>');
       this.right_data_container = this.right_container.find("#historyRecentInvoicesContainer");
@@ -1943,8 +1948,9 @@
       this.right_container.css("display", "none");
     }
     refreshData() {
-      this.right_data_container.html = "";
-      this.data.forEach((record) => {
+      this.right_data_container.html("");
+      console.log("refresh with : ", this.localPosInvoice.pos_invoices);
+      this.filtered_pos.forEach((record) => {
         var _a;
         console.log("record : ", record);
         const posContainer = document.createElement("div");
@@ -1988,6 +1994,25 @@
         posContainer.appendChild(l1);
         posContainer.appendChild(l2);
         this.right_data_container.append(posContainer);
+      });
+    }
+    setListener() {
+      this.filter_input.on("input", (event2) => {
+        console.log(event2.target.value);
+        const filter = event2.target.value;
+        this.filtered_pos = this.localPosInvoice.pos_invoices.filter((pos) => {
+          if (filter == "") {
+            return true;
+          } else if (filter == "Paid") {
+            return pos.docstatus == 0;
+          } else if (filter == "Consolidated") {
+            return pos.docstatus == 1;
+          } else {
+            return false;
+          }
+        });
+        console.log("we should refresh the data ::: ", this.filtered_pos);
+        this.refreshData();
       });
     }
   };
@@ -2079,4 +2104,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.VEO6LLSL.js.map
+//# sourceMappingURL=pos.bundle.RTYT47DY.js.map

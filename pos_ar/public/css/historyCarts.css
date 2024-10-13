@@ -75,6 +75,10 @@
 
 }
 
+#historyRecentInvoicesContainer .posInvoiceContainer:hover{
+	background : #f5f5f5 ;
+}
+
 #historyRecentInvoicesContainer .posInvoiceContainer .l1{
 	width : 100% ;
 }
