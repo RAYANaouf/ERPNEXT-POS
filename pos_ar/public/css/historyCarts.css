@@ -87,11 +87,22 @@
 
 #posItemList{
 
-	padding       : 16px    ;
-	background    : #cccccc ;
+	padding       : 0px  16px    ;
+	background    : #e0e0e0 ;
 	border-radius : 12px    ;
 }
 
+#posItemList>div{
+	margin : 8px ;
+}
+
+#posItemList>div>div{
+	flex-grow : 1 ;
+}
+#posItemList>div .itemName{
+	font-size   : 16px ;
+	font-weight : 600  ;
+}
 
 /*********************  right container  *****************************/
 
