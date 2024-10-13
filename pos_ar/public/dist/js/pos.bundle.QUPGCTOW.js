@@ -1914,7 +1914,7 @@
       this.localPosInvoice = { lastTime: null, pos_invoices: [] };
       this.filter = "";
       this.filtered_pos_list = [];
-      this.selected_pos = { name: null };
+      this.selected_pos = {};
       this.start_work();
     }
     start_work() {
@@ -1929,6 +1929,7 @@
           } else {
             this.selected_pos = structuredClone(this.filtered_pos_list[0]);
           }
+          console.log("selected pos ==> ", this.selected_pos);
           this.refreshData();
         },
         (error) => {
@@ -1942,7 +1943,7 @@
       this.wrapper.find("#RightSection").append('<div id="historyRightContainer" class="columnBox"></div>');
       this.left_container = this.wrapper.find("#historyLeftContainer");
       this.right_container = this.wrapper.find("#historyRightContainer");
-      this.left_container.append('<div id="PosContentHeader" class="rowBox" ><div class="c1 columnBox"><div id="posCustomer">Customer</div><div id="posSoldBy">Sold by : User</div></div><div class="c2 columnBox"><div id="posCost">0,0000 DA</div><div id="posId">ACC-PSINV-2024-ID</div><div>POS Status</div></div></div>');
+      this.left_container.append('<div id="PosContentHeader" class="rowBox" ><div class="c1 columnBox"><div id="posCustomer">Customer</div><div id="posSoldBy">Sold by : User</div></div><div class="c2 columnBox"><div id="posCost">0,0000 DA</div><div id="posId">ACC-PSINV-2024-ID</div><div id="posStatus">POS Status</div></div></div>');
       this.pos_header = this.left_container.find("#PosContentHeader");
       this.left_container.append('<div id="posContent"></div>');
       this.pos_content = this.left_container.find("#posContent");
@@ -1969,14 +1970,6 @@
       this.search_container.append('<input type="text" id="historyInput" placeholder="Search by invoice id or custumer name">');
       this.right_container.append('<div id="historyRecentInvoicesContainer" ></div>');
       this.right_data_container = this.right_container.find("#historyRecentInvoicesContainer");
-    }
-    show_cart() {
-      this.left_container.css("display", "flex");
-      this.right_container.css("display", "flex");
-    }
-    hide_cart() {
-      this.left_container.css("display", "none");
-      this.right_container.css("display", "none");
     }
     refreshData() {
       this.right_data_container.html("");
@@ -2029,29 +2022,29 @@
         });
         this.right_data_container.append(posContainer);
       });
+      this.refreshPosDetailsData();
     }
     refreshPosDetailsData() {
-      const posDetailsHeader = document.createElement("div");
-      const posCustomer = document.createElement("div");
-      const posCost = document.createElement("div");
-      const posId = document.createElement("div");
-      const posSoldBy = document.createElement("div");
-      const posState = document.createElement("div");
-      const posItemsCaontainer = document.createElement("div");
-      const posItem = document.createElement("div");
-      const posItemId = document.createElement("div");
-      const posItemQnt = document.createElement("div");
-      const posItemDiscount = document.createElement("div");
-      const posItemCost = document.createElement("div");
-      const totalContainer = document.createElement("div");
-      const netTotal = document.createElement("div");
-      const grandTotal = document.createElement("div");
-      const paymentContainer = document.createElement("div");
-      const cashMethod = document.createElement("div");
-      const actionButtons = document.createElement("div");
-      const printActionBtn = document.createElement("div");
-      const emailActionBtn = document.createElement("div");
-      const returnActionBtn = document.createElement("div");
+      var _a;
+      this.pos_header.find("#posCustomer").text(this.selected_pos.customer);
+      this.pos_header.find("#posCost").text((_a = this.selected_pos.paid_amount) != null ? _a : 0 + "DA");
+      this.pos_header.find("#posId").text(this.selected_pos.id);
+      let posStatus = "";
+      if (this.selected_pos.docStatus == 0) {
+        posStatus = "Paid";
+      } else {
+        posStatus = "Consolidated";
+      }
+      console.log("pos status : ", posStatus);
+      this.pos_header.find("#posStatus").text(posStatus);
+    }
+    show_cart() {
+      this.left_container.css("display", "flex");
+      this.right_container.css("display", "flex");
+    }
+    hide_cart() {
+      this.left_container.css("display", "none");
+      this.right_container.css("display", "none");
     }
     setListener() {
       this.filter_input.on("input", (event2) => {
@@ -2078,7 +2071,7 @@
   pos_ar.PointOfSale.pos_db = class POSDatabase {
     constructor() {
       this.dbName = "PosDb";
-      this.dbVersion = 13;
+      this.dbVersion = 14;
       this.db = null;
       this.openDatabase();
     }
@@ -2161,4 +2154,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.4E4WVLWI.js.map
+//# sourceMappingURL=pos.bundle.QUPGCTOW.js.map

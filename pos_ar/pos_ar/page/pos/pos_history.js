@@ -14,7 +14,7 @@ pos_ar.PointOfSale.pos_history = class {
 		this.localPosInvoice   = { lastTime : null , pos_invoices : [] }
 		this.filter            = "" ;
 		this.filtered_pos_list = [] ;
-		this.selected_pos      = { name : null } ;
+		this.selected_pos      = {} ;
 		this.start_work();
 	}
 
@@ -33,6 +33,7 @@ pos_ar.PointOfSale.pos_history = class {
 							else{
 								this.selected_pos = structuredClone(this.filtered_pos_list[0])
 							}
+							console.log("selected pos ==> " , this.selected_pos)
 							this.refreshData()
 						},
 						(error) => {
@@ -54,7 +55,7 @@ pos_ar.PointOfSale.pos_history = class {
 
 
 		//pos details  the container of the pos details
-		this.left_container.append('<div id="PosContentHeader" class="rowBox" ><div class="c1 columnBox"><div id="posCustomer">Customer</div><div id="posSoldBy">Sold by : User</div></div><div class="c2 columnBox"><div id="posCost">0,0000 DA</div><div id="posId">ACC-PSINV-2024-ID</div><div>POS Status</div></div></div>')
+		this.left_container.append('<div id="PosContentHeader" class="rowBox" ><div class="c1 columnBox"><div id="posCustomer">Customer</div><div id="posSoldBy">Sold by : User</div></div><div class="c2 columnBox"><div id="posCost">0,0000 DA</div><div id="posId">ACC-PSINV-2024-ID</div><div id="posStatus">POS Status</div></div></div>')
 
 		//first section is the header information
 		this.pos_header = this.left_container.find('#PosContentHeader');
@@ -102,22 +103,10 @@ pos_ar.PointOfSale.pos_history = class {
 
 
 		this.right_data_container = this.right_container.find('#historyRecentInvoicesContainer')
+
+
 	}
 
-
-
-
-	//show and hide
-	show_cart(){
-		this.left_container.css('display' , 'flex');
-		this.right_container.css('display' , 'flex');
-	}
-
-	//hide and hide
-	hide_cart(){
-		this.left_container.css('display' , 'none');
-		this.right_container.css('display' , 'none');
-	}
 
 
 
@@ -197,41 +186,58 @@ pos_ar.PointOfSale.pos_history = class {
 
 			this.right_data_container.append(posContainer);
 		})
+
+
+		//dont forget to refresh the details cart view because the selected pos may change
+		this.refreshPosDetailsData();
+
 	}
 
 
 
 	refreshPosDetailsData(){
 
-		const posDetailsHeader = document.createElement('div');
-		const posCustomer      = document.createElement('div');
-		const posCost          = document.createElement('div');
-		const posId            = document.createElement('div');
-		const posSoldBy        = document.createElement('div');
-		const posState         = document.createElement('div');
+		//const customer = document.getElementById("posCustomer");
+		//customer.textContent = this.selected_pos.customer;
 
-		const posItemsCaontainer = document.createElement('div');
-		const posItem            = document.createElement('div');
-		const posItemId          = document.createElement('div');
-		const posItemQnt         = document.createElement('div');
-		const posItemDiscount    = document.createElement('div');
-		const posItemCost        = document.createElement('div');
+		this.pos_header.find('#posCustomer').text(this.selected_pos.customer)
+		//it is not the paid amount it should be the total invoice amount
+		this.pos_header.find('#posCost').text(this.selected_pos.paid_amount??0 + "DA")
+		this.pos_header.find('#posId').text(this.selected_pos.id)
+		let posStatus = ""
+		if(this.selected_pos.docStatus == 0){
+			posStatus = "Paid"
+		}
+		else{
+			posStatus = "Consolidated"
+		}
 
-		const totalContainer     = document.createElement('div');
-		const netTotal           = document.createElement('div');
-		const grandTotal         = document.createElement('div');
+		console.log("pos status : " , posStatus );
 
-		const paymentContainer   = document.createElement('div');
-		const cashMethod         = document.createElement('div');
+		this.pos_header.find('#posStatus').text(posStatus)
 
-		const actionButtons      = document.createElement('div');
-		const printActionBtn     = document.createElement('div');
-		const emailActionBtn     = document.createElement('div');
-		const returnActionBtn    = document.createElement('div');
 
 
 	}
 
+
+
+	//show and hide
+	show_cart(){
+		this.left_container.css('display' , 'flex');
+		this.right_container.css('display' , 'flex');
+	}
+
+	//hide and hide
+	hide_cart(){
+		this.left_container.css('display' , 'none');
+		this.right_container.css('display' , 'none');
+	}
+
+
+
+
+	/************************************* set listeners  ***********************************************/
 	//set listeners
 	setListener(){
 
