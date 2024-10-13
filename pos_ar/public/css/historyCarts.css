@@ -18,23 +18,19 @@
 
 /*********************   left container  *****************************/
 
-#historyLeftContainer #historyLeftContainerHeader{
-	height : 55px ;
-	width  : calc(100% - 32px);	
-}
 
-#historyLeftContainerContent{
-	width     : 100% ;
-	flex-grow : 1 ;
-}
 
 
 /****** pos header  *******/
-#historyLeftContainerContent #PosContentHeader>div{
+#PosContentHeader{
+	padding : 16px 16px 25px 16px;
+}
+
+#PosContentHeader>div{
 	flex-grow : 1 ;
 }
 
-#historyLeftContainerContent #PosContentHeader .c2{
+#PosContentHeader>div.c2{
 	align-items : end ;
 }
 

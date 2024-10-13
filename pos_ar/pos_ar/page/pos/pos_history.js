@@ -21,7 +21,7 @@ pos_ar.PointOfSale.pos_history = class {
 
 
 	start_work(){
-		this.prepare_selected_item_cart();
+		this.prepare_history_cart();
 		this.db.getAllPosInvoice(
 						(result)=>{
 							console.log("the result ::::" , result);
@@ -45,29 +45,24 @@ pos_ar.PointOfSale.pos_history = class {
 
 	/*************************************    UI    *******************************************************/
 
-	prepare_selected_item_cart(){
+	prepare_history_cart(){
 		this.wrapper.find('#LeftSection').append('<div id="historyLeftContainer" class="columnBox"></div>')
 		this.wrapper.find('#RightSection').append('<div id="historyRightContainer" class="columnBox"></div>')
 
 		this.left_container  = this.wrapper.find('#historyLeftContainer')
 		this.right_container = this.wrapper.find('#historyRightContainer')
 
-		//left
-		this.left_container.append('<div id="historyLeftContainerHeader" class="rowBox align_center" ><h4 class="CartTitle">POS Order</h4></div>')
-		this.left_container.append('<div id="historyLeftContainerContent" class="columnBox"> </div>')
-
 
 		//pos details  the container of the pos details
-		this.pos_details = this.left_container.find('#historyLeftContainerContent');
-		this.pos_details.append('<div id="PosContentHeader" class="rowBox" ><div class="c1 columnBox"><div id="posCustomer">Customer</div><div id="posSoldBy">Sold by : User</div></div><div class="c2 columnBox"><div id="posCost">0,0000 DA</div><div id="posId">ACC-PSINV-2024-ID</div><div>POS Status</div></div></div>')
+		this.left_container.append('<div id="PosContentHeader" class="rowBox" ><div class="c1 columnBox"><div id="posCustomer">Customer</div><div id="posSoldBy">Sold by : User</div></div><div class="c2 columnBox"><div id="posCost">0,0000 DA</div><div id="posId">ACC-PSINV-2024-ID</div><div>POS Status</div></div></div>')
 
 		//first section is the header information
-		this.pos_content_header = this.pos_details.find('#PosContentHeader');
+		this.pos_header = this.left_container.find('#PosContentHeader');
 
-		this.pos_details.append('<div id="posContent"></div>')
+		this.left_container.append('<div id="posContent"></div>')
 
 		//second section is the data like items , cost and payments methods.
-		this.pos_content = this.pos_details.find('#posContent')
+		this.pos_content = this.left_container.find('#posContent')
 		this.pos_content.append('<div id="posItemContainer"><div class="posSectionTitle">Items</div><div id="posItemList"></div></div>')
 
 		this.itemContainer = this.pos_content.find('#posItemContainer')
@@ -83,7 +78,7 @@ pos_ar.PointOfSale.pos_history = class {
 		this.paymentsContainer = this.pos_content.find('#posPaymentsContainer')
 		this.methodList        = this.itemContainer.find('#posMethodList')
 
-		this.pos_details.append('<div id="posActionsContainer" class="rowBox align_content"> <div id="posPrintBtn" class="actionBtn rowBox centerItem"> Print Receipt </div>  <div id="posEmailBtn" class="actionBtn rowBox centerItem"> Email Receipt </div>   <div id="posReturnBtn" class="actionBtn rowBox centerItem"> Return </div>  </div>')
+		this.left_container.append('<div id="posActionsContainer" class="rowBox align_content"> <div id="posPrintBtn" class="actionBtn rowBox centerItem"> Print Receipt </div>  <div id="posEmailBtn" class="actionBtn rowBox centerItem"> Email Receipt </div>   <div id="posReturnBtn" class="actionBtn rowBox centerItem"> Return </div>  </div>')
 
 		//third and last section is the action buttons
 		this.actionButtonsContainer = this.pos_content.find('#posActionsContainer')

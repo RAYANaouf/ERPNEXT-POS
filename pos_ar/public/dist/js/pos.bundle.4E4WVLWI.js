@@ -893,6 +893,9 @@
       this.actionContainer = this.wrapper.find("#ActionsContainerBox");
       this.actionContainer.append('<div id="CustomerBox" class="rowBox align_center">');
       this.actionContainer.append('<div id="MenuBox"     class="rowBox centerItem">');
+      this.actionContainer.append('<div id="HomeBox"     class="rowBox centerItem"  style="display:none;">');
+      this.home = this.actionContainer.find("#HomeBox");
+      this.home.append('<img src="/assets/pos_ar/images/home.png" alt="Home" id="homeBoxIcon" >');
       this.menu = this.actionContainer.find("#MenuBox");
       this.menu.append('<img src="/assets/pos_ar/images/menu.png" alt="Menu" id="MenuBtn" >');
       this.menu.append('<div id="menuItemsContainer"     class="columnBox">');
@@ -921,10 +924,12 @@
     }
     hideActionBar() {
       this.customerBox.css("display", "none");
+      this.home.css("display", "flex");
       this.actionContainer.css("flex-direction", "row-reverse");
     }
     showActionBar() {
       this.customerBox.css("display", "flex");
+      this.home.css("display", "none");
       this.actionContainer.css("flex-direction", "row");
     }
     setListeners() {
@@ -947,6 +952,9 @@
           this.menuItemsContainer.css("visibility", "visible");
           this.menuItemsContainer.css("opacity", "1");
         }
+      });
+      this.home.on("click", (event2) => {
+        console.log("we should go home!");
       });
     }
     setSynced() {
@@ -1910,7 +1918,7 @@
       this.start_work();
     }
     start_work() {
-      this.prepare_selected_item_cart();
+      this.prepare_history_cart();
       this.db.getAllPosInvoice(
         (result) => {
           console.log("the result ::::", result);
@@ -1929,18 +1937,15 @@
       );
       this.setListener();
     }
-    prepare_selected_item_cart() {
+    prepare_history_cart() {
       this.wrapper.find("#LeftSection").append('<div id="historyLeftContainer" class="columnBox"></div>');
       this.wrapper.find("#RightSection").append('<div id="historyRightContainer" class="columnBox"></div>');
       this.left_container = this.wrapper.find("#historyLeftContainer");
       this.right_container = this.wrapper.find("#historyRightContainer");
-      this.left_container.append('<div id="historyLeftContainerHeader" class="rowBox align_center" ><h4 class="CartTitle">POS Order</h4></div>');
-      this.left_container.append('<div id="historyLeftContainerContent" class="columnBox"> </div>');
-      this.pos_details = this.left_container.find("#historyLeftContainerContent");
-      this.pos_details.append('<div id="PosContentHeader" class="rowBox" ><div class="c1 columnBox"><div id="posCustomer">Customer</div><div id="posSoldBy">Sold by : User</div></div><div class="c2 columnBox"><div id="posCost">0,0000 DA</div><div id="posId">ACC-PSINV-2024-ID</div><div>POS Status</div></div></div>');
-      this.pos_content_header = this.pos_details.find("#PosContentHeader");
-      this.pos_details.append('<div id="posContent"></div>');
-      this.pos_content = this.pos_details.find("#posContent");
+      this.left_container.append('<div id="PosContentHeader" class="rowBox" ><div class="c1 columnBox"><div id="posCustomer">Customer</div><div id="posSoldBy">Sold by : User</div></div><div class="c2 columnBox"><div id="posCost">0,0000 DA</div><div id="posId">ACC-PSINV-2024-ID</div><div>POS Status</div></div></div>');
+      this.pos_header = this.left_container.find("#PosContentHeader");
+      this.left_container.append('<div id="posContent"></div>');
+      this.pos_content = this.left_container.find("#posContent");
       this.pos_content.append('<div id="posItemContainer"><div class="posSectionTitle">Items</div><div id="posItemList"></div></div>');
       this.itemContainer = this.pos_content.find("#posItemContainer");
       this.itemList = this.itemContainer.find("#posItemList");
@@ -1950,7 +1955,7 @@
       this.pos_content.append('<div id="posPaymentsContainer"><div class="posSectionTitle">Payments</div><div id="posMethodList"></div></div>');
       this.paymentsContainer = this.pos_content.find("#posPaymentsContainer");
       this.methodList = this.itemContainer.find("#posMethodList");
-      this.pos_details.append('<div id="posActionsContainer" class="rowBox align_content"> <div id="posPrintBtn" class="actionBtn rowBox centerItem"> Print Receipt </div>  <div id="posEmailBtn" class="actionBtn rowBox centerItem"> Email Receipt </div>   <div id="posReturnBtn" class="actionBtn rowBox centerItem"> Return </div>  </div>');
+      this.left_container.append('<div id="posActionsContainer" class="rowBox align_content"> <div id="posPrintBtn" class="actionBtn rowBox centerItem"> Print Receipt </div>  <div id="posEmailBtn" class="actionBtn rowBox centerItem"> Email Receipt </div>   <div id="posReturnBtn" class="actionBtn rowBox centerItem"> Return </div>  </div>');
       this.actionButtonsContainer = this.pos_content.find("#posActionsContainer");
       this.printBtn = this.actionButtonsContainer.find("#posPrintBtn");
       this.emailBtn = this.actionButtonsContainer.find("#posEmailBtn");
@@ -2156,4 +2161,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.U7TLNOTO.js.map
+//# sourceMappingURL=pos.bundle.4E4WVLWI.js.map

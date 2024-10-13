@@ -35,7 +35,12 @@ pos_ar.PointOfSale.pos_customer_box = class{
 
 		this.actionContainer.append('<div id="CustomerBox" class="rowBox align_center">');
 		this.actionContainer.append('<div id="MenuBox"     class="rowBox centerItem">');
+		this.actionContainer.append('<div id="HomeBox"     class="rowBox centerItem"  style="display:none;">');
 
+
+
+		this.home = this.actionContainer.find('#HomeBox')
+		this.home.append('<img src="/assets/pos_ar/images/home.png" alt="Home" id="homeBoxIcon" >')
 
 		this.menu = this.actionContainer.find('#MenuBox')
 		this.menu.append('<img src="/assets/pos_ar/images/menu.png" alt="Menu" id="MenuBtn" >')
@@ -75,11 +80,13 @@ pos_ar.PointOfSale.pos_customer_box = class{
 	//show and hide
 	hideActionBar(){
 		this.customerBox.css('display' , 'none');
+		this.home.css('display' , 'flex');
 		this.actionContainer.css('flex-direction' , 'row-reverse')
 	}
 
 	showActionBar(){
 		this.customerBox.css('display' , 'flex');
+		this.home.css('display' , 'none');
 		this.actionContainer.css('flex-direction' , 'row')
 	}
 
@@ -112,6 +119,10 @@ pos_ar.PointOfSale.pos_customer_box = class{
 				this.menuItemsContainer.css('opacity' , '1')
 			}
 
+		})
+
+		this.home.on('click' , (event)=>{
+			console.log("we should go home!")
 		})
 
 	}
