@@ -181,6 +181,7 @@ pos_ar.PointOfSale.pos_history = class {
 			posContainer.appendChild(l2)
 
 			posContainer.addEventListener('click' , () => {
+				this.selected_pos = record
 				this.refreshPosDetailsData();
 			})
 
@@ -197,13 +198,15 @@ pos_ar.PointOfSale.pos_history = class {
 
 	refreshPosDetailsData(){
 
+		console.log(" refreshing details data " , this.selected_pos);
+
 		//const customer = document.getElementById("posCustomer");
 		//customer.textContent = this.selected_pos.customer;
 
 		this.pos_header.find('#posCustomer').text(this.selected_pos.customer)
 		//it is not the paid amount it should be the total invoice amount
 		this.pos_header.find('#posCost').text(this.selected_pos.paid_amount??0 + "DA")
-		this.pos_header.find('#posId').text(this.selected_pos.id)
+		this.pos_header.find('#posId').text(this.selected_pos.name)
 		let posStatus = ""
 		if(this.selected_pos.docStatus == 0){
 			posStatus = "Paid"
@@ -215,6 +218,11 @@ pos_ar.PointOfSale.pos_history = class {
 		console.log("pos status : " , posStatus );
 
 		this.pos_header.find('#posStatus').text(posStatus)
+
+		this.itemList.html('');
+		this.selected_pos.items.forEach(item => {
+			this.itemList.append(`<div> ${item.item_name} </div>`)
+		})
 
 
 

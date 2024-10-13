@@ -85,7 +85,12 @@
 	flex-grow : 1 ;
 }
 
+#posItemList{
 
+	padding       : 16px    ;
+	background    : #cccccc ;
+	border-radius : 12px    ;
+}
 
 
 /*********************  right container  *****************************/
@@ -133,7 +138,8 @@
 	padding       : 16px    ;
 	border        : 2px solid #cccccc ;
 	border-radius : 16px    ;
-
+	
+	cursor        : pointer ;
 }
 
 #historyRecentInvoicesContainer .posInvoiceContainer:hover{

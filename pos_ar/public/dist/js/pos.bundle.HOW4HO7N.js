@@ -2018,6 +2018,7 @@
         posContainer.appendChild(l1);
         posContainer.appendChild(l2);
         posContainer.addEventListener("click", () => {
+          this.selected_pos = record;
           this.refreshPosDetailsData();
         });
         this.right_data_container.append(posContainer);
@@ -2026,9 +2027,10 @@
     }
     refreshPosDetailsData() {
       var _a;
+      console.log(" refreshing details data ", this.selected_pos);
       this.pos_header.find("#posCustomer").text(this.selected_pos.customer);
       this.pos_header.find("#posCost").text((_a = this.selected_pos.paid_amount) != null ? _a : 0 + "DA");
-      this.pos_header.find("#posId").text(this.selected_pos.id);
+      this.pos_header.find("#posId").text(this.selected_pos.name);
       let posStatus = "";
       if (this.selected_pos.docStatus == 0) {
         posStatus = "Paid";
@@ -2037,6 +2039,10 @@
       }
       console.log("pos status : ", posStatus);
       this.pos_header.find("#posStatus").text(posStatus);
+      this.itemList.html("");
+      this.selected_pos.items.forEach((item) => {
+        this.itemList.append(`<div> ${item.item_name} </div>`);
+      });
     }
     show_cart() {
       this.left_container.css("display", "flex");
@@ -2154,4 +2160,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.QUPGCTOW.js.map
+//# sourceMappingURL=pos.bundle.HOW4HO7N.js.map
