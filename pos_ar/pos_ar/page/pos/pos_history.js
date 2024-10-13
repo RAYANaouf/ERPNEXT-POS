@@ -151,12 +151,46 @@ pos_ar.PointOfSale.pos_history = class {
 			posContainer.appendChild(l1)
 			posContainer.appendChild(l2)
 
+			posContainer.on('click' , () => {
+				this.onPosClick();
+			})
 
 			this.right_data_container.append(posContainer);
 		})
 	}
 
 
+
+	refreshPosDetailsData(){
+
+		const posDetailsHeader = document.createElement('div');
+		const posCustomer      = document.createElement('div');
+		const posCost          = document.createElement('div');
+		const posId            = document.createElement('div');
+		const posSoldBy        = document.createElement('div');
+		const posState         = document.createElement('div');
+
+		const posItemsCaontainer = document.createElement('div');
+		const posItem            = document.createElement('div');
+		const posItemId          = document.createElement('div');
+		const posItemQnt         = document.createElement('div');
+		const posItemDiscount    = document.createElement('div');
+		const posItemCost        = document.createElement('div');
+
+		const totalContainer     = document.createElement('div');
+		const netTotal           = document.createElement('div');
+		const grandTotal         = document.createElement('div');
+
+		const paymentContainer   = document.createElement('div');
+		const cashMethod         = document.createElement('div');
+
+		const actionButtons      = document.createElement('div');
+		const printActionBtn     = document.createElement('div');
+		const emailActionBtn     = document.createElement('div');
+		const returnActionBtn    = document.createElement('div');
+
+
+	}
 
 	//set listeners
 	setListener(){
@@ -185,5 +219,6 @@ pos_ar.PointOfSale.pos_history = class {
 		});
 
 	}
+
 
 }
