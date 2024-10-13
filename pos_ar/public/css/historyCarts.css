@@ -83,3 +83,24 @@
 	flex-grow  : 1     ;
 }
 
+#historyRecentInvoicesContainer .posInvoiceContainer .l2{
+	width       : 100% ;
+	margin-top  : 6px  ;
+}
+
+#historyRecentInvoicesContainer .posInvoiceContainer .l2 .customer{
+
+	flex-grow : 1 ;
+
+}
+#historyRecentInvoicesContainer .posInvoiceContainer .l2 .customerLogo{
+	width  : 16px ;
+	height : 16px ;
+
+	margin-right : 6px ;
+}
+
+#historyRecentInvoicesContainer .posInvoiceContainer .l2 .customerName{
+
+}
+

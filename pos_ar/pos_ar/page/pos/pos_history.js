@@ -81,7 +81,7 @@ pos_ar.PointOfSale.pos_history = class {
 
 			const posContainer = document.createElement('div');
 			posContainer.classList.add('posInvoiceContainer')
-			posContainer.classList.add('rowBox')
+			posContainer.classList.add('columnBox')
 			posContainer.classList.add('align_content')
 
 
@@ -104,23 +104,37 @@ pos_ar.PointOfSale.pos_history = class {
 			l1.appendChild(posCost)
 
 
-			// line 2
+			///////////// line 2
 			const l2           = document.createElement('div')
 			l2.classList.add('l2')
 			l2.classList.add('rowBox')
 			l2.classList.add('align_content')
 
+			//l2 customer
 			const customer = document.createElement('div')
+			customer.classList.add('customer')
+			customer.classList.add('rowBox')
+			customer.classList.add('align_content')
+
 			const customerLogo  = document.createElement('img')
 			customerLogo.src    = '/assets/pos_ar/images/customer.png' ;
-			customerLogo.width  = 40 ;
-			customerLogo.height = 40 ;
+			customerLogo.width  = 16 ;
+			customerLogo.height = 16 ;
+			customerLogo.classList.add('customerLogo');
 
 			const customerName       = document.createElement('div')
 			customerName.textContent = record.customer
+			customerName.classList.add('customerName');
 
 			customer.appendChild(customerLogo);
 			customer.appendChild(customerName);
+
+			l2.appendChild(customer);
+
+			//l2 creation time
+			const creationTime  = document.createElement('div')
+			creationTime.textContent = record.creation_time
+			l2.appendChild(creationTime);
 
 			//add all to container
 			posContainer.appendChild(l1)
