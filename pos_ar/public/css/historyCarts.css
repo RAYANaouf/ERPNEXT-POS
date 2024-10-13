@@ -16,13 +16,78 @@
 	overflow-y    : auto ;
 }
 
+/*********************   left container  *****************************/
+
 #historyLeftContainer #historyLeftContainerHeader{
 	height : 55px ;
 	width  : calc(100% - 32px);	
 }
 
+#historyLeftContainerContent{
+	width     : 100% ;
+	flex-grow : 1 ;
+}
 
 
+/****** pos header  *******/
+#historyLeftContainerContent #PosContentHeader>div{
+	flex-grow : 1 ;
+}
+
+#historyLeftContainerContent #PosContentHeader .c2{
+	align-items : end ;
+}
+
+#posCustomer{
+	font-size   : 30px ;
+	font-weight : 800  ;
+}
+
+#posSoldBy{
+	font-size   : 16px ;
+	font-weight : 500  ;	
+}
+
+#posCost{
+	width       : max-content ;
+	font-size   : 25px ;
+	font-weight : 800  ;	
+}
+#posId {
+	width       : max-content ;
+}
+#posStatus {
+	width       : max-content ;
+}
+
+
+/****** pos content  *******/
+
+/* titles */
+.posSectionTitle{
+	font-size   : 18px ;
+	font-weight : 700  ;	
+}
+/* button action */
+.actionBtn{
+	margin  : 16px     ;
+	padding : 8px 16px ;
+	background    : #f0f0f0 ;
+	border  : 2px solid #cccccc ;
+	border-radius : 16px    ;
+
+	flex-grow     : 1       ;
+}
+.actionBtn:hover{
+	background   : #e0e0e0 ;
+	border-color : #c0c0c0 ;
+}
+
+/* make the main section take the extra empty space */
+
+#posContent{
+	flex-grow : 1 ;
+}
 
 
 

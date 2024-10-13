@@ -11,9 +11,10 @@ pos_ar.PointOfSale.pos_history = class {
 
 
 		//local data
-		this.localPosInvoice = { lastTime : null , pos_invoices : [] }
-		this.filter          = "" ;
-		this.filtered_pos    = [] ;
+		this.localPosInvoice   = { lastTime : null , pos_invoices : [] }
+		this.filter            = "" ;
+		this.filtered_pos_list = [] ;
+		this.selected_pos      = { name : null } ;
 		this.start_work();
 	}
 
@@ -24,8 +25,14 @@ pos_ar.PointOfSale.pos_history = class {
 		this.db.getAllPosInvoice(
 						(result)=>{
 							console.log("the result ::::" , result);
-							this.localPosInvoice.pos_invoices = result;
-							this.filtered_pos                 = result;
+							this.localPosInvoice.pos_invoices = result ;
+							this.filtered_pos_list            = result ;
+							if(this.filtered_pos_list.length == 0){
+								this.selected_pos = null
+							}
+							else{
+								this.selected_pos = structuredClone(this.filtered_pos_list[0])
+							}
 							this.refreshData()
 						},
 						(error) => {
@@ -47,6 +54,42 @@ pos_ar.PointOfSale.pos_history = class {
 
 		//left
 		this.left_container.append('<div id="historyLeftContainerHeader" class="rowBox align_center" ><h4 class="CartTitle">POS Order</h4></div>')
+		this.left_container.append('<div id="historyLeftContainerContent" class="columnBox"> </div>')
+
+
+		//pos details  the container of the pos details
+		this.pos_details = this.left_container.find('#historyLeftContainerContent');
+		this.pos_details.append('<div id="PosContentHeader" class="rowBox" ><div class="c1 columnBox"><div id="posCustomer">Customer</div><div id="posSoldBy">Sold by : User</div></div><div class="c2 columnBox"><div id="posCost">0,0000 DA</div><div id="posId">ACC-PSINV-2024-ID</div><div>POS Status</div></div></div>')
+
+		//first section is the header information
+		this.pos_content_header = this.pos_details.find('#PosContentHeader');
+
+		this.pos_details.append('<div id="posContent"></div>')
+
+		//second section is the data like items , cost and payments methods.
+		this.pos_content = this.pos_details.find('#posContent')
+		this.pos_content.append('<div id="posItemContainer"><div class="posSectionTitle">Items</div><div id="posItemList"></div></div>')
+
+		this.itemContainer = this.pos_content.find('#posItemContainer')
+		this.itemList      = this.itemContainer.find('#posItemList')
+
+		this.pos_content.append('<div id="posTotalsContainer"><div class="posSectionTitle">Totals</div><div id="posTotalList"></div></div>')
+
+		this.totalsContainer = this.pos_content.find('#posTotalsContainer')
+		this.totalList       = this.itemContainer.find('#posTotalList')
+
+		this.pos_content.append('<div id="posPaymentsContainer"><div class="posSectionTitle">Payments</div><div id="posMethodList"></div></div>')
+
+		this.paymentsContainer = this.pos_content.find('#posPaymentsContainer')
+		this.methodList        = this.itemContainer.find('#posMethodList')
+
+		this.pos_details.append('<div id="posActionsContainer" class="rowBox align_content"> <div id="posPrintBtn" class="actionBtn rowBox centerItem"> Print Receipt </div>  <div id="posEmailBtn" class="actionBtn rowBox centerItem"> Email Receipt </div>   <div id="posReturnBtn" class="actionBtn rowBox centerItem"> Return </div>  </div>')
+
+		//third and last section is the action buttons
+		this.actionButtonsContainer = this.pos_content.find('#posActionsContainer')
+		this.printBtn  = this.actionButtonsContainer.find('#posPrintBtn')
+		this.emailBtn  = this.actionButtonsContainer.find('#posEmailBtn')
+		this.returnBtn = this.actionButtonsContainer.find('#posReturnBtn')
 
 		this.right_container.append('<div id="historyRightContainerHeader" class="rowBox align_center" ><h4 class="CartTitle">Recent Orders</h4></div>')
 		this.right_container.append('<div id="historyRightSearchContainer" class="rowBox align_center" ></div>');
@@ -65,6 +108,8 @@ pos_ar.PointOfSale.pos_history = class {
 
 		this.right_data_container = this.right_container.find('#historyRecentInvoicesContainer')
 	}
+
+
 
 
 	//show and hide
@@ -86,7 +131,7 @@ pos_ar.PointOfSale.pos_history = class {
 
 		console.log("refresh with : "  , this.localPosInvoice.pos_invoices);
 
-		this.filtered_pos.forEach( record => {
+		this.filtered_pos_list.forEach( record => {
 			console.log("record : " , record);
 			//this.right_data_container.append(`<div class="posInvoiceContiner"> ${record} </div>`)
 
@@ -151,8 +196,8 @@ pos_ar.PointOfSale.pos_history = class {
 			posContainer.appendChild(l1)
 			posContainer.appendChild(l2)
 
-			posContainer.on('click' , () => {
-				this.onPosClick();
+			posContainer.addEventListener('click' , () => {
+				this.refreshPosDetailsData();
 			})
 
 			this.right_data_container.append(posContainer);
@@ -199,7 +244,7 @@ pos_ar.PointOfSale.pos_history = class {
 			console.log(event.target.value);
 			const filter = event.target.value;
 
-			this.filtered_pos = this.localPosInvoice.pos_invoices.filter( pos => {
+			this.filtered_pos_list = this.localPosInvoice.pos_invoices.filter( pos => {
 				if(filter == ""){
 					return true ;
 				}
@@ -214,7 +259,7 @@ pos_ar.PointOfSale.pos_history = class {
 				}
 			})
 
-			console.log("we should refresh the data ::: " , this.filtered_pos)
+			console.log("we should refresh the data ::: " , this.filtered_pos_list)
 			this.refreshData();
 		});
 

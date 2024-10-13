@@ -1905,7 +1905,8 @@
       this.db = db;
       this.localPosInvoice = { lastTime: null, pos_invoices: [] };
       this.filter = "";
-      this.filtered_pos = [];
+      this.filtered_pos_list = [];
+      this.selected_pos = { name: null };
       this.start_work();
     }
     start_work() {
@@ -1914,7 +1915,12 @@
         (result) => {
           console.log("the result ::::", result);
           this.localPosInvoice.pos_invoices = result;
-          this.filtered_pos = result;
+          this.filtered_pos_list = result;
+          if (this.filtered_pos_list.length == 0) {
+            this.selected_pos = null;
+          } else {
+            this.selected_pos = structuredClone(this.filtered_pos_list[0]);
+          }
           this.refreshData();
         },
         (error) => {
@@ -1929,6 +1935,26 @@
       this.left_container = this.wrapper.find("#historyLeftContainer");
       this.right_container = this.wrapper.find("#historyRightContainer");
       this.left_container.append('<div id="historyLeftContainerHeader" class="rowBox align_center" ><h4 class="CartTitle">POS Order</h4></div>');
+      this.left_container.append('<div id="historyLeftContainerContent" class="columnBox"> </div>');
+      this.pos_details = this.left_container.find("#historyLeftContainerContent");
+      this.pos_details.append('<div id="PosContentHeader" class="rowBox" ><div class="c1 columnBox"><div id="posCustomer">Customer</div><div id="posSoldBy">Sold by : User</div></div><div class="c2 columnBox"><div id="posCost">0,0000 DA</div><div id="posId">ACC-PSINV-2024-ID</div><div>POS Status</div></div></div>');
+      this.pos_content_header = this.pos_details.find("#PosContentHeader");
+      this.pos_details.append('<div id="posContent"></div>');
+      this.pos_content = this.pos_details.find("#posContent");
+      this.pos_content.append('<div id="posItemContainer"><div class="posSectionTitle">Items</div><div id="posItemList"></div></div>');
+      this.itemContainer = this.pos_content.find("#posItemContainer");
+      this.itemList = this.itemContainer.find("#posItemList");
+      this.pos_content.append('<div id="posTotalsContainer"><div class="posSectionTitle">Totals</div><div id="posTotalList"></div></div>');
+      this.totalsContainer = this.pos_content.find("#posTotalsContainer");
+      this.totalList = this.itemContainer.find("#posTotalList");
+      this.pos_content.append('<div id="posPaymentsContainer"><div class="posSectionTitle">Payments</div><div id="posMethodList"></div></div>');
+      this.paymentsContainer = this.pos_content.find("#posPaymentsContainer");
+      this.methodList = this.itemContainer.find("#posMethodList");
+      this.pos_details.append('<div id="posActionsContainer" class="rowBox align_content"> <div id="posPrintBtn" class="actionBtn rowBox centerItem"> Print Receipt </div>  <div id="posEmailBtn" class="actionBtn rowBox centerItem"> Email Receipt </div>   <div id="posReturnBtn" class="actionBtn rowBox centerItem"> Return </div>  </div>');
+      this.actionButtonsContainer = this.pos_content.find("#posActionsContainer");
+      this.printBtn = this.actionButtonsContainer.find("#posPrintBtn");
+      this.emailBtn = this.actionButtonsContainer.find("#posEmailBtn");
+      this.returnBtn = this.actionButtonsContainer.find("#posReturnBtn");
       this.right_container.append('<div id="historyRightContainerHeader" class="rowBox align_center" ><h4 class="CartTitle">Recent Orders</h4></div>');
       this.right_container.append('<div id="historyRightSearchContainer" class="rowBox align_center" ></div>');
       this.search_container = this.right_container.find("#historyRightSearchContainer");
@@ -1950,7 +1976,7 @@
     refreshData() {
       this.right_data_container.html("");
       console.log("refresh with : ", this.localPosInvoice.pos_invoices);
-      this.filtered_pos.forEach((record) => {
+      this.filtered_pos_list.forEach((record) => {
         var _a;
         console.log("record : ", record);
         const posContainer = document.createElement("div");
@@ -1993,8 +2019,8 @@
         l2.appendChild(creationTime);
         posContainer.appendChild(l1);
         posContainer.appendChild(l2);
-        posContainer.on("click", () => {
-          this.onPosClick();
+        posContainer.addEventListener("click", () => {
+          this.refreshPosDetailsData();
         });
         this.right_data_container.append(posContainer);
       });
@@ -2026,7 +2052,7 @@
       this.filter_input.on("input", (event2) => {
         console.log(event2.target.value);
         const filter = event2.target.value;
-        this.filtered_pos = this.localPosInvoice.pos_invoices.filter((pos) => {
+        this.filtered_pos_list = this.localPosInvoice.pos_invoices.filter((pos) => {
           if (filter == "") {
             return true;
           } else if (filter == "Paid") {
@@ -2037,7 +2063,7 @@
             return false;
           }
         });
-        console.log("we should refresh the data ::: ", this.filtered_pos);
+        console.log("we should refresh the data ::: ", this.filtered_pos_list);
         this.refreshData();
       });
     }
@@ -2130,4 +2156,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.GHCDJAHK.js.map
+//# sourceMappingURL=pos.bundle.U7TLNOTO.js.map
