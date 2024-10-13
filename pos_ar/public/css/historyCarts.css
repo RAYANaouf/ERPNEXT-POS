@@ -97,8 +97,16 @@
 }
 
 #posItemList>div>div{
-	flex-grow : 1 ;
+	width : 33.3333333334% ;
 }
+
+#posItemList>div>div.itemCost{
+	justify-content : end  ;
+}
+#posItemList>div>div.itemQuantity{
+	justify-content : end  ;
+}
+
 #posItemList>div .itemName{
 	font-size   : 16px ;
 	font-weight : 600  ;

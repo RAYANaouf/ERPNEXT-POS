@@ -2041,7 +2041,7 @@
       this.pos_header.find("#posStatus").text(posStatus);
       this.itemList.html("");
       this.selected_pos.items.forEach((item) => {
-        this.itemList.append(`<div class="rowBox align_item">    <div class="itemName rowBox centerItem">${item.item_name}</div>   <div class="itemQuantity rowBox centerItem">${item.qty}</div>   <div class="itemCost rowBox centerItem">${item.qty * item.rate} DA</div>  </div>`);
+        this.itemList.append(`<div class="rowBox align_item">    <div class="itemName rowBox align_center">${item.item_name}</div>   <div class="itemQuantity rowBox align_center">${item.qty}</div>   <div class="itemCost rowBox align_center">${item.qty * item.rate} DA</div>  </div>`);
       });
     }
     show_cart() {
@@ -2160,4 +2160,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.OIID22WX.js.map
+//# sourceMappingURL=pos.bundle.CGXVHSMX.js.map
