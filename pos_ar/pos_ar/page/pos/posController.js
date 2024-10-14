@@ -821,7 +821,8 @@ pos_ar.PointOfSale.Controller = class {
 
 			// we still didnt implement the  base_paid_amount and amount_eligible_for_commissionseen
 			// value in deafault pos ==>  ["Administrator"]. i think it is an array.
-			frappe.db.insert({
+
+			/*frappe.db.insert({
 				'doctype'      : "POS Invoice",
 				'customer'     : this.sellInvoices.get(invoiceName).customer    ,
 				'pos_profile'  : this.sellInvoices.get(invoiceName).pos_profile ,
@@ -857,8 +858,29 @@ pos_ar.PointOfSale.Controller = class {
 			}).catch(err =>{
 				counter += 1 ;
 				failure += 1 ;
-			})
+			})*/
 
+
+			frappe.db.insert(
+					this.sellInvoices.get(invoiceName)
+			).then(r =>{
+
+				invoicesRef.push({'pos_invoice' : r.name , 'customer' : r.customer } )
+				this.sellInvoices.delete(invoiceName)
+
+				counter += 1 ;
+
+				frappe.show_progress('Syncing Invoices...' , counter , all_invoices.length , 'syncing')
+
+				if(counter == all_invoices.length){
+					frappe.hide_progress();
+					this.customer_box.setSynced();
+				}
+
+			}).catch(err=>{
+				counter += 1 ;
+				failure += 1 ;
+			})
 		})
 	}
 
