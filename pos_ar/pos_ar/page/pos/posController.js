@@ -1,4 +1,5 @@
 
+
 pos_ar.PointOfSale.Controller = class {
         constructor(wrapper) {
 		//principales variable
@@ -11,8 +12,12 @@ pos_ar.PointOfSale.Controller = class {
                 this.itemList          = []
                 this.itemPrices        = []
                 this.priceLists        = []
+
+
+		let initPos = frappe.model.get_new_doc('POS Invoice')
+		initPos.items = [];
                 this.selectedItemMaps  = new Map([
-							["C1" , new Map()]
+							["C1" , initPos ]
 						])
                 this.warehouseList     = []
                 this.PosProfileList    = []
@@ -43,6 +48,9 @@ pos_ar.PointOfSale.Controller = class {
 		await  this.checkForPOSEntry()
                 await  this.prepare_components();
 		this.setListeners();
+
+		console.log("selectedItemMaps ::: " , this.selectedItemMaps)
+
 	}
 
 
@@ -355,24 +363,9 @@ pos_ar.PointOfSale.Controller = class {
 		itemCloned.discount_percentage = 0;
 
 
-		console.log("old ===> " , this.selectedItemMaps )
-
-		console.log("updated ===> " , this.selectedItemMaps.get(this.selectedTab.tabName).has(itemCloned.name) )
+		this.addItemToPosInvoice( item )
 
 
-		if(!this.selectedItemMaps.get(this.selectedTab.tabName).has(itemCloned.name)){
-			itemCloned.quantity            = 1 ;
-			itemCloned.discount_amount     = 0 ;
-			itemCloned.discount_percentage = 0 ;
-			itemCloned.amount              = this.getItemPrice(itemCloned.name);
-			this.selectedItemMaps.get(this.selectedTab.tabName).set( itemCloned.name , itemCloned )
-		}
-		else{
-			const existingItem = this.selectedItemMaps.get(this.selectedTab.tabName).get(itemCloned.name);
-			console.log("quantity ===> " , existingItem.quantity);
-			existingItem.quantity += 1 ;
-			this.selectedItemMaps.get(this.selectedTab.tabName).set( itemCloned.name , existingItem);
-		}
 
 
 		console.log("updated ===> " , this.selectedItemMaps )
@@ -659,6 +652,10 @@ pos_ar.PointOfSale.Controller = class {
 
 		let items = []
 
+
+
+
+
 		this.selectedItemMaps.get(this.selectedTab.tabName).forEach((value,key) =>{
 			// we still didnt implement the price_list_rate and base_price_list_rate
 			// same thing with actual_qty refering to the stock quantity
@@ -691,6 +688,11 @@ pos_ar.PointOfSale.Controller = class {
 				"items"      : items,
 				"creation_time": frappe.datetime.now_datetime()
 		});
+
+
+
+
+
 
 		const pos_invoice = {
 					tabName       : this.selectedTab.tabName ,
@@ -915,6 +917,33 @@ pos_ar.PointOfSale.Controller = class {
 
 	}
 
+
+	addItemToPosInvoice( clickedItem ){
+
+		console.log("clicked item ::: " , clickedItem)
+
+		const posInvoice = this.selectedItemMaps.get(this.selectedTab.tabName);
+		const posItems   = posInvoice.items;
+
+		let exist = false ;
+
+		posItems.forEach(item => {
+			if(item.name == clickedItem.name){
+				exist = true;
+				item.qty += 1 ;
+			}
+		})
+
+		if(!exist){
+			clickedItem.discount_amount     = 0 ;
+			clickedItem.discount_percentage = 0 ;
+			clickedItem.qty                 = 1 ;
+			itemCloned.rate                 = this.getItemPrice(clickedItem.name);
+			posItems.push(clickedItem)
+		}
+
+
+	}
         /*********************  get data functions ******************************/
 
 

@@ -9,8 +9,10 @@
       this.itemList = [];
       this.itemPrices = [];
       this.priceLists = [];
+      let initPos = frappe.model.get_new_doc("POS Invoice");
+      initPos.items = [];
       this.selectedItemMaps = /* @__PURE__ */ new Map([
-        ["C1", /* @__PURE__ */ new Map()]
+        ["C1", initPos]
       ]);
       this.warehouseList = [];
       this.PosProfileList = [];
@@ -33,6 +35,7 @@
       await this.checkForPOSEntry();
       await this.prepare_components();
       this.setListeners();
+      console.log("selectedItemMaps ::: ", this.selectedItemMaps);
     }
     async refreshApp() {
       console.log("refresh");
@@ -292,23 +295,10 @@
       );
     }
     itemClick_selector(item) {
-      const itemCloned = structuredClone(item);
-      itemCloned.discount_amount = 0;
-      itemCloned.discount_percentage = 0;
-      console.log("old ===> ", this.selectedItemMaps);
-      console.log("updated ===> ", this.selectedItemMaps.get(this.selectedTab.tabName).has(itemCloned.name));
-      if (!this.selectedItemMaps.get(this.selectedTab.tabName).has(itemCloned.name)) {
-        itemCloned.quantity = 1;
-        itemCloned.discount_amount = 0;
-        itemCloned.discount_percentage = 0;
-        itemCloned.amount = this.getItemPrice(itemCloned.name);
-        this.selectedItemMaps.get(this.selectedTab.tabName).set(itemCloned.name, itemCloned);
-      } else {
-        const existingItem = this.selectedItemMaps.get(this.selectedTab.tabName).get(itemCloned.name);
-        console.log("quantity ===> ", existingItem.quantity);
-        existingItem.quantity += 1;
-        this.selectedItemMaps.get(this.selectedTab.tabName).set(itemCloned.name, existingItem);
-      }
+      const itemCloned2 = structuredClone(item);
+      itemCloned2.discount_amount = 0;
+      itemCloned2.discount_percentage = 0;
+      this.addItemToPosInvoice(item);
       console.log("updated ===> ", this.selectedItemMaps);
       this.selected_item_cart.calculateNetTotal();
       this.selected_item_cart.calculateQnatity();
@@ -646,6 +636,25 @@
       if (document.readyState === "complete") {
         console.log("DOM was already loaded");
         navigator.serviceWorker.register("../assets/pos_ar/public/js/sw.js").then((reg) => console.log("Service Worker registered successfully.")).catch((err) => console.log(`Service Worker registration failed: ${err}`));
+      }
+    }
+    addItemToPosInvoice(clickedItem) {
+      console.log("clicked item ::: ", clickedItem);
+      const posInvoice = this.selectedItemMaps.get(this.selectedTab.tabName);
+      const posItems = posInvoice.items;
+      let exist = false;
+      posItems.forEach((item) => {
+        if (item.name == clickedItem.name) {
+          exist = true;
+          item.qty += 1;
+        }
+      });
+      if (!exist) {
+        clickedItem.discount_amount = 0;
+        clickedItem.discount_percentage = 0;
+        clickedItem.qty = 1;
+        itemCloned.rate = this.getItemPrice(clickedItem.name);
+        posItems.push(clickedItem);
       }
     }
     async fetchCustomers() {
@@ -2160,4 +2169,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.CGXVHSMX.js.map
+//# sourceMappingURL=pos.bundle.5OEOVOVF.js.map
