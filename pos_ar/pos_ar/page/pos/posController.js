@@ -732,13 +732,17 @@ pos_ar.PointOfSale.Controller = class {
 
 
 		let new_pos_invoice = frappe.model.get_new_doc('POS Invoice');
-		new_pos_invoice.customer      = this.customersList[0].name
-		new_pos_invoice.pos_profile   = this.PosProfileList[0].name
-		new_pos_invoice.items         = items
-		new_pos_invoice.paid_amount   = paid_amount
+		new_pos_invoice.customer         = this.customersList[0].name
+		new_pos_invoice.pos_profile      = this.PosProfileList[0].name
+		new_pos_invoice.items            = items
+		new_pos_invoice.paid_amount      = paid_amount
+		new_pos_invoice.base_paid_amount = paid_amount
 		new_pos_invoice.amount_eligible_for_commission = paid_amount
-		new_pos_invoice.creation_time = frappe.datetime.now_datetime()
-
+		new_pos_invoice.creation_time    = frappe.datetime.now_datetime()
+		new_pos_invoice.payments         = [{'mode_of_payment' : 'Cash' , 'amount' : paid_amount}]
+		new_pos_invoice.is_pos           = 1
+		new_pos_invoice.update_stock     = 1
+		new_pos_invoice.docstatus        = 1
 
 
 		this.sellInvoices.set(new_pos_invoice.name , new_pos_invoice);
@@ -859,6 +863,7 @@ pos_ar.PointOfSale.Controller = class {
 				counter += 1 ;
 				failure += 1 ;
 			})*/
+
 
 
 			frappe.db.insert(
