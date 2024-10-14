@@ -321,6 +321,7 @@ pos_ar.PointOfSale.pos_payment_cart = class{
 			this.invoice_data.grandTotal += item.qty * item.rate
 		})
 
+		this.payment_details.find('#paymentGrandTotalValue').text(`${this.invoice_data.grandTotal} DA`)
 		this.generateProposedPaidAmount(this.invoice_data.grandTotal);
 	}
 

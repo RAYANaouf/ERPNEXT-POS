@@ -928,6 +928,11 @@ pos_ar.PointOfSale.Controller = class {
 
 	addItemToPosInvoice( clickedItem ){
 
+
+		let clonedItem = {} ;
+		Object.assign(clonedItem , clickedItem)
+
+
 		console.log("clicked item ::: " , clickedItem)
 
 		const posInvoice = this.selectedItemMaps.get(this.selectedTab.tabName);
@@ -943,11 +948,11 @@ pos_ar.PointOfSale.Controller = class {
 		})
 
 		if(!exist){
-			clickedItem.discount_amount     = 0 ;
-			clickedItem.discount_percentage = 0 ;
-			clickedItem.qty                 = 1 ;
-			clickedItem.rate                = this.getItemPrice(clickedItem.name);
-			posItems.push(clickedItem)
+			clonedItem.discount_amount     = 0 ;
+			clonedItem.discount_percentage = 0 ;
+			clonedItem.qty                 = 1 ;
+			clonedItem.rate                = this.getItemPrice(clickedItem.name);
+			posItems.push(clonedItem)
 		}
 
 

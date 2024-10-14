@@ -178,6 +178,8 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 		console.log("debuging " , this.selected_tab)
 		console.log("selected map ==::==>  " , this.selected_item_maps)
 
+		console.log("pos " ,  this.selected_item_maps.get(this.selected_tab.tabName)  , "debuging here ! ==::==> " , this.selected_item_maps.get(this.selected_tab.tabName).items)
+
 		this.selected_item_maps.get(this.selected_tab.tabName).items.forEach( item  =>{
 			const itemElement   = document.createElement("div");
 			const leftGroup     = document.createElement("div");
@@ -249,7 +251,9 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 
 	createNewTab(){
 			this.counter += 1 ;
-			this.selected_item_maps.set(`C${this.counter}` , new Map())
+			let initPos   = frappe.model.get_new_doc('POS Invoice');
+			initPos.items  = [];
+			this.selected_item_maps.set(`C${this.counter}` , initPos)
 			this.selected_tab.tabName = `C${this.counter}`
 
 			//update UI
@@ -390,15 +394,7 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 	setListener(){
 
 		this.add_tab_button.on('mousedown' , (event)=>{
-			this.counter += 1 ;
-			this.selected_item_maps.set(`C${this.counter}` , new Map())
-			this.selected_tab.tabName = `C${this.counter}`
-
-			//update UI
-			this.refreshTabs()
-			this.refreshSelectedItem()
-			this.on_tab_click();
-			console.log("add Tab new map ==> " , this.selected_item_maps)
+			this.createNewTab()
 		})
 
 	}
