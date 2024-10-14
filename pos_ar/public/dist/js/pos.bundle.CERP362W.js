@@ -758,7 +758,7 @@
     async fetchPosProfileList() {
       try {
         return await frappe.db.get_list("POS Profile", {
-          fields: ["name", "warehouse", "income_account", "write_off_account", "write_off_cost_center"],
+          fields: ["name", "warehouse", "income_account", "write_off_account", "write_off_cost_center", "taxes_and_charges", "tax_category"],
           filters: { disabled: 0 },
           limit: 1e5
         });
@@ -2194,4 +2194,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.VR4XWL7Q.js.map
+//# sourceMappingURL=pos.bundle.CERP362W.js.map
