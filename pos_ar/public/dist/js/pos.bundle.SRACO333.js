@@ -295,9 +295,9 @@
       );
     }
     itemClick_selector(item) {
-      const itemCloned2 = structuredClone(item);
-      itemCloned2.discount_amount = 0;
-      itemCloned2.discount_percentage = 0;
+      const itemCloned = structuredClone(item);
+      itemCloned.discount_amount = 0;
+      itemCloned.discount_percentage = 0;
       this.addItemToPosInvoice(item);
       console.log("updated ===> ", this.selectedItemMaps);
       this.selected_item_cart.calculateNetTotal();
@@ -653,7 +653,7 @@
         clickedItem.discount_amount = 0;
         clickedItem.discount_percentage = 0;
         clickedItem.qty = 1;
-        itemCloned.rate = this.getItemPrice(clickedItem.name);
+        clickedItem.rate = this.getItemPrice(clickedItem.name);
         posItems.push(clickedItem);
       }
     }
@@ -1256,24 +1256,24 @@
     }
     calculateNetTotal() {
       let netTotal = 0;
-      this.selected_item_maps.get(this.selected_tab.tabName).forEach((value, key) => {
-        netTotal += value.quantity * value.amount;
+      this.selected_item_maps.get(this.selected_tab.tabName).items.forEach((item) => {
+        netTotal += item.rate * item.qty;
       });
       const netTotal_HTML = document.getElementById("netTotalValue");
       netTotal_HTML.textContent = netTotal;
     }
     calculateQnatity() {
       let quantity = 0;
-      this.selected_item_maps.get(this.selected_tab.tabName).forEach((value, key) => {
-        quantity += value.quantity;
+      this.selected_item_maps.get(this.selected_tab.tabName).items.forEach((item) => {
+        quantity += item.qty;
       });
       const totalQuantity_HTML = document.getElementById("totalQuantityValue");
       totalQuantity_HTML.textContent = quantity;
     }
     calculateGrandTotal() {
       let grandTotal = 0;
-      this.selected_item_maps.get(this.selected_tab.tabName).forEach((value, key) => {
-        grandTotal += value.quantity * value.amount;
+      this.selected_item_maps.get(this.selected_tab.tabName).items.forEach((item) => {
+        grandTotal += item.qty * item.rate;
       });
       const grandTotal_HTML = document.getElementById("grandTotalValue");
       grandTotal_HTML.textContent = grandTotal;
@@ -2169,4 +2169,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.5OEOVOVF.js.map
+//# sourceMappingURL=pos.bundle.SRACO333.js.map

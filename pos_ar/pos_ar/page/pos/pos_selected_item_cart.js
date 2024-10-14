@@ -408,18 +408,18 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 
 	calculateNetTotal(){
 		let netTotal = 0;
-		this.selected_item_maps.get(this.selected_tab.tabName).forEach((value,key) =>{
-			netTotal += value.quantity * value.amount
+		this.selected_item_maps.get(this.selected_tab.tabName).items.forEach( item => {
+			netTotal += item.rate * item.qty
 		})
-
 		const netTotal_HTML = document.getElementById("netTotalValue");
 		netTotal_HTML.textContent = netTotal;
 	}
 
 	calculateQnatity(){
 		let quantity = 0;
-		this.selected_item_maps.get(this.selected_tab.tabName).forEach((value,key) =>{
-			quantity += value.quantity
+
+		this.selected_item_maps.get(this.selected_tab.tabName).items.forEach( item => {
+			quantity += item.qty
 		})
 
 		const totalQuantity_HTML = document.getElementById("totalQuantityValue");
@@ -428,8 +428,10 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 
 	calculateGrandTotal(){
 		let grandTotal = 0;
-		this.selected_item_maps.get(this.selected_tab.tabName).forEach((value,key) =>{
-			grandTotal += value.quantity * value.amount
+
+
+		this.selected_item_maps.get(this.selected_tab.tabName).items.forEach( item => {
+			grandTotal += item.qty * item.rate
 		})
 
 		const grandTotal_HTML = document.getElementById("grandTotalValue");

@@ -938,7 +938,7 @@ pos_ar.PointOfSale.Controller = class {
 			clickedItem.discount_amount     = 0 ;
 			clickedItem.discount_percentage = 0 ;
 			clickedItem.qty                 = 1 ;
-			itemCloned.rate                 = this.getItemPrice(clickedItem.name);
+			clickedItem.rate                = this.getItemPrice(clickedItem.name);
 			posItems.push(clickedItem)
 		}
 
