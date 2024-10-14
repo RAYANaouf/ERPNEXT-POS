@@ -1092,8 +1092,8 @@
       const selectedItemsContainer = document.getElementById("selectedItemsContainer");
       selectedItemsContainer.innerHTML = "";
       console.log("debuging ", this.selected_tab);
-      console.log("selected map ", this.selected_item_maps);
-      this.selected_item_maps.get(this.selected_tab.tabName).forEach((item, itemId) => {
+      console.log("selected map ==::==>  ", this.selected_item_maps);
+      this.selected_item_maps.get(this.selected_tab.tabName).items.forEach((item) => {
         const itemElement = document.createElement("div");
         const leftGroup = document.createElement("div");
         const rightGroup = document.createElement("div");
@@ -1116,10 +1116,10 @@
         itemName.textContent = item.name;
         itemName.classList.add("selectedItemName");
         leftGroup.appendChild(itemName);
-        itemQuantity.textContent = item.quantity;
+        itemQuantity.textContent = item.qty;
         itemQuantity.classList.add("itemQuantity");
         rightGroup.appendChild(itemQuantity);
-        itemPrice.textContent = item.amount + " DA";
+        itemPrice.textContent = item.rate + " DA";
         itemPrice.classList.add("itemPrice");
         rightGroup.appendChild(itemPrice);
         leftGroup.classList.add("rowBox", "align_center", "leftGroup");
@@ -1127,7 +1127,7 @@
         rightGroup.classList.add("rowBox", "align_center", "rightGroup");
         itemElement.appendChild(rightGroup);
         itemElement.classList.add("rowBox", "align_center", "row_sbtw", "ItemElement", "pointer");
-        if (itemId == this.selected_item.name)
+        if (item.name == this.selected_item.name)
           itemElement.classList.add("selected");
         itemElement.addEventListener("click", (event2) => {
           console.log("we are click");
@@ -2169,4 +2169,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.SRACO333.js.map
+//# sourceMappingURL=pos.bundle.ZF3BU354.js.map

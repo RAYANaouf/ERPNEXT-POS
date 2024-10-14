@@ -176,9 +176,9 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 		selectedItemsContainer.innerHTML = "";
 
 		console.log("debuging " , this.selected_tab)
-		console.log("selected map " , this.selected_item_maps)
+		console.log("selected map ==::==>  " , this.selected_item_maps)
 
-		this.selected_item_maps.get(this.selected_tab.tabName).forEach((item,itemId) =>{
+		this.selected_item_maps.get(this.selected_tab.tabName).items.forEach( item  =>{
 			const itemElement   = document.createElement("div");
 			const leftGroup     = document.createElement("div");
 			const rightGroup    = document.createElement("div");
@@ -211,11 +211,11 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 			leftGroup.appendChild(itemName);
 
 			//quantity
-			itemQuantity.textContent = item.quantity
+			itemQuantity.textContent = item.qty
 			itemQuantity.classList.add("itemQuantity");
 			rightGroup.appendChild(itemQuantity);
 			//price
-			itemPrice.textContent = item.amount + " DA"
+			itemPrice.textContent = item.rate + " DA"
 			itemPrice.classList.add("itemPrice");
 			rightGroup.appendChild(itemPrice);
 
@@ -230,7 +230,7 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 
 			//item
 			itemElement.classList.add("rowBox" , "align_center" , "row_sbtw" , "ItemElement" , "pointer")
-			if(itemId == this.selected_item.name)
+			if(item.name == this.selected_item.name)
 				itemElement.classList.add("selected")
 			itemElement.addEventListener("click" , event =>{
 				console.log("we are click")
