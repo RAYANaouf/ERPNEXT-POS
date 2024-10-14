@@ -64,7 +64,9 @@
 	display : none ;
 }
 
-input{
+input,
+select
+{
 	height        : 30px     ;
 	padding       : 0px 8px  ;
 
@@ -75,7 +77,8 @@ input{
 	border-radius : 10px     ;
 
 }
-input:focus{
+input:focus,
+select:focus{
 	outline : none !important;
 	background : #fcfcfc !important;
 	border        : 2px solid #ac6500 !important;

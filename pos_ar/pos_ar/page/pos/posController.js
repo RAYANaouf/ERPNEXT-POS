@@ -282,7 +282,8 @@ pos_ar.PointOfSale.Controller = class {
 	init_customer_box(){
 		this.customer_box  = new pos_ar.PointOfSale.pos_customer_box(
 									this.$rightSection ,
-									this.customersList ,
+									this.customersList    ,
+									this.selectedCustomer ,
 									this.onSync.bind(this),
 									this.onClosePOS.bind(this),
 									this.onHistoryClick.bind(this)

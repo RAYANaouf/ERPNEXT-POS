@@ -2,17 +2,19 @@
 pos_ar.PointOfSale.pos_customer_box = class{
 
 	constructor(
-		wrapper,
-		customersList,
-		onSync,
-		onClosePOS,
+		wrapper          ,
+		customersList    ,
+		selectedCustomer ,
+		onSync     ,
+		onClosePOS ,
 		onHistoryClick
 	){
-		this.wrapper          = wrapper ;
-		this.customers_list   = customersList ;
-		this.on_sync          = onSync ;
-		this.on_close_pos     = onClosePOS;
-		this.on_history_click = onHistoryClick;
+		this.wrapper           = wrapper ;
+		this.customers_list    = customersList ;
+		this.selected_customer = selectedCustomer;
+		this.on_sync           = onSync ;
+		this.on_close_pos      = onClosePOS;
+		this.on_history_click  = onHistoryClick;
 
 		//local
 		this.online  = true    ;
@@ -56,8 +58,9 @@ pos_ar.PointOfSale.pos_customer_box = class{
 		this.setting      = this.menuItemsContainer.find('#settingMenuItem')
 
 		this.customerBox = this.actionContainer.find('#CustomerBox');
-		this.customerBox.append('<input list="CustomerList"  id="CustomerInput" name="Customer" placeHolder="Enter the customer">')
-		this.customerBox.append('<datalist id="CustomerList"></datalist>')
+		this.customerBox.append('<select  id="CustomerInput" placeHolder="Enter the customer"></select>')
+
+		this.customer_selecte = this.customerBox.find('#CustomerInput')
 		this.customerBox.append('<div id="syncBtn" class="Synced">Sync</div>')
 
 		this.sync_btn = this.customerBox.find('#syncBtn')
@@ -66,7 +69,7 @@ pos_ar.PointOfSale.pos_customer_box = class{
 
 	setCustomersInList(){
 
-		const customerList_html = document.getElementById("CustomerList");
+		const customerList_html = document.getElementById("CustomerInput");
 		customerList_html.innerHTML = "" ;
 
 		this.customers_list.forEach(customer =>{
@@ -96,6 +99,11 @@ pos_ar.PointOfSale.pos_customer_box = class{
 
 		this.customerBox.find('#syncBtn').on('click' , (event)=>{
 			this.on_sync();
+		})
+
+		this.customerBox.find('#CustomerInput').on('input' , (event)=>{
+			const customer = event.target.value ;
+			this.selected_customer = customer;
 		})
 
 		this.close_pos.on('click' , (event)=>{
