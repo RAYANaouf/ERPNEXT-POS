@@ -494,26 +494,49 @@ pos_ar.PointOfSale.Controller = class {
 
 		if( field ==  "quantity" ){
 			this.selectedItem.quantity = value;
-			this.selectedItemMaps.get(this.selectedTab.tabName).set( this.selectedItem.name , Object.assign({},this.selectedItem) )
+			this.editPosItemQty(this.selectedItem.name , this.selectedItem.quantity);
+
+			console.log("item ==>>> " , this.selectedItem)
+
 			//redrawing
 			this.selected_item_cart.refreshSelectedItem();
 		}
 		else if( field ==  "rate" ){
-			this.selectedItem.amount = value;
-			this.selectedItemMaps.get(this.selectedTab.tabName).set( this.selectedItem.name , Object.assign({},this.selectedItem)  )
+			this.selectedItem.rate = value;
+			this.editPosItemRate(this.selectedItem.name , this.selectedItem.rate);
+
+
+			//recalculate the rate
+			let oldRate = this.selectedItem.rate;
+			let persont = this.selectedItem.discount_percentage
+			let montant = oldRate * (persont / 100)
+
+			this.selectedItem.discount_percentage = persont;
+			this.selectedItem.discount_amount     = montant;
+
+			console.log("item ==>>> " , this.selectedItem)
+
+
 			//redrawing
 			this.selected_item_cart.refreshSelectedItem();
+			this.item_details.refreshDate(this.selectedItem);
+
 		}
 		else if( field == "discount_percentage"){
 
 			//recalculate the rate
-			let oldRate = this.selectedItem.amount;
+			let oldRate = this.selectedItem.rate;
 			let montant = oldRate * (value / 100)
 
-			this.selectedItem.discount_percentage = value;
+			this.selectedItem.discount_percentage = parseFloat(value);
 			this.selectedItem.discount_amount     = montant;
 
-			this.selectedItemMaps.get(this.selectedTab.tabName).set( this.selectedItem.name , Object.assign({},this.selectedItem)  )
+			this.editPosItemDiscountAmount(this.selectedItem.name , this.selectedItem.discount_amount);
+			this.editPosItemDiscountPercentage(this.selectedItem.name ,  this.selectedItem.discount_percentage);
+
+			console.log("item ==>>> " , this.selectedItem)
+
+
 			//redrawing
 			this.selected_item_cart.refreshSelectedItem();
 			this.item_details.refreshDate(this.selectedItem);
@@ -521,9 +544,9 @@ pos_ar.PointOfSale.Controller = class {
 		else if( field == "discount_amount"){
 
 			//recalculate the rate
-			let oldRate = this.selectedItem.amount;
+			let oldRate = this.selectedItem.rate;
 			let persent = ((value * 100) / oldRate).toFixed(2);
-			let montant = value;
+			let montant = parseFloat(value);
 
 			//prevent negatif result
 			if(persent > 100){
@@ -533,10 +556,16 @@ pos_ar.PointOfSale.Controller = class {
 				montant = oldRate;
 			}
 
-			this.selectedItem.discount_percentage = persent;
+			this.selectedItem.discount_percentage = parseFloat(persent);
 			this.selectedItem.discount_amount     = montant;
 
-			this.selectedItemMaps.get(this.selectedTab.tabName).set( this.selectedItem.name , Object.assign({},this.selectedItem)  )
+
+			this.editPosItemDiscountAmount(this.selectedItem.name , this.selectedItem.discount_amount);
+			this.editPosItemDiscountPercentage(this.selectedItem.name , this.selectedItem.discount_percentage);
+
+			console.log("item ==>>> " , this.selectedItem)
+
+
 			//redrawing
 			this.selected_item_cart.refreshSelectedItem();
 			this.item_details.refreshDate(this.selectedItem);
@@ -665,20 +694,20 @@ pos_ar.PointOfSale.Controller = class {
 
 
 
-		this.selectedItemMaps.get(this.selectedTab.tabName).forEach((value,key) =>{
+		this.selectedItemMaps.get(this.selectedTab.tabName).items.forEach(  item  =>{
 			// we still didnt implement the price_list_rate and base_price_list_rate
 			// same thing with actual_qty refering to the stock quantity
 			let newItem = {
-				'item_name'               : value.name,
-				'item_code'               : value.name,
-				'rate'                    : value.amount,
-				'qty'                     : value.quantity,
-				'description'             : value.name,
-				'image'                   : value.image,
+				'item_name'               : item.name,
+				'item_code'               : item.name,
+				'rate'                    : item.rate,
+				'qty'                     : item.qty,
+				'description'             : item.name,
+				'image'                   : item.image,
 				'expense_account'         : 'Cost of Goods Sold - MS',
 				'use_serial_batch_fields' : 1,
-				'discount_percentage'     : value.discount_percentage,
-				'discount_amount'         : value.discount_amount,
+				'discount_percentage'     : item.discount_percentage,
+				'discount_amount'         : item.discount_amount,
 				'warehouse'               : this.PosProfileList[0].warehouse,
 				'income_account'          : this.PosProfileList[0].income_account,
 				'item_tax_rate'           : {}
@@ -690,26 +719,7 @@ pos_ar.PointOfSale.Controller = class {
 		if(items.length ==0)
 			return
 
-		this.sellInvoices.set(
-				this.selectedTab.tabName , {
-				"customer"   : this.customersList[0].name,
-				"pos_profile": this.PosProfileList[0].name,
-				"items"      : items,
-				"creation_time": frappe.datetime.now_datetime()
-		});
 
-
-
-
-
-
-		const pos_invoice = {
-					tabName       : this.selectedTab.tabName ,
-					customer      : this.customersList[0].name ,
-					pos_profile   : this.PosProfileList[0].name ,
-					items         : items ,
-					creation_time : frappe.datetime.now_datetime()
-				}
 
 
 		let totalQty    = 0 ;
@@ -720,6 +730,7 @@ pos_ar.PointOfSale.Controller = class {
 			paid_amount += item.rate * item.qty
 		})
 
+
 		let new_pos_invoice = frappe.model.get_new_doc('POS Invoice');
 		new_pos_invoice.customer      = this.customersList[0].name
 		new_pos_invoice.pos_profile   = this.PosProfileList[0].name
@@ -728,7 +739,11 @@ pos_ar.PointOfSale.Controller = class {
 		new_pos_invoice.amount_eligible_for_commission = paid_amount
 		new_pos_invoice.creation_time = frappe.datetime.now_datetime()
 
-		console.log("created pos_invoice " , pos_invoice)
+
+
+		this.sellInvoices.set(new_pos_invoice.name , new_pos_invoice);
+
+
 
 		this.db.savePosInvoice(
 					new_pos_invoice ,
@@ -739,6 +754,7 @@ pos_ar.PointOfSale.Controller = class {
 						console.log("failure => " , event )
 					}
 				)
+
 
 		this.customer_box.setNotSynced();
 
@@ -772,9 +788,9 @@ pos_ar.PointOfSale.Controller = class {
 		}
 
 		//calculate amount
-		let all_tabs = Array.from(this.sellInvoices.keys())
+		let all_invoices = Array.from(this.sellInvoices.keys())
 
-		if(all_tabs.length == 0){
+		if(all_invoices.length == 0){
 
 			// with options
 			frappe.msgprint({
@@ -787,18 +803,18 @@ pos_ar.PointOfSale.Controller = class {
 		}
 
 		//progress
-		frappe.show_progress('Syncing Invoices...' , 0 , all_tabs.length , 'syncing')
+		frappe.show_progress('Syncing Invoices...' , 0 , all_invoices.length , 'syncing')
 
 		let counter     = 0  ;
 		let failure     = 0  ;
 		let seccess     = 0  ;
 		let invoicesRef = [] ;
 
-		all_tabs.forEach(tab =>{
+		all_invoices.forEach(invoiceName =>{
 			//calculate the paid_amount
 			let paid_amount = 0 ;
 			let totalQty    = 0 ;
-			this.sellInvoices.get(tab).items.forEach(item =>{
+			this.sellInvoices.get(invoiceName).items.forEach(item =>{
 				totalQty    += item.qty
 				paid_amount += item.rate * item.qty
 			})
@@ -807,10 +823,10 @@ pos_ar.PointOfSale.Controller = class {
 			// value in deafault pos ==>  ["Administrator"]. i think it is an array.
 			frappe.db.insert({
 				'doctype'      : "POS Invoice",
-				'customer'     : this.sellInvoices.get(tab).customer    ,
-				'pos_profile'  : this.sellInvoices.get(tab).pos_profile ,
-				'items'        : this.sellInvoices.get(tab).items       ,
-				'creation_time': this.sellInvoices.get(tab).creation_time,
+				'customer'     : this.sellInvoices.get(invoiceName).customer    ,
+				'pos_profile'  : this.sellInvoices.get(invoiceName).pos_profile ,
+				'items'        : this.sellInvoices.get(invoiceName).items       ,
+				'creation_time': this.sellInvoices.get(invoiceName).creation_time,
 				'paid_amount'  : paid_amount,
 				'amount_eligible_for_commission' : paid_amount,
 				'write_off_account': this.PosProfileList[0].write_off_account,
@@ -826,13 +842,13 @@ pos_ar.PointOfSale.Controller = class {
 			}).then(r => {
 
 				invoicesRef.push({'pos_invoice' : r.name , 'customer' : r.customer } )
-				this.sellInvoices.delete(tab)
+				this.sellInvoices.delete(invoiceName)
 
 				counter += 1 ;
 
-				frappe.show_progress('Syncing Invoices...' , counter , all_tabs.length , 'syncing')
+				frappe.show_progress('Syncing Invoices...' , counter , all_invoices.length , 'syncing')
 
-				if(counter == all_tabs.length){
+				if(counter == all_invoices.length){
 					frappe.hide_progress();
 					this.customer_box.setSynced();
 				}
@@ -958,6 +974,40 @@ pos_ar.PointOfSale.Controller = class {
 
 
 	}
+
+	editPosItemQty(itemName , qty){
+		let items = this.selectedItemMaps.get(this.selectedTab.tabName).items
+		items.forEach(item => {
+			if(item.name == itemName){
+				item.qty = qty
+			}
+		})
+	}
+	editPosItemRate(itemName , rate){
+		let items = this.selectedItemMaps.get(this.selectedTab.tabName).items
+		items.forEach(item => {
+			if(item.name == itemName){
+				item.rate = rate
+			}
+		})
+	}
+	editPosItemDiscountPercentage(itemName , discountPercentage){
+		let items = this.selectedItemMaps.get(this.selectedTab.tabName).items
+		items.forEach(item => {
+			if(item.name == itemName){
+				item.discount_percentage = discountPercentage
+			}
+		})
+	}
+	editPosItemDiscountAmount(itemName , discountAmount){
+		let items = this.selectedItemMaps.get(this.selectedTab.tabName).items
+		items.forEach(item => {
+			if(item.name == itemName){
+				item.discount_amount = discountAmount
+			}
+		})
+	}
+
         /*********************  get data functions ******************************/
 
 

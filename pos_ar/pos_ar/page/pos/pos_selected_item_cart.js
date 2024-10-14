@@ -172,15 +172,15 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 
 	refreshSelectedItem(){
 
+
+
 		const selectedItemsContainer = document.getElementById("selectedItemsContainer");
 		selectedItemsContainer.innerHTML = "";
 
-		console.log("debuging " , this.selected_tab)
-		console.log("selected map ==::==>  " , this.selected_item_maps)
-
-		console.log("pos " ,  this.selected_item_maps.get(this.selected_tab.tabName)  , "debuging here ! ==::==> " , this.selected_item_maps.get(this.selected_tab.tabName).items)
-
 		this.selected_item_maps.get(this.selected_tab.tabName).items.forEach( item  =>{
+
+			//console.log("item >==>>>> " , item)
+
 			const itemElement   = document.createElement("div");
 			const leftGroup     = document.createElement("div");
 			const rightGroup    = document.createElement("div");
@@ -217,7 +217,7 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 			itemQuantity.classList.add("itemQuantity");
 			rightGroup.appendChild(itemQuantity);
 			//price
-			itemPrice.textContent = item.rate + " DA"
+			itemPrice.textContent = (item.rate - item.discount_amount) + " DA"
 			itemPrice.classList.add("itemPrice");
 			rightGroup.appendChild(itemPrice);
 

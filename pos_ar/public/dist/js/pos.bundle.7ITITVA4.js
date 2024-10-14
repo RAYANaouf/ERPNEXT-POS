@@ -368,33 +368,45 @@
       }
       if (field == "quantity") {
         this.selectedItem.quantity = value;
-        this.selectedItemMaps.get(this.selectedTab.tabName).set(this.selectedItem.name, Object.assign({}, this.selectedItem));
+        this.editPosItemQty(this.selectedItem.name, this.selectedItem.quantity);
+        console.log("item ==>>> ", this.selectedItem);
         this.selected_item_cart.refreshSelectedItem();
       } else if (field == "rate") {
-        this.selectedItem.amount = value;
-        this.selectedItemMaps.get(this.selectedTab.tabName).set(this.selectedItem.name, Object.assign({}, this.selectedItem));
-        this.selected_item_cart.refreshSelectedItem();
-      } else if (field == "discount_percentage") {
-        let oldRate = this.selectedItem.amount;
-        let montant = oldRate * (value / 100);
-        this.selectedItem.discount_percentage = value;
+        this.selectedItem.rate = value;
+        this.editPosItemRate(this.selectedItem.name, this.selectedItem.rate);
+        let oldRate = this.selectedItem.rate;
+        let persont = this.selectedItem.discount_percentage;
+        let montant = oldRate * (persont / 100);
+        this.selectedItem.discount_percentage = persont;
         this.selectedItem.discount_amount = montant;
-        this.selectedItemMaps.get(this.selectedTab.tabName).set(this.selectedItem.name, Object.assign({}, this.selectedItem));
+        console.log("item ==>>> ", this.selectedItem);
+        this.selected_item_cart.refreshSelectedItem();
+        this.item_details.refreshDate(this.selectedItem);
+      } else if (field == "discount_percentage") {
+        let oldRate = this.selectedItem.rate;
+        let montant = oldRate * (value / 100);
+        this.selectedItem.discount_percentage = parseFloat(value);
+        this.selectedItem.discount_amount = montant;
+        this.editPosItemDiscountAmount(this.selectedItem.name, this.selectedItem.discount_amount);
+        this.editPosItemDiscountPercentage(this.selectedItem.name, this.selectedItem.discount_percentage);
+        console.log("item ==>>> ", this.selectedItem);
         this.selected_item_cart.refreshSelectedItem();
         this.item_details.refreshDate(this.selectedItem);
       } else if (field == "discount_amount") {
-        let oldRate = this.selectedItem.amount;
+        let oldRate = this.selectedItem.rate;
         let persent = (value * 100 / oldRate).toFixed(2);
-        let montant = value;
+        let montant = parseFloat(value);
         if (persent > 100) {
           persent = 100;
         }
         if (value > oldRate) {
           montant = oldRate;
         }
-        this.selectedItem.discount_percentage = persent;
+        this.selectedItem.discount_percentage = parseFloat(persent);
         this.selectedItem.discount_amount = montant;
-        this.selectedItemMaps.get(this.selectedTab.tabName).set(this.selectedItem.name, Object.assign({}, this.selectedItem));
+        this.editPosItemDiscountAmount(this.selectedItem.name, this.selectedItem.discount_amount);
+        this.editPosItemDiscountPercentage(this.selectedItem.name, this.selectedItem.discount_percentage);
+        console.log("item ==>>> ", this.selectedItem);
         this.selected_item_cart.refreshSelectedItem();
         this.item_details.refreshDate(this.selectedItem);
       }
@@ -475,18 +487,18 @@
     }
     onCompleteOrder() {
       let items = [];
-      this.selectedItemMaps.get(this.selectedTab.tabName).forEach((value, key) => {
+      this.selectedItemMaps.get(this.selectedTab.tabName).items.forEach((item) => {
         let newItem = {
-          "item_name": value.name,
-          "item_code": value.name,
-          "rate": value.amount,
-          "qty": value.quantity,
-          "description": value.name,
-          "image": value.image,
+          "item_name": item.name,
+          "item_code": item.name,
+          "rate": item.rate,
+          "qty": item.qty,
+          "description": item.name,
+          "image": item.image,
           "expense_account": "Cost of Goods Sold - MS",
           "use_serial_batch_fields": 1,
-          "discount_percentage": value.discount_percentage,
-          "discount_amount": value.discount_amount,
+          "discount_percentage": item.discount_percentage,
+          "discount_amount": item.discount_amount,
           "warehouse": this.PosProfileList[0].warehouse,
           "income_account": this.PosProfileList[0].income_account,
           "item_tax_rate": {}
@@ -495,22 +507,6 @@
       });
       if (items.length == 0)
         return;
-      this.sellInvoices.set(
-        this.selectedTab.tabName,
-        {
-          "customer": this.customersList[0].name,
-          "pos_profile": this.PosProfileList[0].name,
-          "items": items,
-          "creation_time": frappe.datetime.now_datetime()
-        }
-      );
-      const pos_invoice = {
-        tabName: this.selectedTab.tabName,
-        customer: this.customersList[0].name,
-        pos_profile: this.PosProfileList[0].name,
-        items,
-        creation_time: frappe.datetime.now_datetime()
-      };
       let totalQty = 0;
       let paid_amount = 0;
       items.forEach((item) => {
@@ -524,7 +520,7 @@
       new_pos_invoice.paid_amount = paid_amount;
       new_pos_invoice.amount_eligible_for_commission = paid_amount;
       new_pos_invoice.creation_time = frappe.datetime.now_datetime();
-      console.log("created pos_invoice ", pos_invoice);
+      this.sellInvoices.set(new_pos_invoice.name, new_pos_invoice);
       this.db.savePosInvoice(
         new_pos_invoice,
         (event2) => {
@@ -551,8 +547,8 @@
         this.checkForPOSEntry();
         return;
       }
-      let all_tabs = Array.from(this.sellInvoices.keys());
-      if (all_tabs.length == 0) {
+      let all_invoices = Array.from(this.sellInvoices.keys());
+      if (all_invoices.length == 0) {
         frappe.msgprint({
           title: __("Sync Complete"),
           indicator: "green",
@@ -560,24 +556,24 @@
         });
         return;
       }
-      frappe.show_progress("Syncing Invoices...", 0, all_tabs.length, "syncing");
+      frappe.show_progress("Syncing Invoices...", 0, all_invoices.length, "syncing");
       let counter = 0;
       let failure = 0;
       let seccess = 0;
       let invoicesRef = [];
-      all_tabs.forEach((tab) => {
+      all_invoices.forEach((invoiceName) => {
         let paid_amount = 0;
         let totalQty = 0;
-        this.sellInvoices.get(tab).items.forEach((item) => {
+        this.sellInvoices.get(invoiceName).items.forEach((item) => {
           totalQty += item.qty;
           paid_amount += item.rate * item.qty;
         });
         frappe.db.insert({
           "doctype": "POS Invoice",
-          "customer": this.sellInvoices.get(tab).customer,
-          "pos_profile": this.sellInvoices.get(tab).pos_profile,
-          "items": this.sellInvoices.get(tab).items,
-          "creation_time": this.sellInvoices.get(tab).creation_time,
+          "customer": this.sellInvoices.get(invoiceName).customer,
+          "pos_profile": this.sellInvoices.get(invoiceName).pos_profile,
+          "items": this.sellInvoices.get(invoiceName).items,
+          "creation_time": this.sellInvoices.get(invoiceName).creation_time,
           "paid_amount": paid_amount,
           "amount_eligible_for_commission": paid_amount,
           "write_off_account": this.PosProfileList[0].write_off_account,
@@ -592,10 +588,10 @@
           "docstatus": 1
         }).then((r) => {
           invoicesRef.push({ "pos_invoice": r.name, "customer": r.customer });
-          this.sellInvoices.delete(tab);
+          this.sellInvoices.delete(invoiceName);
           counter += 1;
-          frappe.show_progress("Syncing Invoices...", counter, all_tabs.length, "syncing");
-          if (counter == all_tabs.length) {
+          frappe.show_progress("Syncing Invoices...", counter, all_invoices.length, "syncing");
+          if (counter == all_invoices.length) {
             frappe.hide_progress();
             this.customer_box.setSynced();
           }
@@ -665,6 +661,38 @@
         clonedItem.rate = this.getItemPrice(clickedItem.name);
         posItems.push(clonedItem);
       }
+    }
+    editPosItemQty(itemName, qty) {
+      let items = this.selectedItemMaps.get(this.selectedTab.tabName).items;
+      items.forEach((item) => {
+        if (item.name == itemName) {
+          item.qty = qty;
+        }
+      });
+    }
+    editPosItemRate(itemName, rate) {
+      let items = this.selectedItemMaps.get(this.selectedTab.tabName).items;
+      items.forEach((item) => {
+        if (item.name == itemName) {
+          item.rate = rate;
+        }
+      });
+    }
+    editPosItemDiscountPercentage(itemName, discountPercentage) {
+      let items = this.selectedItemMaps.get(this.selectedTab.tabName).items;
+      items.forEach((item) => {
+        if (item.name == itemName) {
+          item.discount_percentage = discountPercentage;
+        }
+      });
+    }
+    editPosItemDiscountAmount(itemName, discountAmount) {
+      let items = this.selectedItemMaps.get(this.selectedTab.tabName).items;
+      items.forEach((item) => {
+        if (item.name == itemName) {
+          item.discount_amount = discountAmount;
+        }
+      });
     }
     async fetchCustomers() {
       try {
@@ -1105,9 +1133,6 @@
     refreshSelectedItem() {
       const selectedItemsContainer = document.getElementById("selectedItemsContainer");
       selectedItemsContainer.innerHTML = "";
-      console.log("debuging ", this.selected_tab);
-      console.log("selected map ==::==>  ", this.selected_item_maps);
-      console.log("pos ", this.selected_item_maps.get(this.selected_tab.tabName), "debuging here ! ==::==> ", this.selected_item_maps.get(this.selected_tab.tabName).items);
       this.selected_item_maps.get(this.selected_tab.tabName).items.forEach((item) => {
         const itemElement = document.createElement("div");
         const leftGroup = document.createElement("div");
@@ -1134,7 +1159,7 @@
         itemQuantity.textContent = item.qty;
         itemQuantity.classList.add("itemQuantity");
         rightGroup.appendChild(itemQuantity);
-        itemPrice.textContent = item.rate + " DA";
+        itemPrice.textContent = item.rate - item.discount_amount + " DA";
         itemPrice.classList.add("itemPrice");
         rightGroup.appendChild(itemPrice);
         leftGroup.classList.add("rowBox", "align_center", "leftGroup");
@@ -2179,4 +2204,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.QMYQTI3F.js.map
+//# sourceMappingURL=pos.bundle.7ITITVA4.js.map
