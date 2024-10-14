@@ -12,6 +12,8 @@ pos_ar.PointOfSale.pos_payment_cart = class{
 		onComplete,
 		onInput
 	){
+
+
 		this.wrapper                 = wrapper     ;
 		this.selected_item_map       = selectedItemMap;
 		this.selected_tab            = selectedTab ;
@@ -33,6 +35,9 @@ pos_ar.PointOfSale.pos_payment_cart = class{
 		this.prepare_payment_cart();
 		this.calculateGrandTotal()
 		this.setListeners()
+
+		console.log("helloooooooooooooooooooooooooooo ")
+
 	}
 
 	prepare_payment_cart(){
@@ -312,18 +317,15 @@ pos_ar.PointOfSale.pos_payment_cart = class{
 		console.log("invoice data : " ,  this.invoice_data);
 		this.invoice_data.grandTotal = 0 ;
 
-		this.selected_item_map.get(this.selected_tab.tabName).forEach((value,key)=>{
-			this.invoice_data.grandTotal += value.quantity * value.amount
+		this.selected_item_map.get(this.selected_tab.tabName).items.forEach( item =>{
+			this.invoice_data.grandTotal += item.qty * item.rate
 		})
-
-		this.payment_details.find('#paymentGrandTotalValue').text(`${this.invoice_data.grandTotal} DA`)
 
 		this.generateProposedPaidAmount(this.invoice_data.grandTotal);
 	}
 
 	calculateToChange(){
 		this.invoice_data.toChange = (this.invoice_data.paidAmount - this.invoice_data.grandTotal)
-		console.log("paid  " ,this.invoice_data.paidAmount , " - " , this.invoice_data.grandTotal , " = "  ,   this.invoice_data.toChange)
 		this.payment_details.find('#paimentToChangeValue').text(`${this.invoice_data.toChange} DA`)
 	}
 

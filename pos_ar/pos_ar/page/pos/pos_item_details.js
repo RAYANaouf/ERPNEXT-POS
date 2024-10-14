@@ -94,11 +94,10 @@ pos_ar.PointOfSale.pos_item_details = class{
 
 	refreshDate(item){
 
-		console.log("start ref")
 		const imageContainer    = document.getElementById("detailsItemImage") ;
-		const name  = document.getElementById("detailsItemName");
-		const warehouse     = document.getElementById("detailsItemWarehouse");
-		const itemGroup     = document.getElementById("detailsItemGroup");
+		const name              = document.getElementById("detailsItemName");
+		const warehouse         = document.getElementById("detailsItemWarehouse");
+		const itemGroup         = document.getElementById("detailsItemGroup");
 
 		const quantity             = document.getElementById("itemDetailsQuantityInput");
 		const rate                 = document.getElementById("itemDetailsRateInput");
@@ -133,11 +132,11 @@ pos_ar.PointOfSale.pos_item_details = class{
 
 
 		//quantity
-		quantity.value = item.quantity
+		quantity.value = item.qty
 
 		//rate
-		rate.value = item.amount
-		discountedRate.value = item.amount - item.discount_amount
+		rate.value = item.rate
+		discountedRate.value = item.rate - item.discount_amount
 
 		//discount
 		discount_amount.value     = item.discount_amount ?? 0.00;
@@ -168,8 +167,6 @@ pos_ar.PointOfSale.pos_item_details = class{
 
 		//hightlited fields
 		this.makeSelectedFieldHighlighted()
-		//listeners
-		//setItemDetailsFieldsListener()
 	}
 
 	show_cart(){

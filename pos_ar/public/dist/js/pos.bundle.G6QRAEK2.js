@@ -275,6 +275,7 @@
     }
     init_paymentCart() {
       console.log("im heeeeeeeeeeeeer @#$%^&*(*&^%$##$%^&*()^%$#@");
+      console.log(" hiiiiiiiiiiiiiiiiiiii payment ::");
       this.payment_cart = new pos_ar.PointOfSale.pos_payment_cart(
         this.$leftSection,
         this.selectedItemMaps,
@@ -287,6 +288,7 @@
           this.onInput(event2, field, value);
         }
       );
+      console.log(" hiiiiiiiiiiiiiiiiiiii payment ", this.payment_cart);
     }
     init_historyCart() {
       this.history_cart = new pos_ar.PointOfSale.pos_history(
@@ -307,6 +309,10 @@
     }
     onSelectedItemClick(item) {
       Object.assign(this.selectedItem, item);
+      console.log("selected item clicked ::: ", item);
+      console.log("item_details :: ", this.item_details);
+      console.log("item_selector :: ", this.item_selector);
+      console.log("payment_cart :: ", this.payment_cart);
       this.item_details.show_cart();
       this.selected_item_cart.showKeyboard();
       this.item_selector.hideCart();
@@ -1353,7 +1359,6 @@
     }
     refreshDate(item) {
       var _a, _b;
-      console.log("start ref");
       const imageContainer = document.getElementById("detailsItemImage");
       const name = document.getElementById("detailsItemName");
       const warehouse = document.getElementById("detailsItemWarehouse");
@@ -1382,9 +1387,9 @@
       }
       name.textContent = item.item_name;
       name.classList.add("rowBox", "align_center");
-      quantity.value = item.quantity;
-      rate.value = item.amount;
-      discountedRate.value = item.amount - item.discount_amount;
+      quantity.value = item.qty;
+      rate.value = item.rate;
+      discountedRate.value = item.rate - item.discount_amount;
       discount_amount.value = (_a = item.discount_amount) != null ? _a : 0;
       discount_percentage.value = (_b = item.discount_percentage) != null ? _b : 0;
       available.value = this.getQtyInWarehouse(item.name, this.warehouse);
@@ -1699,6 +1704,7 @@
       this.prepare_payment_cart();
       this.calculateGrandTotal();
       this.setListeners();
+      console.log("helloooooooooooooooooooooooooooo ");
     }
     prepare_payment_cart() {
       this.wrapper.append('<div id="paymentMethodCart" class="columnBox align_center"></div>');
@@ -1890,15 +1896,13 @@
     calculateGrandTotal() {
       console.log("invoice data : ", this.invoice_data);
       this.invoice_data.grandTotal = 0;
-      this.selected_item_map.get(this.selected_tab.tabName).forEach((value, key) => {
-        this.invoice_data.grandTotal += value.quantity * value.amount;
+      this.selected_item_map.get(this.selected_tab.tabName).items.forEach((item) => {
+        this.invoice_data.grandTotal += item.qty * item.rate;
       });
-      this.payment_details.find("#paymentGrandTotalValue").text(`${this.invoice_data.grandTotal} DA`);
       this.generateProposedPaidAmount(this.invoice_data.grandTotal);
     }
     calculateToChange() {
       this.invoice_data.toChange = this.invoice_data.paidAmount - this.invoice_data.grandTotal;
-      console.log("paid  ", this.invoice_data.paidAmount, " - ", this.invoice_data.grandTotal, " = ", this.invoice_data.toChange);
       this.payment_details.find("#paimentToChangeValue").text(`${this.invoice_data.toChange} DA`);
     }
     refreshPaidAmount() {
@@ -2169,4 +2173,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.ZF3BU354.js.map
+//# sourceMappingURL=pos.bundle.G6QRAEK2.js.map

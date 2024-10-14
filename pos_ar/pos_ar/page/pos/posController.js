@@ -328,6 +328,7 @@ pos_ar.PointOfSale.Controller = class {
 
         init_paymentCart(){
 		console.log("im heeeeeeeeeeeeer @#$%^&*(*&^%$##$%^&*()^%$#@")
+		console.log(" hiiiiiiiiiiiiiiiiiiii payment ::")
 		this.payment_cart = new pos_ar.PointOfSale.pos_payment_cart(
 									this.$leftSection,
 									this.selectedItemMaps,
@@ -340,6 +341,7 @@ pos_ar.PointOfSale.Controller = class {
 										this.onInput(event , field , value);
 									},
 								)
+		console.log(" hiiiiiiiiiiiiiiiiiiii payment " , this.payment_cart)
         }
 
         init_historyCart(){
@@ -385,6 +387,12 @@ pos_ar.PointOfSale.Controller = class {
 		Object.assign(this.selectedItem , item)
 
 
+		console.log("selected item clicked ::: " , item);
+
+
+		console.log("item_details :: " , this.item_details)
+		console.log("item_selector :: " , this.item_selector)
+		console.log("payment_cart :: " , this.payment_cart)
 		//show
 		this.item_details.show_cart();
 		this.selected_item_cart.showKeyboard();
