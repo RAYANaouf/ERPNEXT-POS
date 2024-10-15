@@ -352,9 +352,13 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 
 	//hide
 	hideCart(){
-
 		this.tabs_bar.css('display' , 'none');
 		this.cartBox.css('display' , 'none');
+	}
+	//hide
+	showCart(){
+		this.tabs_bar.css('display' , 'flex');
+		this.cartBox.css('display' , 'flex');
 	}
 	/************************  set listeners  ***************************/
 

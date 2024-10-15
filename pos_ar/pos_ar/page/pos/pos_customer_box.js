@@ -5,6 +5,7 @@ pos_ar.PointOfSale.pos_customer_box = class{
 		wrapper          ,
 		customersList    ,
 		selectedCustomer ,
+		backHome         ,
 		onSync     ,
 		onClosePOS ,
 		onHistoryClick
@@ -12,6 +13,7 @@ pos_ar.PointOfSale.pos_customer_box = class{
 		this.wrapper           = wrapper ;
 		this.customers_list    = customersList ;
 		this.selected_customer = selectedCustomer;
+		this.back_home         = backHome
 		this.on_sync           = onSync ;
 		this.on_close_pos      = onClosePOS;
 		this.on_history_click  = onHistoryClick;
@@ -131,7 +133,7 @@ pos_ar.PointOfSale.pos_customer_box = class{
 		})
 
 		this.home.on('click' , (event)=>{
-			console.log("we should go home!")
+			this.back_home()
 		})
 
 	}

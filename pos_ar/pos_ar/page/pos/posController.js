@@ -290,6 +290,7 @@ pos_ar.PointOfSale.Controller = class {
 									this.$rightSection ,
 									this.customersList    ,
 									this.selectedCustomer ,
+									this.backHome.bind(this),
 									this.onSync.bind(this),
 									this.onClosePOS.bind(this),
 									this.onHistoryClick.bind(this)
@@ -478,6 +479,21 @@ pos_ar.PointOfSale.Controller = class {
 		this.item_selector.hideCart();
 		this.selected_item_cart.hideCart();
 		this.customer_box.hideActionBar();
+
+	}
+
+	backHome(){
+
+		//show
+		this.item_selector.showCart();
+		this.customer_box.showActionBar();
+		this.selected_item_cart.showCart()
+
+		//hide
+		this.payment_cart.hideCart()  ;
+		this.item_details.hide_cart() ;
+		this.history_cart.hide_cart() ;
+
 
 	}
 

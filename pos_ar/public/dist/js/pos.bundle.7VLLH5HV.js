@@ -233,6 +233,7 @@
         this.$rightSection,
         this.customersList,
         this.selectedCustomer,
+        this.backHome.bind(this),
         this.onSync.bind(this),
         this.onClosePOS.bind(this),
         this.onHistoryClick.bind(this)
@@ -353,6 +354,14 @@
       this.item_selector.hideCart();
       this.selected_item_cart.hideCart();
       this.customer_box.hideActionBar();
+    }
+    backHome() {
+      this.item_selector.showCart();
+      this.customer_box.showActionBar();
+      this.selected_item_cart.showCart();
+      this.payment_cart.hideCart();
+      this.item_details.hide_cart();
+      this.history_cart.hide_cart();
     }
     onInput(event2, field, value) {
       console.log("<<we are in onInpute function >>  event : ", event2, " field : ", field, " value : ", value);
@@ -929,10 +938,11 @@
 
   // ../pos_ar/pos_ar/pos_ar/page/pos/pos_customer_box.js
   pos_ar.PointOfSale.pos_customer_box = class {
-    constructor(wrapper, customersList, selectedCustomer, onSync, onClosePOS, onHistoryClick) {
+    constructor(wrapper, customersList, selectedCustomer, backHome, onSync, onClosePOS, onHistoryClick) {
       this.wrapper = wrapper;
       this.customers_list = customersList;
       this.selected_customer = selectedCustomer;
+      this.back_home = backHome;
       this.on_sync = onSync;
       this.on_close_pos = onClosePOS;
       this.on_history_click = onHistoryClick;
@@ -1016,7 +1026,7 @@
         }
       });
       this.home.on("click", (event2) => {
-        console.log("we should go home!");
+        this.back_home();
       });
     }
     setSynced() {
@@ -1273,6 +1283,10 @@
     hideCart() {
       this.tabs_bar.css("display", "none");
       this.cartBox.css("display", "none");
+    }
+    showCart() {
+      this.tabs_bar.css("display", "flex");
+      this.cartBox.css("display", "flex");
     }
     setButtonsListeners() {
       const key_0 = this.buttonsContainer.find("#key_0");
@@ -2285,4 +2299,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.JOYBF2WH.js.map
+//# sourceMappingURL=pos.bundle.7VLLH5HV.js.map
