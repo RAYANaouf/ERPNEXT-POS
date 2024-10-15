@@ -5,6 +5,7 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 	constructor(
 		wrapper          ,
 		selectedItemMaps ,
+		salesTaxes      ,
 		selectedTab      ,
 		selectedItem     ,
 		selectedField    ,
@@ -15,6 +16,7 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 	){
 		this.wrapper                 = wrapper;
 		this.selected_item_maps      = selectedItemMaps;
+		this.sales_taxes             = salesTaxes     ;
 		this.selected_tab            = selectedTab     ;
 		this.selected_item           = selectedItem    ;
 		this.selected_field          = selectedField   ;
@@ -91,6 +93,7 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 		this.cartDetails.append('<div id="discount" class="rowBox align_center row_sbtw"></div>')
 		this.cartDetails.append('<div id="totalQuantity" class="rowBox align_center row_sbtw"></div>')
 		this.cartDetails.append('<div id="netTotal" class="rowBox align_center row_sbtw"></div>')
+		this.cartDetails.append('<div id="VAT" class="columnBox"></div>')
 		this.cartDetails.append('<div id="grandTotal" class="rowBox align_center row_sbtw"></div>')
 
 		this.discount      = this.cartDetails.find('#discount')
@@ -104,6 +107,14 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 		this.netTotal      = this.cartDetails.find('#netTotal')
 		this.netTotal.append('<div id="netTotalTitle">Net Total</div>')
 		this.netTotal.append('<div id="netTotalValue">0.00</div>')
+
+		this.vat           = this.cartDetails.find('#VAT')
+		this.sales_taxes.forEach( tax =>{
+			this.vat.append(`<div id="taxConatiner_${tax.name}" class="rowBox align_center row_sbtw"></div>`)
+			const taxContainer = this.vat.find(`#taxConatiner_${tax.name}`)
+			taxContainer.append(`<div id="tax_${tax.name}_Title">${tax.description}</div>`)
+			taxContainer.append(`<div id="tax_${tax.name}_Value">0.00</div>`)
+		})
 
 		this.grandTotal    = this.cartDetails.find('#grandTotal')
 		this.grandTotal.append('<div id="grandTotalTitle">Grand Total</div>')

@@ -82,22 +82,17 @@ pos_ar.PointOfSale.Controller = class {
 
 		this.sales_taxes  = this.getSalesTax()
 
+
+		console.log("taxes and charges templates  => ", this.taxes_and_charges_template)
+		console.log("taxes and charges            => ", this.sales_taxes_and_charges)
+		console.log("debog check ==> " , this.sales_taxes)
+
 		if(this.PosProfileList.length == 0){
 			frappe.set_route("Form", "POS Profile");
 			return;
 		}
 
 
-                console.log("customersList => " , this.customersList )
-                console.log("itemGroupList => " , this.itemGroupList )
-                console.log("itemList      => " , this.itemList      )
-                console.log("itemPrices    => " , this.itemPrices    )
-                console.log("priceLists    => " , this.priceLists    )
-                console.log("warehouseList => " , this.warehouseList )
-                console.log("POSProfileList => ", this.PosProfileList)
-                console.log("bin list       => ", this.binList       )
-                console.log("taxes and charges templates  => ", this.taxes_and_charges_template)
-                console.log("taxes and charges            => ", this.sales_taxes_and_charges)
         }
 
 
@@ -304,6 +299,7 @@ pos_ar.PointOfSale.Controller = class {
 		this.selected_item_cart  = new pos_ar.PointOfSale.pos_selected_item_cart(
 									this.$rightSection ,
 									this.selectedItemMaps,
+									this.sales_taxes,
 									this.selectedTab  ,
 									this.selectedItem ,
 									this.selectedField,
@@ -1139,7 +1135,7 @@ pos_ar.PointOfSale.Controller = class {
         async fetchSalesTaxesAndCharges(){
                 try{
                         return await frappe.db.get_list('Sales Taxes and Charges' , {
-				fields  : ['name' , 'description' , 'account_head' , 'rate' , 'parent' ],
+				fields  : ['name'  ,  'cost_center' , 'description' , 'included_in_print_rate' , 'rate' , 'included_in_paid_amount' , 'parent' ],
                                 filters : { parenttype : 'Sales Taxes and Charges Template'},
 				limit : 100000
                         })

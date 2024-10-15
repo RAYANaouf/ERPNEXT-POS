@@ -160,6 +160,14 @@
         padding : 0px 16px ;
 }
 
+#RightSection #CartBox #cartDetails #VAT{
+        padding : 0px 16px ;
+}
+
+#RightSection #CartBox #cartDetails #VAT>div{
+        height : 24px  ;
+}
+
 #RightSection #CartBox #cartDetails #grandTotal{
         height : 30px  ;
         margin : 4px 0px ;

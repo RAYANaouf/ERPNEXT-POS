@@ -57,20 +57,13 @@
       this.sales_taxes_and_charges = await this.fetchSalesTaxesAndCharges();
       this.taxes_and_charges_template = await this.fetchSalesTaxesAndChargesTemplate();
       this.sales_taxes = this.getSalesTax();
+      console.log("taxes and charges templates  => ", this.taxes_and_charges_template);
+      console.log("taxes and charges            => ", this.sales_taxes_and_charges);
+      console.log("debog check ==> ", this.sales_taxes);
       if (this.PosProfileList.length == 0) {
         frappe.set_route("Form", "POS Profile");
         return;
       }
-      console.log("customersList => ", this.customersList);
-      console.log("itemGroupList => ", this.itemGroupList);
-      console.log("itemList      => ", this.itemList);
-      console.log("itemPrices    => ", this.itemPrices);
-      console.log("priceLists    => ", this.priceLists);
-      console.log("warehouseList => ", this.warehouseList);
-      console.log("POSProfileList => ", this.PosProfileList);
-      console.log("bin list       => ", this.binList);
-      console.log("taxes and charges templates  => ", this.taxes_and_charges_template);
-      console.log("taxes and charges            => ", this.sales_taxes_and_charges);
     }
     prepare_container() {
       this.wrapper.append('<link rel="stylesheet" type="text/css" href="/assets/pos_ar/css/selectorBox.css">');
@@ -249,6 +242,7 @@
       this.selected_item_cart = new pos_ar.PointOfSale.pos_selected_item_cart(
         this.$rightSection,
         this.selectedItemMaps,
+        this.sales_taxes,
         this.selectedTab,
         this.selectedItem,
         this.selectedField,
@@ -800,7 +794,7 @@
     async fetchSalesTaxesAndCharges() {
       try {
         return await frappe.db.get_list("Sales Taxes and Charges", {
-          fields: ["name", "description", "account_head", "rate", "parent"],
+          fields: ["name", "cost_center", "description", "included_in_print_rate", "rate", "included_in_paid_amount", "parent"],
           filters: { parenttype: "Sales Taxes and Charges Template" },
           limit: 1e5
         });
@@ -1052,9 +1046,10 @@
 
   // ../pos_ar/pos_ar/pos_ar/page/pos/pos_selected_item_cart.js
   pos_ar.PointOfSale.pos_selected_item_cart = class {
-    constructor(wrapper, selectedItemMaps, selectedTab, selectedItem, selectedField, onSelectedItemClick, onTabClick, onKeyPressed, onCheckoutClick) {
+    constructor(wrapper, selectedItemMaps, salesTaxes, selectedTab, selectedItem, selectedField, onSelectedItemClick, onTabClick, onKeyPressed, onCheckoutClick) {
       this.wrapper = wrapper;
       this.selected_item_maps = selectedItemMaps;
+      this.sales_taxes = salesTaxes;
       this.selected_tab = selectedTab;
       this.selected_item = selectedItem;
       this.selected_field = selectedField;
@@ -1104,6 +1099,7 @@
       this.cartDetails.append('<div id="discount" class="rowBox align_center row_sbtw"></div>');
       this.cartDetails.append('<div id="totalQuantity" class="rowBox align_center row_sbtw"></div>');
       this.cartDetails.append('<div id="netTotal" class="rowBox align_center row_sbtw"></div>');
+      this.cartDetails.append('<div id="VAT" class="columnBox"></div>');
       this.cartDetails.append('<div id="grandTotal" class="rowBox align_center row_sbtw"></div>');
       this.discount = this.cartDetails.find("#discount");
       this.discount.append('<div id="addDiscountTitle">Add Discount</div>');
@@ -1114,6 +1110,13 @@
       this.netTotal = this.cartDetails.find("#netTotal");
       this.netTotal.append('<div id="netTotalTitle">Net Total</div>');
       this.netTotal.append('<div id="netTotalValue">0.00</div>');
+      this.vat = this.cartDetails.find("#VAT");
+      this.sales_taxes.forEach((tax) => {
+        this.vat.append(`<div id="taxConatiner_${tax.name}" class="rowBox align_center row_sbtw"></div>`);
+        const taxContainer = this.vat.find(`#taxConatiner_${tax.name}`);
+        taxContainer.append(`<div id="tax_${tax.name}_Title">${tax.description}</div>`);
+        taxContainer.append(`<div id="tax_${tax.name}_Value">0.00</div>`);
+      });
       this.grandTotal = this.cartDetails.find("#grandTotal");
       this.grandTotal.append('<div id="grandTotalTitle">Grand Total</div>');
       this.grandTotal.append('<div id="grandTotalValue">0.00</div>');
@@ -2236,4 +2239,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.4WOZB5SU.js.map
+//# sourceMappingURL=pos.bundle.QIL4UPFD.js.map
