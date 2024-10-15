@@ -1382,7 +1382,8 @@
       console.log("grandTotal (after) : ", grandTotal);
       const grandTotal_HTML = document.getElementById("grandTotalValue");
       grandTotal_HTML.textContent = grandTotal;
-      this.selected_tab.grandTotal = grandTotal;
+      this.invoice_data.grandTotal = grandTotal;
+      console.log("changint   ==> ", this.invoice_data.grandTotal);
     }
     makeItemHighlight(itemElement) {
       const selectedItemsContainer = document.getElementById("selectedItemsContainer");
@@ -1798,6 +1799,7 @@
       this.on_close_cart = onClose;
       this.on_complete = onComplete;
       this.on_input = onInput;
+      console.log("starting with  ==> ", this.invoice_data.grandTotal);
       this.start_work();
     }
     start_work() {
@@ -1848,7 +1850,6 @@
       this.cart.css("display", "none");
     }
     clearData() {
-      this.invoice_data.grandTotal = 0;
       this.invoice_data.paidAmount = 0;
       this.invoice_data.toChange = 0;
       this.cashBox.find("#cachInput").val(0);
@@ -1994,11 +1995,7 @@
       this.refreshData();
     }
     calculateGrandTotal() {
-      console.log("invoice data : ", this.invoice_data);
-      this.invoice_data.grandTotal = 0;
-      this.selected_item_map.get(this.selected_tab.tabName).items.forEach((item) => {
-        this.invoice_data.grandTotal += item.qty * item.rate;
-      });
+      console.log("calculateGrandTotal called with ==> ", this.invoice_data.grandTotal);
       this.payment_details.find("#paymentGrandTotalValue").text(`${this.invoice_data.grandTotal} DA`);
       this.generateProposedPaidAmount(this.invoice_data.grandTotal);
     }
@@ -2274,4 +2271,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.DN7XXSAJ.js.map
+//# sourceMappingURL=pos.bundle.6I33OATJ.js.map

@@ -23,6 +23,7 @@ pos_ar.PointOfSale.pos_payment_cart = class{
 		this.on_complete             = onComplete  ;
 		this.on_input                = onInput     ;
 
+		console.log("starting with  ==> " , this.invoice_data.grandTotal)
 
 		this.start_work();
 	}
@@ -31,7 +32,6 @@ pos_ar.PointOfSale.pos_payment_cart = class{
 	/****************************************  UI ***********************************************/
 
 	start_work(){
-
 		this.prepare_payment_cart();
 		this.calculateGrandTotal()
 		this.setListeners()
@@ -100,7 +100,6 @@ pos_ar.PointOfSale.pos_payment_cart = class{
 
 	clearData(){
 
-		this.invoice_data.grandTotal = 0 ;
 		this.invoice_data.paidAmount = 0 ;
 		this.invoice_data.toChange = 0 ;
 
@@ -313,14 +312,7 @@ pos_ar.PointOfSale.pos_payment_cart = class{
 	}
 
 	calculateGrandTotal(){
-
-		console.log("invoice data : " ,  this.invoice_data);
-		this.invoice_data.grandTotal = 0 ;
-
-		this.selected_item_map.get(this.selected_tab.tabName).items.forEach( item =>{
-			this.invoice_data.grandTotal += item.qty * item.rate
-		})
-
+		console.log("calculateGrandTotal called with ==> " , this.invoice_data.grandTotal)
 		this.payment_details.find('#paymentGrandTotalValue').text(`${this.invoice_data.grandTotal} DA`)
 		this.generateProposedPaidAmount(this.invoice_data.grandTotal);
 	}

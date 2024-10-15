@@ -487,7 +487,9 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 		const grandTotal_HTML = document.getElementById("grandTotalValue");
 		grandTotal_HTML.textContent = grandTotal;
 
-		this.selected_tab.grandTotal = grandTotal ;
+		this.invoice_data.grandTotal = grandTotal
+
+		console.log("changint   ==> " , this.invoice_data.grandTotal)
 	}
 
 	makeItemHighlight(itemElement){
