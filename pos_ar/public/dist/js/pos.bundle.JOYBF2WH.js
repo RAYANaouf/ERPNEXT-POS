@@ -502,6 +502,7 @@
       });
       if (items.length == 0)
         return;
+      console.log("the problem is here ====> ", this.invoiceData.discount);
       let new_pos_invoice = frappe.model.get_new_doc("POS Invoice");
       new_pos_invoice.customer = this.customersList[0].name;
       new_pos_invoice.pos_profile = this.PosProfileList[0].name;
@@ -1091,7 +1092,7 @@
       this.cartDetails.append('<div id="grandTotal" class="rowBox align_center row_sbtw"></div>');
       this.discount = this.cartDetails.find("#discount");
       this.discount.append('<div id="addDiscountTitle">Add Discount % </div>');
-      this.discount.append('<input type="number" id="addGlobalDiscountInput" value="0" >');
+      this.discount.append('<input type="number" id="addGlobalDiscountInput" value="0" step="1" min="0" max="100" >');
       this.discountInput = this.discount.find("#addGlobalDiscountInput");
       this.discountTitle = this.discount.find("#addDiscountTitle");
       this.totalQuantity = this.cartDetails.find("#totalQuantity");
@@ -1325,7 +1326,8 @@
           this.invoice_data.discount = 100;
           return;
         }
-        this.invoice_data.discount = event2.target.value;
+        this.invoice_data.discount = parseFloat(event2.target.value);
+        console.log("value ::: ", this.invoice_data.discount);
         this.calculateNetTotal();
         this.calculateVAT();
         this.calculateGrandTotal();
@@ -1336,6 +1338,7 @@
         } else if (event2.target.value > 100) {
           event2.target.value = 100;
         }
+        console.log("value ::: ", this.invoice_data.discount);
         this.calculateNetTotal();
         this.calculateVAT();
         this.calculateGrandTotal();
@@ -2282,4 +2285,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.M77NBHSR.js.map
+//# sourceMappingURL=pos.bundle.JOYBF2WH.js.map

@@ -103,7 +103,7 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 
 		this.discount      = this.cartDetails.find('#discount')
 		this.discount.append('<div id="addDiscountTitle">Add Discount % </div>')
-		this.discount.append('<input type="number" id="addGlobalDiscountInput" value="0" >')
+		this.discount.append('<input type="number" id="addGlobalDiscountInput" value="0" step="1" min="0" max="100" >')
 		this.discountInput = this.discount.find('#addGlobalDiscountInput')
 		this.discountTitle = this.discount.find('#addDiscountTitle')
 
@@ -426,9 +426,12 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 				this.invoice_data.discount = 100 ;
 				return;
 			}
-			this.invoice_data.discount = event.target.value
+
+
+			this.invoice_data.discount = parseFloat(event.target.value)
 
 			//recalculation
+			console.log("value ::: " , this.invoice_data.discount)
 			this.calculateNetTotal()
 			this.calculateVAT()
 			this.calculateGrandTotal()
@@ -442,6 +445,7 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 			}
 
 			//recalculation
+			console.log("value ::: " , this.invoice_data.discount)
 			this.calculateNetTotal()
 			this.calculateVAT()
 			this.calculateGrandTotal()

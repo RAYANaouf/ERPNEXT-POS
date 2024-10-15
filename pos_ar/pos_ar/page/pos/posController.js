@@ -719,7 +719,7 @@ pos_ar.PointOfSale.Controller = class {
 
 
 
-
+		console.log("the problem is here ====> " , this.invoiceData.discount );
 
 		let new_pos_invoice = frappe.model.get_new_doc('POS Invoice');
 		new_pos_invoice.customer          = this.customersList[0].name
