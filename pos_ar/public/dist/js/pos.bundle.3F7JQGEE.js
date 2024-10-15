@@ -304,6 +304,7 @@
       this.addItemToPosInvoice(item);
       console.log("updated ===> ", this.selectedItemMaps);
       this.selected_item_cart.calculateNetTotal();
+      this.selected_item_cart.calculateVAT();
       this.selected_item_cart.calculateQnatity();
       this.selected_item_cart.calculateGrandTotal();
       this.selected_item_cart.refreshSelectedItem();
@@ -1215,6 +1216,7 @@
         selectedItemsContainer.appendChild(itemElement);
       });
       this.calculateNetTotal();
+      this.calculateVAT();
       this.calculateQnatity();
       this.calculateGrandTotal();
     }
@@ -1243,6 +1245,7 @@
         this.cartDetails.addClass("rowBox align_center");
         this.cartDetails.removeClass("columnBox");
         discount.css("display", "none");
+        this.vat.css("display", "none");
         quantity.css("font-size", "smaller");
         netTotal.css("font-size", "smaller");
         grandTotal.css("font-size", "small");
@@ -1251,6 +1254,7 @@
         this.cartDetails.addClass("columnBox");
         this.cartDetails.removeClass("rowBox");
         discount.css("display", "flex");
+        this.vat.css("display", "flex");
         quantity.css("font-size", "small");
         netTotal.css("font-size", "small");
         grandTotal.css("font-size", "larger");
@@ -1336,14 +1340,14 @@
       const netTotal_HTML = document.getElementById("netTotalValue");
       netTotal_HTML.textContent = netTotal;
       this.net_total = netTotal;
-      this.calculateVAT();
     }
     calculateVAT() {
       console.log("VAT ========> start ");
       this.sales_taxes.forEach((tax) => {
         let saleTaxAmount = 0;
         let taxPercentage = tax.rate / 100;
-        this.taxes_map.set(tax.name, this.net_total * taxPercentage);
+        const calculatedTax = (this.net_total * taxPercentage).toFixed(2);
+        this.taxes_map.set(tax.name, calculatedTax);
         const tax_HTML = document.getElementById(`tax_${tax.name}_Value`);
         tax_HTML.textContent = this.taxes_map.get(tax.name);
       });
@@ -2255,4 +2259,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.YEPYEGTO.js.map
+//# sourceMappingURL=pos.bundle.3F7JQGEE.js.map

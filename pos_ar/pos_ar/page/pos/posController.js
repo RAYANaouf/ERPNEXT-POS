@@ -382,6 +382,7 @@ pos_ar.PointOfSale.Controller = class {
 
 
 		this.selected_item_cart.calculateNetTotal();
+		this.selected_item_cart.calculateVAT();
 		this.selected_item_cart.calculateQnatity();
 		this.selected_item_cart.calculateGrandTotal();
 		this.selected_item_cart.refreshSelectedItem();

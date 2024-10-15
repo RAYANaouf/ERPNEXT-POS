@@ -259,6 +259,7 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 		})
 
 		this.calculateNetTotal();
+		this.calculateVAT();
 		this.calculateQnatity();
 		this.calculateGrandTotal();
 	}
@@ -295,7 +296,7 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 			this.cartDetails.addClass('rowBox align_center')
 			this.cartDetails.removeClass('columnBox')
 			discount.css('display' , 'none')
-
+			this.vat.css('display' , 'none')
 			//make the text smaller
 			quantity.css('font-size' , 'smaller')
 			netTotal.css('font-size' , 'smaller')
@@ -306,6 +307,7 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 			this.cartDetails.addClass('columnBox')
 			this.cartDetails.removeClass('rowBox')
 			discount.css('display','flex')
+			this.vat.css('display' , 'flex')
 
 			//reset
 			quantity.css('font-size'   , 'small' )
@@ -424,7 +426,6 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 		const netTotal_HTML = document.getElementById("netTotalValue");
 		netTotal_HTML.textContent = netTotal;
 		this.net_total = netTotal ;
-		this.calculateVAT()
 	}
 
 	calculateVAT(){
@@ -434,7 +435,8 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 		this.sales_taxes.forEach( tax =>{
 			let saleTaxAmount = 0 ;
 			let taxPercentage = (tax.rate / 100)
-			this.taxes_map.set(tax.name , this.net_total * taxPercentage)
+			const calculatedTax = (this.net_total * taxPercentage).toFixed(2)
+			this.taxes_map.set(tax.name , calculatedTax)
 			const tax_HTML = document.getElementById(`tax_${tax.name}_Value`);
 			tax_HTML.textContent = this.taxes_map.get(tax.name);
 		})
