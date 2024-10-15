@@ -37,7 +37,7 @@ pos_ar.PointOfSale.Controller = class {
 		this.sellInvoices    = new Map();
 		this.POSOpeningEntry = {}
 
-		this.invoiceData = {grandTotal : 0 , paidAmount : 0 , toChange : 0}
+		this.invoiceData = { netTotal : 0 , grandTotal : 0 , paidAmount : 0 , toChange : 0}
 		this.db          = null;
 
                 this.start_app();
@@ -299,7 +299,8 @@ pos_ar.PointOfSale.Controller = class {
 		this.selected_item_cart  = new pos_ar.PointOfSale.pos_selected_item_cart(
 									this.$rightSection ,
 									this.selectedItemMaps,
-									this.sales_taxes,
+									this.sales_taxes  ,
+									this.invoiceData  ,
 									this.selectedTab  ,
 									this.selectedItem ,
 									this.selectedField,

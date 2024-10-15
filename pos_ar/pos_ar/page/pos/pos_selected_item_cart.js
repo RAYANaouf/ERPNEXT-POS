@@ -5,7 +5,8 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 	constructor(
 		wrapper          ,
 		selectedItemMaps ,
-		salesTaxes      ,
+		salesTaxes       ,
+		invoiceData      ,
 		selectedTab      ,
 		selectedItem     ,
 		selectedField    ,
@@ -16,7 +17,8 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 	){
 		this.wrapper                 = wrapper;
 		this.selected_item_maps      = selectedItemMaps;
-		this.sales_taxes             = salesTaxes     ;
+		this.sales_taxes             = salesTaxes      ;
+		this.invoice_data            = invoiceData     ;
 		this.selected_tab            = selectedTab     ;
 		this.selected_item           = selectedItem    ;
 		this.selected_field          = selectedField   ;
@@ -26,9 +28,8 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 		this.on_tab_click            = onTabClick      ;
 
 		//local
-		this.net_total   = 0 ;
-		this.grand_total = 0 ;
 		this.taxes_map   = new Map();
+		this.total_tax_amout = 0 ;
 		this.counter    = 1 ;
 
 		this.start_work();
@@ -425,7 +426,7 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 		})
 		const netTotal_HTML = document.getElementById("netTotalValue");
 		netTotal_HTML.textContent = netTotal;
-		this.net_total = netTotal ;
+		this.invoice_data.netTotal = netTotal ;
 	}
 
 	calculateVAT(){
@@ -435,12 +436,23 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 		this.sales_taxes.forEach( tax =>{
 			let saleTaxAmount = 0 ;
 			let taxPercentage = (tax.rate / 100)
-			const calculatedTax = (this.net_total * taxPercentage).toFixed(2)
+			const calculatedTax = (this.invoice_data.netTotal * taxPercentage).toFixed(2)
 			this.taxes_map.set(tax.name , calculatedTax)
 			const tax_HTML = document.getElementById(`tax_${tax.name}_Value`);
 			tax_HTML.textContent = this.taxes_map.get(tax.name);
+
 		})
+
 	}
+
+	calculateTotalTaxAmount(){
+		let result = 0 ;
+		this.taxes_map.forEach(tax => {
+			result += tax ;
+		})
+		return result ;
+	}
+
 
 	calculateQnatity(){
 		let quantity = 0;
@@ -454,17 +466,28 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 	}
 
 	calculateGrandTotal(){
-		let grandTotal = 0;
-
+		let grandTotal = 0 ;
+		let taxAmount  = 0 ;
 
 		this.selected_item_maps.get(this.selected_tab.tabName).items.forEach( item => {
 			grandTotal += item.qty * item.rate
 		})
 
+		this.taxes_map.forEach(tax =>{
+			taxAmount += parseFloat(tax)
+		})
+
+		console.log("grandTotal : " , grandTotal , "taxAmount : " , taxAmount)
+
+		grandTotal = (grandTotal + taxAmount).toFixed(2) ;
+
+		console.log("grandTotal (after) : " , grandTotal )
+
+
 		const grandTotal_HTML = document.getElementById("grandTotalValue");
 		grandTotal_HTML.textContent = grandTotal;
 
-		this.grand_total = grandTotal ;
+		this.selected_tab.grandTotal = grandTotal ;
 	}
 
 	makeItemHighlight(itemElement){

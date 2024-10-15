@@ -25,7 +25,7 @@
       this.sales_taxes = [];
       this.sellInvoices = /* @__PURE__ */ new Map();
       this.POSOpeningEntry = {};
-      this.invoiceData = { grandTotal: 0, paidAmount: 0, toChange: 0 };
+      this.invoiceData = { netTotal: 0, grandTotal: 0, paidAmount: 0, toChange: 0 };
       this.db = null;
       this.start_app();
     }
@@ -243,6 +243,7 @@
         this.$rightSection,
         this.selectedItemMaps,
         this.sales_taxes,
+        this.invoiceData,
         this.selectedTab,
         this.selectedItem,
         this.selectedField,
@@ -1047,10 +1048,11 @@
 
   // ../pos_ar/pos_ar/pos_ar/page/pos/pos_selected_item_cart.js
   pos_ar.PointOfSale.pos_selected_item_cart = class {
-    constructor(wrapper, selectedItemMaps, salesTaxes, selectedTab, selectedItem, selectedField, onSelectedItemClick, onTabClick, onKeyPressed, onCheckoutClick) {
+    constructor(wrapper, selectedItemMaps, salesTaxes, invoiceData, selectedTab, selectedItem, selectedField, onSelectedItemClick, onTabClick, onKeyPressed, onCheckoutClick) {
       this.wrapper = wrapper;
       this.selected_item_maps = selectedItemMaps;
       this.sales_taxes = salesTaxes;
+      this.invoice_data = invoiceData;
       this.selected_tab = selectedTab;
       this.selected_item = selectedItem;
       this.selected_field = selectedField;
@@ -1058,9 +1060,8 @@
       this.on_checkout_click = onCheckoutClick;
       this.on_selected_item_click = onSelectedItemClick;
       this.on_tab_click = onTabClick;
-      this.net_total = 0;
-      this.grand_total = 0;
       this.taxes_map = /* @__PURE__ */ new Map();
+      this.total_tax_amout = 0;
       this.counter = 1;
       this.start_work();
     }
@@ -1339,18 +1340,25 @@
       });
       const netTotal_HTML = document.getElementById("netTotalValue");
       netTotal_HTML.textContent = netTotal;
-      this.net_total = netTotal;
+      this.invoice_data.netTotal = netTotal;
     }
     calculateVAT() {
       console.log("VAT ========> start ");
       this.sales_taxes.forEach((tax) => {
         let saleTaxAmount = 0;
         let taxPercentage = tax.rate / 100;
-        const calculatedTax = (this.net_total * taxPercentage).toFixed(2);
+        const calculatedTax = (this.invoice_data.netTotal * taxPercentage).toFixed(2);
         this.taxes_map.set(tax.name, calculatedTax);
         const tax_HTML = document.getElementById(`tax_${tax.name}_Value`);
         tax_HTML.textContent = this.taxes_map.get(tax.name);
       });
+    }
+    calculateTotalTaxAmount() {
+      let result = 0;
+      this.taxes_map.forEach((tax) => {
+        result += tax;
+      });
+      return result;
     }
     calculateQnatity() {
       let quantity = 0;
@@ -1362,12 +1370,19 @@
     }
     calculateGrandTotal() {
       let grandTotal = 0;
+      let taxAmount = 0;
       this.selected_item_maps.get(this.selected_tab.tabName).items.forEach((item) => {
         grandTotal += item.qty * item.rate;
       });
+      this.taxes_map.forEach((tax) => {
+        taxAmount += parseFloat(tax);
+      });
+      console.log("grandTotal : ", grandTotal, "taxAmount : ", taxAmount);
+      grandTotal = (grandTotal + taxAmount).toFixed(2);
+      console.log("grandTotal (after) : ", grandTotal);
       const grandTotal_HTML = document.getElementById("grandTotalValue");
       grandTotal_HTML.textContent = grandTotal;
-      this.grand_total = grandTotal;
+      this.selected_tab.grandTotal = grandTotal;
     }
     makeItemHighlight(itemElement) {
       const selectedItemsContainer = document.getElementById("selectedItemsContainer");
@@ -2259,4 +2274,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.3F7JQGEE.js.map
+//# sourceMappingURL=pos.bundle.DN7XXSAJ.js.map
