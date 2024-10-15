@@ -25,8 +25,11 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 		this.on_selected_item_click  = onSelectedItemClick;
 		this.on_tab_click            = onTabClick      ;
 
-
-		this.counter = 1 ;
+		//local
+		this.net_total   = 0 ;
+		this.grand_total = 0 ;
+		this.taxes_map   = new Map();
+		this.counter    = 1 ;
 
 		this.start_work();
 	}
@@ -420,6 +423,21 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 		})
 		const netTotal_HTML = document.getElementById("netTotalValue");
 		netTotal_HTML.textContent = netTotal;
+		this.net_total = netTotal ;
+		this.calculateVAT()
+	}
+
+	calculateVAT(){
+
+		console.log("VAT ========> start ");
+
+		this.sales_taxes.forEach( tax =>{
+			let saleTaxAmount = 0 ;
+			let taxPercentage = (tax.rate / 100)
+			this.taxes_map.set(tax.name , this.net_total * taxPercentage)
+			const tax_HTML = document.getElementById(`tax_${tax.name}_Value`);
+			tax_HTML.textContent = this.taxes_map.get(tax.name);
+		})
 	}
 
 	calculateQnatity(){
@@ -443,6 +461,8 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 
 		const grandTotal_HTML = document.getElementById("grandTotalValue");
 		grandTotal_HTML.textContent = grandTotal;
+
+		this.grand_total = grandTotal ;
 	}
 
 	makeItemHighlight(itemElement){
