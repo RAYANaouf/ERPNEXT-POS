@@ -31,6 +31,7 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 		this.taxes_map   = new Map();
 		this.total_tax_amout = 0 ;
 		this.counter    = 1 ;
+		this.show_discount = false ;
 
 		this.start_work();
 	}
@@ -101,8 +102,10 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 		this.cartDetails.append('<div id="grandTotal" class="rowBox align_center row_sbtw"></div>')
 
 		this.discount      = this.cartDetails.find('#discount')
-		this.discount.append('<div id="addDiscountTitle">Add Discount</div>')
-		this.discount.append('<div id="addDiscountValue"></div>')
+		this.discount.append('<div id="addDiscountTitle">Add Discount % </div>')
+		this.discount.append('<input type="number" id="addGlobalDiscountInput" value="0" >')
+		this.discountInput = this.discount.find('#addGlobalDiscountInput')
+		this.discountTitle = this.discount.find('#addDiscountTitle')
 
 		this.totalQuantity = this.cartDetails.find('#totalQuantity')
 		this.totalQuantity.append('<div id="totalQuantityTitle">Total Quantity</div>')
@@ -412,6 +415,26 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 
 		this.add_tab_button.on('mousedown' , (event)=>{
 			this.createNewTab()
+		})
+
+		this.discountInput.on('input' , (event)=> {
+			if(event.target.value == ''){
+				this.invoice_data.discount = 0 ;
+				return;
+			}
+			else if(event.target.value > 100){
+				this.invoice_data.discount = 100 ;
+				return;
+			}
+			this.invoice_data.discount = event.target.value
+		})
+		this.discountInput.on('blur' , (event)=> {
+			if(event.target.value == ''){
+				event.target.value = 0 ;
+			}
+			else if(event.target.value > 100){
+				event.target.value = 100 ;
+			}
 		})
 
 	}

@@ -143,10 +143,9 @@
 }
 
 #RightSection #CartBox #cartDetails #discount{
-        height : 25px  ;
         border : 1px dashed #c0c0c0 ;
         border-radius : 12px  ;
-        padding : 0px 16px ;
+        padding : 4px 16px ;
 }
 #RightSection #CartBox #cartDetails #discount:hover{
         background : #F0F0F0 ;

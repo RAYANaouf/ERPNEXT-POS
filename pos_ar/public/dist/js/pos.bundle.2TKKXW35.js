@@ -25,7 +25,7 @@
       this.sales_taxes = [];
       this.sellInvoices = /* @__PURE__ */ new Map();
       this.POSOpeningEntry = {};
-      this.invoiceData = { netTotal: 0, grandTotal: 0, paidAmount: 0, toChange: 0 };
+      this.invoiceData = { netTotal: 0, grandTotal: 0, paidAmount: 0, toChange: 0, discount: 0 };
       this.db = null;
       this.start_app();
     }
@@ -276,8 +276,6 @@
       );
     }
     init_paymentCart() {
-      console.log("im heeeeeeeeeeeeer @#$%^&*(*&^%$##$%^&*()^%$#@");
-      console.log(" hiiiiiiiiiiiiiiiiiiii payment ::");
       this.payment_cart = new pos_ar.PointOfSale.pos_payment_cart(
         this.$leftSection,
         this.selectedItemMaps,
@@ -290,7 +288,6 @@
           this.onInput(event2, field, value);
         }
       );
-      console.log(" hiiiiiiiiiiiiiiiiiiii payment ", this.payment_cart);
     }
     init_historyCart() {
       this.history_cart = new pos_ar.PointOfSale.pos_history(
@@ -509,19 +506,17 @@
       });
       if (items.length == 0)
         return;
-      let totalQty = 0;
       let paid_amount = 0;
       items.forEach((item) => {
-        totalQty += item.qty;
         paid_amount += item.rate * item.qty;
       });
       let new_pos_invoice = frappe.model.get_new_doc("POS Invoice");
       new_pos_invoice.customer = this.customersList[0].name;
       new_pos_invoice.pos_profile = this.PosProfileList[0].name;
       new_pos_invoice.items = items;
-      new_pos_invoice.paid_amount = paid_amount;
-      new_pos_invoice.base_paid_amount = paid_amount;
-      new_pos_invoice.amount_eligible_for_commission = paid_amount;
+      new_pos_invoice.taxes_and_charges = this.PosProfileList[0].taxes_and_charges;
+      new_pos_invoice.paid_amount = this.invoiceData.paidAmount;
+      new_pos_invoice.base_paid_amount = this.invoiceData.paidAmount;
       new_pos_invoice.creation_time = frappe.datetime.now_datetime();
       new_pos_invoice.payments = [{ "mode_of_payment": "Cash", "amount": paid_amount }];
       new_pos_invoice.is_pos = 1;
@@ -570,9 +565,7 @@
       let invoicesRef = [];
       all_invoices.forEach((invoiceName) => {
         let paid_amount = 0;
-        let totalQty = 0;
         this.sellInvoices.get(invoiceName).items.forEach((item) => {
-          totalQty += item.qty;
           paid_amount += item.rate * item.qty;
         });
         frappe.db.insert(
@@ -1063,6 +1056,7 @@
       this.taxes_map = /* @__PURE__ */ new Map();
       this.total_tax_amout = 0;
       this.counter = 1;
+      this.show_discount = false;
       this.start_work();
     }
     start_work() {
@@ -1107,8 +1101,10 @@
       this.cartDetails.append('<div id="VAT" class="columnBox"></div>');
       this.cartDetails.append('<div id="grandTotal" class="rowBox align_center row_sbtw"></div>');
       this.discount = this.cartDetails.find("#discount");
-      this.discount.append('<div id="addDiscountTitle">Add Discount</div>');
-      this.discount.append('<div id="addDiscountValue"></div>');
+      this.discount.append('<div id="addDiscountTitle">Add Discount % </div>');
+      this.discount.append('<input type="number" id="addGlobalDiscountInput" value="0" >');
+      this.discountInput = this.discount.find("#addGlobalDiscountInput");
+      this.discountTitle = this.discount.find("#addDiscountTitle");
       this.totalQuantity = this.cartDetails.find("#totalQuantity");
       this.totalQuantity.append('<div id="totalQuantityTitle">Total Quantity</div>');
       this.totalQuantity.append('<div id="totalQuantityValue">0</div>');
@@ -1331,6 +1327,23 @@
     setListener() {
       this.add_tab_button.on("mousedown", (event2) => {
         this.createNewTab();
+      });
+      this.discountInput.on("input", (event2) => {
+        if (event2.target.value == "") {
+          this.invoice_data.discount = 0;
+          return;
+        } else if (event2.target.value > 100) {
+          this.invoice_data.discount = 100;
+          return;
+        }
+        this.invoice_data.discount = event2.target.value;
+      });
+      this.discountInput.on("blur", (event2) => {
+        if (event2.target.value == "") {
+          event2.target.value = 0;
+        } else if (event2.target.value > 100) {
+          event2.target.value = 100;
+        }
       });
     }
     calculateNetTotal() {
@@ -2005,6 +2018,11 @@
     }
     refreshPaidAmount() {
       this.payment_details.find("#paimentPaidAmountValue").text(`${this.invoice_data.paidAmount} DA`);
+      const paid_amount_DA = this.payment_details.find("#paimentPaidAmountValue").text();
+      const paid_amount_txt = paid_amount_DA.slice(0, -2);
+      const paid_amount = parseFloat(paid_amount_txt);
+      this.invoice_data.paidAmount = paid_amount;
+      console.log("paid_amount : ", paid_amount, "paid_amount_txt ", paid_amount_txt, "paid_amount_DA", paid_amount_DA);
     }
     generateProposedPaidAmount(total) {
       const money = [10, 20, 50, 100, 200, 500, 1e3, 2e3];
@@ -2271,4 +2289,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.6I33OATJ.js.map
+//# sourceMappingURL=pos.bundle.2TKKXW35.js.map

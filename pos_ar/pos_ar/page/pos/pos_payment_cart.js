@@ -324,6 +324,11 @@ pos_ar.PointOfSale.pos_payment_cart = class{
 
 	refreshPaidAmount(){
 		this.payment_details.find('#paimentPaidAmountValue').text(`${this.invoice_data.paidAmount} DA`)
+		const paid_amount_DA         = this.payment_details.find('#paimentPaidAmountValue').text();
+		const paid_amount_txt        = paid_amount_DA.slice(0 , -2)
+		const paid_amount            = parseFloat(paid_amount_txt)
+		this.invoice_data.paidAmount = paid_amount;
+		console.log("paid_amount : " , paid_amount  , "paid_amount_txt " , paid_amount_txt , "paid_amount_DA" , paid_amount_DA)
 	}
 
 

@@ -37,7 +37,7 @@ pos_ar.PointOfSale.Controller = class {
 		this.sellInvoices    = new Map();
 		this.POSOpeningEntry = {}
 
-		this.invoiceData = { netTotal : 0 , grandTotal : 0 , paidAmount : 0 , toChange : 0}
+		this.invoiceData = { netTotal : 0 , grandTotal : 0 , paidAmount : 0 , toChange : 0 , discount : 0}
 		this.db          = null;
 
                 this.start_app();
@@ -336,8 +336,6 @@ pos_ar.PointOfSale.Controller = class {
 
 
         init_paymentCart(){
-		console.log("im heeeeeeeeeeeeer @#$%^&*(*&^%$##$%^&*()^%$#@")
-		console.log(" hiiiiiiiiiiiiiiiiiiii payment ::")
 		this.payment_cart = new pos_ar.PointOfSale.pos_payment_cart(
 									this.$leftSection,
 									this.selectedItemMaps,
@@ -350,7 +348,6 @@ pos_ar.PointOfSale.Controller = class {
 										this.onInput(event , field , value);
 									},
 								)
-		console.log(" hiiiiiiiiiiiiiiiiiiii payment " , this.payment_cart)
         }
 
         init_historyCart(){
@@ -700,9 +697,6 @@ pos_ar.PointOfSale.Controller = class {
 		let items = []
 
 
-
-
-
 		this.selectedItemMaps.get(this.selectedTab.tabName).items.forEach(  item  =>{
 			// we still didnt implement the price_list_rate and base_price_list_rate
 			// same thing with actual_qty refering to the stock quantity
@@ -731,27 +725,25 @@ pos_ar.PointOfSale.Controller = class {
 
 
 
-		let totalQty    = 0 ;
 		let paid_amount = 0 ;
 		//calculate the cost and the quantity
 		items.forEach(item =>{
-			totalQty    += item.qty
 			paid_amount += item.rate * item.qty
 		})
 
 
 		let new_pos_invoice = frappe.model.get_new_doc('POS Invoice');
-		new_pos_invoice.customer         = this.customersList[0].name
-		new_pos_invoice.pos_profile      = this.PosProfileList[0].name
-		new_pos_invoice.items            = items
-		new_pos_invoice.paid_amount      = paid_amount
-		new_pos_invoice.base_paid_amount = paid_amount
-		new_pos_invoice.amount_eligible_for_commission = paid_amount
-		new_pos_invoice.creation_time    = frappe.datetime.now_datetime()
-		new_pos_invoice.payments         = [{'mode_of_payment' : 'Cash' , 'amount' : paid_amount}]
-		new_pos_invoice.is_pos           = 1
-		new_pos_invoice.update_stock     = 1
-		new_pos_invoice.docstatus        = 1
+		new_pos_invoice.customer          = this.customersList[0].name
+		new_pos_invoice.pos_profile       = this.PosProfileList[0].name
+		new_pos_invoice.items             = items
+		new_pos_invoice.taxes_and_charges = this.PosProfileList[0].taxes_and_charges
+		new_pos_invoice.paid_amount       = this.invoiceData.paidAmount
+		new_pos_invoice.base_paid_amount  = this.invoiceData.paidAmount
+		new_pos_invoice.creation_time     = frappe.datetime.now_datetime()
+		new_pos_invoice.payments          = [{'mode_of_payment' : 'Cash' , 'amount' : paid_amount}]
+		new_pos_invoice.is_pos            = 1
+		new_pos_invoice.update_stock      = 1
+		new_pos_invoice.docstatus         = 1
 
 
 		this.sellInvoices.set(new_pos_invoice.name , new_pos_invoice);
@@ -826,9 +818,7 @@ pos_ar.PointOfSale.Controller = class {
 		all_invoices.forEach(invoiceName =>{
 			//calculate the paid_amount
 			let paid_amount = 0 ;
-			let totalQty    = 0 ;
 			this.sellInvoices.get(invoiceName).items.forEach(item =>{
-				totalQty    += item.qty
 				paid_amount += item.rate * item.qty
 			})
 
@@ -1147,18 +1137,6 @@ pos_ar.PointOfSale.Controller = class {
                         return [];
                 }
         }
-
-        /*async fetchSalesTaxesAndChargesComplete(){
-                try{
-			const result = await frappe.db.get_doc('Sales Taxes and Charges' , this.test)
-			console.log("testiiiiiing : " , result);
-                }
-                catch(error){
-                        console.error('Error fetching Warehouse list : ' , error)
-                        return [];
-                }
-        }*/
-
 
 
         async fetchBinList(){
