@@ -29,6 +29,10 @@ pos_ar.PointOfSale.Controller = class {
 		this.selectedPaymentMethod = {"methodName" : ""}
 		this.selectedCustomer      = {"name"       : ""}
 
+
+		//taxes
+		this.sales_taxes = [];
+
 		//sell invoice
 		this.sellInvoices    = new Map();
 		this.POSOpeningEntry = {}
@@ -76,8 +80,7 @@ pos_ar.PointOfSale.Controller = class {
 		this.sales_taxes_and_charges    = await this.fetchSalesTaxesAndCharges()
 		this.taxes_and_charges_template = await this.fetchSalesTaxesAndChargesTemplate()
 
-		this.sales_tax  = this.getSalesTax()
-		console.log("loooooooooooooooooooke at here : " , this.sales_tax);
+		this.sales_taxes  = this.getSalesTax()
 
 		if(this.PosProfileList.length == 0){
 			frappe.set_route("Form", "POS Profile");
@@ -1004,17 +1007,16 @@ pos_ar.PointOfSale.Controller = class {
 	}
 
 	getSalesTax(){
-		const taxTemplateId = this.PosProfileList.taxes_and_charges
-		let   salesTax      = null
-		/*const taxTemplate   = null
-		this.taxes_and_charges_template.forEach( template =>{
-			if(template.name == taxTemplateId ){
-				taxTemplate = template
-			}
-		})*/
+		const taxTemplateId = this.PosProfileList[0].taxes_and_charges
+		let   salesTax      = []
+
+
+		console.log("taxTemplateId : " , taxTemplateId)
+
 		this.sales_taxes_and_charges.forEach( tax => {
 			if(tax.parent == taxTemplateId){
-				salesTax = tax
+				console.log("debuging ==> parent : " , tax.parent , " taxTemplateId : " , taxTemplateId)
+				salesTax.push(tax)
 			}
 		})
 
@@ -1137,7 +1139,7 @@ pos_ar.PointOfSale.Controller = class {
         async fetchSalesTaxesAndCharges(){
                 try{
                         return await frappe.db.get_list('Sales Taxes and Charges' , {
-				fields  : ['name' , 'description' , 'cost_center' , 'rate' , 'tax_amount' , 'total' , 'tax_amount_after_discount_amount' ,'account_head'],
+				fields  : ['name' , 'description' , 'account_head' , 'rate' , 'parent' ],
                                 filters : { parenttype : 'Sales Taxes and Charges Template'},
 				limit : 100000
                         })
