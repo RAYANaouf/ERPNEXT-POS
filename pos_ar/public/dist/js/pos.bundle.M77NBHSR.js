@@ -446,10 +446,6 @@
         }
         this.selected_item_cart.refreshSelectedItem();
         this.item_details.refreshDate(this.selectedItem);
-      } else if (action == "cash") {
-        console.log("action :: ", action, " key :: ", key);
-        this.paid_amount = key;
-        this.payment_cart.refreshData();
       } else if (action == "addToField") {
         if (this.selectedField.field_name == "cash") {
           this.payment_cart.handleInput(key);
@@ -506,19 +502,16 @@
       });
       if (items.length == 0)
         return;
-      let paid_amount = 0;
-      items.forEach((item) => {
-        paid_amount += item.rate * item.qty;
-      });
       let new_pos_invoice = frappe.model.get_new_doc("POS Invoice");
       new_pos_invoice.customer = this.customersList[0].name;
       new_pos_invoice.pos_profile = this.PosProfileList[0].name;
       new_pos_invoice.items = items;
       new_pos_invoice.taxes_and_charges = this.PosProfileList[0].taxes_and_charges;
+      new_pos_invoice.additional_discount_percentage = this.invoiceData.discount;
       new_pos_invoice.paid_amount = this.invoiceData.paidAmount;
       new_pos_invoice.base_paid_amount = this.invoiceData.paidAmount;
       new_pos_invoice.creation_time = frappe.datetime.now_datetime();
-      new_pos_invoice.payments = [{ "mode_of_payment": "Cash", "amount": paid_amount }];
+      new_pos_invoice.payments = [{ "mode_of_payment": "Cash", "amount": this.invoiceData.paidAmount }];
       new_pos_invoice.is_pos = 1;
       new_pos_invoice.update_stock = 1;
       new_pos_invoice.docstatus = 1;
@@ -564,10 +557,6 @@
       let seccess = 0;
       let invoicesRef = [];
       all_invoices.forEach((invoiceName) => {
-        let paid_amount = 0;
-        this.sellInvoices.get(invoiceName).items.forEach((item) => {
-          paid_amount += item.rate * item.qty;
-        });
         frappe.db.insert(
           this.sellInvoices.get(invoiceName)
         ).then((r) => {
@@ -1337,6 +1326,9 @@
           return;
         }
         this.invoice_data.discount = event2.target.value;
+        this.calculateNetTotal();
+        this.calculateVAT();
+        this.calculateGrandTotal();
       });
       this.discountInput.on("blur", (event2) => {
         if (event2.target.value == "") {
@@ -1344,6 +1336,9 @@
         } else if (event2.target.value > 100) {
           event2.target.value = 100;
         }
+        this.calculateNetTotal();
+        this.calculateVAT();
+        this.calculateGrandTotal();
       });
     }
     calculateNetTotal() {
@@ -1351,6 +1346,9 @@
       this.selected_item_maps.get(this.selected_tab.tabName).items.forEach((item) => {
         netTotal += item.rate * item.qty;
       });
+      if (this.invoice_data.discount > 0) {
+        netTotal -= netTotal * (this.invoice_data.discount / 100);
+      }
       const netTotal_HTML = document.getElementById("netTotalValue");
       netTotal_HTML.textContent = netTotal;
       this.invoice_data.netTotal = netTotal;
@@ -1383,20 +1381,15 @@
     }
     calculateGrandTotal() {
       let grandTotal = 0;
+      let netTotal = this.invoice_data.netTotal;
       let taxAmount = 0;
-      this.selected_item_maps.get(this.selected_tab.tabName).items.forEach((item) => {
-        grandTotal += item.qty * item.rate;
-      });
       this.taxes_map.forEach((tax) => {
         taxAmount += parseFloat(tax);
       });
-      console.log("grandTotal : ", grandTotal, "taxAmount : ", taxAmount);
-      grandTotal = (grandTotal + taxAmount).toFixed(2);
-      console.log("grandTotal (after) : ", grandTotal);
+      grandTotal = netTotal + taxAmount;
       const grandTotal_HTML = document.getElementById("grandTotalValue");
-      grandTotal_HTML.textContent = grandTotal;
+      grandTotal_HTML.textContent = grandTotal.toFixed(2);
       this.invoice_data.grandTotal = grandTotal;
-      console.log("changint   ==> ", this.invoice_data.grandTotal);
     }
     makeItemHighlight(itemElement) {
       const selectedItemsContainer = document.getElementById("selectedItemsContainer");
@@ -2289,4 +2282,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.2TKKXW35.js.map
+//# sourceMappingURL=pos.bundle.M77NBHSR.js.map

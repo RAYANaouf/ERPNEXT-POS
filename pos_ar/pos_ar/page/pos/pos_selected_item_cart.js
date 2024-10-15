@@ -427,6 +427,11 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 				return;
 			}
 			this.invoice_data.discount = event.target.value
+
+			//recalculation
+			this.calculateNetTotal()
+			this.calculateVAT()
+			this.calculateGrandTotal()
 		})
 		this.discountInput.on('blur' , (event)=> {
 			if(event.target.value == ''){
@@ -435,6 +440,12 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 			else if(event.target.value > 100){
 				event.target.value = 100 ;
 			}
+
+			//recalculation
+			this.calculateNetTotal()
+			this.calculateVAT()
+			this.calculateGrandTotal()
+
 		})
 
 	}
@@ -447,9 +458,13 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 		this.selected_item_maps.get(this.selected_tab.tabName).items.forEach( item => {
 			netTotal += item.rate * item.qty
 		})
+
+		if(this.invoice_data.discount > 0){
+			netTotal -= (netTotal * (this.invoice_data.discount / 100))
+		}
 		const netTotal_HTML = document.getElementById("netTotalValue");
-		netTotal_HTML.textContent = netTotal;
-		this.invoice_data.netTotal = netTotal ;
+		netTotal_HTML.textContent  = netTotal;
+		this.invoice_data.netTotal = netTotal;
 	}
 
 	calculateVAT(){
@@ -490,29 +505,21 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 
 	calculateGrandTotal(){
 		let grandTotal = 0 ;
+		let netTotal   = this.invoice_data.netTotal ;
 		let taxAmount  = 0 ;
-
-		this.selected_item_maps.get(this.selected_tab.tabName).items.forEach( item => {
-			grandTotal += item.qty * item.rate
-		})
 
 		this.taxes_map.forEach(tax =>{
 			taxAmount += parseFloat(tax)
 		})
 
-		console.log("grandTotal : " , grandTotal , "taxAmount : " , taxAmount)
-
-		grandTotal = (grandTotal + taxAmount).toFixed(2) ;
-
-		console.log("grandTotal (after) : " , grandTotal )
+		grandTotal = (netTotal + taxAmount) ;
 
 
 		const grandTotal_HTML = document.getElementById("grandTotalValue");
-		grandTotal_HTML.textContent = grandTotal;
+		grandTotal_HTML.textContent = (grandTotal).toFixed(2);
 
 		this.invoice_data.grandTotal = grandTotal
 
-		console.log("changint   ==> " , this.invoice_data.grandTotal)
 	}
 
 	makeItemHighlight(itemElement){

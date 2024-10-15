@@ -636,11 +636,6 @@ pos_ar.PointOfSale.Controller = class {
 			this.item_details.refreshDate(this.selectedItem);
 
 		}
-		else if(action == "cash"){
-			console.log("action :: " , action , " key :: " , key);
-			this.paid_amount = key;
-			this.payment_cart.refreshData();
-		}
 		else if(action == "addToField"){
 			if(this.selectedField.field_name == "cash"){
 				this.payment_cart.handleInput(key);
@@ -725,22 +720,17 @@ pos_ar.PointOfSale.Controller = class {
 
 
 
-		let paid_amount = 0 ;
-		//calculate the cost and the quantity
-		items.forEach(item =>{
-			paid_amount += item.rate * item.qty
-		})
-
 
 		let new_pos_invoice = frappe.model.get_new_doc('POS Invoice');
 		new_pos_invoice.customer          = this.customersList[0].name
 		new_pos_invoice.pos_profile       = this.PosProfileList[0].name
 		new_pos_invoice.items             = items
 		new_pos_invoice.taxes_and_charges = this.PosProfileList[0].taxes_and_charges
+		new_pos_invoice.additional_discount_percentage = this.invoiceData.discount
 		new_pos_invoice.paid_amount       = this.invoiceData.paidAmount
 		new_pos_invoice.base_paid_amount  = this.invoiceData.paidAmount
 		new_pos_invoice.creation_time     = frappe.datetime.now_datetime()
-		new_pos_invoice.payments          = [{'mode_of_payment' : 'Cash' , 'amount' : paid_amount}]
+		new_pos_invoice.payments          = [{'mode_of_payment' : 'Cash' , 'amount' : this.invoiceData.paidAmount}]
 		new_pos_invoice.is_pos            = 1
 		new_pos_invoice.update_stock      = 1
 		new_pos_invoice.docstatus         = 1
@@ -816,12 +806,6 @@ pos_ar.PointOfSale.Controller = class {
 		let invoicesRef = [] ;
 
 		all_invoices.forEach(invoiceName =>{
-			//calculate the paid_amount
-			let paid_amount = 0 ;
-			this.sellInvoices.get(invoiceName).items.forEach(item =>{
-				paid_amount += item.rate * item.qty
-			})
-
 			// we still didnt implement the  base_paid_amount and amount_eligible_for_commissionseen
 			// value in deafault pos ==>  ["Administrator"]. i think it is an array.
 
