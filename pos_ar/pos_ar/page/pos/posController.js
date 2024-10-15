@@ -73,6 +73,12 @@ pos_ar.PointOfSale.Controller = class {
                 this.binList        = await this.fetchBinList()
 
 
+		this.sales_taxes_and_charges    = await this.fetchSalesTaxesAndCharges()
+		this.taxes_and_charges_template = await this.fetchSalesTaxesAndChargesTemplate()
+
+		this.sales_tax  = this.getSalesTax()
+		console.log("loooooooooooooooooooke at here : " , this.sales_tax);
+
 		if(this.PosProfileList.length == 0){
 			frappe.set_route("Form", "POS Profile");
 			return;
@@ -87,6 +93,8 @@ pos_ar.PointOfSale.Controller = class {
                 console.log("warehouseList => " , this.warehouseList )
                 console.log("POSProfileList => ", this.PosProfileList)
                 console.log("bin list       => ", this.binList       )
+                console.log("taxes and charges templates  => ", this.taxes_and_charges_template)
+                console.log("taxes and charges            => ", this.sales_taxes_and_charges)
         }
 
 
@@ -826,46 +834,6 @@ pos_ar.PointOfSale.Controller = class {
 			// we still didnt implement the  base_paid_amount and amount_eligible_for_commissionseen
 			// value in deafault pos ==>  ["Administrator"]. i think it is an array.
 
-			/*frappe.db.insert({
-				'doctype'      : "POS Invoice",
-				'customer'     : this.sellInvoices.get(invoiceName).customer    ,
-				'pos_profile'  : this.sellInvoices.get(invoiceName).pos_profile ,
-				'items'        : this.sellInvoices.get(invoiceName).items       ,
-				'creation_time': this.sellInvoices.get(invoiceName).creation_time,
-				'paid_amount'  : paid_amount,
-				'amount_eligible_for_commission' : paid_amount,
-				'write_off_account': this.PosProfileList[0].write_off_account,
-				'write_off_cost_center': this.PosProfileList[0].write_off_cost_center,
-				'outstanding_amount' : 0 ,
-				'is_pos'       : 1       ,
-				'payments'     :[{
-					'mode_of_payment' : 'Cash',
-					'amount'          : paid_amount
-				}],
-				'update_stock' : 1       ,
-				'docstatus'    : 1
-			}).then(r => {
-
-				invoicesRef.push({'pos_invoice' : r.name , 'customer' : r.customer } )
-				this.sellInvoices.delete(invoiceName)
-
-				counter += 1 ;
-
-				frappe.show_progress('Syncing Invoices...' , counter , all_invoices.length , 'syncing')
-
-				if(counter == all_invoices.length){
-					frappe.hide_progress();
-					this.customer_box.setSynced();
-				}
-
-
-			}).catch(err =>{
-				counter += 1 ;
-				failure += 1 ;
-			})*/
-
-
-
 			frappe.db.insert(
 					this.sellInvoices.get(invoiceName)
 			).then(r =>{
@@ -1035,6 +1003,24 @@ pos_ar.PointOfSale.Controller = class {
 		})
 	}
 
+	getSalesTax(){
+		const taxTemplateId = this.PosProfileList.taxes_and_charges
+		let   salesTax      = null
+		/*const taxTemplate   = null
+		this.taxes_and_charges_template.forEach( template =>{
+			if(template.name == taxTemplateId ){
+				taxTemplate = template
+			}
+		})*/
+		this.sales_taxes_and_charges.forEach( tax => {
+			if(tax.parent == taxTemplateId){
+				salesTax = tax
+			}
+		})
+
+		return salesTax;
+	}
+
         /*********************  get data functions ******************************/
 
 
@@ -1131,6 +1117,48 @@ pos_ar.PointOfSale.Controller = class {
                         return [];
                 }
         }
+
+
+        async fetchSalesTaxesAndChargesTemplate(){
+                try{
+                        return await frappe.db.get_list('Sales Taxes and Charges Template' , {
+                                fields  : ['name' , 'title' , 'is_default' , 'company' , 'tax_category' , 'taxes' ],
+                                filters : { disabled : 0},
+				limit : 100000
+                        })
+                }
+                catch(error){
+                        console.error('Error fetching Warehouse list : ' , error)
+                        return [];
+                }
+        }
+
+
+        async fetchSalesTaxesAndCharges(){
+                try{
+                        return await frappe.db.get_list('Sales Taxes and Charges' , {
+				fields  : ['name' , 'description' , 'cost_center' , 'rate' , 'tax_amount' , 'total' , 'tax_amount_after_discount_amount' ,'account_head'],
+                                filters : { parenttype : 'Sales Taxes and Charges Template'},
+				limit : 100000
+                        })
+                }
+                catch(error){
+                        console.error('Error fetching Warehouse list : ' , error)
+                        return [];
+                }
+        }
+
+        /*async fetchSalesTaxesAndChargesComplete(){
+                try{
+			const result = await frappe.db.get_doc('Sales Taxes and Charges' , this.test)
+			console.log("testiiiiiing : " , result);
+                }
+                catch(error){
+                        console.error('Error fetching Warehouse list : ' , error)
+                        return [];
+                }
+        }*/
+
 
 
         async fetchBinList(){
