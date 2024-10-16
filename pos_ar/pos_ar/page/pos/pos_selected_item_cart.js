@@ -13,6 +13,7 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 		onSelectedItemClick,
 		onTabClick       ,
 		onKeyPressed     ,
+		createNewTab     ,
 		onCheckoutClick  ,
 	){
 		this.wrapper                 = wrapper;
@@ -26,6 +27,7 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 		this.on_checkout_click       = onCheckoutClick ;
 		this.on_selected_item_click  = onSelectedItemClick;
 		this.on_tab_click            = onTabClick      ;
+		this.create_new_tab          = createNewTab    ;
 
 		//local
 		this.taxes_map   = new Map();
@@ -270,11 +272,7 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 
 	createNewTab(){
 			this.counter += 1 ;
-			let initPos   = frappe.model.get_new_doc('POS Invoice');
-			initPos.items  = [];
-			this.selected_item_maps.set(`C${this.counter}` , initPos)
-			this.selected_tab.tabName = `C${this.counter}`
-
+			this.create_new_tab(this.counter);
 			//update UI
 			this.refreshTabs()
 			this.refreshSelectedItem()

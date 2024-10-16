@@ -1,7 +1,7 @@
 pos_ar.PointOfSale.pos_db  = class POSDatabase {
 
 	constructor() {
-		this.dbName = 'POSDB_test5';
+		this.dbName = 'POSDB_test6';
 		this.dbVersion = 14;
 		this.db = null;
 
@@ -90,6 +90,21 @@ pos_ar.PointOfSale.pos_db  = class POSDatabase {
 	}
 
 
+	updatePosInvoice(posInvoice, onSuccess, onFailure) {
+		const transaction = this.db.transaction(['POS Invoice'], "readwrite");
+		const store = transaction.objectStore('POS Invoice');
+
+		// add if not exists or update if it exists.
+		const request = store.put(posInvoice);
+
+		request.onsuccess = (event) => {
+			onSuccess(event);
+		};
+
+		request.onerror = (event) => {
+			onFailure(event);
+    		};
+	}
 
 	getAllPosInvoice(onSuccess , onFailure){
 		const transaction = this.db.transaction(['POS Invoice'] , "readwrite");

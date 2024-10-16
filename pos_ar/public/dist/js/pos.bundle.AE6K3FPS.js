@@ -284,6 +284,7 @@
         (action, key) => {
           this.onKeyPressed(action, key);
         },
+        this.createNewTab.bind(this),
         this.onCheckout.bind(this)
       );
     }
@@ -349,6 +350,17 @@
       this.item_details.refreshDate(item);
     }
     onCheckout() {
+      const pos_checkout = this.selectedItemMaps.get(this.selectedTab.tabName);
+      console.log("pos on checkout : ", pos_checkout);
+      this.db.savePosInvoice(
+        pos_checkout,
+        (event2) => {
+          console.log("sucess => ", event2);
+        },
+        (event2) => {
+          console.log("failure => ", event2);
+        }
+      );
       this.payment_cart.showCart();
       this.item_selector.hideCart();
       this.item_details.hide_cart();
@@ -389,6 +401,24 @@
       this.payment_cart.hideCart();
       this.item_details.hide_cart();
       this.history_cart.hide_cart();
+    }
+    createNewTab(counter) {
+      let new_pos_invoice = frappe.model.get_new_doc("POS Invoice");
+      new_pos_invoice.customer = this.selectedCustomer.name;
+      new_pos_invoice.pos_profile = this.selectedPosProfile.name;
+      new_pos_invoice.items = [];
+      new_pos_invoice.taxes_and_charges = this.selectedPosProfile.taxes_and_charges;
+      new_pos_invoice.additional_discount_percentage = this.invoiceData.discount;
+      new_pos_invoice.paid_amount = 0;
+      new_pos_invoice.base_paid_amount = 0;
+      new_pos_invoice.creation_time = frappe.datetime.now_datetime();
+      new_pos_invoice.payments = [{ "mode_of_payment": "Cash", "amount": 0 }];
+      new_pos_invoice.is_pos = 1;
+      new_pos_invoice.update_stock = 1;
+      new_pos_invoice.docstatus = 0;
+      new_pos_invoice.status = "Draft";
+      this.selectedItemMaps.set(`C${counter}`, new_pos_invoice);
+      this.selectedTab.tabName = `C${counter}`;
     }
     onInput(event2, field, value) {
       if (event2 == "focus" || event2 == "blur") {
@@ -542,25 +572,17 @@
         };
         items.push(newItem);
       });
+      this.selectedItemMaps.get(this.selectedTab.tabName).items = items;
       if (items.length == 0)
         return;
-      console.log("the problem is here ====> ", this.selectedCustomer);
-      let new_pos_invoice = frappe.model.get_new_doc("POS Invoice");
-      new_pos_invoice.customer = this.selectedCustomer.name;
-      new_pos_invoice.pos_profile = this.selectedPosProfile.name;
-      new_pos_invoice.items = items;
-      new_pos_invoice.taxes_and_charges = this.selectedPosProfile.taxes_and_charges;
-      new_pos_invoice.additional_discount_percentage = this.invoiceData.discount;
-      new_pos_invoice.paid_amount = this.invoiceData.paidAmount;
-      new_pos_invoice.base_paid_amount = this.invoiceData.paidAmount;
-      new_pos_invoice.creation_time = frappe.datetime.now_datetime();
-      new_pos_invoice.payments = [{ "mode_of_payment": "Cash", "amount": this.invoiceData.paidAmount }];
-      new_pos_invoice.is_pos = 1;
-      new_pos_invoice.update_stock = 1;
-      new_pos_invoice.docstatus = 0;
-      this.sellInvoices.set(new_pos_invoice.name, new_pos_invoice);
-      this.db.savePosInvoice(
-        new_pos_invoice,
+      this.selectedItemMaps.get(this.selectedTab.tabName).paid_amount = this.invoiceData.paidAmount;
+      this.selectedItemMaps.get(this.selectedTab.tabName).base_paid_amount = this.invoiceData.paidAmount;
+      this.selectedItemMaps.get(this.selectedTab.tabName).payments = [{ "mode_of_payment": "Cash", "amount": this.invoiceData.paidAmount }];
+      this.selectedItemMaps.get(this.selectedTab.tabName).status = "Paid";
+      this.selectedItemMaps.get(this.selectedTab.tabName).docstatus = 1;
+      this.sellInvoices.set(this.selectedItemMaps.get(this.selectedTab.tabName).name, this.selectedItemMaps.get(this.selectedTab.tabName));
+      this.db.updatePosInvoice(
+        this.selectedItemMaps.get(this.selectedTab.tabName),
         (event2) => {
           console.log("sucess => ", event2);
         },
@@ -1084,7 +1106,7 @@
 
   // ../pos_ar/pos_ar/pos_ar/page/pos/pos_selected_item_cart.js
   pos_ar.PointOfSale.pos_selected_item_cart = class {
-    constructor(wrapper, selectedItemMaps, salesTaxes, invoiceData, selectedTab, selectedItem, selectedField, onSelectedItemClick, onTabClick, onKeyPressed, onCheckoutClick) {
+    constructor(wrapper, selectedItemMaps, salesTaxes, invoiceData, selectedTab, selectedItem, selectedField, onSelectedItemClick, onTabClick, onKeyPressed, createNewTab, onCheckoutClick) {
       this.wrapper = wrapper;
       this.selected_item_maps = selectedItemMaps;
       this.sales_taxes = salesTaxes;
@@ -1096,6 +1118,7 @@
       this.on_checkout_click = onCheckoutClick;
       this.on_selected_item_click = onSelectedItemClick;
       this.on_tab_click = onTabClick;
+      this.create_new_tab = createNewTab;
       this.taxes_map = /* @__PURE__ */ new Map();
       this.total_tax_amout = 0;
       this.counter = 1;
@@ -1262,10 +1285,7 @@
     }
     createNewTab() {
       this.counter += 1;
-      let initPos = frappe.model.get_new_doc("POS Invoice");
-      initPos.items = [];
-      this.selected_item_maps.set(`C${this.counter}`, initPos);
-      this.selected_tab.tabName = `C${this.counter}`;
+      this.create_new_tab(this.counter);
       this.refreshTabs();
       this.refreshSelectedItem();
     }
@@ -2290,7 +2310,7 @@
   // ../pos_ar/pos_ar/pos_ar/page/pos/pos_db.js
   pos_ar.PointOfSale.pos_db = class POSDatabase {
     constructor() {
-      this.dbName = "POSDB_test5";
+      this.dbName = "POSDB_test6";
       this.dbVersion = 14;
       this.db = null;
       this.openDatabase();
@@ -2354,6 +2374,17 @@
         onFailure(event2);
       };
     }
+    updatePosInvoice(posInvoice, onSuccess, onFailure) {
+      const transaction = this.db.transaction(["POS Invoice"], "readwrite");
+      const store = transaction.objectStore("POS Invoice");
+      const request = store.put(posInvoice);
+      request.onsuccess = (event2) => {
+        onSuccess(event2);
+      };
+      request.onerror = (event2) => {
+        onFailure(event2);
+      };
+    }
     getAllPosInvoice(onSuccess, onFailure) {
       const transaction = this.db.transaction(["POS Invoice"], "readwrite");
       const store = transaction.objectStore("POS Invoice");
@@ -2376,4 +2407,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.QWBT46RM.js.map
+//# sourceMappingURL=pos.bundle.AE6K3FPS.js.map

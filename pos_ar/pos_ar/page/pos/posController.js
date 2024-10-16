@@ -453,20 +453,20 @@ pos_ar.PointOfSale.Controller = class {
 
 	onCheckout(){
 
+		const pos_checkout = this.selectedItemMaps.get(this.selectedTab.tabName);
+		console.log("pos on checkout : " , pos_checkout);
 
-		let new_pos_invoice = frappe.model.get_new_doc('POS Invoice');
-		new_pos_invoice.customer          = this.selectedCustomer.name
-		new_pos_invoice.pos_profile       = this.selectedPosProfile.name
-		new_pos_invoice.items             = items
-		new_pos_invoice.taxes_and_charges = this.selectedPosProfile.taxes_and_charges
-		new_pos_invoice.additional_discount_percentage = this.invoiceData.discount
-		new_pos_invoice.paid_amount       = this.invoiceData.paidAmount
-		new_pos_invoice.base_paid_amount  = this.invoiceData.paidAmount
-		new_pos_invoice.creation_time     = frappe.datetime.now_datetime()
-		new_pos_invoice.payments          = [{'mode_of_payment' : 'Cash' , 'amount' : this.invoiceData.paidAmount}]
-		new_pos_invoice.is_pos            = 1
-		new_pos_invoice.update_stock      = 1
-		new_pos_invoice.docstatus         = 0
+		this.db.savePosInvoice(
+					pos_checkout ,
+					(event) => {
+						console.log("sucess => " , event )
+					},
+					(event) => {
+						console.log("failure => " , event )
+					}
+				)
+
+
 
 
 
@@ -548,10 +548,25 @@ pos_ar.PointOfSale.Controller = class {
 	}
 
 	createNewTab(counter){
-		let initPos   = frappe.model.get_new_doc('POS Invoice');
-		initPos.items  = [];
-		this.selected_item_maps.set(`C${counter}` , initPos)
-		this.selected_tab.tabName = `C${counter}`
+		let new_pos_invoice = frappe.model.get_new_doc('POS Invoice');
+		new_pos_invoice.customer          = this.selectedCustomer.name
+		new_pos_invoice.pos_profile       = this.selectedPosProfile.name
+		new_pos_invoice.items             = [];
+		new_pos_invoice.taxes_and_charges = this.selectedPosProfile.taxes_and_charges
+		new_pos_invoice.additional_discount_percentage = this.invoiceData.discount
+		new_pos_invoice.paid_amount       = 0
+		new_pos_invoice.base_paid_amount  = 0
+		new_pos_invoice.creation_time     = frappe.datetime.now_datetime()
+		new_pos_invoice.payments          = [{'mode_of_payment' : 'Cash' , 'amount' : 0}]
+		new_pos_invoice.is_pos            = 1
+		new_pos_invoice.update_stock      = 1
+		new_pos_invoice.docstatus         = 0
+		new_pos_invoice.status            = 'Draft'
+
+
+
+		this.selectedItemMaps.set(`C${counter}` , new_pos_invoice)
+		this.selectedTab.tabName = `C${counter}`
 
 	}
 
@@ -675,7 +690,7 @@ pos_ar.PointOfSale.Controller = class {
 			}
 			else if(this.selectedField.field_name == "rate"){
 
-		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		this.selectedItem.rate = newValue;
+				this.selectedItem.rate = newValue;
 				const posItems = this.selectedItemMaps.get(this.selectedTab.tabName)
 
 				//recalculate the rate
@@ -806,33 +821,22 @@ pos_ar.PointOfSale.Controller = class {
 			items.push(newItem)
 		})
 
+		this.selectedItemMaps.get(this.selectedTab.tabName).items = items
+
 		if(items.length ==0)
 			return
 
 
-		console.log("the problem is here ====> " , this.selectedCustomer );
+		this.selectedItemMaps.get(this.selectedTab.tabName).paid_amount       = this.invoiceData.paidAmount
+		this.selectedItemMaps.get(this.selectedTab.tabName).base_paid_amount  = this.invoiceData.paidAmount
+		this.selectedItemMaps.get(this.selectedTab.tabName).payments          = [{'mode_of_payment' : 'Cash' , 'amount' : this.invoiceData.paidAmount}]
+		this.selectedItemMaps.get(this.selectedTab.tabName).status            = 'Paid'
+		this.selectedItemMaps.get(this.selectedTab.tabName).docstatus         = 1
 
-		let new_pos_invoice = frappe.model.get_new_doc('POS Invoice');
-		new_pos_invoice.customer          = this.selectedCustomer.name
-		new_pos_invoice.pos_profile       = this.selectedPosProfile.name
-		new_pos_invoice.items             = items
-		new_pos_invoice.taxes_and_charges = this.selectedPosProfile.taxes_and_charges
-		new_pos_invoice.additional_discount_percentage = this.invoiceData.discount
-		new_pos_invoice.paid_amount       = this.invoiceData.paidAmount
-		new_pos_invoice.base_paid_amount  = this.invoiceData.paidAmount
-		new_pos_invoice.creation_time     = frappe.datetime.now_datetime()
-		new_pos_invoice.payments          = [{'mode_of_payment' : 'Cash' , 'amount' : this.invoiceData.paidAmount}]
-		new_pos_invoice.is_pos            = 1
-		new_pos_invoice.update_stock      = 1
-		new_pos_invoice.docstatus         = 0
+		this.sellInvoices.set(this.selectedItemMaps.get(this.selectedTab.tabName).name , this.selectedItemMaps.get(this.selectedTab.tabName));
 
-
-		this.sellInvoices.set(new_pos_invoice.name , new_pos_invoice);
-
-
-
-		this.db.savePosInvoice(
-					new_pos_invoice ,
+		this.db.updatePosInvoice(
+					this.selectedItemMaps.get(this.selectedTab.tabName) ,
 					(event) => {
 						console.log("sucess => " , event )
 					},
@@ -840,6 +844,8 @@ pos_ar.PointOfSale.Controller = class {
 						console.log("failure => " , event )
 					}
 				)
+
+
 
 
 		this.customer_box.setNotSynced();
