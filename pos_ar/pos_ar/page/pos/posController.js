@@ -347,6 +347,7 @@ pos_ar.PointOfSale.Controller = class {
 									(action , key) =>{
 										this.onKeyPressed(action , key)
 									},
+									this.createNewTab.bind(this),
 									this.onCheckout.bind(this)
 									)
 	}
@@ -452,6 +453,23 @@ pos_ar.PointOfSale.Controller = class {
 
 	onCheckout(){
 
+
+		let new_pos_invoice = frappe.model.get_new_doc('POS Invoice');
+		new_pos_invoice.customer          = this.selectedCustomer.name
+		new_pos_invoice.pos_profile       = this.selectedPosProfile.name
+		new_pos_invoice.items             = items
+		new_pos_invoice.taxes_and_charges = this.selectedPosProfile.taxes_and_charges
+		new_pos_invoice.additional_discount_percentage = this.invoiceData.discount
+		new_pos_invoice.paid_amount       = this.invoiceData.paidAmount
+		new_pos_invoice.base_paid_amount  = this.invoiceData.paidAmount
+		new_pos_invoice.creation_time     = frappe.datetime.now_datetime()
+		new_pos_invoice.payments          = [{'mode_of_payment' : 'Cash' , 'amount' : this.invoiceData.paidAmount}]
+		new_pos_invoice.is_pos            = 1
+		new_pos_invoice.update_stock      = 1
+		new_pos_invoice.docstatus         = 0
+
+
+
 		//show
 		this.payment_cart.showCart();
 
@@ -526,6 +544,14 @@ pos_ar.PointOfSale.Controller = class {
 		this.item_details.hide_cart() ;
 		this.history_cart.hide_cart() ;
 
+
+	}
+
+	createNewTab(counter){
+		let initPos   = frappe.model.get_new_doc('POS Invoice');
+		initPos.items  = [];
+		this.selected_item_maps.set(`C${counter}` , initPos)
+		this.selected_tab.tabName = `C${counter}`
 
 	}
 
@@ -649,7 +675,7 @@ pos_ar.PointOfSale.Controller = class {
 			}
 			else if(this.selectedField.field_name == "rate"){
 
-				this.selectedItem.rate = newValue;
+		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		this.selectedItem.rate = newValue;
 				const posItems = this.selectedItemMaps.get(this.selectedTab.tabName)
 
 				//recalculate the rate
