@@ -116,8 +116,6 @@ pos_ar.PointOfSale.pos_history = class {
 		console.log("refresh with : "  , this.localPosInvoice.pos_invoices);
 
 		this.filtered_pos_list.forEach( record => {
-			console.log("record : " , record);
-			//this.right_data_container.append(`<div class="posInvoiceContiner"> ${record} </div>`)
 
 			const posContainer = document.createElement('div');
 			posContainer.classList.add('posInvoiceContainer')

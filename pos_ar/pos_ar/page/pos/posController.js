@@ -25,10 +25,11 @@ pos_ar.PointOfSale.Controller = class {
 
                 this.selectedItem          = {}
                 this.selectedField         = {}
-                this.selectedTab           = {"tabName"    : "C1"}
-		this.selectedPaymentMethod = {"methodName" : ""}
+                this.selectedTab           = {"tabName"    : "C1" }
+		this.selectedPaymentMethod = {"methodName" : ""   }
 		this.selectedCustomer      = {"name"       : "" , "customer_name" : ""}
-		this.selectedPosProfile    = {"name"       : ""}
+		this.selectedPosProfile    = {"name"       : ""   }
+		this.selectedPriceList     = {"name"       : ""   }
 
 		//taxes
 		this.sales_taxes = [];
@@ -101,6 +102,20 @@ pos_ar.PointOfSale.Controller = class {
 			frappe.warn(
 					'You dont have a customer',
 					'please create a customer to continue',
+					()=>{
+					},
+					'Done',
+					false
+			)
+
+		}
+
+		if(this.priceLists.length > 0){
+			Object.assign(this.selectedPriceList , this.priceLists[0])
+		}else{
+			frappe.warn(
+					'You dont have a single price list',
+					'please create a priceList to continue',
 					()=>{
 					},
 					'Done',

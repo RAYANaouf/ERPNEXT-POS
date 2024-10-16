@@ -23,6 +23,7 @@
       this.selectedPaymentMethod = { "methodName": "" };
       this.selectedCustomer = { "name": "", "customer_name": "" };
       this.selectedPosProfile = { "name": "" };
+      this.selectedPriceList = { "name": "" };
       this.sales_taxes = [];
       this.sellInvoices = /* @__PURE__ */ new Map();
       this.POSOpeningEntry = {};
@@ -72,6 +73,18 @@
         frappe.warn(
           "You dont have a customer",
           "please create a customer to continue",
+          () => {
+          },
+          "Done",
+          false
+        );
+      }
+      if (this.priceLists.length > 0) {
+        Object.assign(this.selectedPriceList, this.priceLists[0]);
+      } else {
+        frappe.warn(
+          "You dont have a single price list",
+          "please create a priceList to continue",
           () => {
           },
           "Done",
@@ -2142,7 +2155,6 @@
       console.log("refresh with : ", this.localPosInvoice.pos_invoices);
       this.filtered_pos_list.forEach((record) => {
         var _a;
-        console.log("record : ", record);
         const posContainer = document.createElement("div");
         posContainer.classList.add("posInvoiceContainer");
         posContainer.classList.add("columnBox");
@@ -2326,4 +2338,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.FWZRD7QB.js.map
+//# sourceMappingURL=pos.bundle.OFHDZED7.js.map
