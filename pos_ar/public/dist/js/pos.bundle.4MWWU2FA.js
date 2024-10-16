@@ -556,7 +556,7 @@
       new_pos_invoice.payments = [{ "mode_of_payment": "Cash", "amount": this.invoiceData.paidAmount }];
       new_pos_invoice.is_pos = 1;
       new_pos_invoice.update_stock = 1;
-      new_pos_invoice.docstatus = 1;
+      new_pos_invoice.docstatus = 0;
       this.sellInvoices.set(new_pos_invoice.name, new_pos_invoice);
       this.db.savePosInvoice(
         new_pos_invoice,
@@ -2093,14 +2093,13 @@
       this.localPosInvoice = { lastTime: null, pos_invoices: [] };
       this.filter = "";
       this.filtered_pos_list = [];
-      this.selected_pos = {};
+      this.selected_pos = null;
       this.start_work();
     }
     start_work() {
       this.prepare_history_cart();
       this.db.getAllPosInvoice(
         (result) => {
-          console.log("the result ::::", result);
           this.localPosInvoice.pos_invoices = result;
           this.filtered_pos_list = result;
           if (this.filtered_pos_list.length == 0) {
@@ -2108,7 +2107,6 @@
           } else {
             this.selected_pos = structuredClone(this.filtered_pos_list[0]);
           }
-          console.log("selected pos ==> ", this.selected_pos);
           this.refreshData();
         },
         (error) => {
@@ -2136,23 +2134,22 @@
       this.paymentsContainer = this.pos_content.find("#posPaymentsContainer");
       this.methodList = this.itemContainer.find("#posMethodList");
       this.left_container.append('<div id="posActionsContainer" class="rowBox align_content"> <div id="posPrintBtn" class="actionBtn rowBox centerItem"> Print Receipt </div>  <div id="posEmailBtn" class="actionBtn rowBox centerItem"> Email Receipt </div>   <div id="posReturnBtn" class="actionBtn rowBox centerItem"> Return </div>  </div>');
-      this.actionButtonsContainer = this.pos_content.find("#posActionsContainer");
+      this.actionButtonsContainer = this.left_container.find("#posActionsContainer");
       this.printBtn = this.actionButtonsContainer.find("#posPrintBtn");
       this.emailBtn = this.actionButtonsContainer.find("#posEmailBtn");
       this.returnBtn = this.actionButtonsContainer.find("#posReturnBtn");
       this.right_container.append('<div id="historyRightContainerHeader" class="rowBox align_center" ><h4 class="CartTitle">Recent Orders</h4></div>');
       this.right_container.append('<div id="historyRightSearchContainer" class="rowBox align_center" ></div>');
       this.search_container = this.right_container.find("#historyRightSearchContainer");
-      this.search_container.append('<input list="PosInvoiceTypeList" id="PosInvoiceTypeInput" placeholder="POS Invoice Type">');
-      this.search_container.append('<datalist id="PosInvoiceTypeList"><option value="Draft"><option value="Paid"><option value="Consolidated"></datalist>');
+      this.search_container.append('<select  id="PosInvoiceTypeInput" placeholder="POS Invoice Type">');
       this.filter_input = this.search_container.find("#PosInvoiceTypeInput");
+      this.filter_input.append('<option value="Draft">Draft</option><option value="Paid">Paid</option><option value="Consolidated">Consolidated</option>');
       this.search_container.append('<input type="text" id="historyInput" placeholder="Search by invoice id or custumer name">');
       this.right_container.append('<div id="historyRecentInvoicesContainer" ></div>');
       this.right_data_container = this.right_container.find("#historyRecentInvoicesContainer");
     }
     refreshData() {
       this.right_data_container.html("");
-      console.log("refresh with : ", this.localPosInvoice.pos_invoices);
       this.filtered_pos_list.forEach((record) => {
         var _a;
         const posContainer = document.createElement("div");
@@ -2204,18 +2201,23 @@
       this.refreshPosDetailsData();
     }
     refreshPosDetailsData() {
-      var _a;
-      console.log(" refreshing details data ", this.selected_pos);
-      this.pos_header.find("#posCustomer").text(this.selected_pos.customer);
-      this.pos_header.find("#posCost").text((_a = this.selected_pos.paid_amount) != null ? _a : 0 + "DA");
-      this.pos_header.find("#posId").text(this.selected_pos.name);
+      var _a, _b, _c, _d;
+      if (this.selected_pos == null) {
+        console.log("empty ");
+        this.setEmpty();
+        return;
+      } else {
+        this.setData();
+      }
+      this.pos_header.find("#posCustomer").text((_a = this.selected_pos.customer) != null ? _a : "CustomerName");
+      this.pos_header.find("#posCost").text((_b = this.selected_pos.paid_amount) != null ? _b : 0 + "DA");
+      this.pos_header.find("#posId").text((_c = this.selected_pos.name) != null ? _c : "POS Invoice Name");
       let posStatus = "";
-      if (this.selected_pos.docStatus == 0) {
+      if ((_d = this.selected_pos.docStatus) != null ? _d : true) {
         posStatus = "Paid";
       } else {
         posStatus = "Consolidated";
       }
-      console.log("pos status : ", posStatus);
       this.pos_header.find("#posStatus").text(posStatus);
       this.itemList.html("");
       this.selected_pos.items.forEach((item) => {
@@ -2225,36 +2227,65 @@
     show_cart() {
       this.left_container.css("display", "flex");
       this.right_container.css("display", "flex");
+      this.db.getAllPosInvoice(
+        (result) => {
+          this.localPosInvoice.pos_invoices = result;
+          this.filtered_pos_list = result;
+          if (this.filtered_pos_list.length == 0) {
+            this.selected_pos = null;
+          } else {
+            this.selected_pos = structuredClone(this.filtered_pos_list[0]);
+          }
+          this.refreshData();
+        },
+        (error) => {
+          console.log(error);
+        }
+      );
     }
     hide_cart() {
       this.left_container.css("display", "none");
       this.right_container.css("display", "none");
     }
+    setEmpty() {
+      this.pos_header.css("display", "none");
+      this.pos_content.css("display", "none");
+      console.log("hellllooooo ===> ", this.actionButtonsContainer);
+      this.actionButtonsContainer.css("display", "none");
+      this.actionButtonsContainer.css("background", "green");
+      console.log("heloooo");
+    }
+    setData() {
+      this.pos_header.css("display", "flex");
+      this.pos_content.css("display", "flex");
+      this.actionButtonsContainer.css("display", "flex");
+    }
     setListener() {
       this.filter_input.on("input", (event2) => {
-        console.log(event2.target.value);
         const filter = event2.target.value;
         this.filtered_pos_list = this.localPosInvoice.pos_invoices.filter((pos) => {
           if (filter == "") {
             return true;
-          } else if (filter == "Paid") {
+          } else if (filter == "Draft") {
             return pos.docstatus == 0;
+          } else if (filter == "Paid") {
+            return pos.docstatus == 1;
           } else if (filter == "Consolidated") {
             return pos.docstatus == 1;
           } else {
             return false;
           }
         });
-        console.log("we should refresh the data ::: ", this.filtered_pos_list);
         this.refreshData();
       });
+      this.refreshData();
     }
   };
 
   // ../pos_ar/pos_ar/pos_ar/page/pos/pos_db.js
   pos_ar.PointOfSale.pos_db = class POSDatabase {
     constructor() {
-      this.dbName = "PosDb";
+      this.dbName = "POSDB_test4";
       this.dbVersion = 14;
       this.db = null;
       this.openDatabase();
@@ -2296,7 +2327,8 @@
           db.createObjectStore("Bin", { keyPath: "name" });
         }
         if (!db.objectStoreNames.contains("POS Invoice")) {
-          db.createObjectStore("POS Invoice", { autoIncrement: true });
+          const posInvoiceStore = db.createObjectStore("POS Invoice", { autoIncrement: true });
+          posInvoiceStore.createIndex("docstatus", "docstatus", { unique: false });
         }
       };
     }
@@ -2304,17 +2336,6 @@
       this.db.onerror = (event2) => {
         var _a;
         console.error(`Database error: ${(_a = event2.target.error) == null ? void 0 : _a.message}`);
-      };
-    }
-    savePosInvoice(posInvoice, onSuccess, onFailure) {
-      const transaction = this.db.transaction(["POS Invoice"], "readwrite");
-      const store = transaction.objectStore("POS Invoice");
-      const request = store.add(posInvoice);
-      request.onsuccess = (event2) => {
-        onSuccess(event2);
-      };
-      request.onerror = (event2) => {
-        onFailure(event2);
       };
     }
     savePosInvoice(posInvoice, onSuccess, onFailure) {
@@ -2336,6 +2357,18 @@
         onSuccess(value);
       };
     }
+    getDraftPosInvoice(onSuccess, onFailure) {
+      const transaction_posInvoice = this.db.transaction(["POS Invoice"], "readwrite");
+      const store_posInvoice = transaction_posInvoice.objectStore("POS Invoice");
+      const index_docstatus_posInvoice = store_posInvoice.index("docstatus");
+      const request = index_docstatus_posInvoice.getAll(0);
+      request.onsuccess = (event2) => {
+        onSuccess(event2.target.result);
+      };
+      request.onerror = (event2) => {
+        onFailure(event2);
+      };
+    }
   };
 })();
-//# sourceMappingURL=pos.bundle.B7B442JW.js.map
+//# sourceMappingURL=pos.bundle.4MWWU2FA.js.map

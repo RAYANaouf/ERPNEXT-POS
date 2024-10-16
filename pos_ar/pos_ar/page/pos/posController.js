@@ -795,7 +795,7 @@ pos_ar.PointOfSale.Controller = class {
 		new_pos_invoice.payments          = [{'mode_of_payment' : 'Cash' , 'amount' : this.invoiceData.paidAmount}]
 		new_pos_invoice.is_pos            = 1
 		new_pos_invoice.update_stock      = 1
-		new_pos_invoice.docstatus         = 1
+		new_pos_invoice.docstatus         = 0
 
 
 		this.sellInvoices.set(new_pos_invoice.name , new_pos_invoice);

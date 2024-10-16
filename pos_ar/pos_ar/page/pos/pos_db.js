@@ -1,7 +1,7 @@
 pos_ar.PointOfSale.pos_db  = class POSDatabase {
 
 	constructor() {
-		this.dbName = 'PosDb';
+		this.dbName = 'POSDB_test4';
 		this.dbVersion = 14;
 		this.db = null;
 
@@ -55,7 +55,8 @@ pos_ar.PointOfSale.pos_db  = class POSDatabase {
 				db.createObjectStore('Bin', { keyPath: 'name' });
 			}
 			if (!db.objectStoreNames.contains('POS Invoice')) {
-				db.createObjectStore('POS Invoice', { autoIncrement : true });
+				const posInvoiceStore = db.createObjectStore('POS Invoice', { autoIncrement : true });
+				posInvoiceStore.createIndex('docstatus' , 'docstatus' , {unique : false})
 			}
 		};
 	}
@@ -88,23 +89,6 @@ pos_ar.PointOfSale.pos_db  = class POSDatabase {
 
 	}
 
-	savePosInvoice(posInvoice , onSuccess , onFailure){
-
-		const transaction = this.db.transaction(['POS Invoice'] , "readwrite");
-		const store       = transaction.objectStore('POS Invoice')
-		const request     = store.add(posInvoice)
-
-		request.onsuccess = (event) => {
-			onSuccess(event);
-		};
-
-		request.onerror = (event) => {
-			onFailure(event);
-		};
-
-	}
-
-
 
 
 	getAllPosInvoice(onSuccess , onFailure){
@@ -114,6 +98,23 @@ pos_ar.PointOfSale.pos_db  = class POSDatabase {
 			const value = event.target.result
 			onSuccess(value);
 		}
+	}
+
+	getDraftPosInvoice(onSuccess , onFailure){
+		const transaction_posInvoice     = this.db.transaction(['POS Invoice'] , "readwrite");
+		const store_posInvoice           = transaction_posInvoice.objectStore('POS Invoice');
+		const index_docstatus_posInvoice = store_posInvoice.index('docstatus');
+
+		const request = index_docstatus_posInvoice.getAll(0);
+
+		request.onsuccess = (event) => {
+			onSuccess(event.target.result);
+		};
+
+		request.onerror = (event) => {
+			onFailure(event);
+		};
+
 	}
 
 

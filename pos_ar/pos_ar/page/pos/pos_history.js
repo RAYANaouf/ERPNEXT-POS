@@ -14,7 +14,7 @@ pos_ar.PointOfSale.pos_history = class {
 		this.localPosInvoice   = { lastTime : null , pos_invoices : [] }
 		this.filter            = "" ;
 		this.filtered_pos_list = [] ;
-		this.selected_pos      = {} ;
+		this.selected_pos      = null ;
 		this.start_work();
 	}
 
@@ -24,7 +24,6 @@ pos_ar.PointOfSale.pos_history = class {
 		this.prepare_history_cart();
 		this.db.getAllPosInvoice(
 						(result)=>{
-							console.log("the result ::::" , result);
 							this.localPosInvoice.pos_invoices = result ;
 							this.filtered_pos_list            = result ;
 							if(this.filtered_pos_list.length == 0){
@@ -33,7 +32,6 @@ pos_ar.PointOfSale.pos_history = class {
 							else{
 								this.selected_pos = structuredClone(this.filtered_pos_list[0])
 							}
-							console.log("selected pos ==> " , this.selected_pos)
 							this.refreshData()
 						},
 						(error) => {
@@ -82,7 +80,7 @@ pos_ar.PointOfSale.pos_history = class {
 		this.left_container.append('<div id="posActionsContainer" class="rowBox align_content"> <div id="posPrintBtn" class="actionBtn rowBox centerItem"> Print Receipt </div>  <div id="posEmailBtn" class="actionBtn rowBox centerItem"> Email Receipt </div>   <div id="posReturnBtn" class="actionBtn rowBox centerItem"> Return </div>  </div>')
 
 		//third and last section is the action buttons
-		this.actionButtonsContainer = this.pos_content.find('#posActionsContainer')
+		this.actionButtonsContainer = this.left_container.find('#posActionsContainer')
 		this.printBtn  = this.actionButtonsContainer.find('#posPrintBtn')
 		this.emailBtn  = this.actionButtonsContainer.find('#posEmailBtn')
 		this.returnBtn = this.actionButtonsContainer.find('#posReturnBtn')
@@ -91,10 +89,10 @@ pos_ar.PointOfSale.pos_history = class {
 		this.right_container.append('<div id="historyRightSearchContainer" class="rowBox align_center" ></div>');
 
 		this.search_container = this.right_container.find('#historyRightSearchContainer');
-		this.search_container.append('<input list="PosInvoiceTypeList" id="PosInvoiceTypeInput" placeholder="POS Invoice Type">');
-		this.search_container.append('<datalist id="PosInvoiceTypeList"><option value="Draft"><option value="Paid"><option value="Consolidated"></datalist>')
+		this.search_container.append('<select  id="PosInvoiceTypeInput" placeholder="POS Invoice Type">');
 
 		this.filter_input = this.search_container.find("#PosInvoiceTypeInput")
+		this.filter_input.append('<option value="Draft">Draft</option><option value="Paid">Paid</option><option value="Consolidated">Consolidated</option>')
 
 		this.search_container.append('<input type="text" id="historyInput" placeholder="Search by invoice id or custumer name">');
 
@@ -112,8 +110,6 @@ pos_ar.PointOfSale.pos_history = class {
 
 	refreshData(){
 		this.right_data_container.html('');
-
-		console.log("refresh with : "  , this.localPosInvoice.pos_invoices);
 
 		this.filtered_pos_list.forEach( record => {
 
@@ -196,24 +192,26 @@ pos_ar.PointOfSale.pos_history = class {
 
 	refreshPosDetailsData(){
 
-		console.log(" refreshing details data " , this.selected_pos);
+		if(this.selected_pos == null ){
+			console.log("empty ")
+			this.setEmpty();
+			return;
+		}
+		else{
+			this.setData();
+		}
 
-		//const customer = document.getElementById("posCustomer");
-		//customer.textContent = this.selected_pos.customer;
-
-		this.pos_header.find('#posCustomer').text(this.selected_pos.customer)
+		this.pos_header.find('#posCustomer').text(this.selected_pos.customer?? "CustomerName")
 		//it is not the paid amount it should be the total invoice amount
 		this.pos_header.find('#posCost').text(this.selected_pos.paid_amount??0 + "DA")
-		this.pos_header.find('#posId').text(this.selected_pos.name)
+		this.pos_header.find('#posId').text(this.selected_pos.name?? "POS Invoice Name")
 		let posStatus = ""
-		if(this.selected_pos.docStatus == 0){
+		if(this.selected_pos.docStatus??0 == 0){
 			posStatus = "Paid"
 		}
 		else{
 			posStatus = "Consolidated"
 		}
-
-		console.log("pos status : " , posStatus );
 
 		this.pos_header.find('#posStatus').text(posStatus)
 
@@ -232,12 +230,48 @@ pos_ar.PointOfSale.pos_history = class {
 	show_cart(){
 		this.left_container.css('display' , 'flex');
 		this.right_container.css('display' , 'flex');
+
+		//refrenshing data
+		this.db.getAllPosInvoice(
+						(result)=>{
+							this.localPosInvoice.pos_invoices = result ;
+							this.filtered_pos_list            = result ;
+							if(this.filtered_pos_list.length == 0){
+								this.selected_pos = null
+							}
+							else{
+								this.selected_pos = structuredClone(this.filtered_pos_list[0])
+							}
+							this.refreshData()
+						},(error) => {
+							console.log(error)
+						}
+		)
+
 	}
 
 	//hide and hide
 	hide_cart(){
 		this.left_container.css('display' , 'none');
 		this.right_container.css('display' , 'none');
+	}
+
+
+	//set empty
+	setEmpty(){
+		this.pos_header.css('display' , 'none')
+		this.pos_content.css('display' , 'none')
+		console.log("hellllooooo ===> " , this.actionButtonsContainer)
+		this.actionButtonsContainer.css('display' , 'none')
+		this.actionButtonsContainer.css('background' , 'green')
+		console.log("heloooo")
+	}
+
+	//set data
+	setData(){
+		this.pos_header.css('display' , 'flex')
+		this.pos_content.css('display' , 'flex')
+		this.actionButtonsContainer.css('display' , 'flex')
 	}
 
 
@@ -248,15 +282,17 @@ pos_ar.PointOfSale.pos_history = class {
 	setListener(){
 
 		this.filter_input.on('input' , (event) => {
-			console.log(event.target.value);
 			const filter = event.target.value;
 
 			this.filtered_pos_list = this.localPosInvoice.pos_invoices.filter( pos => {
 				if(filter == ""){
 					return true ;
 				}
-				else if(filter == "Paid" ){
+				else if(filter == "Draft" ){
 					return pos.docstatus == 0 ;
+				}
+				else if(filter == "Paid" ){
+					return pos.docstatus == 1 ;
 				}
 				else if(filter == "Consolidated"){
 					return pos.docstatus == 1 ;
@@ -266,9 +302,10 @@ pos_ar.PointOfSale.pos_history = class {
 				}
 			})
 
-			console.log("we should refresh the data ::: " , this.filtered_pos_list)
 			this.refreshData();
 		});
+
+		this.refreshData();
 
 	}
 
