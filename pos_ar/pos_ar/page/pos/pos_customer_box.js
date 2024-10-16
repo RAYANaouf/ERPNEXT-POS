@@ -104,9 +104,13 @@ pos_ar.PointOfSale.pos_customer_box = class{
 		})
 
 		this.customerBox.find('#CustomerInput').on('input' , (event)=>{
-			const customer = event.target.value ;
-			this.selected_customer = customer;
-			console.log("customer : " , customer)
+			const customer_value = event.target.value ;
+
+			this.customers_list.forEach( customer => {
+				if( customer.name == customer_value){
+					console.log("selected customer : " , customer)
+				}
+			})
 		})
 
 		this.close_pos.on('click' , (event)=>{

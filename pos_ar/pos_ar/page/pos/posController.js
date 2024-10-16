@@ -27,7 +27,7 @@ pos_ar.PointOfSale.Controller = class {
                 this.selectedField         = {}
                 this.selectedTab           = {"tabName"    : "C1"}
 		this.selectedPaymentMethod = {"methodName" : ""}
-		this.selectedCustomer      = {"name"       : ""}
+		this.selectedCustomer      = {"name"       : "" , "customer_name" : ""}
 
 
 		//taxes
@@ -68,7 +68,8 @@ pos_ar.PointOfSale.Controller = class {
 
 	async prepare_app_defaults(){
                 this.customersList  = await this.fetchCustomers()
-                this.itemGroupList  = await this.fetchItemGroups()
+		Object.assign(this.selectedCustomer , this.customersList[0])
+		this.itemGroupList  = await this.fetchItemGroups()
                 this.itemList       = await this.fetchItems()
                 this.itemPrices     = await this.fetchItemPrice()
                 this.priceLists     = await this.fetchPriceList()
@@ -738,7 +739,7 @@ pos_ar.PointOfSale.Controller = class {
 		console.log("the problem is here ====> " , this.invoiceData.discount );
 
 		let new_pos_invoice = frappe.model.get_new_doc('POS Invoice');
-		new_pos_invoice.customer          = this.customersList[0].name
+		new_pos_invoice.customer          = this.selectedCustomer.name
 		new_pos_invoice.pos_profile       = this.PosProfileList[0].name
 		new_pos_invoice.items             = items
 		new_pos_invoice.taxes_and_charges = this.PosProfileList[0].taxes_and_charges

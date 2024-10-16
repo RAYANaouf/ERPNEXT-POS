@@ -21,7 +21,7 @@
       this.selectedField = {};
       this.selectedTab = { "tabName": "C1" };
       this.selectedPaymentMethod = { "methodName": "" };
-      this.selectedCustomer = { "name": "" };
+      this.selectedCustomer = { "name": "", "customer_name": "" };
       this.sales_taxes = [];
       this.sellInvoices = /* @__PURE__ */ new Map();
       this.POSOpeningEntry = {};
@@ -47,6 +47,7 @@
     }
     async prepare_app_defaults() {
       this.customersList = await this.fetchCustomers();
+      Object.assign(this.selectedCustomer, this.customersList[0]);
       this.itemGroupList = await this.fetchItemGroups();
       this.itemList = await this.fetchItems();
       this.itemPrices = await this.fetchItemPrice();
@@ -513,7 +514,7 @@
         return;
       console.log("the problem is here ====> ", this.invoiceData.discount);
       let new_pos_invoice = frappe.model.get_new_doc("POS Invoice");
-      new_pos_invoice.customer = this.customersList[0].name;
+      new_pos_invoice.customer = this.selectedCustomer.name;
       new_pos_invoice.pos_profile = this.PosProfileList[0].name;
       new_pos_invoice.items = items;
       new_pos_invoice.taxes_and_charges = this.PosProfileList[0].taxes_and_charges;
@@ -1004,9 +1005,12 @@
         this.on_sync();
       });
       this.customerBox.find("#CustomerInput").on("input", (event2) => {
-        const customer = event2.target.value;
-        this.selected_customer = customer;
-        console.log("customer : ", customer);
+        const customer_value = event2.target.value;
+        this.customers_list.forEach((customer) => {
+          if (customer.name == customer_value) {
+            console.log("selected customer : ", customer);
+          }
+        });
       });
       this.close_pos.on("click", (event2) => {
         this.on_close_pos();
@@ -2299,4 +2303,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.7VLLH5HV.js.map
+//# sourceMappingURL=pos.bundle.T5G42OVJ.js.map
