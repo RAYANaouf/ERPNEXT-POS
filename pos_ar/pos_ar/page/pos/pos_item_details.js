@@ -12,7 +12,6 @@ pos_ar.PointOfSale.pos_item_details = class{
 		onInput,
 		onClose,
 	){
-		console.log("hello from item_details 0")
 		this.wrapper        = wrapper   ;
 		this.warehouse      = warehouse ;
 		this.price_lists    = priceLists;
@@ -22,8 +21,6 @@ pos_ar.PointOfSale.pos_item_details = class{
 		this.on_input       = onInput;
 		this.on_close_cart  = onClose;
 		this.bin_list       = binList;
-
-		console.log("start with : " , warehouse)
 
 		this.start_the_work();
 	}

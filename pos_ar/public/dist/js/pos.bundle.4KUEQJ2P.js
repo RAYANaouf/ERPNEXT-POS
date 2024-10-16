@@ -336,8 +336,8 @@
       this.selected_item_cart.refreshSelectedItem();
     }
     onSelectedItemClick(item) {
-      Object.assign(this.selectedItem, item);
-      console.log("selected item clicked ::: ", item);
+      this.selectedItem = structuredClone(item);
+      console.log("selected item clicked ::: ", this.selectedItem);
       console.log("item_details :: ", this.item_details);
       console.log("item_selector :: ", this.item_selector);
       console.log("payment_cart :: ", this.payment_cart);
@@ -391,7 +391,6 @@
       this.history_cart.hide_cart();
     }
     onInput(event2, field, value) {
-      console.log("<<we are in onInpute function >>  event : ", event2, " field : ", field, " value : ", value);
       if (event2 == "focus" || event2 == "blur") {
         if (event2 == "focus")
           Object.assign(this.selectedField, { field_name: field });
@@ -404,17 +403,16 @@
       if (field == "quantity") {
         this.selectedItem.quantity = value;
         this.editPosItemQty(this.selectedItem.name, this.selectedItem.quantity);
-        console.log("item ==>>> ", this.selectedItem);
         this.selected_item_cart.refreshSelectedItem();
       } else if (field == "rate") {
         this.selectedItem.rate = value;
-        this.editPosItemRate(this.selectedItem.name, this.selectedItem.rate);
         let oldRate = this.selectedItem.rate;
         let persont = this.selectedItem.discount_percentage;
         let montant = oldRate * (persont / 100);
         this.selectedItem.discount_percentage = persont;
         this.selectedItem.discount_amount = montant;
-        console.log("item ==>>> ", this.selectedItem);
+        this.editPosItemDiscountAmount(this.selectedItem.name, this.selectedItem.discount_amount);
+        this.editPosItemRate(this.selectedItem.name, this.selectedItem.rate);
         this.selected_item_cart.refreshSelectedItem();
         this.item_details.refreshDate(this.selectedItem);
       } else if (field == "discount_percentage") {
@@ -424,7 +422,6 @@
         this.selectedItem.discount_amount = montant;
         this.editPosItemDiscountAmount(this.selectedItem.name, this.selectedItem.discount_amount);
         this.editPosItemDiscountPercentage(this.selectedItem.name, this.selectedItem.discount_percentage);
-        console.log("item ==>>> ", this.selectedItem);
         this.selected_item_cart.refreshSelectedItem();
         this.item_details.refreshDate(this.selectedItem);
       } else if (field == "discount_amount") {
@@ -457,29 +454,35 @@
       } else if (action == "discount") {
         this.item_details.requestFocus("discount_percentage");
       } else if (action == "remove") {
-        this.selectedItemMaps.get(this.selectedTab.tabName).delete(this.selectedItem.name);
+        this.deleteItemFromPOsInvoice(this.selectedItem.name);
         this.selected_item_cart.refreshSelectedItem();
+        this.onClose_details();
       } else if (action == "delete") {
         let newValue = this.item_details.deleteCharacter();
         if (this.selectedField.field_name == "quantity") {
           this.selectedItem.quantity = newValue;
-          this.selectedItemMaps.get(this.selectedTab.tabName).set(this.selectedItem.name, Object.assign({}, this.selectedItem));
+          const posItems = this.selectedItemMaps.get(this.selectedTab.tabName);
         } else if (this.selectedField.field_name == "rate") {
-          this.selectedItem.amount = newValue;
-          this.selectedItemMaps.get(this.selectedTab.tabName).set(this.selectedItem.name, Object.assign({}, this.selectedItem));
+          this.selectedItem.rate = newValue;
+          const posItems = this.selectedItemMaps.get(this.selectedTab.tabName);
+          let oldRate = this.selectedItem.rate;
+          let persont = this.selectedItem.discount_percentage;
+          let montant = oldRate * (persont / 100);
+          this.selectedItem.discount_amount = montant;
+        } else if (this.selectedField.field_name == "discount_percentage") {
+          let oldRate = this.selectedItem.rate;
+          let montant = oldRate * (newValue / 100);
+          this.selectedItem.discount_percentage = newValue;
+          this.selectedItem.discount_amount = montant;
         } else if (this.selectedField.field_name == "discount_percentage") {
           let oldRate = this.selectedItem.amount;
           let montant = oldRate * (newValue / 100);
           this.selectedItem.discount_percentage = newValue;
           this.selectedItem.discount_amount = montant;
-          this.selectedItemMaps.get(this.selectedTab.tabName).set(this.selectedItem.name, Object.assign({}, this.selectedItem));
-        } else if (this.selectedField.field_name == "discount_percentage") {
-          let oldRate = this.selectedItem.amount;
-          let montant = oldRate * (newValue / 100);
-          this.selectedItem.discount_percentage = newValue;
-          this.selectedItem.discount_amount = montant;
-          this.selectedItemMaps.get(this.selectedTab.tabName).set(this.selectedItem.name, Object.assign({}, this.selectedItem));
         }
+        this.editPosItemDiscountAmount(this.selectedItem.name, this.selectedItem.discount_amount);
+        this.editPosItemRate(this.selectedItem.name, this.selectedItem.rate);
+        this.editPosItemQty(this.selectedItem.name, this.selectedItem.quantity);
         this.selected_item_cart.refreshSelectedItem();
         this.item_details.refreshDate(this.selectedItem);
       } else if (action == "addToField") {
@@ -681,6 +684,13 @@
         clonedItem.rate = this.getItemPrice(clickedItem.name);
         posItems.push(clonedItem);
       }
+    }
+    deleteItemFromPOsInvoice(itemId) {
+      const posInvoice = this.selectedItemMaps.get(this.selectedTab.tabName);
+      const posItems = posInvoice.items;
+      posInvoice.items = posItems.filter((item) => item.name != itemId);
+      this.selectedItem = structuredClone({ name: "" });
+      console.log("new pos invoice : ", posInvoice.items);
     }
     editPosItemQty(itemName, qty) {
       let items = this.selectedItemMaps.get(this.selectedTab.tabName).items;
@@ -1468,7 +1478,6 @@
   // ../pos_ar/pos_ar/pos_ar/page/pos/pos_item_details.js
   pos_ar.PointOfSale.pos_item_details = class {
     constructor(wrapper, warehouse, priceLists, itemPrices, binList, selectedItem, selectedField, onInput, onClose) {
-      console.log("hello from item_details 0");
       this.wrapper = wrapper;
       this.warehouse = warehouse;
       this.price_lists = priceLists;
@@ -1478,7 +1487,6 @@
       this.on_input = onInput;
       this.on_close_cart = onClose;
       this.bin_list = binList;
-      console.log("start with : ", warehouse);
       this.start_the_work();
     }
     start_the_work() {
@@ -2338,4 +2346,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.OFHDZED7.js.map
+//# sourceMappingURL=pos.bundle.4KUEQJ2P.js.map

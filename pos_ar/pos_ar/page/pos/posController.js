@@ -424,10 +424,9 @@ pos_ar.PointOfSale.Controller = class {
 	onSelectedItemClick(item){
 
 
-		Object.assign(this.selectedItem , item)
+		this.selectedItem = structuredClone(item)
 
-
-		console.log("selected item clicked ::: " , item);
+		console.log("selected item clicked ::: " , this.selectedItem);
 
 
 		console.log("item_details :: " , this.item_details)
@@ -531,9 +530,7 @@ pos_ar.PointOfSale.Controller = class {
 
 	onInput( event , field , value){
 
-		console.log("<<we are in onInpute function >>  event : " , event , " field : " , field , " value : " , value)
 
-		//console.log("item " , this.selectedItem )
 		if(event == "focus" || event == "blur"){
 			if(event == "focus")
 				Object.assign(this.selectedField , {field_name : field})
@@ -550,15 +547,11 @@ pos_ar.PointOfSale.Controller = class {
 			this.selectedItem.quantity = value;
 			this.editPosItemQty(this.selectedItem.name , this.selectedItem.quantity);
 
-			console.log("item ==>>> " , this.selectedItem)
-
 			//redrawing
 			this.selected_item_cart.refreshSelectedItem();
 		}
 		else if( field ==  "rate" ){
 			this.selectedItem.rate = value;
-			this.editPosItemRate(this.selectedItem.name , this.selectedItem.rate);
-
 
 			//recalculate the rate
 			let oldRate = this.selectedItem.rate;
@@ -568,8 +561,8 @@ pos_ar.PointOfSale.Controller = class {
 			this.selectedItem.discount_percentage = persont;
 			this.selectedItem.discount_amount     = montant;
 
-			console.log("item ==>>> " , this.selectedItem)
-
+			this.editPosItemDiscountAmount(this.selectedItem.name , this.selectedItem.discount_amount);
+			this.editPosItemRate(this.selectedItem.name , this.selectedItem.rate);
 
 			//redrawing
 			this.selected_item_cart.refreshSelectedItem();
@@ -587,8 +580,6 @@ pos_ar.PointOfSale.Controller = class {
 
 			this.editPosItemDiscountAmount(this.selectedItem.name , this.selectedItem.discount_amount);
 			this.editPosItemDiscountPercentage(this.selectedItem.name ,  this.selectedItem.discount_percentage);
-
-			console.log("item ==>>> " , this.selectedItem)
 
 
 			//redrawing
@@ -643,29 +634,37 @@ pos_ar.PointOfSale.Controller = class {
 			this.item_details.requestFocus("discount_percentage")
 		}
 		else if(action == "remove"){
-			this.selectedItemMaps.get(this.selectedTab.tabName).delete(this.selectedItem.name)
+			this.deleteItemFromPOsInvoice(this.selectedItem.name)
 			this.selected_item_cart.refreshSelectedItem();
+			this.onClose_details()
 		}
 		else if(action == "delete"){
 			let newValue =  this.item_details.deleteCharacter()
 			if(this.selectedField.field_name == "quantity"){
 				this.selectedItem.quantity = newValue;
-				this.selectedItemMaps.get(this.selectedTab.tabName).set( this.selectedItem.name , Object.assign({},this.selectedItem) );
+				const posItems = this.selectedItemMaps.get(this.selectedTab.tabName)
 			}
 			else if(this.selectedField.field_name == "rate"){
-				this.selectedItem.amount = newValue;
-				this.selectedItemMaps.get(this.selectedTab.tabName).set( this.selectedItem.name , Object.assign({},this.selectedItem)  );
+
+				this.selectedItem.rate = newValue;
+				const posItems = this.selectedItemMaps.get(this.selectedTab.tabName)
+
+				//recalculate the rate
+				let oldRate = this.selectedItem.rate;
+				let persont = this.selectedItem.discount_percentage
+				let montant = oldRate * (persont / 100)
+
+				this.selectedItem.discount_amount     = montant;
 
 			}
 			else if(this.selectedField.field_name == "discount_percentage"){
 				//recalculate the rate
-				let oldRate = this.selectedItem.amount;
+				let oldRate = this.selectedItem.rate;
 				let montant = oldRate * (newValue / 100)
 
 				this.selectedItem.discount_percentage = newValue;
 				this.selectedItem.discount_amount     = montant;
 
-				this.selectedItemMaps.get(this.selectedTab.tabName).set( this.selectedItem.name , Object.assign({},this.selectedItem)  );
 			}
 			else if(this.selectedField.field_name == "discount_percentage"){
 				//recalculate the rate
@@ -676,8 +675,14 @@ pos_ar.PointOfSale.Controller = class {
 				this.selectedItem.discount_percentage = newValue;
 				this.selectedItem.discount_amount     = montant;
 
-				this.selectedItemMaps.get(this.selectedTab.tabName).set( this.selectedItem.name , Object.assign({},this.selectedItem)  );
 			}
+
+
+
+			//update the posInvoice
+			this.editPosItemDiscountAmount(this.selectedItem.name , this.selectedItem.discount_amount);
+			this.editPosItemRate(this.selectedItem.name , this.selectedItem.rate);
+			this.editPosItemQty(this.selectedItem.name , this.selectedItem.quantity);
 
 			//update the ui
 			this.selected_item_cart.refreshSelectedItem()
@@ -1003,6 +1008,16 @@ pos_ar.PointOfSale.Controller = class {
 		}
 
 
+	}
+
+	deleteItemFromPOsInvoice( itemId ){
+		const posInvoice = this.selectedItemMaps.get(this.selectedTab.tabName);
+		const posItems   = posInvoice.items ;
+
+		posInvoice.items  = posItems.filter( item => item.name != itemId )
+
+		this.selectedItem = structuredClone({ name : ""})
+		console.log("new pos invoice : " , posInvoice.items)
 	}
 
 	editPosItemQty(itemName , qty){
