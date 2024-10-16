@@ -693,7 +693,7 @@ pos_ar.PointOfSale.Controller = class {
 
 				}
 				else if( this.selectedField.field_name ==  "rate" ){
-					this.selectedItem.amount += key;
+					this.selectedItem.rate += key;
 
 				}
 				else if( this.selectedField.field_name ==  "discount_percentage" ){

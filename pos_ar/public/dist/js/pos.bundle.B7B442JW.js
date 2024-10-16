@@ -488,7 +488,7 @@
             this.selectedItem.qty += key;
             console.log("we are here, with : ", this.selectedItem.qty);
           } else if (this.selectedField.field_name == "rate") {
-            this.selectedItem.amount += key;
+            this.selectedItem.rate += key;
           } else if (this.selectedField.field_name == "discount_percentage") {
             let oldRate = this.selectedItem.amount;
             let old_percentage = (_a = this.selectedItem.discount_percentage) != null ? _a : 0;
@@ -2338,4 +2338,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.2MB5A3NG.js.map
+//# sourceMappingURL=pos.bundle.B7B442JW.js.map
