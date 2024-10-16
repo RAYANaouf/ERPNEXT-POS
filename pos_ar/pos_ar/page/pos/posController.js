@@ -544,8 +544,8 @@ pos_ar.PointOfSale.Controller = class {
 		}
 
 		if( field ==  "quantity" ){
-			this.selectedItem.quantity = value;
-			this.editPosItemQty(this.selectedItem.name , this.selectedItem.quantity);
+			this.selectedItem.qty = value;
+			this.editPosItemQty(this.selectedItem.name , this.selectedItem.qty);
 
 			//redrawing
 			this.selected_item_cart.refreshSelectedItem();
@@ -641,7 +641,7 @@ pos_ar.PointOfSale.Controller = class {
 		else if(action == "delete"){
 			let newValue =  this.item_details.deleteCharacter()
 			if(this.selectedField.field_name == "quantity"){
-				this.selectedItem.quantity = newValue;
+				this.selectedItem.qty = newValue;
 				const posItems = this.selectedItemMaps.get(this.selectedTab.tabName)
 			}
 			else if(this.selectedField.field_name == "rate"){
@@ -679,35 +679,21 @@ pos_ar.PointOfSale.Controller = class {
 
 
 
-			//update the posInvoice
-			this.editPosItemDiscountAmount(this.selectedItem.name , this.selectedItem.discount_amount);
-			this.editPosItemRate(this.selectedItem.name , this.selectedItem.rate);
-			this.editPosItemQty(this.selectedItem.name , this.selectedItem.quantity);
-
-			//update the ui
-			this.selected_item_cart.refreshSelectedItem()
-			this.item_details.refreshDate(this.selectedItem);
-
 		}
 		else if(action == "addToField"){
+
 			if(this.selectedField.field_name == "cash"){
 				this.payment_cart.handleInput(key);
 			}
 			else{
 
 				if( this.selectedField.field_name ==  "quantity" ){
-					this.selectedItem.quantity += key;
-					this.selectedItemMaps.get(this.selectedTab.tabName).set( this.selectedItem.name , Object.assign({},this.selectedItem) );
-					//redrawing
-					this.selected_item_cart.refreshSelectedItem();
-					this.item_details.refreshDate(this.selectedItem);
+					this.selectedItem.qty += key;
+					console.log("we are here, with : " , this.selectedItem.qty)
+
 				}
 				else if( this.selectedField.field_name ==  "rate" ){
 					this.selectedItem.amount += key;
-					this.selectedItemMaps.get(this.selectedTab.tabName).set( this.selectedItem.name , Object.assign({},this.selectedItem)  );
-					//redrawing
-					this.selected_item_cart.refreshSelectedItem();
-					this.item_details.refreshDate(this.selectedItem);
 
 				}
 				else if( this.selectedField.field_name ==  "discount_percentage" ){
@@ -727,16 +713,27 @@ pos_ar.PointOfSale.Controller = class {
 					this.selectedItem.discount_amount     = montant;
 					this.selectedItem.amount              = newRate;
 
-					this.selectedItemMaps.get(this.selectedTab.tabName).set( this.selectedItem.name , Object.assign({},this.selectedItem)  )
-					//redrawing
-					this.selected_item_cart.refreshSelectedItem();
-					this.item_details.refreshDate(this.selectedItem);
-
-
 				}
 
 			}
+
+		//update the posInvoice
+		this.editPosItemDiscountAmount(this.selectedItem.name , this.selectedItem.discount_amount);
+		this.editPosItemRate(this.selectedItem.name , this.selectedItem.rate);
+		this.editPosItemQty(this.selectedItem.name , this.selectedItem.qty);
+
+		//update the ui
+		this.selected_item_cart.refreshSelectedItem()
+		this.item_details.refreshDate(this.selectedItem);
+
+
+
 		}
+
+
+
+
+
 	}
 
 
