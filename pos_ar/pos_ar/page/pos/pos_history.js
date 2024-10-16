@@ -58,7 +58,7 @@ pos_ar.PointOfSale.pos_history = class {
 		//first section is the header information
 		this.pos_header = this.left_container.find('#PosContentHeader');
 
-		this.left_container.append('<div id="posContent"></div>')
+		this.left_container.append('<div id="posContent" class="columnBox"></div>')
 
 		//second section is the data like items , cost and payments methods.
 		this.pos_content = this.left_container.find('#posContent')
@@ -261,10 +261,7 @@ pos_ar.PointOfSale.pos_history = class {
 	setEmpty(){
 		this.pos_header.css('display' , 'none')
 		this.pos_content.css('display' , 'none')
-		console.log("hellllooooo ===> " , this.actionButtonsContainer)
 		this.actionButtonsContainer.css('display' , 'none')
-		this.actionButtonsContainer.css('background' , 'green')
-		console.log("heloooo")
 	}
 
 	//set data

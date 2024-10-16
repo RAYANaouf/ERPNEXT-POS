@@ -544,14 +544,14 @@ pos_ar.PointOfSale.Controller = class {
 		}
 
 		if( field ==  "quantity" ){
-			this.selectedItem.qty = value;
+			this.selectedItem.qty = parseFloat(value);
 			this.editPosItemQty(this.selectedItem.name , this.selectedItem.qty);
 
 			//redrawing
 			this.selected_item_cart.refreshSelectedItem();
 		}
 		else if( field ==  "rate" ){
-			this.selectedItem.rate = value;
+			this.selectedItem.rate = parseFloat(value);
 
 			//recalculate the rate
 			let oldRate = this.selectedItem.rate;
@@ -573,7 +573,7 @@ pos_ar.PointOfSale.Controller = class {
 
 			//recalculate the rate
 			let oldRate = this.selectedItem.rate;
-			let montant = oldRate * (value / 100)
+			let montant = oldRate * (parseFloat(value) / 100)
 
 			this.selectedItem.discount_percentage = parseFloat(value);
 			this.selectedItem.discount_amount     = montant;
@@ -590,14 +590,14 @@ pos_ar.PointOfSale.Controller = class {
 
 			//recalculate the rate
 			let oldRate = this.selectedItem.rate;
-			let persent = ((value * 100) / oldRate).toFixed(2);
+			let persent = ((parseFloat(value) * 100) / oldRate).toFixed(2);
 			let montant = parseFloat(value);
 
 			//prevent negatif result
 			if(persent > 100){
 				persent = 100 ;
 			}
-			if(value > oldRate){
+			if(parseFloat(value) > oldRate){
 				montant = oldRate;
 			}
 
@@ -639,7 +639,9 @@ pos_ar.PointOfSale.Controller = class {
 			this.onClose_details()
 		}
 		else if(action == "delete"){
-			let newValue =  this.item_details.deleteCharacter()
+
+			let newValue =  parseFloat(this.item_details.deleteCharacter())
+
 			if(this.selectedField.field_name == "quantity"){
 				this.selectedItem.qty = newValue;
 				const posItems = this.selectedItemMaps.get(this.selectedTab.tabName)
@@ -668,12 +670,12 @@ pos_ar.PointOfSale.Controller = class {
 			}
 			else if(this.selectedField.field_name == "discount_percentage"){
 				//recalculate the rate
-				let oldRate = this.selectedItem.amount;
+				let oldRate = this.selectedItem.rate;
 				let montant = oldRate * (newValue / 100)
 
 				//asign the values to the selectedItem refrence
 				this.selectedItem.discount_percentage = newValue;
-				this.selectedItem.discount_amount     = montant;
+				this.selectedItem.discount_rate     = montant;
 
 			}
 
@@ -698,7 +700,7 @@ pos_ar.PointOfSale.Controller = class {
 				}
 				else if( this.selectedField.field_name ==  "discount_percentage" ){
 					//recalculate the rate
-					let oldRate        = this.selectedItem.amount;
+					let oldRate        = this.selectedItem.rate;
 					let old_percentage = this.selectedItem.discount_percentage ?? 0;
 					let input          = `${old_percentage}` + key ;
 					let discount_percentage = parseFloat(input);
@@ -711,11 +713,13 @@ pos_ar.PointOfSale.Controller = class {
 
 					this.selectedItem.discount_percentage = (discount_percentage);
 					this.selectedItem.discount_amount     = montant;
-					this.selectedItem.amount              = newRate;
 
 				}
 
 			}
+
+
+		}
 
 		//update the posInvoice
 		this.editPosItemDiscountAmount(this.selectedItem.name , this.selectedItem.discount_amount);
@@ -725,12 +729,6 @@ pos_ar.PointOfSale.Controller = class {
 		//update the ui
 		this.selected_item_cart.refreshSelectedItem()
 		this.item_details.refreshDate(this.selectedItem);
-
-
-
-		}
-
-
 
 
 
