@@ -28,7 +28,7 @@ pos_ar.PointOfSale.Controller = class {
                 this.selectedTab           = {"tabName"    : "C1"}
 		this.selectedPaymentMethod = {"methodName" : ""}
 		this.selectedCustomer      = {"name"       : "" , "customer_name" : ""}
-
+		this.selectedPosProfile    = {"name"       : ""}
 
 		//taxes
 		this.sales_taxes = [];
@@ -68,7 +68,6 @@ pos_ar.PointOfSale.Controller = class {
 
 	async prepare_app_defaults(){
                 this.customersList  = await this.fetchCustomers()
-		Object.assign(this.selectedCustomer , this.customersList[0])
 		this.itemGroupList  = await this.fetchItemGroups()
                 this.itemList       = await this.fetchItems()
                 this.itemPrices     = await this.fetchItemPrice()
@@ -84,6 +83,7 @@ pos_ar.PointOfSale.Controller = class {
 		this.sales_taxes  = this.getSalesTax()
 
 
+
 		console.log("taxes and charges templates  => ", this.taxes_and_charges_template)
 		console.log("taxes and charges            => ", this.sales_taxes_and_charges)
 		console.log("debog check ==> " , this.sales_taxes)
@@ -91,6 +91,22 @@ pos_ar.PointOfSale.Controller = class {
 		if(this.PosProfileList.length == 0){
 			frappe.set_route("Form", "POS Profile");
 			return;
+		}
+
+		Object.assign(this.selectedPosProfile , this.PosProfileList[0])
+
+		if(this.customersList.length > 0){
+			Object.assign(this.selectedCustomer , this.customersList[0])
+		}else{
+			frappe.warn(
+					'You dont have a customer',
+					'please create a customer to continue',
+					()=>{
+					},
+					'Done',
+					false
+			)
+
 		}
 
 
@@ -127,7 +143,7 @@ pos_ar.PointOfSale.Controller = class {
 		try{
 			const r = await frappe.db.get_list('POS Opening Entry' , {
 					filters :{
-						'pos_profile' : this.PosProfileList[0].name,
+						'pos_profile' : this.selectedPosProfile.name,
 						'status'      : 'Open',
 						'user'        : frappe.session.user
 					},
@@ -320,10 +336,10 @@ pos_ar.PointOfSale.Controller = class {
 	}
 
 	init_item_details(){
-		console.log("warehouse ==> " , this.PosProfileList[0].warehouse)
+		console.log("warehouse ==> " , this.selectedPosProfile.warehouse)
 		this.item_details = new pos_ar.PointOfSale.pos_item_details(
 									this.$leftSection,
-									this.PosProfileList[0].warehouse,
+									this.selectedPosProfile.warehouse,
 									this.priceLists,
 									this.itemPrices,
 									this.binList,
@@ -706,6 +722,18 @@ pos_ar.PointOfSale.Controller = class {
 
 	onCompleteOrder(){
 
+		//check if they set a customer
+		if(this.selectedCustomer.name = ""){
+			frappe.warn(
+					'Customer didnt selected!',
+					'you have to select a customer',
+					()=>{
+					},
+					'Done',
+					false
+			)
+		}
+
 		let items = []
 
 
@@ -723,8 +751,8 @@ pos_ar.PointOfSale.Controller = class {
 				'use_serial_batch_fields' : 1,
 				'discount_percentage'     : item.discount_percentage,
 				'discount_amount'         : item.discount_amount,
-				'warehouse'               : this.PosProfileList[0].warehouse,
-				'income_account'          : this.PosProfileList[0].income_account,
+				'warehouse'               : this.selectedPosProfile.warehouse,
+				'income_account'          : this.selectedPosProfile.income_account,
 				'item_tax_rate'           : {}
 			}
 
@@ -740,9 +768,9 @@ pos_ar.PointOfSale.Controller = class {
 
 		let new_pos_invoice = frappe.model.get_new_doc('POS Invoice');
 		new_pos_invoice.customer          = this.selectedCustomer.name
-		new_pos_invoice.pos_profile       = this.PosProfileList[0].name
+		new_pos_invoice.pos_profile       = this.selectedPosProfile.name
 		new_pos_invoice.items             = items
-		new_pos_invoice.taxes_and_charges = this.PosProfileList[0].taxes_and_charges
+		new_pos_invoice.taxes_and_charges = this.selectedPosProfile.taxes_and_charges
 		new_pos_invoice.additional_discount_percentage = this.invoiceData.discount
 		new_pos_invoice.paid_amount       = this.invoiceData.paidAmount
 		new_pos_invoice.base_paid_amount  = this.invoiceData.paidAmount
@@ -996,7 +1024,7 @@ pos_ar.PointOfSale.Controller = class {
 	}
 
 	getSalesTax(){
-		const taxTemplateId = this.PosProfileList[0].taxes_and_charges
+		const taxTemplateId = this.selectedPosProfile.taxes_and_charges
 		let   salesTax      = []
 
 
