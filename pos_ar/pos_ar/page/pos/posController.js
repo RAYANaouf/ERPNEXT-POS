@@ -97,7 +97,7 @@ pos_ar.PointOfSale.Controller = class {
 		Object.assign(this.selectedPosProfile , this.PosProfileList[0])
 
 		if(this.customersList.length > 0){
-			Object.assign(this.selectedCustomer , this.customersList[0])
+			this.selectedCustomer = structuredClone(this.customersList[0])
 		}else{
 			frappe.warn(
 					'You dont have a customer',
@@ -151,6 +151,7 @@ pos_ar.PointOfSale.Controller = class {
 		this.init_item_details();
 		this.init_paymentCart();
 		this.init_historyCart();
+
 	}
 
 	async checkForPOSEntry(){
@@ -690,12 +691,14 @@ pos_ar.PointOfSale.Controller = class {
 			else{
 
 				if( this.selectedField.field_name ==  "quantity" ){
-					this.selectedItem.qty += key;
+					const newVal = this.selectedItem.qty + key
+					this.selectedItem.qty = parseFloat(newVal);
 					console.log("we are here, with : " , this.selectedItem.qty)
 
 				}
 				else if( this.selectedField.field_name ==  "rate" ){
-					this.selectedItem.rate += key;
+					const newVal = this.selectedItem.rate + key
+					this.selectedItem.rate = parseFloat(newVal);
 
 				}
 				else if( this.selectedField.field_name ==  "discount_percentage" ){
@@ -737,8 +740,11 @@ pos_ar.PointOfSale.Controller = class {
 
 	onCompleteOrder(){
 
+
+
+
 		//check if they set a customer
-		if(this.selectedCustomer.name = ""){
+		if(this.selectedCustomer.name == ""){
 			frappe.warn(
 					'Customer didnt selected!',
 					'you have to select a customer',
@@ -778,8 +784,7 @@ pos_ar.PointOfSale.Controller = class {
 			return
 
 
-
-		console.log("the problem is here ====> " , this.invoiceData.discount );
+		console.log("the problem is here ====> " , this.selectedCustomer );
 
 		let new_pos_invoice = frappe.model.get_new_doc('POS Invoice');
 		new_pos_invoice.customer          = this.selectedCustomer.name

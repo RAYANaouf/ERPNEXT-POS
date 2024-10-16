@@ -68,7 +68,7 @@
       }
       Object.assign(this.selectedPosProfile, this.PosProfileList[0]);
       if (this.customersList.length > 0) {
-        Object.assign(this.selectedCustomer, this.customersList[0]);
+        this.selectedCustomer = structuredClone(this.customersList[0]);
       } else {
         frappe.warn(
           "You dont have a customer",
@@ -485,10 +485,12 @@
           this.payment_cart.handleInput(key);
         } else {
           if (this.selectedField.field_name == "quantity") {
-            this.selectedItem.qty += key;
+            const newVal = this.selectedItem.qty + key;
+            this.selectedItem.qty = parseFloat(newVal);
             console.log("we are here, with : ", this.selectedItem.qty);
           } else if (this.selectedField.field_name == "rate") {
-            this.selectedItem.rate += key;
+            const newVal = this.selectedItem.rate + key;
+            this.selectedItem.rate = parseFloat(newVal);
           } else if (this.selectedField.field_name == "discount_percentage") {
             let oldRate = this.selectedItem.rate;
             let old_percentage = (_a = this.selectedItem.discount_percentage) != null ? _a : 0;
@@ -511,7 +513,7 @@
       this.item_details.refreshDate(this.selectedItem);
     }
     onCompleteOrder() {
-      if (this.selectedCustomer.name = "") {
+      if (this.selectedCustomer.name == "") {
         frappe.warn(
           "Customer didnt selected!",
           "you have to select a customer",
@@ -542,7 +544,7 @@
       });
       if (items.length == 0)
         return;
-      console.log("the problem is here ====> ", this.invoiceData.discount);
+      console.log("the problem is here ====> ", this.selectedCustomer);
       let new_pos_invoice = frappe.model.get_new_doc("POS Invoice");
       new_pos_invoice.customer = this.selectedCustomer.name;
       new_pos_invoice.pos_profile = this.selectedPosProfile.name;
@@ -2219,6 +2221,7 @@
         posStatus = "Consolidated";
       }
       this.pos_header.find("#posStatus").text(posStatus);
+      this.pos_header.find("#posStatus").addClass(`${posStatus}`);
       this.itemList.html("");
       this.selected_pos.items.forEach((item) => {
         this.itemList.append(`<div class="rowBox align_item">    <div class="itemName rowBox align_center">${item.item_name}</div>   <div class="itemQuantity rowBox align_center">${item.qty}</div>   <div class="itemCost rowBox align_center">${item.qty * item.rate} DA</div>  </div>`);
@@ -2287,7 +2290,7 @@
   // ../pos_ar/pos_ar/pos_ar/page/pos/pos_db.js
   pos_ar.PointOfSale.pos_db = class POSDatabase {
     constructor() {
-      this.dbName = "POSDB_test4";
+      this.dbName = "POSDB_test5";
       this.dbVersion = 14;
       this.db = null;
       this.openDatabase();
@@ -2373,4 +2376,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.B46BA7MO.js.map
+//# sourceMappingURL=pos.bundle.QWBT46RM.js.map

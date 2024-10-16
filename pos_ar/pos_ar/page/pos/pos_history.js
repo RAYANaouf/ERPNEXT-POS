@@ -216,6 +216,7 @@ pos_ar.PointOfSale.pos_history = class {
 		}
 
 		this.pos_header.find('#posStatus').text(posStatus)
+		this.pos_header.find('#posStatus').addClass(`${posStatus}`)
 
 		this.itemList.html('');
 		this.selected_pos.items.forEach(item => {

@@ -35,26 +35,38 @@
 }
 
 #posCustomer{
-	font-size   : 30px ;
+	font-size   : 45px ;
 	font-weight : 800  ;
 }
 
 #posSoldBy{
-	font-size   : 16px ;
+	font-size   : 25px ;
 	font-weight : 500  ;	
 }
 
 #posCost{
 	width       : max-content ;
-	font-size   : 25px ;
+	font-size   : 45px ;
 	font-weight : 800  ;	
 }
 #posId {
 	width       : max-content ;
+	font-size   : 25px ;
+	font-weight : 700  ;	
 }
 #posStatus {
 	width       : max-content ;
+	font-size   : 25px ;
+	font-weight : 700  ;	
 }
+#posStatus.Paid,
+#posStatus.Consolidated {
+	color : green ;
+}
+#posStatus.Draft {
+	color : green ;
+}
+
 
 
 /****** pos content  *******/
