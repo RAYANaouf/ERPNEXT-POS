@@ -61,7 +61,8 @@
 
 /* titles */
 .posSectionTitle{
-	font-size   : 18px ;
+	margin      : 20px 0px 10px 0px;
+	font-size   : 22px ;
 	font-weight : 700  ;	
 }
 /* button action */
@@ -88,7 +89,7 @@
 #posItemList{
 
 	padding       : 0px  16px    ;
-	background    : #e0e0e0 ;
+	background    : #efefef ;
 	border-radius : 12px    ;
 }
 
@@ -102,13 +103,17 @@
 
 #posItemList>div>div.itemCost{
 	justify-content : end  ;
+	font-size   : 16px ;
+	font-weight : 600  ;
 }
 #posItemList>div>div.itemQuantity{
 	justify-content : end  ;
+	font-size   : 16px ;
+	font-weight : 600  ;
 }
 
 #posItemList>div .itemName{
-	font-size   : 16px ;
+	font-size   : 20px ;
 	font-weight : 600  ;
 }
 

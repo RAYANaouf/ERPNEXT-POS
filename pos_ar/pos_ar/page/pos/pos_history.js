@@ -24,6 +24,7 @@ pos_ar.PointOfSale.pos_history = class {
 		this.prepare_history_cart();
 		this.db.getAllPosInvoice(
 						(result)=>{
+							console.log("the db data " , result)
 							this.localPosInvoice.pos_invoices = result ;
 							this.filtered_pos_list            = result ;
 							if(this.filtered_pos_list.length == 0){
@@ -201,6 +202,7 @@ pos_ar.PointOfSale.pos_history = class {
 			this.setData();
 		}
 
+
 		this.pos_header.find('#posCustomer').text(this.selected_pos.customer?? "CustomerName")
 		//it is not the paid amount it should be the total invoice amount
 		this.pos_header.find('#posCost').text(this.selected_pos.paid_amount??0 + "DA")
@@ -299,6 +301,12 @@ pos_ar.PointOfSale.pos_history = class {
 				}
 			})
 
+			if(this.filtered_pos_list.length == 0){
+				this.selected_pos = null;
+			}
+			else{
+				this.selected_pos = this.filtered_pos_list[0]
+			}
 			this.refreshData();
 		});
 
