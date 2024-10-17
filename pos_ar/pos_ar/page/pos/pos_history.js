@@ -26,12 +26,28 @@ pos_ar.PointOfSale.pos_history = class {
 						(result)=>{
 							console.log("the db data " , result)
 							this.localPosInvoice.pos_invoices = result ;
-							this.filtered_pos_list            = result ;
+
+							this.filtered_pos_list = this.localPosInvoice.pos_invoices.filter( pos => {
+
+								console.log("pos : " , pos , "its status " , pos.status)
+
+								if(pos.status == 'Draft' ){
+									return true ;
+								}
+								else{
+									return false ;
+								}
+							})
+
+							console.log("log init data : " , this.filtered_pos_list)
+
 							if(this.filtered_pos_list.length == 0){
 								this.selected_pos = null
+								console.log("first condition")
 							}
 							else{
 								this.selected_pos = structuredClone(this.filtered_pos_list[0])
+								console.log("second condition")
 							}
 							this.refreshData()
 						},
@@ -111,6 +127,8 @@ pos_ar.PointOfSale.pos_history = class {
 
 	refreshData(){
 		this.right_data_container.html('');
+
+		console.log("looke at here now : " , this.filtered_pos_list)
 
 		this.filtered_pos_list.forEach( record => {
 
@@ -234,11 +252,23 @@ pos_ar.PointOfSale.pos_history = class {
 		this.left_container.css('display' , 'flex');
 		this.right_container.css('display' , 'flex');
 
+		const filter = this.filter_input.val();
+		console.log("filter : " , filter);
+
 		//refrenshing data
 		this.db.getAllPosInvoice(
 						(result)=>{
 							this.localPosInvoice.pos_invoices = result ;
-							this.filtered_pos_list            = result ;
+							this.filtered_pos_list = this.localPosInvoice.pos_invoices.filter( pos => {
+
+								if(pos.status == 'Draft' ){
+									return true ;
+								}
+								else{
+									return false ;
+								}
+							})
+
 							if(this.filtered_pos_list.length == 0){
 								this.selected_pos = null
 							}
@@ -284,18 +314,16 @@ pos_ar.PointOfSale.pos_history = class {
 		this.filter_input.on('input' , (event) => {
 			const filter = event.target.value;
 
+			console.log("filter : " , filter)
+
+			
+
 			this.filtered_pos_list = this.localPosInvoice.pos_invoices.filter( pos => {
 				if(filter == ""){
 					return true ;
 				}
-				else if(filter == "Draft" ){
-					return pos.docstatus == 0 ;
-				}
-				else if(filter == "Paid" ){
-					return pos.docstatus == 1 ;
-				}
-				else if(filter == "Consolidated"){
-					return pos.docstatus == 1 ;
+				else if(filter == pos.status ){
+					return true ;
 				}
 				else{
 					return false ;

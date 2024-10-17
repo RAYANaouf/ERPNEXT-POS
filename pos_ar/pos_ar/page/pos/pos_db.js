@@ -1,7 +1,7 @@
 pos_ar.PointOfSale.pos_db  = class POSDatabase {
 
 	constructor() {
-		this.dbName = 'POSDB_test6';
+		this.dbName = 'POSDB_test8';
 		this.dbVersion = 14;
 		this.db = null;
 
@@ -55,7 +55,7 @@ pos_ar.PointOfSale.pos_db  = class POSDatabase {
 				db.createObjectStore('Bin', { keyPath: 'name' });
 			}
 			if (!db.objectStoreNames.contains('POS Invoice')) {
-				const posInvoiceStore = db.createObjectStore('POS Invoice', { autoIncrement : true });
+				const posInvoiceStore = db.createObjectStore('POS Invoice', { keyPath : 'name' });
 				posInvoiceStore.createIndex('docstatus' , 'docstatus' , {unique : false})
 			}
 		};
@@ -77,7 +77,7 @@ pos_ar.PointOfSale.pos_db  = class POSDatabase {
 
 		const transaction = this.db.transaction(['POS Invoice'] , "readwrite");
 		const store       = transaction.objectStore('POS Invoice')
-		const request     = store.add(posInvoice)
+		const request     = store.put(posInvoice)
 
 		request.onsuccess = (event) => {
 			onSuccess(event);

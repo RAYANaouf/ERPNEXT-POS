@@ -16,16 +16,14 @@ pos_ar.PointOfSale.Controller = class {
 
 		let initPos = frappe.model.get_new_doc('POS Invoice')
 		initPos.items = [];
-                this.selectedItemMaps  = new Map([
-							["C1" , initPos ]
-						])
+                this.selectedItemMaps  = new Map()
                 this.warehouseList     = []
                 this.PosProfileList    = []
                 this.binList           = []
 
                 this.selectedItem          = {}
                 this.selectedField         = {}
-                this.selectedTab           = {"tabName"    : "C1" }
+                this.selectedTab           = {"tabName"    : "" }
 		this.selectedPaymentMethod = {"methodName" : ""   }
 		this.selectedCustomer      = {"name"       : "" , "customer_name" : ""}
 		this.selectedPosProfile    = {"name"       : ""   }
@@ -124,6 +122,24 @@ pos_ar.PointOfSale.Controller = class {
 
 		}
 
+
+		let new_pos_invoice = frappe.model.get_new_doc('POS Invoice');
+		new_pos_invoice.customer          = this.selectedCustomer.name
+		new_pos_invoice.pos_profile       = this.selectedPosProfile.name
+		new_pos_invoice.items             = [];
+		new_pos_invoice.taxes_and_charges = this.selectedPosProfile.taxes_and_charges
+		new_pos_invoice.additional_discount_percentage = this.invoiceData.discount
+		new_pos_invoice.paid_amount       = 0
+		new_pos_invoice.base_paid_amount  = 0
+		new_pos_invoice.creation_time     = frappe.datetime.now_datetime()
+		new_pos_invoice.payments          = [{'mode_of_payment' : 'Cash' , 'amount' : 0}]
+		new_pos_invoice.is_pos            = 1
+		new_pos_invoice.update_stock      = 1
+		new_pos_invoice.docstatus         = 0
+		new_pos_invoice.status            = 'Draft'
+
+		this.selectedItemMaps.set("C1" , new_pos_invoice)
+		this.selectedTab.tabName = `C1`
 
         }
 
@@ -832,6 +848,7 @@ pos_ar.PointOfSale.Controller = class {
 		this.selectedItemMaps.get(this.selectedTab.tabName).payments          = [{'mode_of_payment' : 'Cash' , 'amount' : this.invoiceData.paidAmount}]
 		this.selectedItemMaps.get(this.selectedTab.tabName).status            = 'Paid'
 		this.selectedItemMaps.get(this.selectedTab.tabName).docstatus         = 1
+		this.selectedItemMaps.get(this.selectedTab.tabName).customer          = this.selectedCustomer.name
 
 		this.sellInvoices.set(this.selectedItemMaps.get(this.selectedTab.tabName).name , this.selectedItemMaps.get(this.selectedTab.tabName));
 

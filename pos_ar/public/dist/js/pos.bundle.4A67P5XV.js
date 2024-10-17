@@ -11,15 +11,13 @@
       this.priceLists = [];
       let initPos = frappe.model.get_new_doc("POS Invoice");
       initPos.items = [];
-      this.selectedItemMaps = /* @__PURE__ */ new Map([
-        ["C1", initPos]
-      ]);
+      this.selectedItemMaps = /* @__PURE__ */ new Map();
       this.warehouseList = [];
       this.PosProfileList = [];
       this.binList = [];
       this.selectedItem = {};
       this.selectedField = {};
-      this.selectedTab = { "tabName": "C1" };
+      this.selectedTab = { "tabName": "" };
       this.selectedPaymentMethod = { "methodName": "" };
       this.selectedCustomer = { "name": "", "customer_name": "" };
       this.selectedPosProfile = { "name": "" };
@@ -91,6 +89,22 @@
           false
         );
       }
+      let new_pos_invoice = frappe.model.get_new_doc("POS Invoice");
+      new_pos_invoice.customer = this.selectedCustomer.name;
+      new_pos_invoice.pos_profile = this.selectedPosProfile.name;
+      new_pos_invoice.items = [];
+      new_pos_invoice.taxes_and_charges = this.selectedPosProfile.taxes_and_charges;
+      new_pos_invoice.additional_discount_percentage = this.invoiceData.discount;
+      new_pos_invoice.paid_amount = 0;
+      new_pos_invoice.base_paid_amount = 0;
+      new_pos_invoice.creation_time = frappe.datetime.now_datetime();
+      new_pos_invoice.payments = [{ "mode_of_payment": "Cash", "amount": 0 }];
+      new_pos_invoice.is_pos = 1;
+      new_pos_invoice.update_stock = 1;
+      new_pos_invoice.docstatus = 0;
+      new_pos_invoice.status = "Draft";
+      this.selectedItemMaps.set("C1", new_pos_invoice);
+      this.selectedTab.tabName = `C1`;
     }
     prepare_container() {
       this.wrapper.append('<link rel="stylesheet" type="text/css" href="/assets/pos_ar/css/selectorBox.css">');
@@ -580,6 +594,7 @@
       this.selectedItemMaps.get(this.selectedTab.tabName).payments = [{ "mode_of_payment": "Cash", "amount": this.invoiceData.paidAmount }];
       this.selectedItemMaps.get(this.selectedTab.tabName).status = "Paid";
       this.selectedItemMaps.get(this.selectedTab.tabName).docstatus = 1;
+      this.selectedItemMaps.get(this.selectedTab.tabName).customer = this.selectedCustomer.name;
       this.sellInvoices.set(this.selectedItemMaps.get(this.selectedTab.tabName).name, this.selectedItemMaps.get(this.selectedTab.tabName));
       this.db.updatePosInvoice(
         this.selectedItemMaps.get(this.selectedTab.tabName),
@@ -2123,11 +2138,21 @@
         (result) => {
           console.log("the db data ", result);
           this.localPosInvoice.pos_invoices = result;
-          this.filtered_pos_list = result;
+          this.filtered_pos_list = this.localPosInvoice.pos_invoices.filter((pos) => {
+            console.log("pos : ", pos, "its status ", pos.status);
+            if (pos.status == "Draft") {
+              return true;
+            } else {
+              return false;
+            }
+          });
+          console.log("log init data : ", this.filtered_pos_list);
           if (this.filtered_pos_list.length == 0) {
             this.selected_pos = null;
+            console.log("first condition");
           } else {
             this.selected_pos = structuredClone(this.filtered_pos_list[0]);
+            console.log("second condition");
           }
           this.refreshData();
         },
@@ -2172,6 +2197,7 @@
     }
     refreshData() {
       this.right_data_container.html("");
+      console.log("looke at here now : ", this.filtered_pos_list);
       this.filtered_pos_list.forEach((record) => {
         var _a;
         const posContainer = document.createElement("div");
@@ -2250,10 +2276,18 @@
     show_cart() {
       this.left_container.css("display", "flex");
       this.right_container.css("display", "flex");
+      const filter = this.filter_input.val();
+      console.log("filter : ", filter);
       this.db.getAllPosInvoice(
         (result) => {
           this.localPosInvoice.pos_invoices = result;
-          this.filtered_pos_list = result;
+          this.filtered_pos_list = this.localPosInvoice.pos_invoices.filter((pos) => {
+            if (pos.status == "Draft") {
+              return true;
+            } else {
+              return false;
+            }
+          });
           if (this.filtered_pos_list.length == 0) {
             this.selected_pos = null;
           } else {
@@ -2283,15 +2317,12 @@
     setListener() {
       this.filter_input.on("input", (event2) => {
         const filter = event2.target.value;
+        console.log("filter : ", filter);
         this.filtered_pos_list = this.localPosInvoice.pos_invoices.filter((pos) => {
           if (filter == "") {
             return true;
-          } else if (filter == "Draft") {
-            return pos.docstatus == 0;
-          } else if (filter == "Paid") {
-            return pos.docstatus == 1;
-          } else if (filter == "Consolidated") {
-            return pos.docstatus == 1;
+          } else if (filter == pos.status) {
+            return true;
           } else {
             return false;
           }
@@ -2310,7 +2341,7 @@
   // ../pos_ar/pos_ar/pos_ar/page/pos/pos_db.js
   pos_ar.PointOfSale.pos_db = class POSDatabase {
     constructor() {
-      this.dbName = "POSDB_test6";
+      this.dbName = "POSDB_test8";
       this.dbVersion = 14;
       this.db = null;
       this.openDatabase();
@@ -2352,7 +2383,7 @@
           db.createObjectStore("Bin", { keyPath: "name" });
         }
         if (!db.objectStoreNames.contains("POS Invoice")) {
-          const posInvoiceStore = db.createObjectStore("POS Invoice", { autoIncrement: true });
+          const posInvoiceStore = db.createObjectStore("POS Invoice", { keyPath: "name" });
           posInvoiceStore.createIndex("docstatus", "docstatus", { unique: false });
         }
       };
@@ -2366,7 +2397,7 @@
     savePosInvoice(posInvoice, onSuccess, onFailure) {
       const transaction = this.db.transaction(["POS Invoice"], "readwrite");
       const store = transaction.objectStore("POS Invoice");
-      const request = store.add(posInvoice);
+      const request = store.put(posInvoice);
       request.onsuccess = (event2) => {
         onSuccess(event2);
       };
@@ -2407,4 +2438,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.AE6K3FPS.js.map
+//# sourceMappingURL=pos.bundle.4A67P5XV.js.map
