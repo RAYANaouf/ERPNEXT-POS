@@ -95,8 +95,6 @@ pos_ar.PointOfSale.Controller = class {
 
 		console.log("selected pos profile 1 : " , this.selectedPosProfile)
 
-		// calculate the tax after setting the default pos profile because it use it to get the tax
-		this.sales_taxes  = this.getSalesTaxes()
 
 
 		if(this.customersList.length > 0){
@@ -145,6 +143,10 @@ pos_ar.PointOfSale.Controller = class {
 
 		this.selectedItemMaps.set("C1" , new_pos_invoice)
 		this.selectedTab.tabName = `C1`
+
+
+		// calculate the tax after setting the default pos profile because it use it to get the tax
+		this.sales_taxes  = this.getSalesTaxes(this.selectedItemMaps.get(this.selectedTab.tabName))
 
         }
 
@@ -884,6 +886,8 @@ pos_ar.PointOfSale.Controller = class {
 			items.push(newItem)
 		})
 
+
+
 		this.selectedItemMaps.get(this.selectedTab.tabName).items = items
 
 		if(items.length ==0)
@@ -899,6 +903,10 @@ pos_ar.PointOfSale.Controller = class {
 
 		this.sellInvoices.set(this.selectedItemMaps.get(this.selectedTab.tabName).name , this.selectedItemMaps.get(this.selectedTab.tabName));
 
+		const status = this.checkIfPaid(this.selectedItemMaps.get(this.selectedTab.tabName))
+		console.log("the pos status now : " , status)
+
+
 		this.db.updatePosInvoice(
 					this.selectedItemMaps.get(this.selectedTab.tabName) ,
 					(event) => {
@@ -908,6 +916,7 @@ pos_ar.PointOfSale.Controller = class {
 						console.log("failure => " , event )
 					}
 				)
+
 
 
 
@@ -975,6 +984,25 @@ pos_ar.PointOfSale.Controller = class {
 			).then(r =>{
 
 				invoicesRef.push({'pos_invoice' : r.name , 'customer' : r.customer } )
+
+				console.log("the pos invoice :: " , r)
+
+				//this.checkIfPaid()
+
+				this.selectedItemMaps.get(this.selectedTab.tabName).status = 'Unpaid'
+
+				this.db.updatePosInvoice(
+							this.selectedItemMaps.get(this.selectedTab.tabName) ,
+							(event) => {
+								console.log("sucess => " , event )
+							},
+							(event) => {
+								console.log("failure => " , event )
+							}
+						)
+
+
+
 				this.sellInvoices.delete(invoiceName)
 
 				counter += 1 ;
@@ -990,10 +1018,52 @@ pos_ar.PointOfSale.Controller = class {
 				counter += 1 ;
 				failure += 1 ;
 			})
+
 		})
+
 	}
 
 
+	checkIfPaid(pos){
+
+
+		console.log("checking the pos now : " , pos  , "and the paid amount" , pos.paid_amount)
+
+		let netTotal   = 0 ;
+		let grandTotal = 0 ;
+		let allTaxes   = 0 ;
+		let discount   = 0 ;
+
+		//net total
+		pos.items.forEach( item => {
+			netTotal += item.qty * item.rate
+		})
+
+		//taxes
+		const taxTemplate = pos.taxes_and_charges
+		const taxes       = this.getSalesTaxes(pos)
+		taxes.forEach(tax =>{
+			allTaxes += (tax.rate / 100) * netTotal
+		})
+
+		//discount
+		discount = (pos.additional_discount_percentage / 100) * netTotal
+
+
+		grandTotal  = netTotal + allTaxes - discount
+
+
+		if(pos.paid_amount == 0){
+			return "UnPaid"
+		}
+		else if(pos.paid_amount < grandTotal){
+			return "UnPaid"
+		}
+		else{
+			return "Paid"
+		}
+
+	}
 
 	onClosePOS(){
 
@@ -1149,13 +1219,10 @@ pos_ar.PointOfSale.Controller = class {
 		})
 	}
 
-	getSalesTaxes(){
+	getSalesTaxes(pos){
 
-		const taxTemplateId = this.selectedPosProfile.taxes_and_charges
+		const taxTemplateId = pos.taxes_and_charges
 		let   salesTax      = []
-
-		console.log("selected pos profile 11" , this.selectedPosProfile)
-		console.log("taxTemplateId : " , taxTemplateId , "the profile : " , this.selectedPosProfile)
 
 		this.sales_taxes_and_charges.forEach( tax => {
 			if(tax.parent == taxTemplateId){
@@ -1163,7 +1230,6 @@ pos_ar.PointOfSale.Controller = class {
 				salesTax.push(tax)
 			}
 		})
-		console.log("sales tax : " , salesTax);
 		return salesTax;
 	}
 

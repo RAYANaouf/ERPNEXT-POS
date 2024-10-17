@@ -1,7 +1,6 @@
 
 pos_ar.PointOfSale.pos_selected_item_cart = class{
 
-
 	constructor(
 		wrapper          ,
 		selectedItemMaps ,
@@ -457,21 +456,42 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 
 
 		this.tabs_container.find(".tabDeleteBtn").on('click' , (event) => {
-			
+			//Stop the click event from propagating to the parent .tab
+		        event.stopPropagation();
+
+			const clickedTab = $(event.target).closest('.tab').find('.tabName').text();
+
+			this.selected_item_maps.delete(clickedTab)
+
+			if(this.selected_item_maps.size > 0  ){
+				this.selected_tab.tabName = Array.from(this.selected_item_maps.keys())[0]
+				console.log("this.selected_tab.tabName : " , this.selected_tab)
+			}
+			else{
+				this.createNewTab()
+			}
+
+
+			this.refreshTabs()
+			this.refreshSelectedItem()
+
 		})
 
 
 		this.discountInput.on('input' , (event)=> {
 			if(event.target.value == ''){
+				this.selected_item_maps.get(selected_tab.tabName).additional_discount_percentage = 0
 				this.invoice_data.discount = 0 ;
 				return;
 			}
 			else if(event.target.value > 100){
+				this.selected_item_maps.get(selected_tab.tabName).additional_discount_percentage = 100
 				this.invoice_data.discount = 100 ;
 				return;
 			}
 
 
+			this.selected_item_maps.get(selected_tab.tabName).additional_discount_percentage = parseFloat(event.target.value)
 			this.invoice_data.discount = parseFloat(event.target.value)
 
 			//recalculation

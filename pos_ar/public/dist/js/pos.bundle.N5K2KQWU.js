@@ -65,7 +65,6 @@
       }
       Object.assign(this.selectedPosProfile, this.PosProfileList[0]);
       console.log("selected pos profile 1 : ", this.selectedPosProfile);
-      this.sales_taxes = this.getSalesTaxes();
       if (this.customersList.length > 0) {
         this.selectedCustomer = structuredClone(this.customersList[0]);
       } else {
@@ -106,6 +105,7 @@
       new_pos_invoice.status = "Draft";
       this.selectedItemMaps.set("C1", new_pos_invoice);
       this.selectedTab.tabName = `C1`;
+      this.sales_taxes = this.getSalesTaxes(this.selectedItemMaps.get(this.selectedTab.tabName));
     }
     prepare_container() {
       this.wrapper.append('<link rel="stylesheet" type="text/css" href="/assets/pos_ar/css/selectorBox.css">');
@@ -624,6 +624,8 @@
       this.selectedItemMaps.get(this.selectedTab.tabName).docstatus = 1;
       this.selectedItemMaps.get(this.selectedTab.tabName).customer = this.selectedCustomer.name;
       this.sellInvoices.set(this.selectedItemMaps.get(this.selectedTab.tabName).name, this.selectedItemMaps.get(this.selectedTab.tabName));
+      const status = this.checkIfPaid(this.selectedItemMaps.get(this.selectedTab.tabName));
+      console.log("the pos status now : ", status);
       this.db.updatePosInvoice(
         this.selectedItemMaps.get(this.selectedTab.tabName),
         (event2) => {
@@ -669,6 +671,17 @@
           this.sellInvoices.get(invoiceName)
         ).then((r) => {
           invoicesRef.push({ "pos_invoice": r.name, "customer": r.customer });
+          console.log("the pos invoice :: ", r);
+          this.selectedItemMaps.get(this.selectedTab.tabName).status = "Unpaid";
+          this.db.updatePosInvoice(
+            this.selectedItemMaps.get(this.selectedTab.tabName),
+            (event2) => {
+              console.log("sucess => ", event2);
+            },
+            (event2) => {
+              console.log("failure => ", event2);
+            }
+          );
           this.sellInvoices.delete(invoiceName);
           counter += 1;
           frappe.show_progress("Syncing Invoices...", counter, all_invoices.length, "syncing");
@@ -681,6 +694,30 @@
           failure += 1;
         });
       });
+    }
+    checkIfPaid(pos) {
+      console.log("checking the pos now : ", pos, "and the paid amount", pos.paid_amount);
+      let netTotal = 0;
+      let grandTotal = 0;
+      let allTaxes = 0;
+      let discount = 0;
+      pos.items.forEach((item) => {
+        netTotal += item.qty * item.rate;
+      });
+      const taxTemplate = pos.taxes_and_charges;
+      const taxes = this.getSalesTaxes(pos);
+      taxes.forEach((tax) => {
+        allTaxes += tax.rate / 100 * netTotal;
+      });
+      discount = pos.additional_discount_percentage / 100 * netTotal;
+      grandTotal = netTotal + allTaxes - discount;
+      if (pos.paid_amount == 0) {
+        return "UnPaid";
+      } else if (pos.paid_amount < grandTotal) {
+        return "UnPaid";
+      } else {
+        return "Paid";
+      }
     }
     onClosePOS() {
       let all_tabs = Array.from(this.sellInvoices.keys());
@@ -782,18 +819,15 @@
         }
       });
     }
-    getSalesTaxes() {
-      const taxTemplateId = this.selectedPosProfile.taxes_and_charges;
+    getSalesTaxes(pos) {
+      const taxTemplateId = pos.taxes_and_charges;
       let salesTax = [];
-      console.log("selected pos profile 11", this.selectedPosProfile);
-      console.log("taxTemplateId : ", taxTemplateId, "the profile : ", this.selectedPosProfile);
       this.sales_taxes_and_charges.forEach((tax) => {
         if (tax.parent == taxTemplateId) {
           console.log("debuging ==> parent : ", tax.parent, " taxTemplateId : ", taxTemplateId);
           salesTax.push(tax);
         }
       });
-      console.log("sales tax : ", salesTax);
       return salesTax;
     }
     async fetchCustomers() {
@@ -1458,15 +1492,29 @@
         this.createNewTab();
       });
       this.tabs_container.find(".tabDeleteBtn").on("click", (event2) => {
+        event2.stopPropagation();
+        const clickedTab = $(event2.target).closest(".tab").find(".tabName").text();
+        this.selected_item_maps.delete(clickedTab);
+        if (this.selected_item_maps.size > 0) {
+          this.selected_tab.tabName = Array.from(this.selected_item_maps.keys())[0];
+          console.log("this.selected_tab.tabName : ", this.selected_tab);
+        } else {
+          this.createNewTab();
+        }
+        this.refreshTabs();
+        this.refreshSelectedItem();
       });
       this.discountInput.on("input", (event2) => {
         if (event2.target.value == "") {
+          this.selected_item_maps.get(selected_tab.tabName).additional_discount_percentage = 0;
           this.invoice_data.discount = 0;
           return;
         } else if (event2.target.value > 100) {
+          this.selected_item_maps.get(selected_tab.tabName).additional_discount_percentage = 100;
           this.invoice_data.discount = 100;
           return;
         }
+        this.selected_item_maps.get(selected_tab.tabName).additional_discount_percentage = parseFloat(event2.target.value);
         this.invoice_data.discount = parseFloat(event2.target.value);
         console.log("value ::: ", this.invoice_data.discount);
         this.calculateNetTotal();
@@ -2557,4 +2605,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.BOLG6SEC.js.map
+//# sourceMappingURL=pos.bundle.N5K2KQWU.js.map
