@@ -133,4 +133,22 @@ pos_ar.PointOfSale.pos_db  = class POSDatabase {
 	}
 
 
+
+	// New delete function to remove a POS Invoice
+	deletePosInvoice(invoiceName, onSuccess, onFailure) {
+		const transaction = this.db.transaction(['POS Invoice'], "readwrite");
+		const store = transaction.objectStore('POS Invoice');
+		const request = store.delete(invoiceName);  // Deletes the record with the key 'invoiceName', (i set the name as keypath , in erpnext name is the id.)
+
+		request.onsuccess = (event) => {
+			onSuccess(event);  // Call success callback if the deletion is successful
+		};
+
+		request.onerror = (event) => {
+			onFailure(event);  // Call failure callback if there is an error
+		};
+	}
+
+
+
 }

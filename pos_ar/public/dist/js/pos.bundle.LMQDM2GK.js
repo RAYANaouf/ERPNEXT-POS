@@ -345,7 +345,8 @@
       this.history_cart = new pos_ar.PointOfSale.pos_history(
         this.wrapper,
         this.db,
-        this.sales_taxes_and_charges
+        this.sales_taxes_and_charges,
+        this.historyCartClick.bind(this)
       );
     }
     itemClick_selector(item) {
@@ -444,6 +445,8 @@
       new_pos_invoice.status = "Draft";
       this.selectedItemMaps.set(`C${counter}`, new_pos_invoice);
       this.selectedTab.tabName = `C${counter}`;
+    }
+    historyCartClick(event2, message) {
     }
     onInput(event2, field, value) {
       if (event2 == "focus" || event2 == "blur") {
@@ -2136,10 +2139,11 @@
 
   // ../pos_ar/pos_ar/pos_ar/page/pos/pos_history.js
   pos_ar.PointOfSale.pos_history = class {
-    constructor(wrapper, db, salesTaxesAndCharges) {
+    constructor(wrapper, db, salesTaxesAndCharges, onClick) {
       this.wrapper = wrapper;
       this.db = db;
       this.sales_taxes_and_charges = salesTaxesAndCharges;
+      this.on_click = onClick;
       this.localPosInvoice = { lastTime: null, pos_invoices: [] };
       this.filter = "";
       this.filtered_pos_list = [];
@@ -2194,11 +2198,15 @@
       this.pos_content.append('<div id="posPaymentsContainer"><div class="posSectionTitle">Payments</div><div id="posMethodList"></div></div>');
       this.paymentsContainer = this.pos_content.find("#posPaymentsContainer");
       this.methodList = this.pos_content.find("#posMethodList");
-      this.left_container.append('<div id="posActionsContainer" class="rowBox align_content"> <div id="posPrintBtn" class="actionBtn rowBox centerItem"> Print Receipt </div>  <div id="posEmailBtn" class="actionBtn rowBox centerItem"> Email Receipt </div>   <div id="posReturnBtn" class="actionBtn rowBox centerItem"> Return </div>  </div>');
+      this.left_container.append('<div id="posActionsContainer" class="rowBox align_content"  style="display = none ;" > <div id="posPrintBtn" class="actionBtn rowBox centerItem"> Print Receipt </div>  <div id="posEmailBtn" class="actionBtn rowBox centerItem"> Email Receipt </div>   <div id="posReturnBtn" class="actionBtn rowBox centerItem"> Return </div>  </div>');
+      this.left_container.append('<div id="posDraftActionsContainer" class="rowBox align_content" style="display = none ;"> <div id="posEditBtn" class="actionBtn rowBox centerItem"> Edit Invoice </div>  <div id="posDeleteBtn" class="actionBtn rowBox centerItem"> Delete Invoice </div>  </div>');
       this.actionButtonsContainer = this.left_container.find("#posActionsContainer");
       this.printBtn = this.actionButtonsContainer.find("#posPrintBtn");
       this.emailBtn = this.actionButtonsContainer.find("#posEmailBtn");
       this.returnBtn = this.actionButtonsContainer.find("#posReturnBtn");
+      this.draftActionButtonsContainer = this.left_container.find("#posDraftActionsContainer");
+      this.deleteBtn = this.draftActionButtonsContainer.find("#posDeleteBtn");
+      this.editBtn = this.draftActionButtonsContainer.find("#posEditBtn");
       this.right_container.append('<div id="historyRightContainerHeader" class="rowBox align_center" ><h4 class="CartTitle">Recent Orders</h4></div>');
       this.right_container.append('<div id="historyRightSearchContainer" class="rowBox align_center" ></div>');
       this.search_container = this.right_container.find("#historyRightSearchContainer");
@@ -2275,6 +2283,13 @@
       this.pos_header.find("#posId").text((_c = this.selected_pos.name) != null ? _c : "POS Invoice Name");
       this.pos_header.find("#posStatus").text(this.selected_pos.status);
       this.pos_header.find("#posStatus").removeClass().addClass(`${this.selected_pos.status}`);
+      if (this.selected_pos.status == "Draft") {
+        this.draftActionButtonsContainer.css("display", "flex");
+        this.actionButtonsContainer.css("display", "none");
+      } else {
+        this.draftActionButtonsContainer.css("display", "none");
+        this.actionButtonsContainer.css("display", "flex");
+      }
       this.itemList.html("");
       this.selected_pos.items.forEach((item) => {
         this.itemList.append(`<div class="rowBox align_item">    <div class="itemName rowBox align_center">${item.item_name}</div>   <div class="itemQuantity rowBox align_center">${item.qty}</div>   <div class="itemCost rowBox align_center">${item.qty * item.rate} DA</div>  </div>`);
@@ -2337,11 +2352,11 @@
       this.pos_header.css("display", "none");
       this.pos_content.css("display", "none");
       this.actionButtonsContainer.css("display", "none");
+      this.draftActionButtonsContainer.css("display", "none");
     }
     setData() {
       this.pos_header.css("display", "flex");
       this.pos_content.css("display", "flex");
-      this.actionButtonsContainer.css("display", "flex");
     }
     setListener() {
       this.filter_input.on("input", (event2) => {
@@ -2363,7 +2378,23 @@
         }
         this.refreshData();
       });
-      this.refreshData();
+      this.deleteBtn.on("click", (event2) => {
+        this.db.deletePosInvoice(
+          this.selected_pos.name,
+          (event3) => {
+            this.filtered_pos_list = this.filtered_pos_list.filter((pos) => pos.name != this.selected_pos.name);
+            if (this.filtered_pos_list.length > 0) {
+              this.selected_pos = this.filtered_pos_list[0];
+            } else {
+              this.selected_pos = null;
+            }
+            this.refreshData();
+          },
+          (error) => {
+            console.log("error on deleting the pos : ", error);
+          }
+        );
+      });
     }
     getSalesTaxes(pos) {
       const taxTemplateId = pos.taxes_and_charges;
@@ -2477,6 +2508,17 @@
         onFailure(event2);
       };
     }
+    deletePosInvoice(invoiceName, onSuccess, onFailure) {
+      const transaction = this.db.transaction(["POS Invoice"], "readwrite");
+      const store = transaction.objectStore("POS Invoice");
+      const request = store.delete(invoiceName);
+      request.onsuccess = (event2) => {
+        onSuccess(event2);
+      };
+      request.onerror = (event2) => {
+        onFailure(event2);
+      };
+    }
   };
 })();
-//# sourceMappingURL=pos.bundle.W3NBVSWT.js.map
+//# sourceMappingURL=pos.bundle.LMQDM2GK.js.map

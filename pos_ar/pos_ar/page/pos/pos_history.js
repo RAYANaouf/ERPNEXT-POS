@@ -5,12 +5,13 @@ pos_ar.PointOfSale.pos_history = class {
 	constructor(
 		wrapper,
 		db,
-		salesTaxesAndCharges
+		salesTaxesAndCharges,
+		onClick
 	){
-		this.wrapper = wrapper;
-		this.db      = db;
+		this.wrapper   = wrapper;
+		this.db        = db;
 		this.sales_taxes_and_charges = salesTaxesAndCharges
-
+		this.on_click  = onClick;
 		//local data
 		this.localPosInvoice   = { lastTime : null , pos_invoices : [] }
 		this.filter            = "" ;
@@ -95,13 +96,19 @@ pos_ar.PointOfSale.pos_history = class {
 		this.paymentsContainer = this.pos_content.find('#posPaymentsContainer')
 		this.methodList        = this.pos_content.find('#posMethodList')
 
-		this.left_container.append('<div id="posActionsContainer" class="rowBox align_content"> <div id="posPrintBtn" class="actionBtn rowBox centerItem"> Print Receipt </div>  <div id="posEmailBtn" class="actionBtn rowBox centerItem"> Email Receipt </div>   <div id="posReturnBtn" class="actionBtn rowBox centerItem"> Return </div>  </div>')
+		this.left_container.append('<div id="posActionsContainer" class="rowBox align_content"  style="display = none ;" > <div id="posPrintBtn" class="actionBtn rowBox centerItem"> Print Receipt </div>  <div id="posEmailBtn" class="actionBtn rowBox centerItem"> Email Receipt </div>   <div id="posReturnBtn" class="actionBtn rowBox centerItem"> Return </div>  </div>')
+		this.left_container.append('<div id="posDraftActionsContainer" class="rowBox align_content" style="display = none ;"> <div id="posEditBtn" class="actionBtn rowBox centerItem"> Edit Invoice </div>  <div id="posDeleteBtn" class="actionBtn rowBox centerItem"> Delete Invoice </div>  </div>')
 
 		//third and last section is the action buttons
 		this.actionButtonsContainer = this.left_container.find('#posActionsContainer')
 		this.printBtn  = this.actionButtonsContainer.find('#posPrintBtn')
 		this.emailBtn  = this.actionButtonsContainer.find('#posEmailBtn')
 		this.returnBtn = this.actionButtonsContainer.find('#posReturnBtn')
+
+		this.draftActionButtonsContainer = this.left_container.find('#posDraftActionsContainer')
+		this.deleteBtn  = this.draftActionButtonsContainer.find('#posDeleteBtn')
+		this.editBtn    = this.draftActionButtonsContainer.find('#posEditBtn')
+
 
 		this.right_container.append('<div id="historyRightContainerHeader" class="rowBox align_center" ><h4 class="CartTitle">Recent Orders</h4></div>')
 		this.right_container.append('<div id="historyRightSearchContainer" class="rowBox align_center" ></div>');
@@ -229,6 +236,14 @@ pos_ar.PointOfSale.pos_history = class {
 		this.pos_header.find('#posStatus').text(this.selected_pos.status)
 		this.pos_header.find('#posStatus').removeClass().addClass(`${this.selected_pos.status}`)
 
+		if(this.selected_pos.status == "Draft"){
+			this.draftActionButtonsContainer.css('display' , 'flex')
+			this.actionButtonsContainer.css('display' , 'none')
+		}else{
+			this.draftActionButtonsContainer.css('display' , 'none')
+			this.actionButtonsContainer.css('display' , 'flex')
+		}
+
 
 		/**********************  items list ***************************/
 		this.itemList.html('');
@@ -327,13 +342,13 @@ pos_ar.PointOfSale.pos_history = class {
 		this.pos_header.css('display' , 'none')
 		this.pos_content.css('display' , 'none')
 		this.actionButtonsContainer.css('display' , 'none')
+		this.draftActionButtonsContainer.css('display' , 'none')
 	}
 
 	//set data
 	setData(){
 		this.pos_header.css('display' , 'flex')
 		this.pos_content.css('display' , 'flex')
-		this.actionButtonsContainer.css('display' , 'flex')
 	}
 
 
@@ -370,7 +385,28 @@ pos_ar.PointOfSale.pos_history = class {
 			this.refreshData();
 		});
 
-		this.refreshData();
+
+		this.deleteBtn.on('click' , (event)=>{
+			this.db.deletePosInvoice(
+				this.selected_pos.name,
+				(event)=>{
+					//remove the deleted one from the filtred list
+					this.filtered_pos_list = this.filtered_pos_list.filter(pos => pos.name != this.selected_pos.name)
+					//selected new pos
+					if(this.filtered_pos_list.length > 0){
+						this.selected_pos = this.filtered_pos_list[0]
+					}
+					else{
+						this.selected_pos = null ;
+					}
+					this.refreshData()
+				},
+				(error)=>{
+					//error callback
+					console.log("error on deleting the pos : " , error);
+				}
+			)
+		})
 
 	}
 

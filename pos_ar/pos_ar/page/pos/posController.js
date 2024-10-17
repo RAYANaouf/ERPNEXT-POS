@@ -420,7 +420,8 @@ pos_ar.PointOfSale.Controller = class {
 		this.history_cart = new pos_ar.PointOfSale.pos_history(
 									this.wrapper,
 									this.db,
-									this.sales_taxes_and_charges
+									this.sales_taxes_and_charges,
+									this.historyCartClick.bind(this)
 								)
         }
 
@@ -602,6 +603,10 @@ pos_ar.PointOfSale.Controller = class {
 		this.selectedItemMaps.set(`C${counter}` , new_pos_invoice)
 		this.selectedTab.tabName = `C${counter}`
 
+	}
+
+	historyCartClick(event , message){
+		//go back to edit pos draft
 	}
 
 	onInput( event , field , value){

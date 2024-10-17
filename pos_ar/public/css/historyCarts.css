@@ -106,7 +106,9 @@
 	border-radius : 12px    ;
 }
 
-#posItemList>div{
+#posItemList>div ,
+#posTotalList>div,
+#posMethodList>div{
 	padding : 16px 0px ;
 }
 
@@ -131,9 +133,6 @@
 }
 
 
-#posTotalList>div{
-	padding : 16px 0px ;
-}
 
 #posTotalList div.name,
 #posMethodList div.name{
