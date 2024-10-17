@@ -63,6 +63,7 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 		this.tabs_container.append('<div class="tab selected rowBox align_center"><div class="tabName">C1</div><img src="/assets/pos_ar/images/cancel.png" width="10px" height="10px" class="tabDeleteBtn"></div>')
 		this.tabs_bar.append('<div id="addTabBtn" class="tab unselected">+</div>')
 
+
 		this.add_tab_button = this.tabs_bar.find('#addTabBtn')
 
 		this.cartBox.append('<div id="CartBoxTopBar" class=" rowBox align_center  row_sbtw"><div>')
@@ -176,6 +177,10 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 
 			const clickedTab = $(event.target).closest('.tab').find('.tabName').text();
 
+
+			//console.log("")
+
+
 			this.selected_tab.tabName = clickedTab
 			console.log("clicked tab : " , clickedTab , "selected one : " , this.selected_tab , " clicked element : " , event.target)
 
@@ -191,29 +196,62 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 		})
 
 		this.tabs_container.find(".tabDeleteBtn").on('click' , (event) => {
+
+			//Stop the click event from propagating to the parent .tab
+		        event.stopPropagation();
+
 			const clickedTab = $(event.target).closest('.tab').find('.tabName').text();
 
 
-			let selectedTabIndex = 0 ;
-			for(let key of this.selected_item_maps.keys()){
-				if(key == clickedTab){
-					return;
-				}
-				else{
-					selectedTabIndex += 1 ;
-				}
+
+
+			this.selected_item_maps.delete(clickedTab)
+
+			console.log("this.selected_item_maps.keys()" , this.selected_item_maps.size)
+
+			console.log(" this.selected_item_maps.keys")
+
+
+			if(this.selected_item_maps.size > 0  ){
+				this.selected_tab.tabName = Array.from(this.selected_item_maps.keys())[0]
+				console.log("this.selected_tab.tabName : " , this.selected_tab)
+			}
+			else{
+				this.createNewTab()
 			}
 
-			console.log("clicked tab index");
 
-			//this.selected_item_maps.delete(clickedTab)
+			/*let selectedTabIndex = Array.from(this.selected_item_maps.keys()).findIndex(key => key == clickedTab);
 
-			if(this.selected_item_maps.keys().length > 0){
-				
+			this.selected_item_maps.delete(clickedTab)
+
+
+			if(this.selected_item_maps.keys().length == 0 ){
+				//create one
+				this.createNewTab()
 			}
-			//console.log("clicked tab : " , clickedTab ," map :" , this.selected_item_maps ," selected one : " , this.selected_tab , " clicked element : " , event.target)
 
-			//this.selected_tab.tabName = clickedTab
+
+
+			console.log("selectedTabIndex : " , selectedTabIndex , " while the tab array is : " , this.selected_item_maps.keys())
+
+
+			if(selectedTabIndex == 0){
+				console.log("condition 1")
+				this.selected_tab.tabName = this.selected_item_maps.keys()[0]
+			}
+			else{
+				console.log("condition 2")
+				//console.log("this.selected_tab.tabName : " , this.selected_item_maps , "this.selected_item_maps : " , this.selected_item_maps)
+				this.selected_tab.tabName = this.selected_item_maps.key()[selectedTabIndex-1]
+			}
+*/
+			console.log("this.selected_tab" , this.selected_tab)
+
+			this.refreshTabs()
+			this.refreshSelectedItem()
+
+
 		})
 	}
 
@@ -451,6 +489,12 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 		this.add_tab_button.on('mousedown' , (event)=>{
 			this.createNewTab()
 		})
+
+
+		this.tabs_container.find(".tabDeleteBtn").on('click' , (event) => {
+			
+		})
+
 
 		this.discountInput.on('input' , (event)=> {
 			if(event.target.value == ''){

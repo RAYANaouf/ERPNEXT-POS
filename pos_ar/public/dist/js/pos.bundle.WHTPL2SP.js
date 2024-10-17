@@ -1277,18 +1277,20 @@
         this.on_tab_click(clickedTab);
       });
       this.tabs_container.find(".tabDeleteBtn").on("click", (event2) => {
+        event2.stopPropagation();
         const clickedTab = $(event2.target).closest(".tab").find(".tabName").text();
-        let selectedTabIndex = 0;
-        for (let key of this.selected_item_maps.keys()) {
-          if (key == clickedTab) {
-            return;
-          } else {
-            selectedTabIndex += 1;
-          }
+        this.selected_item_maps.delete(clickedTab);
+        console.log("this.selected_item_maps.keys()", this.selected_item_maps.size);
+        console.log(" this.selected_item_maps.keys");
+        if (this.selected_item_maps.size > 0) {
+          this.selected_tab.tabName = Array.from(this.selected_item_maps.keys())[0];
+          console.log("this.selected_tab.tabName : ", this.selected_tab);
+        } else {
+          this.createNewTab();
         }
-        console.log("clicked tab index");
-        if (this.selected_item_maps.keys().length > 0) {
-        }
+        console.log("this.selected_tab", this.selected_tab);
+        this.refreshTabs();
+        this.refreshSelectedItem();
       });
     }
     refreshSelectedItem() {
@@ -1457,6 +1459,8 @@
     setListener() {
       this.add_tab_button.on("mousedown", (event2) => {
         this.createNewTab();
+      });
+      this.tabs_container.find(".tabDeleteBtn").on("click", (event2) => {
       });
       this.discountInput.on("input", (event2) => {
         if (event2.target.value == "") {
@@ -2556,4 +2560,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.SY5N5HEG.js.map
+//# sourceMappingURL=pos.bundle.WHTPL2SP.js.map
