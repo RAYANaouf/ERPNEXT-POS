@@ -4,11 +4,12 @@ pos_ar.PointOfSale.pos_history = class {
 
 	constructor(
 		wrapper,
-		db
+		db,
+		salesTaxesAndCharges
 	){
 		this.wrapper = wrapper;
 		this.db      = db;
-
+		this.sales_taxes_and_charges = salesTaxesAndCharges
 
 		//local data
 		this.localPosInvoice   = { lastTime : null , pos_invoices : [] }
@@ -242,10 +243,19 @@ pos_ar.PointOfSale.pos_history = class {
 		})
 		this.totalList.append(`<div class="rowBox align_item"> <div class="name rowBox align_center">Net Total</div> <div class="price rowBox align_center">${netTotal} DA</div> </div>`)
 
+		const salesTaxes = this.getSalesTaxes(this.selected_pos);
+		console.log("just debuging : " , salesTaxes)
 
+		let allTax = 0
 		if(this.selected_pos.taxes_and_charges != "" || this.selected_pos.taxes_and_charges != null){
-			this.totalList.append(`<div class="rowBox align_item"> <div class="name rowBox align_center">${this.selected_pos.taxes_and_charges}</div> <div class="price rowBox align_center"> 0.00 DA</div> </div>`)
+			salesTaxes.forEach( tax =>{
+				allTax += (tax.rate/100) * netTotal
+				this.totalList.append(`<div class="rowBox align_item"> <div class="name rowBox align_center">${tax.description}</div> <div class="price rowBox align_center">${(tax.rate/100) * netTotal} DA</div> </div>`)
+			})
 		}
+
+		this.totalList.append(`<div class="rowBox align_item"> <div class="name rowBox align_center">Grand Total</div> <div class="price rowBox align_center">${netTotal + allTax} DA</div> </div>`)
+
 
 
 	}
@@ -321,7 +331,6 @@ pos_ar.PointOfSale.pos_history = class {
 
 			console.log("filter : " , filter)
 
-			
 
 			this.filtered_pos_list = this.localPosInvoice.pos_invoices.filter( pos => {
 				if(filter == ""){
@@ -348,5 +357,20 @@ pos_ar.PointOfSale.pos_history = class {
 
 	}
 
+	/******************************************** functions  ********************************************************/
+	getSalesTaxes(pos){
+
+		const taxTemplateId = pos.taxes_and_charges
+                let   salesTax      = []
+
+                this.sales_taxes_and_charges.forEach( tax => {
+                        if(tax.parent == taxTemplateId){
+                                console.log("debuging ==> parent : " , tax.parent , " taxTemplateId : " , taxTemplateId)
+                                salesTax.push(tax)
+                        }
+                })
+                console.log("sales tax :=:=> " , salesTax);
+                return salesTax;
+	}
 
 }

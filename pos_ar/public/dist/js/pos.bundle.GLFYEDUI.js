@@ -56,7 +56,6 @@
       this.binList = await this.fetchBinList();
       this.sales_taxes_and_charges = await this.fetchSalesTaxesAndCharges();
       this.taxes_and_charges_template = await this.fetchSalesTaxesAndChargesTemplate();
-      this.sales_taxes = this.getSalesTax();
       console.log("taxes and charges templates  => ", this.taxes_and_charges_template);
       console.log("taxes and charges            => ", this.sales_taxes_and_charges);
       console.log("debog check ==> ", this.sales_taxes);
@@ -65,6 +64,8 @@
         return;
       }
       Object.assign(this.selectedPosProfile, this.PosProfileList[0]);
+      console.log("selected pos profile 1 : ", this.selectedPosProfile);
+      this.sales_taxes = this.getSalesTaxes();
       if (this.customersList.length > 0) {
         this.selectedCustomer = structuredClone(this.customersList[0]);
       } else {
@@ -117,13 +118,21 @@
       this.$components_wrapper = this.wrapper.find("#MainContainer");
     }
     prepare_components() {
+      console.log("selected pos profile 2 : ", this.selectedPosProfile);
       this.set_right_and_left_sections();
+      console.log("selected pos profile 3 : ", this.selectedPosProfile);
       this.init_item_selector();
+      console.log("selected pos profile 4 : ", this.selectedPosProfile);
       this.init_customer_box();
+      console.log("selected pos profile 5 : ", this.selectedPosProfile);
       this.init_selected_item();
+      console.log("selected pos profile 6 : ", this.selectedPosProfile);
       this.init_item_details();
+      console.log("selected pos profile 7 : ", this.selectedPosProfile);
       this.init_paymentCart();
+      console.log("selected pos profile 8 : ", this.selectedPosProfile);
       this.init_historyCart();
+      console.log("selected pos profile 9 : ", this.selectedPosProfile);
     }
     async checkForPOSEntry() {
       try {
@@ -335,7 +344,8 @@
     init_historyCart() {
       this.history_cart = new pos_ar.PointOfSale.pos_history(
         this.wrapper,
-        this.db
+        this.db,
+        this.sales_taxes_and_charges
       );
     }
     itemClick_selector(item) {
@@ -400,6 +410,7 @@
       this.selected_item_cart.cleanHeighlight();
     }
     onHistoryClick() {
+      console.log("selected pos profile 10 : ", this.selectedPosProfile);
       console.log("history ::", this.history_cart);
       this.history_cart.show_cart();
       this.payment_cart.hideCart();
@@ -754,16 +765,18 @@
         }
       });
     }
-    getSalesTax() {
+    getSalesTaxes() {
       const taxTemplateId = this.selectedPosProfile.taxes_and_charges;
       let salesTax = [];
-      console.log("taxTemplateId : ", taxTemplateId);
+      console.log("selected pos profile 11", this.selectedPosProfile);
+      console.log("taxTemplateId : ", taxTemplateId, "the profile : ", this.selectedPosProfile);
       this.sales_taxes_and_charges.forEach((tax) => {
         if (tax.parent == taxTemplateId) {
           console.log("debuging ==> parent : ", tax.parent, " taxTemplateId : ", taxTemplateId);
           salesTax.push(tax);
         }
       });
+      console.log("sales tax : ", salesTax);
       return salesTax;
     }
     async fetchCustomers() {
@@ -2123,9 +2136,10 @@
 
   // ../pos_ar/pos_ar/pos_ar/page/pos/pos_history.js
   pos_ar.PointOfSale.pos_history = class {
-    constructor(wrapper, db) {
+    constructor(wrapper, db, salesTaxesAndCharges) {
       this.wrapper = wrapper;
       this.db = db;
+      this.sales_taxes_and_charges = salesTaxesAndCharges;
       this.localPosInvoice = { lastTime: null, pos_invoices: [] };
       this.filter = "";
       this.filtered_pos_list = [];
@@ -2272,9 +2286,16 @@
         netTotal += item.rate * item.qty;
       });
       this.totalList.append(`<div class="rowBox align_item"> <div class="name rowBox align_center">Net Total</div> <div class="price rowBox align_center">${netTotal} DA</div> </div>`);
+      const salesTaxes = this.getSalesTaxes(this.selected_pos);
+      console.log("just debuging : ", salesTaxes);
+      let allTax = 0;
       if (this.selected_pos.taxes_and_charges != "" || this.selected_pos.taxes_and_charges != null) {
-        this.totalList.append(`<div class="rowBox align_item"> <div class="name rowBox align_center">${this.selected_pos.taxes_and_charges}</div> <div class="price rowBox align_center"> 0.00 DA</div> </div>`);
+        salesTaxes.forEach((tax) => {
+          allTax += tax.rate / 100 * netTotal;
+          this.totalList.append(`<div class="rowBox align_item"> <div class="name rowBox align_center">${tax.description}</div> <div class="price rowBox align_center">${tax.rate / 100 * netTotal} DA</div> </div>`);
+        });
       }
+      this.totalList.append(`<div class="rowBox align_item"> <div class="name rowBox align_center">Grand Total</div> <div class="price rowBox align_center">${netTotal + allTax} DA</div> </div>`);
     }
     show_cart() {
       this.left_container.css("display", "flex");
@@ -2338,6 +2359,18 @@
         this.refreshData();
       });
       this.refreshData();
+    }
+    getSalesTaxes(pos) {
+      const taxTemplateId = pos.taxes_and_charges;
+      let salesTax = [];
+      this.sales_taxes_and_charges.forEach((tax) => {
+        if (tax.parent == taxTemplateId) {
+          console.log("debuging ==> parent : ", tax.parent, " taxTemplateId : ", taxTemplateId);
+          salesTax.push(tax);
+        }
+      });
+      console.log("sales tax :=:=> ", salesTax);
+      return salesTax;
     }
   };
 
@@ -2441,4 +2474,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.WYA5X6ND.js.map
+//# sourceMappingURL=pos.bundle.GLFYEDUI.js.map

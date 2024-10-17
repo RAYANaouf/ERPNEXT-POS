@@ -79,7 +79,6 @@ pos_ar.PointOfSale.Controller = class {
 		this.sales_taxes_and_charges    = await this.fetchSalesTaxesAndCharges()
 		this.taxes_and_charges_template = await this.fetchSalesTaxesAndChargesTemplate()
 
-		this.sales_taxes  = this.getSalesTax()
 
 
 
@@ -93,6 +92,12 @@ pos_ar.PointOfSale.Controller = class {
 		}
 
 		Object.assign(this.selectedPosProfile , this.PosProfileList[0])
+
+		console.log("selected pos profile 1 : " , this.selectedPosProfile)
+
+		// calculate the tax after setting the default pos profile because it use it to get the tax
+		this.sales_taxes  = this.getSalesTaxes()
+
 
 		if(this.customersList.length > 0){
 			this.selectedCustomer = structuredClone(this.customersList[0])
@@ -160,13 +165,23 @@ pos_ar.PointOfSale.Controller = class {
         }
 
 	prepare_components(){
+
+		console.log("selected pos profile 2 : " , this.selectedPosProfile)
+
 		this.set_right_and_left_sections();
+		console.log("selected pos profile 3 : " , this.selectedPosProfile)
 		this.init_item_selector();
+		console.log("selected pos profile 4 : " , this.selectedPosProfile)
 		this.init_customer_box();
+		console.log("selected pos profile 5 : " , this.selectedPosProfile)
 		this.init_selected_item();
+		console.log("selected pos profile 6 : " , this.selectedPosProfile)
 		this.init_item_details();
+		console.log("selected pos profile 7 : " , this.selectedPosProfile)
 		this.init_paymentCart();
+		console.log("selected pos profile 8 : " , this.selectedPosProfile)
 		this.init_historyCart();
+		console.log("selected pos profile 9 : " , this.selectedPosProfile)
 
 	}
 
@@ -404,7 +419,8 @@ pos_ar.PointOfSale.Controller = class {
         init_historyCart(){
 		this.history_cart = new pos_ar.PointOfSale.pos_history(
 									this.wrapper,
-									this.db
+									this.db,
+									this.sales_taxes_and_charges
 								)
         }
 
@@ -534,6 +550,8 @@ pos_ar.PointOfSale.Controller = class {
 	}
 
 	onHistoryClick(){
+
+		console.log("selected pos profile 10 : " , this.selectedPosProfile)
 
 		console.log("history ::" , this.history_cart)
 		//show
@@ -1102,12 +1120,13 @@ pos_ar.PointOfSale.Controller = class {
 		})
 	}
 
-	getSalesTax(){
+	getSalesTaxes(){
+
 		const taxTemplateId = this.selectedPosProfile.taxes_and_charges
 		let   salesTax      = []
 
-
-		console.log("taxTemplateId : " , taxTemplateId)
+		console.log("selected pos profile 11" , this.selectedPosProfile)
+		console.log("taxTemplateId : " , taxTemplateId , "the profile : " , this.selectedPosProfile)
 
 		this.sales_taxes_and_charges.forEach( tax => {
 			if(tax.parent == taxTemplateId){
@@ -1115,7 +1134,7 @@ pos_ar.PointOfSale.Controller = class {
 				salesTax.push(tax)
 			}
 		})
-
+		console.log("sales tax : " , salesTax);
 		return salesTax;
 	}
 
