@@ -202,15 +202,7 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 
 			const clickedTab = $(event.target).closest('.tab').find('.tabName').text();
 
-
-
-
 			this.selected_item_maps.delete(clickedTab)
-
-			console.log("this.selected_item_maps.keys()" , this.selected_item_maps.size)
-
-			console.log(" this.selected_item_maps.keys")
-
 
 			if(this.selected_item_maps.size > 0  ){
 				this.selected_tab.tabName = Array.from(this.selected_item_maps.keys())[0]
@@ -220,33 +212,6 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 				this.createNewTab()
 			}
 
-
-			/*let selectedTabIndex = Array.from(this.selected_item_maps.keys()).findIndex(key => key == clickedTab);
-
-			this.selected_item_maps.delete(clickedTab)
-
-
-			if(this.selected_item_maps.keys().length == 0 ){
-				//create one
-				this.createNewTab()
-			}
-
-
-
-			console.log("selectedTabIndex : " , selectedTabIndex , " while the tab array is : " , this.selected_item_maps.keys())
-
-
-			if(selectedTabIndex == 0){
-				console.log("condition 1")
-				this.selected_tab.tabName = this.selected_item_maps.keys()[0]
-			}
-			else{
-				console.log("condition 2")
-				//console.log("this.selected_tab.tabName : " , this.selected_item_maps , "this.selected_item_maps : " , this.selected_item_maps)
-				this.selected_tab.tabName = this.selected_item_maps.key()[selectedTabIndex-1]
-			}
-*/
-			console.log("this.selected_tab" , this.selected_tab)
 
 			this.refreshTabs()
 			this.refreshSelectedItem()

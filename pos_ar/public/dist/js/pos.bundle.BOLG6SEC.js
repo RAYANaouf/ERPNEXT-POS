@@ -1280,15 +1280,12 @@
         event2.stopPropagation();
         const clickedTab = $(event2.target).closest(".tab").find(".tabName").text();
         this.selected_item_maps.delete(clickedTab);
-        console.log("this.selected_item_maps.keys()", this.selected_item_maps.size);
-        console.log(" this.selected_item_maps.keys");
         if (this.selected_item_maps.size > 0) {
           this.selected_tab.tabName = Array.from(this.selected_item_maps.keys())[0];
           console.log("this.selected_tab.tabName : ", this.selected_tab);
         } else {
           this.createNewTab();
         }
-        console.log("this.selected_tab", this.selected_tab);
         this.refreshTabs();
         this.refreshSelectedItem();
       });
@@ -2560,4 +2557,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.WHTPL2SP.js.map
+//# sourceMappingURL=pos.bundle.BOLG6SEC.js.map
