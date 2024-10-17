@@ -1181,7 +1181,7 @@
       this.tabs_bar = this.wrapper.find("#tabs");
       this.tabs_container = this.tabs_bar.find("#tabs_container");
       this.cartBox = this.wrapper.find("#CartBox");
-      this.tabs_container.append('<div class="tab selected">C1</div>');
+      this.tabs_container.append('<div class="tab selected rowBox align_center"><div class="tabName">C1</div><img src="/assets/pos_ar/images/cancel.png" width="10px" height="10px" class="tabDeleteBtn"></div>');
       this.tabs_bar.append('<div id="addTabBtn" class="tab unselected">+</div>');
       this.add_tab_button = this.tabs_bar.find("#addTabBtn");
       this.cartBox.append('<div id="CartBoxTopBar" class=" rowBox align_center  row_sbtw"><div>');
@@ -1260,21 +1260,35 @@
       this.tabs_container.empty();
       for (let key of this.selected_item_maps.keys()) {
         if (key == this.selected_tab.tabName) {
-          this.tabs_container.append(`<div class="tab selected">${key}</div>`);
+          this.tabs_container.append(`<div class="tab selected rowBox align_center"><div class="tabName">${key}</div>  <img src="/assets/pos_ar/images/cancel.png" width="10px" height="10px"  class="tabDeleteBtn"  >  </div>`);
         } else {
-          this.tabs_container.append(`<div class="tab">${key}</div>`);
+          this.tabs_container.append(`<div class="tab">  <div class="tabName">${key}</div>  </div>`);
         }
       }
       this.tabs_container.find(".tab").on("click", (event2) => {
-        const clickedTab = $(event2.target).text();
+        const clickedTab = $(event2.target).closest(".tab").find(".tabName").text();
         this.selected_tab.tabName = clickedTab;
+        console.log("clicked tab : ", clickedTab, "selected one : ", this.selected_tab, " clicked element : ", event2.target);
         this.refreshTabs();
         this.refreshSelectedItem();
         this.calculateNetTotal();
         this.calculateQnatity();
         this.calculateGrandTotal();
         this.on_tab_click(clickedTab);
-        console.log("clicked tab ==> ", clickedTab);
+      });
+      this.tabs_container.find(".tabDeleteBtn").on("click", (event2) => {
+        const clickedTab = $(event2.target).closest(".tab").find(".tabName").text();
+        let selectedTabIndex = 0;
+        for (let key of this.selected_item_maps.keys()) {
+          if (key == clickedTab) {
+            return;
+          } else {
+            selectedTabIndex += 1;
+          }
+        }
+        console.log("clicked tab index");
+        if (this.selected_item_maps.keys().length > 0) {
+        }
       });
     }
     refreshSelectedItem() {
@@ -2542,4 +2556,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.EQ55XHLU.js.map
+//# sourceMappingURL=pos.bundle.SY5N5HEG.js.map

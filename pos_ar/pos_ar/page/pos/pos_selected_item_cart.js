@@ -60,7 +60,7 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 		this.cartBox        = this.wrapper.find("#CartBox")
 
 
-		this.tabs_container.append('<div class="tab selected">C1</div>')
+		this.tabs_container.append('<div class="tab selected rowBox align_center"><div class="tabName">C1</div><img src="/assets/pos_ar/images/cancel.png" width="10px" height="10px" class="tabDeleteBtn"></div>')
 		this.tabs_bar.append('<div id="addTabBtn" class="tab unselected">+</div>')
 
 		this.add_tab_button = this.tabs_bar.find('#addTabBtn')
@@ -164,17 +164,20 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 
 		for(let key of this.selected_item_maps.keys() ){
 			if(key == this.selected_tab.tabName){
-				this.tabs_container.append(`<div class="tab selected">${key}</div>`)
+				this.tabs_container.append(`<div class="tab selected rowBox align_center"><div class="tabName">${key}</div>  <img src="/assets/pos_ar/images/cancel.png" width="10px" height="10px"  class="tabDeleteBtn"  >  </div>`)
 			}
 			else{
-				this.tabs_container.append(`<div class="tab">${key}</div>`)
+				this.tabs_container.append(`<div class="tab">  <div class="tabName">${key}</div>  </div>`)
+				//this.tabs_container.append(`<div class="tab rowBox"><div class="tabName">${key}</div> <img src="/assets/pos_ar/images/cancel.png">  </div>`)
 			}
 		}
 
 		this.tabs_container.find(".tab").on('click' , (event)=>{
-			const clickedTab = $(event.target).text()
+
+			const clickedTab = $(event.target).closest('.tab').find('.tabName').text();
 
 			this.selected_tab.tabName = clickedTab
+			console.log("clicked tab : " , clickedTab , "selected one : " , this.selected_tab , " clicked element : " , event.target)
 
 			//update UI
 			this.refreshTabs();
@@ -185,7 +188,32 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 
 			this.on_tab_click(clickedTab);
 
-			console.log("clicked tab ==> " , clickedTab)
+		})
+
+		this.tabs_container.find(".tabDeleteBtn").on('click' , (event) => {
+			const clickedTab = $(event.target).closest('.tab').find('.tabName').text();
+
+
+			let selectedTabIndex = 0 ;
+			for(let key of this.selected_item_maps.keys()){
+				if(key == clickedTab){
+					return;
+				}
+				else{
+					selectedTabIndex += 1 ;
+				}
+			}
+
+			console.log("clicked tab index");
+
+			//this.selected_item_maps.delete(clickedTab)
+
+			if(this.selected_item_maps.keys().length > 0){
+				
+			}
+			//console.log("clicked tab : " , clickedTab ," map :" , this.selected_item_maps ," selected one : " , this.selected_tab , " clicked element : " , event.target)
+
+			//this.selected_tab.tabName = clickedTab
 		})
 	}
 

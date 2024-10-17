@@ -38,6 +38,12 @@
 	background    : #ffffff ; 
 }
 
+div.tab img{
+	width        : 20px ;
+	height       : 20px ;
+	margin-left  : 8px ;
+}
+
 #RightSection #CartBox{
         width         : 100% ;
         height        : calc(100% - 55px) ;
