@@ -93,7 +93,7 @@ pos_ar.PointOfSale.pos_history = class {
 		this.pos_content.append('<div id="posPaymentsContainer"><div class="posSectionTitle">Payments</div><div id="posMethodList"></div></div>')
 
 		this.paymentsContainer = this.pos_content.find('#posPaymentsContainer')
-		this.methodList        = this.itemContainer.find('#posMethodList')
+		this.methodList        = this.pos_content.find('#posMethodList')
 
 		this.left_container.append('<div id="posActionsContainer" class="rowBox align_content"> <div id="posPrintBtn" class="actionBtn rowBox centerItem"> Print Receipt </div>  <div id="posEmailBtn" class="actionBtn rowBox centerItem"> Email Receipt </div>   <div id="posReturnBtn" class="actionBtn rowBox centerItem"> Return </div>  </div>')
 
@@ -212,12 +212,12 @@ pos_ar.PointOfSale.pos_history = class {
 
 	refreshPosDetailsData(){
 
+		/******************  check if there is a selected one *********************/
+		// render the empty page or the selected pos details.
 		if(this.selected_pos == null ){
-			console.log("empty ")
 			this.setEmpty();
 			return;
-		}
-		else{
+		}else{
 			this.setData();
 		}
 
@@ -229,34 +229,51 @@ pos_ar.PointOfSale.pos_history = class {
 		this.pos_header.find('#posStatus').text(this.selected_pos.status)
 		this.pos_header.find('#posStatus').removeClass().addClass(`${this.selected_pos.status}`)
 
+
+		/**********************  items list ***************************/
 		this.itemList.html('');
 		this.selected_pos.items.forEach(item => {
 			this.itemList.append(`<div class="rowBox align_item">    <div class="itemName rowBox align_center">${item.item_name}</div>   <div class="itemQuantity rowBox align_center">${item.qty}</div>   <div class="itemCost rowBox align_center">${item.qty * item.rate} DA</div>  </div>`)
 		})
 
 
+		/*********************  net ,  VAT  , Discount , Grand Total *******************/
 
 		this.totalList.html('');
+
+		/////net total
 		let netTotal = 0 ;
 		this.selected_pos.items.forEach(item => {
 			netTotal += item.rate * item.qty
 		})
 		this.totalList.append(`<div class="rowBox align_item"> <div class="name rowBox align_center">Net Total</div> <div class="price rowBox align_center">${netTotal} DA</div> </div>`)
 
+
+		/////////taxes
 		const salesTaxes = this.getSalesTaxes(this.selected_pos);
-		console.log("just debuging : " , salesTaxes)
 
 		let allTax = 0
-		if(this.selected_pos.taxes_and_charges != "" || this.selected_pos.taxes_and_charges != null){
+		if(this.selected_pos.taxes_and_charges != "" && this.selected_pos.taxes_and_charges != null){
 			salesTaxes.forEach( tax =>{
 				allTax += (tax.rate/100) * netTotal
 				this.totalList.append(`<div class="rowBox align_item"> <div class="name rowBox align_center">${tax.description}</div> <div class="price rowBox align_center">${(tax.rate/100) * netTotal} DA</div> </div>`)
 			})
 		}
 
-		this.totalList.append(`<div class="rowBox align_item"> <div class="name rowBox align_center">Grand Total</div> <div class="price rowBox align_center">${netTotal + allTax} DA</div> </div>`)
+		// grand otal
+		this.totalList.append(`<div class="rowBox align_item"> <div class="grandTotalName rowBox align_center">Grand Total</div> <div class="grandTotalPrice rowBox align_center">${netTotal + allTax} DA</div> </div>`)
 
 
+
+		/***************************** payment methode list *********************************/
+		this.methodList.html('')
+		const payments = this.selected_pos.payments ;
+
+		if(payments != null && payments != ""){
+			payments.forEach( method => {
+				this.methodList.append(`<div class="rowBox align_item"> <div class="name rowBox align_center">${method.mode_of_payment}</div> <div class="price rowBox align_center">${method.amount} DA</div> </div>`)
+			})
+		}
 
 	}
 

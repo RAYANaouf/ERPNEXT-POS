@@ -2193,7 +2193,7 @@
       this.totalList = this.pos_content.find("#posTotalList");
       this.pos_content.append('<div id="posPaymentsContainer"><div class="posSectionTitle">Payments</div><div id="posMethodList"></div></div>');
       this.paymentsContainer = this.pos_content.find("#posPaymentsContainer");
-      this.methodList = this.itemContainer.find("#posMethodList");
+      this.methodList = this.pos_content.find("#posMethodList");
       this.left_container.append('<div id="posActionsContainer" class="rowBox align_content"> <div id="posPrintBtn" class="actionBtn rowBox centerItem"> Print Receipt </div>  <div id="posEmailBtn" class="actionBtn rowBox centerItem"> Email Receipt </div>   <div id="posReturnBtn" class="actionBtn rowBox centerItem"> Return </div>  </div>');
       this.actionButtonsContainer = this.left_container.find("#posActionsContainer");
       this.printBtn = this.actionButtonsContainer.find("#posPrintBtn");
@@ -2265,7 +2265,6 @@
     refreshPosDetailsData() {
       var _a, _b, _c;
       if (this.selected_pos == null) {
-        console.log("empty ");
         this.setEmpty();
         return;
       } else {
@@ -2287,15 +2286,21 @@
       });
       this.totalList.append(`<div class="rowBox align_item"> <div class="name rowBox align_center">Net Total</div> <div class="price rowBox align_center">${netTotal} DA</div> </div>`);
       const salesTaxes = this.getSalesTaxes(this.selected_pos);
-      console.log("just debuging : ", salesTaxes);
       let allTax = 0;
-      if (this.selected_pos.taxes_and_charges != "" || this.selected_pos.taxes_and_charges != null) {
+      if (this.selected_pos.taxes_and_charges != "" && this.selected_pos.taxes_and_charges != null) {
         salesTaxes.forEach((tax) => {
           allTax += tax.rate / 100 * netTotal;
           this.totalList.append(`<div class="rowBox align_item"> <div class="name rowBox align_center">${tax.description}</div> <div class="price rowBox align_center">${tax.rate / 100 * netTotal} DA</div> </div>`);
         });
       }
-      this.totalList.append(`<div class="rowBox align_item"> <div class="name rowBox align_center">Grand Total</div> <div class="price rowBox align_center">${netTotal + allTax} DA</div> </div>`);
+      this.totalList.append(`<div class="rowBox align_item"> <div class="grandTotalName rowBox align_center">Grand Total</div> <div class="grandTotalPrice rowBox align_center">${netTotal + allTax} DA</div> </div>`);
+      this.methodList.html("");
+      const payments = this.selected_pos.payments;
+      if (payments != null && payments != "") {
+        payments.forEach((method) => {
+          this.methodList.append(`<div class="rowBox align_item"> <div class="name rowBox align_center">${method.mode_of_payment}</div> <div class="price rowBox align_center">${method.amount} DA</div> </div>`);
+        });
+      }
     }
     show_cart() {
       this.left_container.css("display", "flex");
@@ -2474,4 +2479,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.GLFYEDUI.js.map
+//# sourceMappingURL=pos.bundle.W3NBVSWT.js.map
