@@ -278,6 +278,11 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 			this.refreshSelectedItem()
 	}
 
+	createTabForEditPOS(){
+		this.counter += 1 ;
+		return this.counter;
+	}
+
 	showKeyboard(){
 		this.editSelectedItem.css('display','flex')
 	}

@@ -605,8 +605,32 @@ pos_ar.PointOfSale.Controller = class {
 
 	}
 
+
 	historyCartClick(event , message){
 		//go back to edit pos draft
+		if(event == 'edit'){
+			const tab = this.selected_item_cart.createTabForEditPOS()
+
+			this.selectedItemMaps.set(`C${tab}` , message)
+			this.selectedTab.tabName = `C${tab}`
+
+
+			console.log("change ::: item map ==> " , this.selectedItemMaps , " selected tab ==> " , this.selectedTab)
+
+			//show
+			this.item_selector.showCart();
+			this.customer_box.showActionBar();
+			this.selected_item_cart.showCart()
+
+			//hide
+			this.item_details.hide_cart() ;
+			this.payment_cart.hideCart()  ;
+			this.history_cart.hide_cart() ;
+
+			//refresh the data :
+			this.selected_item_cart.refreshTabs()
+                        this.selected_item_cart.refreshSelectedItem()
+		}
 	}
 
 	onInput( event , field , value){

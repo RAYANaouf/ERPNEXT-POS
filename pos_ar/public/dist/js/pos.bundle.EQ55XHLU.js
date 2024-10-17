@@ -447,6 +447,20 @@
       this.selectedTab.tabName = `C${counter}`;
     }
     historyCartClick(event2, message) {
+      if (event2 == "edit") {
+        const tab = this.selected_item_cart.createTabForEditPOS();
+        this.selectedItemMaps.set(`C${tab}`, message);
+        this.selectedTab.tabName = `C${tab}`;
+        console.log("change ::: item map ==> ", this.selectedItemMaps, " selected tab ==> ", this.selectedTab);
+        this.item_selector.showCart();
+        this.customer_box.showActionBar();
+        this.selected_item_cart.showCart();
+        this.item_details.hide_cart();
+        this.payment_cart.hideCart();
+        this.history_cart.hide_cart();
+        this.selected_item_cart.refreshTabs();
+        this.selected_item_cart.refreshSelectedItem();
+      }
     }
     onInput(event2, field, value) {
       if (event2 == "focus" || event2 == "blur") {
@@ -1319,6 +1333,10 @@
       this.create_new_tab(this.counter);
       this.refreshTabs();
       this.refreshSelectedItem();
+    }
+    createTabForEditPOS() {
+      this.counter += 1;
+      return this.counter;
     }
     showKeyboard() {
       this.editSelectedItem.css("display", "flex");
@@ -2395,6 +2413,9 @@
           }
         );
       });
+      this.editBtn.on("click", (event2) => {
+        this.on_click("edit", this.selected_pos);
+      });
     }
     getSalesTaxes(pos) {
       const taxTemplateId = pos.taxes_and_charges;
@@ -2521,4 +2542,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.LMQDM2GK.js.map
+//# sourceMappingURL=pos.bundle.EQ55XHLU.js.map
