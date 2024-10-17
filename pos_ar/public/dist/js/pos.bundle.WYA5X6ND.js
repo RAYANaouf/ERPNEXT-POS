@@ -2176,7 +2176,7 @@
       this.itemList = this.itemContainer.find("#posItemList");
       this.pos_content.append('<div id="posTotalsContainer"><div class="posSectionTitle">Totals</div><div id="posTotalList"></div></div>');
       this.totalsContainer = this.pos_content.find("#posTotalsContainer");
-      this.totalList = this.itemContainer.find("#posTotalList");
+      this.totalList = this.pos_content.find("#posTotalList");
       this.pos_content.append('<div id="posPaymentsContainer"><div class="posSectionTitle">Payments</div><div id="posMethodList"></div></div>');
       this.paymentsContainer = this.pos_content.find("#posPaymentsContainer");
       this.methodList = this.itemContainer.find("#posMethodList");
@@ -2249,7 +2249,7 @@
       this.refreshPosDetailsData();
     }
     refreshPosDetailsData() {
-      var _a, _b, _c, _d;
+      var _a, _b, _c;
       if (this.selected_pos == null) {
         console.log("empty ");
         this.setEmpty();
@@ -2260,18 +2260,21 @@
       this.pos_header.find("#posCustomer").text((_a = this.selected_pos.customer) != null ? _a : "CustomerName");
       this.pos_header.find("#posCost").text((_b = this.selected_pos.paid_amount) != null ? _b : 0 + "DA");
       this.pos_header.find("#posId").text((_c = this.selected_pos.name) != null ? _c : "POS Invoice Name");
-      let posStatus = "";
-      if ((_d = this.selected_pos.docStatus) != null ? _d : true) {
-        posStatus = "Paid";
-      } else {
-        posStatus = "Consolidated";
-      }
-      this.pos_header.find("#posStatus").text(posStatus);
-      this.pos_header.find("#posStatus").addClass(`${posStatus}`);
+      this.pos_header.find("#posStatus").text(this.selected_pos.status);
+      this.pos_header.find("#posStatus").removeClass().addClass(`${this.selected_pos.status}`);
       this.itemList.html("");
       this.selected_pos.items.forEach((item) => {
         this.itemList.append(`<div class="rowBox align_item">    <div class="itemName rowBox align_center">${item.item_name}</div>   <div class="itemQuantity rowBox align_center">${item.qty}</div>   <div class="itemCost rowBox align_center">${item.qty * item.rate} DA</div>  </div>`);
       });
+      this.totalList.html("");
+      let netTotal = 0;
+      this.selected_pos.items.forEach((item) => {
+        netTotal += item.rate * item.qty;
+      });
+      this.totalList.append(`<div class="rowBox align_item"> <div class="name rowBox align_center">Net Total</div> <div class="price rowBox align_center">${netTotal} DA</div> </div>`);
+      if (this.selected_pos.taxes_and_charges != "" || this.selected_pos.taxes_and_charges != null) {
+        this.totalList.append(`<div class="rowBox align_item"> <div class="name rowBox align_center">${this.selected_pos.taxes_and_charges}</div> <div class="price rowBox align_center"> 0.00 DA</div> </div>`);
+      }
     }
     show_cart() {
       this.left_container.css("display", "flex");
@@ -2282,7 +2285,7 @@
         (result) => {
           this.localPosInvoice.pos_invoices = result;
           this.filtered_pos_list = this.localPosInvoice.pos_invoices.filter((pos) => {
-            if (pos.status == "Draft") {
+            if (pos.status == filter) {
               return true;
             } else {
               return false;
@@ -2438,4 +2441,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.4A67P5XV.js.map
+//# sourceMappingURL=pos.bundle.WYA5X6ND.js.map

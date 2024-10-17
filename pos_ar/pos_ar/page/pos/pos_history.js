@@ -72,7 +72,7 @@ pos_ar.PointOfSale.pos_history = class {
 		//pos details  the container of the pos details
 		this.left_container.append('<div id="PosContentHeader" class="rowBox" ><div class="c1 columnBox"><div id="posCustomer">Customer</div><div id="posSoldBy">Sold by : User</div></div><div class="c2 columnBox"><div id="posCost">0,0000 DA</div><div id="posId">ACC-PSINV-2024-ID</div><div id="posStatus">POS Status</div></div></div>')
 
-		//first section is the header information
+		//first this.selected_pos.taxes_and_charges = ""section is the header information
 		this.pos_header = this.left_container.find('#PosContentHeader');
 
 		this.left_container.append('<div id="posContent" class="columnBox"></div>')
@@ -87,7 +87,7 @@ pos_ar.PointOfSale.pos_history = class {
 		this.pos_content.append('<div id="posTotalsContainer"><div class="posSectionTitle">Totals</div><div id="posTotalList"></div></div>')
 
 		this.totalsContainer = this.pos_content.find('#posTotalsContainer')
-		this.totalList       = this.itemContainer.find('#posTotalList')
+		this.totalList       = this.pos_content.find('#posTotalList')
 
 		this.pos_content.append('<div id="posPaymentsContainer"><div class="posSectionTitle">Payments</div><div id="posMethodList"></div></div>')
 
@@ -225,22 +225,27 @@ pos_ar.PointOfSale.pos_history = class {
 		//it is not the paid amount it should be the total invoice amount
 		this.pos_header.find('#posCost').text(this.selected_pos.paid_amount??0 + "DA")
 		this.pos_header.find('#posId').text(this.selected_pos.name?? "POS Invoice Name")
-		let posStatus = ""
-		if(this.selected_pos.docStatus??0 == 0){
-			posStatus = "Paid"
-		}
-		else{
-			posStatus = "Consolidated"
-		}
-
-		this.pos_header.find('#posStatus').text(posStatus)
-		this.pos_header.find('#posStatus').addClass(`${posStatus}`)
+		this.pos_header.find('#posStatus').text(this.selected_pos.status)
+		this.pos_header.find('#posStatus').removeClass().addClass(`${this.selected_pos.status}`)
 
 		this.itemList.html('');
 		this.selected_pos.items.forEach(item => {
 			this.itemList.append(`<div class="rowBox align_item">    <div class="itemName rowBox align_center">${item.item_name}</div>   <div class="itemQuantity rowBox align_center">${item.qty}</div>   <div class="itemCost rowBox align_center">${item.qty * item.rate} DA</div>  </div>`)
 		})
 
+
+
+		this.totalList.html('');
+		let netTotal = 0 ;
+		this.selected_pos.items.forEach(item => {
+			netTotal += item.rate * item.qty
+		})
+		this.totalList.append(`<div class="rowBox align_item"> <div class="name rowBox align_center">Net Total</div> <div class="price rowBox align_center">${netTotal} DA</div> </div>`)
+
+
+		if(this.selected_pos.taxes_and_charges != "" || this.selected_pos.taxes_and_charges != null){
+			this.totalList.append(`<div class="rowBox align_item"> <div class="name rowBox align_center">${this.selected_pos.taxes_and_charges}</div> <div class="price rowBox align_center"> 0.00 DA</div> </div>`)
+		}
 
 
 	}
@@ -261,7 +266,7 @@ pos_ar.PointOfSale.pos_history = class {
 							this.localPosInvoice.pos_invoices = result ;
 							this.filtered_pos_list = this.localPosInvoice.pos_invoices.filter( pos => {
 
-								if(pos.status == 'Draft' ){
+								if(pos.status == filter ){
 									return true ;
 								}
 								else{
