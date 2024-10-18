@@ -460,6 +460,8 @@
         this.history_cart.hide_cart();
         this.selected_item_cart.refreshTabs();
         this.selected_item_cart.refreshSelectedItem();
+      } else if (event2 == "return") {
+        this.backHome();
       }
     }
     onInput(event2, field, value) {
@@ -2455,6 +2457,9 @@
       this.editBtn.on("click", (event2) => {
         this.on_click("edit", this.selected_pos);
       });
+      this.returnBtn.on("click", (event2) => {
+        this.on_click("return");
+      });
     }
     getSalesTaxes(pos) {
       const taxTemplateId = pos.taxes_and_charges;
@@ -2581,4 +2586,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.JHXARGQC.js.map
+//# sourceMappingURL=pos.bundle.KGNJZAOC.js.map

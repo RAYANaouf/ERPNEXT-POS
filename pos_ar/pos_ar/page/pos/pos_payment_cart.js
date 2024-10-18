@@ -251,33 +251,6 @@ pos_ar.PointOfSale.pos_payment_cart = class{
 
 		this.cart_footer.find("#completeOrderBtn").on('click' , (event)=>{
 
-			/*if(this.invoice_data.grandTotal > this.invoice_data.paidAmount ){
-				frappe.warn(
-					'Paid amount is less than the Total!',
-					'Please set the correct paid amount value',
-					()=>{
-					},
-					'Done',
-					false
-				)
-				return;
-			}
-			else if(this.invoice_data.grandTotal == 0){
-				console.log("here we go 2")
-				frappe.warn(
-					'No item',
-					'Please select some items.',
-					()=>{
-					},
-					'Done',
-					false
-				)
-				return;
-
-			}*/
-
-
-
 			frappe.confirm('Submit the invoice ?',
 			()=>{/*yes*/
 				this.on_complete()

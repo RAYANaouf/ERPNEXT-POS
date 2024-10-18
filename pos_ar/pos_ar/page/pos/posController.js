@@ -633,6 +633,9 @@ pos_ar.PointOfSale.Controller = class {
 			this.selected_item_cart.refreshTabs()
                         this.selected_item_cart.refreshSelectedItem()
 		}
+		else if(event == 'return'){
+			this.backHome();
+		}
 	}
 
 	onInput( event , field , value){

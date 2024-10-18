@@ -413,6 +413,10 @@ pos_ar.PointOfSale.pos_history = class {
 			this.on_click('edit' , this.selected_pos );
 		})
 
+		this.returnBtn.on('click' , (event)=>{
+			this.on_click('return' );
+		})
+
 	}
 
 	/******************************************** functions  ********************************************************/
