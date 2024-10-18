@@ -897,14 +897,14 @@ pos_ar.PointOfSale.Controller = class {
 		this.selectedItemMaps.get(this.selectedTab.tabName).paid_amount       = this.invoiceData.paidAmount
 		this.selectedItemMaps.get(this.selectedTab.tabName).base_paid_amount  = this.invoiceData.paidAmount
 		this.selectedItemMaps.get(this.selectedTab.tabName).payments          = [{'mode_of_payment' : 'Cash' , 'amount' : this.invoiceData.paidAmount}]
-		this.selectedItemMaps.get(this.selectedTab.tabName).status            = 'Paid'
 		this.selectedItemMaps.get(this.selectedTab.tabName).docstatus         = 1
 		this.selectedItemMaps.get(this.selectedTab.tabName).customer          = this.selectedCustomer.name
 
 		this.sellInvoices.set(this.selectedItemMaps.get(this.selectedTab.tabName).name , this.selectedItemMaps.get(this.selectedTab.tabName));
 
+		//set status
 		const status = this.checkIfPaid(this.selectedItemMaps.get(this.selectedTab.tabName))
-		console.log("the pos status now : " , status)
+		this.selectedItemMaps.get(this.selectedTab.tabName).status            = status
 
 
 		this.db.updatePosInvoice(
@@ -1054,10 +1054,10 @@ pos_ar.PointOfSale.Controller = class {
 
 
 		if(pos.paid_amount == 0){
-			return "UnPaid"
+			return "Unpaid"
 		}
 		else if(pos.paid_amount < grandTotal){
-			return "UnPaid"
+			return "Unpaid"
 		}
 		else{
 			return "Paid"

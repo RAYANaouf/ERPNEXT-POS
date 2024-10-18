@@ -66,6 +66,9 @@
 #posStatus.Draft {
 	color : orange ;
 }
+#posStatus.Unpaid {
+	color : red ;
+}
 
 
 

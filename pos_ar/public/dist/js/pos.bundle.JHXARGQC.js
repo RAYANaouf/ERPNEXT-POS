@@ -620,12 +620,11 @@
       this.selectedItemMaps.get(this.selectedTab.tabName).paid_amount = this.invoiceData.paidAmount;
       this.selectedItemMaps.get(this.selectedTab.tabName).base_paid_amount = this.invoiceData.paidAmount;
       this.selectedItemMaps.get(this.selectedTab.tabName).payments = [{ "mode_of_payment": "Cash", "amount": this.invoiceData.paidAmount }];
-      this.selectedItemMaps.get(this.selectedTab.tabName).status = "Paid";
       this.selectedItemMaps.get(this.selectedTab.tabName).docstatus = 1;
       this.selectedItemMaps.get(this.selectedTab.tabName).customer = this.selectedCustomer.name;
       this.sellInvoices.set(this.selectedItemMaps.get(this.selectedTab.tabName).name, this.selectedItemMaps.get(this.selectedTab.tabName));
       const status = this.checkIfPaid(this.selectedItemMaps.get(this.selectedTab.tabName));
-      console.log("the pos status now : ", status);
+      this.selectedItemMaps.get(this.selectedTab.tabName).status = status;
       this.db.updatePosInvoice(
         this.selectedItemMaps.get(this.selectedTab.tabName),
         (event2) => {
@@ -712,9 +711,9 @@
       discount = pos.additional_discount_percentage / 100 * netTotal;
       grandTotal = netTotal + allTaxes - discount;
       if (pos.paid_amount == 0) {
-        return "UnPaid";
+        return "Unpaid";
       } else if (pos.paid_amount < grandTotal) {
-        return "UnPaid";
+        return "Unpaid";
       } else {
         return "Paid";
       }
@@ -2148,30 +2147,6 @@
         console.log("input", event2.target.value);
       });
       this.cart_footer.find("#completeOrderBtn").on("click", (event2) => {
-        console.log("grand total ==> ", this.invoice_data.grandTotal, "the paid amount ==> ", this.invoice_data.paidAmount);
-        if (this.invoice_data.grandTotal > this.invoice_data.paidAmount) {
-          console.log("here we go 1");
-          frappe.warn(
-            "Paid amount is less than the Total!",
-            "Please set the correct paid amount value",
-            () => {
-            },
-            "Done",
-            false
-          );
-          return;
-        } else if (this.invoice_data.grandTotal == 0) {
-          console.log("here we go 2");
-          frappe.warn(
-            "No item",
-            "Please select some items.",
-            () => {
-            },
-            "Done",
-            false
-          );
-          return;
-        }
         frappe.confirm(
           "Submit the invoice ?",
           () => {
@@ -2293,7 +2268,7 @@
       this.search_container = this.right_container.find("#historyRightSearchContainer");
       this.search_container.append('<select  id="PosInvoiceTypeInput" placeholder="POS Invoice Type">');
       this.filter_input = this.search_container.find("#PosInvoiceTypeInput");
-      this.filter_input.append('<option value="Draft">Draft</option><option value="Paid">Paid</option><option value="Consolidated">Consolidated</option>');
+      this.filter_input.append('<option value="Draft">Draft</option><option value="Paid">Paid</option> <option value="Unpaid">Unpaid</option><option value="Consolidated">Consolidated</option>');
       this.search_container.append('<input type="text" id="historyInput" placeholder="Search by invoice id or custumer name">');
       this.right_container.append('<div id="historyRecentInvoicesContainer" ></div>');
       this.right_data_container = this.right_container.find("#historyRecentInvoicesContainer");
@@ -2405,6 +2380,7 @@
       console.log("filter : ", filter);
       this.db.getAllPosInvoice(
         (result) => {
+          console.log("look at the result : ", result);
           this.localPosInvoice.pos_invoices = result;
           this.filtered_pos_list = this.localPosInvoice.pos_invoices.filter((pos) => {
             if (pos.status == filter) {
@@ -2497,7 +2473,7 @@
   // ../pos_ar/pos_ar/pos_ar/page/pos/pos_db.js
   pos_ar.PointOfSale.pos_db = class POSDatabase {
     constructor() {
-      this.dbName = "POSDB_test8";
+      this.dbName = "POSDB_test12";
       this.dbVersion = 14;
       this.db = null;
       this.openDatabase();
@@ -2605,4 +2581,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.N5K2KQWU.js.map
+//# sourceMappingURL=pos.bundle.JHXARGQC.js.map

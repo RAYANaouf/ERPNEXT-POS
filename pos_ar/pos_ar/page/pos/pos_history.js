@@ -117,7 +117,7 @@ pos_ar.PointOfSale.pos_history = class {
 		this.search_container.append('<select  id="PosInvoiceTypeInput" placeholder="POS Invoice Type">');
 
 		this.filter_input = this.search_container.find("#PosInvoiceTypeInput")
-		this.filter_input.append('<option value="Draft">Draft</option><option value="Paid">Paid</option><option value="Consolidated">Consolidated</option>')
+		this.filter_input.append('<option value="Draft">Draft</option><option value="Paid">Paid</option> <option value="Unpaid">Unpaid</option><option value="Consolidated">Consolidated</option>')
 
 		this.search_container.append('<input type="text" id="historyInput" placeholder="Search by invoice id or custumer name">');
 
@@ -305,6 +305,7 @@ pos_ar.PointOfSale.pos_history = class {
 		//refrenshing data
 		this.db.getAllPosInvoice(
 						(result)=>{
+							console.log("look at the result : " , result)
 							this.localPosInvoice.pos_invoices = result ;
 							this.filtered_pos_list = this.localPosInvoice.pos_invoices.filter( pos => {
 
