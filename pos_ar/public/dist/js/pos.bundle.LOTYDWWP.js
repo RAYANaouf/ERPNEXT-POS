@@ -2270,7 +2270,7 @@
       this.search_container = this.right_container.find("#historyRightSearchContainer");
       this.search_container.append('<select  id="PosInvoiceTypeInput" placeholder="POS Invoice Type">');
       this.filter_input = this.search_container.find("#PosInvoiceTypeInput");
-      this.filter_input.append('<option value="Draft">Draft</option><option value="Paid">Paid</option> <option value="Unpaid">Unpaid</option><option value="Consolidated">Consolidated</option>');
+      this.filter_input.append('<option value="Draft">Draft</option><option value="Paid">Paid</option> <option value="Unpaid">Unpaid</option>');
       this.search_container.append('<input type="text" id="historyInput" placeholder="Search by invoice id or custumer name">');
       this.right_container.append('<div id="historyRecentInvoicesContainer" ></div>');
       this.right_data_container = this.right_container.find("#historyRecentInvoicesContainer");
@@ -2458,7 +2458,7 @@
         this.on_click("edit", this.selected_pos);
       });
       this.returnBtn.on("click", (event2) => {
-        this.on_click("return");
+        this.on_click("return", null);
       });
     }
     getSalesTaxes(pos) {
@@ -2586,4 +2586,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.KGNJZAOC.js.map
+//# sourceMappingURL=pos.bundle.LOTYDWWP.js.map
