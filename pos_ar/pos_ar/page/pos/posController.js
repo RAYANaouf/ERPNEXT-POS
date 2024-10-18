@@ -66,14 +66,14 @@ pos_ar.PointOfSale.Controller = class {
 	}
 
 	async prepare_app_defaults(){
-                this.customersList  = await this.fetchCustomers()
-		this.itemGroupList  = await this.fetchItemGroups()
-                this.itemList       = await this.fetchItems()
-                this.itemPrices     = await this.fetchItemPrice()
-                this.priceLists     = await this.fetchPriceList()
-                this.warehouseList  = await this.fetchWarehouseList()
-                this.PosProfileList = await this.fetchPosProfileList()
-                this.binList        = await this.fetchBinList()
+                this.customersList    = await this.fetchCustomers()
+		this.itemGroupList    = await this.fetchItemGroups()
+                this.itemList         = await this.fetchItems()
+                this.itemPrices       = await this.fetchItemPrice()
+                this.priceLists       = await this.fetchPriceList()
+                this.warehouseList    = await this.fetchWarehouseList()
+                this.PosProfileList   = await this.fetchPosProfileList()
+                this.binList          = await this.fetchBinList()
 
 
 		this.sales_taxes_and_charges    = await this.fetchSalesTaxesAndCharges()
@@ -168,22 +168,13 @@ pos_ar.PointOfSale.Controller = class {
 
 	prepare_components(){
 
-		console.log("selected pos profile 2 : " , this.selectedPosProfile)
-
 		this.set_right_and_left_sections();
-		console.log("selected pos profile 3 : " , this.selectedPosProfile)
 		this.init_item_selector();
-		console.log("selected pos profile 4 : " , this.selectedPosProfile)
 		this.init_customer_box();
-		console.log("selected pos profile 5 : " , this.selectedPosProfile)
 		this.init_selected_item();
-		console.log("selected pos profile 6 : " , this.selectedPosProfile)
 		this.init_item_details();
-		console.log("selected pos profile 7 : " , this.selectedPosProfile)
 		this.init_paymentCart();
-		console.log("selected pos profile 8 : " , this.selectedPosProfile)
 		this.init_historyCart();
-		console.log("selected pos profile 9 : " , this.selectedPosProfile)
 
 	}
 
@@ -205,7 +196,6 @@ pos_ar.PointOfSale.Controller = class {
 			}
 			//copy data
 			Object.assign(this.POSOpeningEntry ,  r[0])
-			console.log("==> " , this.POSOpeningEntry)
 
 			return true;
 
@@ -343,10 +333,10 @@ pos_ar.PointOfSale.Controller = class {
         init_item_selector(){
 		console.log("item list from controller : " , this.itemList)
                 this.item_selector = new pos_ar.PointOfSale.pos_item_selector(
-						this.$leftSection  ,
-						this.itemList      ,
-						this.itemGroupList ,
-						this.itemPrices    ,
+						this.$leftSection     ,
+						this.itemList         ,
+						this.itemGroupList    ,
+						this.itemPrices       ,
 						item => { this.itemClick_selector(item)  }
 					)
 	}

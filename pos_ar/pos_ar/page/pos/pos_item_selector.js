@@ -9,11 +9,11 @@ pos_ar.PointOfSale.pos_item_selector = class {
 		item_prices,
 		onItemClick
 	){
-		this.wrapper         = wrapper;
-		this.item_list       = item_list;
-		this.item_group_list = item_group_list;
-		this.item_prices     = item_prices;
-		this.on_item_click   = onItemClick;
+		this.wrapper           = wrapper;
+		this.item_list         = item_list;
+		this.item_group_list   = item_group_list;
+		this.item_prices       = item_prices;
+		this.on_item_click     = onItemClick;
 
 
 		//class functions invocation
@@ -128,9 +128,21 @@ pos_ar.PointOfSale.pos_item_selector = class {
                 groupItemListInput.addEventListener('input' , (even)=>{
 			this.setItemInFlow(this.getItemByItemGroup(event.target.value))
 		})
+
+		const itemInput = document.getElementById("ItemInput");
+		itemInput.addEventListener('input' , (event)=>{
+			this.setItemInFlow(this.filterListByItemData(event.target.value))
+		})
 	}
 
 	//**************** tools method ****************************//
+
+	//filter list by item code or barcode
+	filterListByItemData( value ){
+		return this.item_list.filter(item => item.name.toLowerCase().includes(value) || item.scan_barcode == value)
+	}
+
+
 	getItemByItemGroup(item_group){
 
 

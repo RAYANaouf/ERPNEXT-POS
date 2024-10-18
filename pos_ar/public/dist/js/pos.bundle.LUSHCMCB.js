@@ -118,21 +118,13 @@
       this.$components_wrapper = this.wrapper.find("#MainContainer");
     }
     prepare_components() {
-      console.log("selected pos profile 2 : ", this.selectedPosProfile);
       this.set_right_and_left_sections();
-      console.log("selected pos profile 3 : ", this.selectedPosProfile);
       this.init_item_selector();
-      console.log("selected pos profile 4 : ", this.selectedPosProfile);
       this.init_customer_box();
-      console.log("selected pos profile 5 : ", this.selectedPosProfile);
       this.init_selected_item();
-      console.log("selected pos profile 6 : ", this.selectedPosProfile);
       this.init_item_details();
-      console.log("selected pos profile 7 : ", this.selectedPosProfile);
       this.init_paymentCart();
-      console.log("selected pos profile 8 : ", this.selectedPosProfile);
       this.init_historyCart();
-      console.log("selected pos profile 9 : ", this.selectedPosProfile);
     }
     async checkForPOSEntry() {
       try {
@@ -150,7 +142,6 @@
           return false;
         }
         Object.assign(this.POSOpeningEntry, r[0]);
-        console.log("==> ", this.POSOpeningEntry);
         return true;
       } catch (error) {
         console.error("error occured : ", error);
@@ -1044,6 +1035,13 @@
       groupItemListInput.addEventListener("input", (even) => {
         this.setItemInFlow(this.getItemByItemGroup(event.target.value));
       });
+      const itemInput = document.getElementById("ItemInput");
+      itemInput.addEventListener("input", (event2) => {
+        this.setItemInFlow(this.filterListByItemData(event2.target.value));
+      });
+    }
+    filterListByItemData(value) {
+      return this.item_list.filter((item) => item.name.toLowerCase().includes(value) || item.scan_barcode == value);
     }
     getItemByItemGroup(item_group) {
       let groups = [];
@@ -2586,4 +2584,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.LOTYDWWP.js.map
+//# sourceMappingURL=pos.bundle.LUSHCMCB.js.map
