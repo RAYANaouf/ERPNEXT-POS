@@ -354,7 +354,6 @@ pos_ar.PointOfSale.Controller = class {
 		this.selected_item_cart  = new pos_ar.PointOfSale.pos_selected_item_cart(
 									this.$rightSection ,
 									this.selectedItemMaps,
-									this.priceLists,
 									this.sales_taxes  ,
 									this.invoiceData  ,
 									this.selectedTab  ,
@@ -418,7 +417,7 @@ pos_ar.PointOfSale.Controller = class {
 
 
         init_settingsCart(){
-		console.log("settings")
+		console.log("settings");
 		this.settings_cart = new pos_ar.PointOfSale.pos_settings(
 									this.wrapper,
 								)

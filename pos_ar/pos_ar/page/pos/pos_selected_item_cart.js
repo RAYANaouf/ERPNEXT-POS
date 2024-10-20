@@ -4,6 +4,7 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 	constructor(
 		wrapper          ,
 		selectedItemMaps ,
+		priceLists       ,
 		salesTaxes       ,
 		invoiceData      ,
 		selectedTab      ,
@@ -17,6 +18,7 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 	){
 		this.wrapper                 = wrapper;
 		this.selected_item_maps      = selectedItemMaps;
+		this.price_lists             = priceLists      ;
 		this.sales_taxes             = salesTaxes      ;
 		this.invoice_data            = invoiceData     ;
 		this.selected_tab            = selectedTab     ;
@@ -42,6 +44,7 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 	// start the class function
 	start_work(){
 		this.prepare_selected_item_cart();
+		this.fullfillPriceList();
 		this.setButtonsListeners();
 		this.setListener()
 	}
@@ -74,9 +77,9 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 		this.cartTopBar.append('<h4 class="CartTitle">Item Cart</h4>')
 		this.cartTopBar.append('<div id="selectedItemsPriceListInput"></div>')
 
-		this.priceListInput = this.cartTopBar.find("#selectedItemsPriceListInput")
-		this.priceListInput.append('<input list="PriceList"  id="PriceListInput" name="PriceList" placeHolder="Choice a Price list">')
-		this.priceListInput.append(' <datalist id="PriceList"></datalist>')
+		this.priceListInputContainer = this.cartTopBar.find("#selectedItemsPriceListInput")
+		this.priceListInputContainer.append('<select  id="PriceListInput" name="PriceList" placeHolder="Choice a Price list">')
+		this.priceListInput = this.priceListInputContainer.find('#PriceListInput')
 
 		this.cartHeader = this.cartBox.find('#cartHeader')
 		this.cartHeader.append('<div><h6>Item</h6></div>')
@@ -156,6 +159,11 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 		})
 	}
 
+	fullfillPriceList(){
+		this.price_lists.forEach(priceList =>{
+			this.priceListInput.append(`<option value="${priceList.name}">priceList.price_list_name</option>`)
+		})
+	}
 
 
 	refreshTabs(){
@@ -514,6 +522,10 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 			this.calculateVAT()
 			this.calculateGrandTotal()
 
+		})
+
+		this.price_lists.on('input' , (event)=>{
+			console.log("selected price list ==> " , event.target.value);
 		})
 
 	}

@@ -1,3 +1,5 @@
+
+
 pos_ar.PointOfSale.Controller = class {
         constructor(wrapper) {
 		//principales variable
@@ -173,7 +175,7 @@ pos_ar.PointOfSale.Controller = class {
 		this.init_item_details();
 		this.init_paymentCart();
 		this.init_historyCart();
-		this.init_settingsCart();
+
 	}
 
 	async checkForPOSEntry(){
@@ -354,7 +356,6 @@ pos_ar.PointOfSale.Controller = class {
 		this.selected_item_cart  = new pos_ar.PointOfSale.pos_selected_item_cart(
 									this.$rightSection ,
 									this.selectedItemMaps,
-									this.priceLists,
 									this.sales_taxes  ,
 									this.invoiceData  ,
 									this.selectedTab  ,
@@ -413,14 +414,6 @@ pos_ar.PointOfSale.Controller = class {
 									this.db,
 									this.sales_taxes_and_charges,
 									this.historyCartClick.bind(this)
-								)
-        }
-
-
-        init_settingsCart(){
-		console.log("settings")
-		this.settings_cart = new pos_ar.PointOfSale.pos_settings(
-									this.wrapper,
 								)
         }
 
@@ -485,12 +478,10 @@ pos_ar.PointOfSale.Controller = class {
 
 	onCheckout(){
 
-		if(this.checkIfRateZero(this.selectedItemMaps.get(this.selectedTab.tabName))){
-			frappe.throw("Item with rate equal 0")
-		}
-		console.log("result : " , this.checkIfRateZero(this.selectedItemMaps.get(this.selectedTab.tabName)))
 		const pos_checkout = this.selectedItemMaps.get(this.selectedTab.tabName);
 		console.log("pos on checkout : " , pos_checkout);
+
+
 
 		this.db.savePosInvoice(
 					pos_checkout ,
@@ -501,6 +492,9 @@ pos_ar.PointOfSale.Controller = class {
 						console.log("failure => " , event )
 					}
 				)
+
+
+
 
 
 		//show
@@ -517,10 +511,6 @@ pos_ar.PointOfSale.Controller = class {
 		this.selected_item_cart.showKeyboard();
 
 	}
-
-
-	
-
 
 	onClose_details(){
 
@@ -852,8 +842,6 @@ pos_ar.PointOfSale.Controller = class {
 	onCompleteOrder(){
 
 
-
-
 		//check if they set a customer
 		if(this.selectedCustomer.name == ""){
 			frappe.warn(
@@ -947,6 +935,17 @@ pos_ar.PointOfSale.Controller = class {
 		this.onClose_payment_cart()
 
 	}
+
+
+
+	checkIfRateZero(pos){
+
+		pos.item.forEach( item => {
+			
+		})
+
+	}
+
 
 
 	onSync(){
@@ -1069,12 +1068,6 @@ pos_ar.PointOfSale.Controller = class {
 		}
 
 	}
-
-
-	checkIfRateZero(pos){
-		return pos.items.some(item => item.rate == 0)
-	}
-
 
 	onClosePOS(){
 

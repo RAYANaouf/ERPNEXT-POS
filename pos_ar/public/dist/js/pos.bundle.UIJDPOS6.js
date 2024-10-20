@@ -125,6 +125,7 @@
       this.init_item_details();
       this.init_paymentCart();
       this.init_historyCart();
+      this.init_settingsCart();
     }
     async checkForPOSEntry() {
       try {
@@ -284,6 +285,7 @@
       this.selected_item_cart = new pos_ar.PointOfSale.pos_selected_item_cart(
         this.$rightSection,
         this.selectedItemMaps,
+        this.priceLists,
         this.sales_taxes,
         this.invoiceData,
         this.selectedTab,
@@ -340,6 +342,12 @@
         this.historyCartClick.bind(this)
       );
     }
+    init_settingsCart() {
+      console.log("settings");
+      this.settings_cart = new pos_ar.PointOfSale.pos_settings(
+        this.wrapper
+      );
+    }
     itemClick_selector(item) {
       const itemCloned = structuredClone(item);
       itemCloned.discount_amount = 0;
@@ -366,6 +374,10 @@
       this.item_details.refreshDate(item);
     }
     onCheckout() {
+      if (this.checkIfRateZero(this.selectedItemMaps.get(this.selectedTab.tabName))) {
+        frappe.throw("Item with rate equal 0");
+      }
+      console.log("result : ", this.checkIfRateZero(this.selectedItemMaps.get(this.selectedTab.tabName)));
       const pos_checkout = this.selectedItemMaps.get(this.selectedTab.tabName);
       console.log("pos on checkout : ", pos_checkout);
       this.db.savePosInvoice(
@@ -710,6 +722,9 @@
       } else {
         return "Paid";
       }
+    }
+    checkIfRateZero(pos) {
+      return pos.items.some((item) => item.rate == 0);
     }
     onClosePOS() {
       let all_tabs = Array.from(this.sellInvoices.keys());
@@ -1184,9 +1199,10 @@
 
   // ../pos_ar/pos_ar/pos_ar/page/pos/pos_selected_item_cart.js
   pos_ar.PointOfSale.pos_selected_item_cart = class {
-    constructor(wrapper, selectedItemMaps, salesTaxes, invoiceData, selectedTab, selectedItem, selectedField, onSelectedItemClick, onTabClick, onKeyPressed, createNewTab, onCheckoutClick) {
+    constructor(wrapper, selectedItemMaps, priceLists, salesTaxes, invoiceData, selectedTab, selectedItem, selectedField, onSelectedItemClick, onTabClick, onKeyPressed, createNewTab, onCheckoutClick) {
       this.wrapper = wrapper;
       this.selected_item_maps = selectedItemMaps;
+      this.price_lists = priceLists;
       this.sales_taxes = salesTaxes;
       this.invoice_data = invoiceData;
       this.selected_tab = selectedTab;
@@ -1205,6 +1221,7 @@
     }
     start_work() {
       this.prepare_selected_item_cart();
+      this.fullfillPriceList();
       this.setButtonsListeners();
       this.setListener();
     }
@@ -1224,9 +1241,9 @@
       this.cartTopBar = this.cartBox.find("#CartBoxTopBar");
       this.cartTopBar.append('<h4 class="CartTitle">Item Cart</h4>');
       this.cartTopBar.append('<div id="selectedItemsPriceListInput"></div>');
-      this.priceListInput = this.cartTopBar.find("#selectedItemsPriceListInput");
-      this.priceListInput.append('<input list="PriceList"  id="PriceListInput" name="PriceList" placeHolder="Choice a Price list">');
-      this.priceListInput.append(' <datalist id="PriceList"></datalist>');
+      this.priceListInputContainer = this.cartTopBar.find("#selectedItemsPriceListInput");
+      this.priceListInputContainer.append('<select  id="PriceListInput" name="PriceList" placeHolder="Choice a Price list">');
+      this.priceListInput = this.priceListInputContainer.find("#PriceListInput");
       this.cartHeader = this.cartBox.find("#cartHeader");
       this.cartHeader.append("<div><h6>Item</h6></div>");
       this.cartHeader.append('<div id="cartHeaderTitles" class="rowBox"></div>');
@@ -1287,6 +1304,11 @@
       this.checkoutBtn = this.cartFooter.find("#checkoutBtn");
       this.checkoutBtn.on("mousedown", (event2) => {
         this.on_checkout_click();
+      });
+    }
+    fullfillPriceList() {
+      this.price_lists.forEach((priceList) => {
+        this.priceListInput.append(`<option value="${priceList.name}">priceList.price_list_name</option>`);
       });
     }
     refreshTabs() {
@@ -1530,6 +1552,9 @@
         this.calculateNetTotal();
         this.calculateVAT();
         this.calculateGrandTotal();
+      });
+      this.price_lists.on("input", (event2) => {
+        console.log("selected price list ==> ", event2.target.value);
       });
     }
     calculateNetTotal() {
@@ -2023,7 +2048,7 @@
       this.cart_content_bottom_section = this.cart_content.find("#paymentContentBottomSection");
       this.cart_content_top_section.append('<div id="cashBox" class="paymentMethodBox"><div id="cashBoxTitle" class="title">Cash</div><input type="float" id="cachInput" value="0"  ></div>');
       this.cart_content_top_section.append('<div id="paymentOnTimeBox" class="paymentMethodBox"><div id="paymentOnTimeBoxTitle" class="title">On Time</div><input type="float" id="paymentOnTimeInput" value="0" ></div>');
-      this.cart_content_top_section.append('<div id="redeemLoyaltyPoints" class="paymentMethodBox"><div id="redeemLoyaltyPointsTitle" class="title" style="display:none;">Redeem Loyalty Points</div><input type="float" id="RedeemLayoutPointsInput" value="0" disabled></div>');
+      this.cart_content_top_section.append('<div id="redeemLoyaltyPoints" class="paymentMethodBox" style="display:none;" ><div id="redeemLoyaltyPointsTitle" class="title"">Redeem Loyalty Points</div><input type="float" id="RedeemLayoutPointsInput" value="0" disabled></div>');
       this.cashBox = this.cart_content_top_section.find("#cashBox");
       this.onTimeBox = this.cart_content_top_section.find("#paymentOnTimeBox");
       this.redeemLoyaltyBox = this.cart_content_top_section.find("#redeemLoyaltyPoints");
@@ -2583,5 +2608,16 @@
       };
     }
   };
+
+  // ../pos_ar/pos_ar/pos_ar/page/pos/pos_settings.js
+  pos_ar.PointOfSale.pos_settings = class {
+    constructor(wrapper) {
+      this.wrapper = wrapper;
+      this.start_work();
+    }
+    start_work() {
+      console.log("setting class start work !");
+    }
+  };
 })();
-//# sourceMappingURL=pos.bundle.O7ZZJUIO.js.map
+//# sourceMappingURL=pos.bundle.UIJDPOS6.js.map
