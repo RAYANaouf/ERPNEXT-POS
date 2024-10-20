@@ -36,10 +36,8 @@
       await this.checkForPOSEntry();
       await this.prepare_components();
       this.setListeners();
-      console.log("selectedItemMaps ::: ", this.selectedItemMaps);
     }
     async refreshApp() {
-      console.log("refresh");
       this.$components_wrapper.text("");
       await this.checkForPOSEntry();
       await this.prepare_components();
@@ -273,8 +271,7 @@
         this.selectedCustomer,
         this.backHome.bind(this),
         this.onSync.bind(this),
-        this.onClosePOS.bind(this),
-        this.onHistoryClick.bind(this)
+        this.onMenuClick.bind(this)
       );
     }
     init_selected_item() {
@@ -340,7 +337,6 @@
       );
     }
     init_settingsCart() {
-      console.log("settings");
       this.settings_cart = new pos_ar.PointOfSale.pos_settings(
         this.wrapper
       );
@@ -419,6 +415,21 @@
       this.item_selector.hideCart();
       this.selected_item_cart.hideCart();
       this.customer_box.hideActionBar();
+    }
+    onMenuClick(menu) {
+      if (menu == "recent_pos") {
+        this.onHistoryClick();
+      } else if (menu == "close_pos") {
+        this.onClosePOS();
+      } else if (menu == "settings") {
+        this.settings_cart.showCart();
+        this.customer_box.hideActionBar();
+        this.item_selector.hideCart();
+        this.selected_item_cart.hideCart();
+        this.payment_cart.hideCart();
+        this.item_details.hide_cart();
+        this.history_cart.hide_cart();
+      }
     }
     backHome() {
       this.item_selector.showCart();
@@ -1090,14 +1101,14 @@
 
   // ../pos_ar/pos_ar/pos_ar/page/pos/pos_customer_box.js
   pos_ar.PointOfSale.pos_customer_box = class {
-    constructor(wrapper, customersList, selectedCustomer, backHome, onSync, onClosePOS, onHistoryClick) {
+    constructor(wrapper, customersList, selectedCustomer, backHome, onSync, onMenuClick) {
       this.wrapper = wrapper;
       this.customers_list = customersList;
       this.selected_customer = selectedCustomer;
       this.back_home = backHome;
       this.on_sync = onSync;
-      this.on_close_pos = onClosePOS;
-      this.on_history_click = onHistoryClick;
+      this.on_menu_click = onMenuClick;
+      console.log("log =+=> ", onMenuClick);
       this.online = true;
       this.show_menu = false;
       this.start_work();
@@ -1164,10 +1175,13 @@
         });
       });
       this.close_pos.on("click", (event2) => {
-        this.on_close_pos();
+        this.on_menu_click("close_pos");
       });
       this.pos_invoices.on("click", (event2) => {
-        this.on_history_click();
+        this.on_menu_click("recent_pos");
+      });
+      this.setting.on("click", (event2) => {
+        this.on_menu_click("settings");
       });
       this.menu.on("click", (event2) => {
         if (this.show_menu) {
@@ -2612,11 +2626,22 @@
     }
     start_work() {
       console.log("setting class start work !");
+      this.prepareSettingsCart();
     }
     prepareSettingsCart() {
       this.wrapper.find("#RightSection").append('<div id="settingsLeftContainer"></div>');
       this.wrapper.find("#LeftSection").append('<div id="settingsRightContainer"></div>');
+      this.rightContainer = this.wrapper.find("#RightSection");
+      this.leftContainer = this.wrapper.find("#LeftSection");
+    }
+    showCart() {
+      this.rightContainer.css("display", "flex");
+      this.leftContainer.css("display", "flex");
+    }
+    hideCart() {
+      this.rightContainer.css("display", "none");
+      this.leftContainer.css("display", "none");
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.ZSHNJ67R.js.map
+//# sourceMappingURL=pos.bundle.7KBUF56R.js.map

@@ -41,22 +41,16 @@ pos_ar.PointOfSale.Controller = class {
         }
 
 	 async start_app(){
-
 		this.db = new pos_ar.PointOfSale.pos_db();
-
 		this.prepare_container();
 		await  this.prepare_app_defaults();
 		await  this.checkForPOSEntry()
                 await  this.prepare_components();
 		this.setListeners();
-
-		console.log("selectedItemMaps ::: " , this.selectedItemMaps)
-
 	}
 
 
 	async refreshApp(){
-		console.log("refresh")
 		this.$components_wrapper.text('');
 		await  this.checkForPOSEntry()
                 await  this.prepare_components();
@@ -337,8 +331,7 @@ pos_ar.PointOfSale.Controller = class {
 									this.selectedCustomer ,
 									this.backHome.bind(this),
 									this.onSync.bind(this),
-									this.onClosePOS.bind(this),
-									this.onHistoryClick.bind(this)
+									this.onMenuClick.bind(this)
 									)
 	}
         init_selected_item(){
@@ -410,7 +403,6 @@ pos_ar.PointOfSale.Controller = class {
 
 
         init_settingsCart(){
-		console.log("settings")
 		this.settings_cart = new pos_ar.PointOfSale.pos_settings(
 									this.wrapper,
 								)
@@ -511,9 +503,6 @@ pos_ar.PointOfSale.Controller = class {
 	}
 
 
-	
-
-
 	onClose_details(){
 
 		//show
@@ -561,6 +550,26 @@ pos_ar.PointOfSale.Controller = class {
 		this.selected_item_cart.hideCart();
 		this.customer_box.hideActionBar();
 
+	}
+
+	onMenuClick(menu){
+		if(menu == 'recent_pos'){
+			this.onHistoryClick()
+		}
+		else if(menu == 'close_pos'){
+			this.onClosePOS()
+		}
+		else if(menu == 'settings'){
+			//show settings
+			this.settings_cart.showCart()
+			this.customer_box.hideActionBar();
+			//hide
+			this.item_selector.hideCart();
+			this.selected_item_cart.hideCart();
+			this.payment_cart.hideCart()  ;
+			this.item_details.hide_cart() ;
+			this.history_cart.hide_cart() ;
+		}
 	}
 
 	backHome(){

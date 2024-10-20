@@ -6,22 +6,24 @@ pos_ar.PointOfSale.pos_customer_box = class{
 		customersList    ,
 		selectedCustomer ,
 		backHome         ,
-		onSync     ,
-		onClosePOS ,
-		onHistoryClick
+		onSync           ,
+		onMenuClick      ,
 	){
-		this.wrapper           = wrapper ;
-		this.customers_list    = customersList ;
-		this.selected_customer = selectedCustomer;
-		this.back_home         = backHome
-		this.on_sync           = onSync ;
-		this.on_close_pos      = onClosePOS;
-		this.on_history_click  = onHistoryClick;
+		this.wrapper           = wrapper          ;
+		this.customers_list    = customersList    ;
+		this.selected_customer = selectedCustomer ;
+		this.back_home         = backHome         ;
+		this.on_sync           = onSync           ;
+		this.on_menu_click     = onMenuClick      ;
+
+
+		console.log("log =+=> " , onMenuClick)
+
 
 		//local
 		this.online  = true    ;
 		this.show_menu = false ;
-		this.start_work();
+		this.start_work()      ;
 	}
 
 
@@ -114,12 +116,17 @@ pos_ar.PointOfSale.pos_customer_box = class{
 		})
 
 		this.close_pos.on('click' , (event)=>{
-			this.on_close_pos();
+			this.on_menu_click('close_pos');
 		})
 
 		this.pos_invoices.on('click' , (event)=>{
-			this.on_history_click();
+			this.on_menu_click('recent_pos');
 		})
+
+		this.setting.on('click' , (event)=>{
+			this.on_menu_click('settings');
+		})
+
 
 		this.menu.on('click' , (event)=>{
 
