@@ -12,5 +12,10 @@ pos_ar.PointOfSale.pos_settings = class{
 	}
 
 
+	prepareSettingsCart(){
+		this.wrapper.find('#RightSection').append('<div id="settingsLeftContainer"></div>')
+		this.wrapper.find('#LeftSection').append('<div id="settingsRightContainer"></div>')
+	}
+
 
 }

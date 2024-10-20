@@ -1551,12 +1551,6 @@
         this.calculateVAT();
         this.calculateGrandTotal();
       });
-      this.price_lists.on("input", (event2) => {
-        console.log("selected price list ==> ", this.selected_price_list.name);
-        console.log("selected price list ==> ", event2.target.value);
-        this.selected_price_list.name = event2.target.value;
-        console.log("selected price list ==> ", this.selected_price_list.name);
-      });
     }
     calculateNetTotal() {
       let netTotal = 0;
@@ -2619,6 +2613,10 @@
     start_work() {
       console.log("setting class start work !");
     }
+    prepareSettingsCart() {
+      this.wrapper.find("#RightSection").append('<div id="settingsLeftContainer"></div>');
+      this.wrapper.find("#LeftSection").append('<div id="settingsRightContainer"></div>');
+    }
   };
 })();
-//# sourceMappingURL=pos.bundle.PBEEWZH7.js.map
+//# sourceMappingURL=pos.bundle.ZSHNJ67R.js.map

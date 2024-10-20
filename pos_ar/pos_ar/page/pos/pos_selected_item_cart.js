@@ -526,13 +526,13 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 
 		})
 
-		this.price_lists.on('input' , (event)=>{
+		/*this.price_lists.on('input' , (event)=>{
 			console.log("selected price list ==> " , this.selected_price_list.name);
 			console.log("selected price list ==> " , event.target.value);
 			this.selected_price_list.name = event.target.value;
 			console.log("selected price list ==> " , this.selected_price_list.name);
 
-		})
+		})*/
 
 	}
 
