@@ -56,15 +56,11 @@
       this.binList = await this.fetchBinList();
       this.sales_taxes_and_charges = await this.fetchSalesTaxesAndCharges();
       this.taxes_and_charges_template = await this.fetchSalesTaxesAndChargesTemplate();
-      console.log("taxes and charges templates  => ", this.taxes_and_charges_template);
-      console.log("taxes and charges            => ", this.sales_taxes_and_charges);
-      console.log("debog check ==> ", this.sales_taxes);
       if (this.PosProfileList.length == 0) {
         frappe.set_route("Form", "POS Profile");
         return;
       }
       Object.assign(this.selectedPosProfile, this.PosProfileList[0]);
-      console.log("selected pos profile 1 : ", this.selectedPosProfile);
       if (this.customersList.length > 0) {
         this.selectedCustomer = structuredClone(this.customersList[0]);
       } else {
@@ -286,6 +282,7 @@
         this.$rightSection,
         this.selectedItemMaps,
         this.priceLists,
+        this.selectedPriceList,
         this.sales_taxes,
         this.invoiceData,
         this.selectedTab,
@@ -1199,10 +1196,11 @@
 
   // ../pos_ar/pos_ar/pos_ar/page/pos/pos_selected_item_cart.js
   pos_ar.PointOfSale.pos_selected_item_cart = class {
-    constructor(wrapper, selectedItemMaps, priceLists, salesTaxes, invoiceData, selectedTab, selectedItem, selectedField, onSelectedItemClick, onTabClick, onKeyPressed, createNewTab, onCheckoutClick) {
+    constructor(wrapper, selectedItemMaps, priceLists, selectedPriceList, salesTaxes, invoiceData, selectedTab, selectedItem, selectedField, onSelectedItemClick, onTabClick, onKeyPressed, createNewTab, onCheckoutClick) {
       this.wrapper = wrapper;
       this.selected_item_maps = selectedItemMaps;
       this.price_lists = priceLists;
+      this.selected_price_list = selectedPriceList;
       this.sales_taxes = salesTaxes;
       this.invoice_data = invoiceData;
       this.selected_tab = selectedTab;
@@ -1554,7 +1552,10 @@
         this.calculateGrandTotal();
       });
       this.price_lists.on("input", (event2) => {
+        console.log("selected price list ==> ", this.selected_price_list.name);
         console.log("selected price list ==> ", event2.target.value);
+        this.selected_price_list.name = event2.target.value;
+        console.log("selected price list ==> ", this.selected_price_list.name);
       });
     }
     calculateNetTotal() {
@@ -2620,4 +2621,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.H466PW2I.js.map
+//# sourceMappingURL=pos.bundle.PBEEWZH7.js.map

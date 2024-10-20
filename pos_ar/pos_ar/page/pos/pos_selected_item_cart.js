@@ -2,23 +2,25 @@
 pos_ar.PointOfSale.pos_selected_item_cart = class{
 
 	constructor(
-		wrapper          ,
-		selectedItemMaps ,
-		priceLists       ,
-		salesTaxes       ,
-		invoiceData      ,
-		selectedTab      ,
-		selectedItem     ,
-		selectedField    ,
+		wrapper           ,
+		selectedItemMaps  ,
+		priceLists        ,
+		selectedPriceList ,
+		salesTaxes        ,
+		invoiceData       ,
+		selectedTab       ,
+		selectedItem      ,
+		selectedField     ,
 		onSelectedItemClick,
-		onTabClick       ,
-		onKeyPressed     ,
-		createNewTab     ,
-		onCheckoutClick  ,
+		onTabClick        ,
+		onKeyPressed      ,
+		createNewTab      ,
+		onCheckoutClick   ,
 	){
 		this.wrapper                 = wrapper;
 		this.selected_item_maps      = selectedItemMaps;
 		this.price_lists             = priceLists      ;
+		this.selected_price_list     = selectedPriceList ;
 		this.sales_taxes             = salesTaxes      ;
 		this.invoice_data            = invoiceData     ;
 		this.selected_tab            = selectedTab     ;
@@ -525,7 +527,11 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 		})
 
 		this.price_lists.on('input' , (event)=>{
+			console.log("selected price list ==> " , this.selected_price_list.name);
 			console.log("selected price list ==> " , event.target.value);
+			this.selected_price_list.name = event.target.value;
+			console.log("selected price list ==> " , this.selected_price_list.name);
+
 		})
 
 	}

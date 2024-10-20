@@ -78,21 +78,12 @@ pos_ar.PointOfSale.Controller = class {
 		this.taxes_and_charges_template = await this.fetchSalesTaxesAndChargesTemplate()
 
 
-
-
-		console.log("taxes and charges templates  => ", this.taxes_and_charges_template)
-		console.log("taxes and charges            => ", this.sales_taxes_and_charges)
-		console.log("debog check ==> " , this.sales_taxes)
-
 		if(this.PosProfileList.length == 0){
 			frappe.set_route("Form", "POS Profile");
 			return;
 		}
 
 		Object.assign(this.selectedPosProfile , this.PosProfileList[0])
-
-		console.log("selected pos profile 1 : " , this.selectedPosProfile)
-
 
 
 		if(this.customersList.length > 0){
@@ -354,7 +345,8 @@ pos_ar.PointOfSale.Controller = class {
 		this.selected_item_cart  = new pos_ar.PointOfSale.pos_selected_item_cart(
 									this.$rightSection ,
 									this.selectedItemMaps,
-									this.priceLists,
+									this.priceLists   ,
+									this.selectedPriceList ,
 									this.sales_taxes  ,
 									this.invoiceData  ,
 									this.selectedTab  ,
