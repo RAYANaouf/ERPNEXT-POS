@@ -271,3 +271,21 @@
 
 	overflow-y    : auto ;	
 }
+
+#settingsCartContent{
+	width : 100% ;
+	flex  : 1    ;
+}
+
+#settingsCartContent>div.c1{
+	width  : 50%  ;
+	height : 100% ;
+
+}
+
+#settingsCartContent>div.c2{
+	width  : 50%  ;
+	height : 100% ;
+
+	background : red ;
+}

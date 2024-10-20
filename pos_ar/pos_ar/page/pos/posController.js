@@ -405,6 +405,8 @@ pos_ar.PointOfSale.Controller = class {
         init_settingsCart(){
 		this.settings_cart = new pos_ar.PointOfSale.pos_settings(
 									this.wrapper,
+									this.PosProfileList,
+									this.selectedPosProfile
 								)
         }
 
