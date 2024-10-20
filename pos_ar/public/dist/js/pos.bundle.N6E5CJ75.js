@@ -363,6 +363,7 @@
       this.selected_item_cart.showKeyboard();
       this.item_selector.hideCart();
       this.payment_cart.hideCart();
+      this.settings_cart.hideCart();
       this.selected_item_cart.setKeyboardOrientation("landscape");
       this.item_details.refreshDate(item);
     }
@@ -385,6 +386,7 @@
       this.payment_cart.showCart();
       this.item_selector.hideCart();
       this.item_details.hide_cart();
+      this.settings_cart.hideCart();
       this.payment_cart.calculateGrandTotal();
       this.selected_item_cart.setKeyboardOrientation("landscape");
       this.selected_item_cart.cleanHeighlight();
@@ -395,6 +397,7 @@
       this.payment_cart.hideCart();
       this.item_details.hide_cart();
       this.selected_item_cart.hideKeyboard();
+      this.settings_cart.hideCart();
       this.selected_item_cart.setKeyboardOrientation("portrait");
       this.selected_item_cart.cleanHeighlight();
     }
@@ -403,6 +406,7 @@
       this.item_details.hide_cart();
       this.payment_cart.hideCart();
       this.selected_item_cart.hideKeyboard();
+      this.settings_cart.hideCart();
       this.selected_item_cart.setKeyboardOrientation("portrait");
       this.selected_item_cart.cleanHeighlight();
     }
@@ -415,6 +419,7 @@
       this.item_selector.hideCart();
       this.selected_item_cart.hideCart();
       this.customer_box.hideActionBar();
+      this.settings_cart.hideCart();
     }
     onMenuClick(menu) {
       if (menu == "recent_pos") {
@@ -438,6 +443,7 @@
       this.payment_cart.hideCart();
       this.item_details.hide_cart();
       this.history_cart.hide_cart();
+      this.settings_cart.hideCart();
     }
     createNewTab(counter) {
       let new_pos_invoice = frappe.model.get_new_doc("POS Invoice");
@@ -469,6 +475,7 @@
         this.item_details.hide_cart();
         this.payment_cart.hideCart();
         this.history_cart.hide_cart();
+        this.settings_cart.hideCart();
         this.selected_item_cart.refreshTabs();
         this.selected_item_cart.refreshSelectedItem();
       } else if (event2 == "return") {
@@ -2625,23 +2632,24 @@
       this.start_work();
     }
     start_work() {
-      console.log("setting class start work !");
       this.prepareSettingsCart();
     }
     prepareSettingsCart() {
       this.wrapper.find("#RightSection").append('<div id="settingsLeftContainer"></div>');
       this.wrapper.find("#LeftSection").append('<div id="settingsRightContainer"></div>');
-      this.rightContainer = this.wrapper.find("#RightSection");
-      this.leftContainer = this.wrapper.find("#LeftSection");
+      this.rightContainer = this.wrapper.find("#settingsRightContainer");
+      this.leftContainer = this.wrapper.find("#settingsLeftContainer");
     }
     showCart() {
+      console.log("show");
       this.rightContainer.css("display", "flex");
       this.leftContainer.css("display", "flex");
     }
     hideCart() {
+      console.log("hide");
       this.rightContainer.css("display", "none");
       this.leftContainer.css("display", "none");
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.7KBUF56R.js.map
+//# sourceMappingURL=pos.bundle.N6E5CJ75.js.map

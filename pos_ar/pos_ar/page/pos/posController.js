@@ -457,6 +457,7 @@ pos_ar.PointOfSale.Controller = class {
 		//close
 		this.item_selector.hideCart();
 		this.payment_cart.hideCart();
+		this.settings_cart.hideCart();
 
 		//change display
 		this.selected_item_cart.setKeyboardOrientation("landscape");
@@ -493,6 +494,7 @@ pos_ar.PointOfSale.Controller = class {
 		//hide
 		this.item_selector.hideCart();
 		this.item_details.hide_cart();
+		this.settings_cart.hideCart();
 
 		//change displayk
 		this.payment_cart.calculateGrandTotal()
@@ -509,9 +511,10 @@ pos_ar.PointOfSale.Controller = class {
 		this.item_selector.showCart();
 
 		//hide
-		this.payment_cart.hideCart();
+		this.payment_cart.hideCart() ;
 		this.item_details.hide_cart();
 		this.selected_item_cart.hideKeyboard();
+		this.settings_cart.hideCart();
 
 		//change display
 		this.selected_item_cart.setKeyboardOrientation("portrait");
@@ -528,6 +531,7 @@ pos_ar.PointOfSale.Controller = class {
 		this.item_details.hide_cart();
 		this.payment_cart.hideCart();
 		this.selected_item_cart.hideKeyboard();
+		this.settings_cart.hideCart();
 
 		//update ui
 		this.selected_item_cart.setKeyboardOrientation("portrait");
@@ -549,6 +553,7 @@ pos_ar.PointOfSale.Controller = class {
 		this.item_selector.hideCart();
 		this.selected_item_cart.hideCart();
 		this.customer_box.hideActionBar();
+		this.settings_cart.hideCart();
 
 	}
 
@@ -583,6 +588,7 @@ pos_ar.PointOfSale.Controller = class {
 		this.payment_cart.hideCart()  ;
 		this.item_details.hide_cart() ;
 		this.history_cart.hide_cart() ;
+		this.settings_cart.hideCart() ;
 
 
 	}
@@ -631,6 +637,7 @@ pos_ar.PointOfSale.Controller = class {
 			this.item_details.hide_cart() ;
 			this.payment_cart.hideCart()  ;
 			this.history_cart.hide_cart() ;
+			this.settings_cart.hideCart();
 
 			//refresh the data :
 			this.selected_item_cart.refreshTabs()
