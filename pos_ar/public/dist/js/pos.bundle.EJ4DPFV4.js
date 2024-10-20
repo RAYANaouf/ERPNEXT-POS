@@ -2647,7 +2647,7 @@
       this.rightContainer.append('<div id="settingsCartContent" class="rowBox"> <div class="c1 columnBox"></div>   <div class="c2 columnBox"></div> </div>');
       this.c1 = this.rightContainer.find("div.c1");
       this.c2 = this.rightContainer.find("div.c2");
-      this.c1.append('<label dor="pos_profile"> POS Profile </label>');
+      this.c1.append('<label for="pos_profile"> POS Profile </label>');
       this.c1.append('<select  name="pos_profile" id="posProfileSelect" ></select>');
       this.pos_profile_select = this.c1.find("#posProfileSelect");
       this.pos_profile_list.forEach((posProfile) => {
@@ -2657,6 +2657,16 @@
           this.pos_profile_select.append(`<option value="${posProfile.name}" selected >${posProfile.name}</option>`);
         }
       });
+      this.c1.append(`<label for="warehouse">POS Warehouse</label>`);
+      this.c1.append(`<input name="warehouse" value="${this.selected_pos_profile.warehouse}" disabled>`);
+      this.c1.append(`<label for="income_account">POS income account</label>`);
+      this.c1.append(`<input name="income_account" value="${this.selected_pos_profile.income_account}" disabled>`);
+      this.c2.append(`<label for="write_off_account">POS write off account</label>`);
+      this.c2.append(`<input name="write_off_account" value="${this.selected_pos_profile.write_off_account}" disabled>`);
+      this.c2.append(`<label for="write_off_cost_center">POS write off cost center</label>`);
+      this.c2.append(`<input name="write_off_cost_center" value="${this.selected_pos_profile.write_off_cost_center}" disabled>`);
+      this.c2.append(`<label for="taxes_and_charges">POS taxes and charges</label>`);
+      this.c2.append(`<input name="taxes_and_charges" value="${this.selected_pos_profile.taxes_and_charges}" disabled>`);
     }
     showCart() {
       console.log("show");
@@ -2670,4 +2680,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.3JZCTCXU.js.map
+//# sourceMappingURL=pos.bundle.EJ4DPFV4.js.map

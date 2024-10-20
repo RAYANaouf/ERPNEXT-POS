@@ -273,19 +273,34 @@
 }
 
 #settingsCartContent{
+
 	width : 100% ;
 	flex  : 1    ;
+	margin-top : 25px ;
 }
 
 #settingsCartContent>div.c1{
 	width  : 50%  ;
 	height : 100% ;
 
+	margin-right : 16px ;
+
 }
 
 #settingsCartContent>div.c2{
 	width  : 50%  ;
 	height : 100% ;
-
-	background : red ;
 }
+
+
+
+#settingsRightContainer div.c1>input,
+#settingsRightContainer div.c1>select,
+#settingsRightContainer div.c2>input,
+#settingsRightContainer div.c2>select{
+
+	margin-bottom : 16px ;
+
+}
+
+
