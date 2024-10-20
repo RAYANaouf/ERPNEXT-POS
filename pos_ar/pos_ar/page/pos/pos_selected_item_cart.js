@@ -161,7 +161,7 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 
 	fullfillPriceList(){
 		this.price_lists.forEach(priceList =>{
-			this.priceListInput.append(`<option value="${priceList.name}">priceList.price_list_name</option>`)
+			this.priceListInput.append(`<option value="${priceList.name}">${priceList.price_list_name}</option>`)
 		})
 	}
 

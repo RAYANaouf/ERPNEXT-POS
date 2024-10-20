@@ -1308,7 +1308,7 @@
     }
     fullfillPriceList() {
       this.price_lists.forEach((priceList) => {
-        this.priceListInput.append(`<option value="${priceList.name}">priceList.price_list_name</option>`);
+        this.priceListInput.append(`<option value="${priceList.name}">${priceList.price_list_name}</option>`);
       });
     }
     refreshTabs() {
@@ -2620,4 +2620,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.UIJDPOS6.js.map
+//# sourceMappingURL=pos.bundle.H466PW2I.js.map
