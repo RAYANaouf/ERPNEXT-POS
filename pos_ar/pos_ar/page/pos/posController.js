@@ -1042,9 +1042,6 @@ pos_ar.PointOfSale.Controller = class {
 
 	checkIfPaid(pos){
 
-
-		console.log("checking the pos now : " , pos  , "and the paid amount" , pos.paid_amount)
-
 		let netTotal   = 0 ;
 		let grandTotal = 0 ;
 		let allTaxes   = 0 ;
@@ -1132,7 +1129,6 @@ pos_ar.PointOfSale.Controller = class {
 	/*****************************  tools  **********************************/
 	getItemPrice(itemId){
 		const price = this.itemPrices.find(itemPrice => itemPrice.item_code == itemId && itemPrice.price_list == this.selectedPriceList.name)
-		console.log("debug heeeeeeeere : " , price , "price list ==> " , price.price_list )
 		return price ? price.price_list_rate  : 0
         }
 

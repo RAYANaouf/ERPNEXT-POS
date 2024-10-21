@@ -188,7 +188,6 @@ pos_ar.PointOfSale.pos_item_selector = class {
 
 	getItemPrice(itemId){
 		const price = this.item_prices.find(itemPrice => itemPrice.item_code == itemId && itemPrice.price_list == this.selected_price_list.name)
-		console.log("debug heeeeeeeere : " , price , "price list =:=:=> " , price.price_list )
 		return price ? price.price_list_rate  : 0
 	}
 

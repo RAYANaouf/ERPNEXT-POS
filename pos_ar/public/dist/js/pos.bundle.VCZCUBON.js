@@ -718,7 +718,6 @@
       });
     }
     checkIfPaid(pos) {
-      console.log("checking the pos now : ", pos, "and the paid amount", pos.paid_amount);
       let netTotal = 0;
       let grandTotal = 0;
       let allTaxes = 0;
@@ -769,7 +768,6 @@
     }
     getItemPrice(itemId) {
       const price = this.itemPrices.find((itemPrice) => itemPrice.item_code == itemId && itemPrice.price_list == this.selectedPriceList.name);
-      console.log("debug heeeeeeeere : ", price, "price list ==> ", price.price_list);
       return price ? price.price_list_rate : 0;
     }
     checkServiceWorker() {
@@ -1107,7 +1105,6 @@
     }
     getItemPrice(itemId) {
       const price = this.item_prices.find((itemPrice) => itemPrice.item_code == itemId && itemPrice.price_list == this.selected_price_list.name);
-      console.log("debug heeeeeeeere : ", price, "price list =:=:=> ", price.price_list);
       return price ? price.price_list_rate : 0;
     }
   };
@@ -2684,4 +2681,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.EFXGHJ2G.js.map
+//# sourceMappingURL=pos.bundle.VCZCUBON.js.map
