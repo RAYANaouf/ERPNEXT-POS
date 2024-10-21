@@ -544,9 +544,6 @@ pos_ar.PointOfSale.Controller = class {
 
 	onHistoryClick(){
 
-		console.log("selected pos profile 10 : " , this.selectedPosProfile)
-
-		console.log("history ::" , this.history_cart)
 		//show
 		this.history_cart.show_cart()
 
@@ -704,7 +701,6 @@ pos_ar.PointOfSale.Controller = class {
 			this.editPosItemDiscountAmount(this.selectedItem.name , this.selectedItem.discount_amount);
 			this.editPosItemDiscountPercentage(this.selectedItem.name ,  this.selectedItem.discount_percentage);
 
-
 			//redrawing
 			this.selected_item_cart.refreshSelectedItem();
 			this.item_details.refreshDate(this.selectedItem);
@@ -727,12 +723,8 @@ pos_ar.PointOfSale.Controller = class {
 			this.selectedItem.discount_percentage = parseFloat(persent);
 			this.selectedItem.discount_amount     = montant;
 
-
 			this.editPosItemDiscountAmount(this.selectedItem.name , this.selectedItem.discount_amount);
 			this.editPosItemDiscountPercentage(this.selectedItem.name , this.selectedItem.discount_percentage);
-
-			console.log("item ==>>> " , this.selectedItem)
-
 
 			//redrawing
 			this.selected_item_cart.refreshSelectedItem();
@@ -746,6 +738,7 @@ pos_ar.PointOfSale.Controller = class {
 
 		console.log("<<we are in onKeyPressed function >>")
 		console.log("action ::: " , action , " key ::: " , key)
+		console.log("selected field ==> " , this.selectedField.field_name)
 
 		if(action == "quantity"){
 			this.item_details.requestFocus("quantity")
@@ -798,8 +791,11 @@ pos_ar.PointOfSale.Controller = class {
 
 				//asign the values to the selectedItem refrence
 				this.selectedItem.discount_percentage = newValue;
-				this.selectedItem.discount_rate     = montant;
+				this.selectedItem.discount_rate       = montant;
 
+			}
+			else if(this.selectedField.field_name == "cash"){
+				this.payment_cart.deleteKeyPress();
 			}
 
 
@@ -854,7 +850,6 @@ pos_ar.PointOfSale.Controller = class {
 		//update the ui
 		this.selected_item_cart.refreshSelectedItem()
 		this.item_details.refreshDate(this.selectedItem);
-
 
 
 	}

@@ -277,8 +277,6 @@ else if(keyContent == "." && !selectedField.value.includes(".")){
 
 			let cursor = field[0].selectionStart;
 
-			console.log(field.val())
-
 			field.val( (index , currentValue) =>{
 
 				console.log("length : " , currentValue , " cursor : " , cursor);

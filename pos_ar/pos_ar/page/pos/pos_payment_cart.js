@@ -269,24 +269,70 @@ pos_ar.PointOfSale.pos_payment_cart = class{
 	handleInput(key){
 
 		let previousValue = this.cashBox.find('#cachInput').val() ;
-
 		// Check if the previous value contains a period (.)
 		if( previousValue.includes('.') && key == "."){
 			return ;
 		}
-
 		// Append the key to the paidAmount if there is no period
 		this.invoice_data.paidAmount += key;
-
 		// Refresh the payment cart
 		this.refreshData();
-
-
-
 	}
 
+	deleteKeyPress(){
+
+		console.log("we are here in deleteKeyPress Cash!")
+
+
+		let cashField = this.cashBox.find('#cachInput');
+		let newValue = 0 ;
+		let cursor = cashField[0].selectionStart;
+
+		cashField.val( (index , currentValue) =>{
+			if( currentValue.length < 0 ){
+				console.log("cnd 1")
+				newValue = 0 ;
+				return 0;
+			}
+			else if( currentValue.length == 1){
+				console.log("cnd 2")
+				newValue = 0 ;
+				return 0 ;
+			}
+			else if( cursor == 0 ){
+				console.log("cnd 3")
+				newValue = currentValue;
+				return currentValue;
+			}
+			else if( cursor == currentValue.length){
+				console.log("cnd 4")
+				newValue = currentValue.slice(0 , cursor-1)
+				return currentValue.slice(0 , cursor-1)
+			}
+			else{
+				console.log("cursor : " , cursor ," current val ==> " , currentValue , " cnd 5 newValue ==> " , currentValue.slice(0,cursor-1) + currentValue.slice(cursor))
+				newValue = currentValue.slice(0,cursor-1) + currentValue.slice(cursor)
+				return currentValue.slice(0,cursor-1) + currentValue.slice(cursor)
+			}
+		})
+
+		console.log("we are in newValue ==> " , newValue);
+
+		this.invoice_data.paidAmount = newValue;
+
+		// Use setTimeout to ensure the new value is set before adjusting cursor
+		setTimeout(() => {
+			cashField[0].setSelectionRange(cursor - 1, cursor - 1); // Move cursor back after deletion
+			cashField[0].focus(); // Ensure the input is focused
+		}, 0);
+
+		this.refreshData();
+	}
+
+
+
+
 	calculateGrandTotal(){
-		console.log("calculateGrandTotal called with ==> " , this.invoice_data.grandTotal)
 		this.payment_details.find('#paymentGrandTotalValue').text(`${this.invoice_data.grandTotal} DA`)
 		this.generateProposedPaidAmount(this.invoice_data.grandTotal);
 	}
@@ -302,7 +348,6 @@ pos_ar.PointOfSale.pos_payment_cart = class{
 		const paid_amount_txt        = paid_amount_DA.slice(0 , -2)
 		const paid_amount            = parseFloat(paid_amount_txt)
 		this.invoice_data.paidAmount = paid_amount;
-		console.log("paid_amount : " , paid_amount  , "paid_amount_txt " , paid_amount_txt , "paid_amount_DA" , paid_amount_DA)
 	}
 
 
@@ -314,8 +359,6 @@ pos_ar.PointOfSale.pos_payment_cart = class{
 		while( counter < total ){
 			counter += money[pointer]
 		}
-
-		console.log("counter : " , counter)
 	}
 
 }

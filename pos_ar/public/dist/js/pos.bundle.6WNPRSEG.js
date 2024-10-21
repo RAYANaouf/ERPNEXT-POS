@@ -414,8 +414,6 @@
       this.selected_item_cart.cleanHeighlight();
     }
     onHistoryClick() {
-      console.log("selected pos profile 10 : ", this.selectedPosProfile);
-      console.log("history ::", this.history_cart);
       this.history_cart.show_cart();
       this.payment_cart.hideCart();
       this.item_details.hide_cart();
@@ -533,7 +531,6 @@
         this.selectedItem.discount_amount = montant;
         this.editPosItemDiscountAmount(this.selectedItem.name, this.selectedItem.discount_amount);
         this.editPosItemDiscountPercentage(this.selectedItem.name, this.selectedItem.discount_percentage);
-        console.log("item ==>>> ", this.selectedItem);
         this.selected_item_cart.refreshSelectedItem();
         this.item_details.refreshDate(this.selectedItem);
       }
@@ -542,6 +539,7 @@
       var _a;
       console.log("<<we are in onKeyPressed function >>");
       console.log("action ::: ", action, " key ::: ", key);
+      console.log("selected field ==> ", this.selectedField.field_name);
       if (action == "quantity") {
         this.item_details.requestFocus("quantity");
       } else if (action == "rate") {
@@ -574,6 +572,8 @@
           let montant = oldRate * (newValue / 100);
           this.selectedItem.discount_percentage = newValue;
           this.selectedItem.discount_rate = montant;
+        } else if (this.selectedField.field_name == "cash") {
+          this.payment_cart.deleteKeyPress();
         }
       } else if (action == "addToField") {
         if (this.selectedField.field_name == "cash") {
@@ -1575,6 +1575,9 @@
         this.calculateVAT();
         this.calculateGrandTotal();
       });
+      this.priceListInput.on("input", (event2) => {
+        console.log("price list input ==> ", event2.target.value);
+      });
     }
     calculateNetTotal() {
       let netTotal = 0;
@@ -1815,7 +1818,6 @@
       if (field == "quantity") {
         let field2 = this.c1.find("#itemDetailsQuantityInput");
         let cursor = field2[0].selectionStart;
-        console.log(field2.val());
         field2.val((index, currentValue) => {
           console.log("length : ", currentValue, " cursor : ", cursor);
           if (currentValue.length < 0) {
@@ -2209,8 +2211,43 @@
       this.invoice_data.paidAmount += key;
       this.refreshData();
     }
+    deleteKeyPress() {
+      console.log("we are here in deleteKeyPress Cash!");
+      let cashField = this.cashBox.find("#cachInput");
+      let newValue = 0;
+      let cursor = cashField[0].selectionStart;
+      cashField.val((index, currentValue) => {
+        if (currentValue.length < 0) {
+          console.log("cnd 1");
+          newValue = 0;
+          return 0;
+        } else if (currentValue.length == 1) {
+          console.log("cnd 2");
+          newValue = 0;
+          return 0;
+        } else if (cursor == 0) {
+          console.log("cnd 3");
+          newValue = currentValue;
+          return currentValue;
+        } else if (cursor == currentValue.length) {
+          console.log("cnd 4");
+          newValue = currentValue.slice(0, cursor - 1);
+          return currentValue.slice(0, cursor - 1);
+        } else {
+          console.log("cursor : ", cursor, " current val ==> ", currentValue, " cnd 5 newValue ==> ", currentValue.slice(0, cursor - 1) + currentValue.slice(cursor));
+          newValue = currentValue.slice(0, cursor - 1) + currentValue.slice(cursor);
+          return currentValue.slice(0, cursor - 1) + currentValue.slice(cursor);
+        }
+      });
+      console.log("we are in newValue ==> ", newValue);
+      this.invoice_data.paidAmount = newValue;
+      setTimeout(() => {
+        cashField[0].setSelectionRange(cursor - 1, cursor - 1);
+        cashField[0].focus();
+      }, 0);
+      this.refreshData();
+    }
     calculateGrandTotal() {
-      console.log("calculateGrandTotal called with ==> ", this.invoice_data.grandTotal);
       this.payment_details.find("#paymentGrandTotalValue").text(`${this.invoice_data.grandTotal} DA`);
       this.generateProposedPaidAmount(this.invoice_data.grandTotal);
     }
@@ -2224,7 +2261,6 @@
       const paid_amount_txt = paid_amount_DA.slice(0, -2);
       const paid_amount = parseFloat(paid_amount_txt);
       this.invoice_data.paidAmount = paid_amount;
-      console.log("paid_amount : ", paid_amount, "paid_amount_txt ", paid_amount_txt, "paid_amount_DA", paid_amount_DA);
     }
     generateProposedPaidAmount(total) {
       const money = [10, 20, 50, 100, 200, 500, 1e3, 2e3];
@@ -2233,7 +2269,6 @@
       while (counter < total) {
         counter += money[pointer];
       }
-      console.log("counter : ", counter);
     }
   };
 
@@ -2681,4 +2716,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.VCZCUBON.js.map
+//# sourceMappingURL=pos.bundle.6WNPRSEG.js.map
