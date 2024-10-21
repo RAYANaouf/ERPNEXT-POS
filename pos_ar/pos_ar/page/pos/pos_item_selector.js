@@ -7,13 +7,15 @@ pos_ar.PointOfSale.pos_item_selector = class {
 		item_list ,
 		item_group_list ,
 		item_prices,
+		selectedPriceList,
 		onItemClick
 	){
-		this.wrapper           = wrapper;
-		this.item_list         = item_list;
-		this.item_group_list   = item_group_list;
-		this.item_prices       = item_prices;
-		this.on_item_click     = onItemClick;
+		this.wrapper             = wrapper           ;
+		this.item_list           = item_list         ;
+		this.item_group_list     = item_group_list   ;
+		this.item_prices         = item_prices       ;
+		this.selected_price_list = selectedPriceList ;
+		this.on_item_click       = onItemClick       ;
 
 
 		//class functions invocation
@@ -185,8 +187,10 @@ pos_ar.PointOfSale.pos_item_selector = class {
 
 
 	getItemPrice(itemId){
-		const price = this.item_prices.find(itemPrice => itemPrice.item_code == itemId)
+		const price = this.item_prices.find(itemPrice => itemPrice.item_code == itemId && itemPrice.price_list == this.selected_price_list.name)
+		console.log("debug heeeeeeeere : " , price , "price list =:=:=> " , price.price_list )
 		return price ? price.price_list_rate  : 0
 	}
+
 
 }

@@ -316,10 +316,11 @@ pos_ar.PointOfSale.Controller = class {
         init_item_selector(){
 		console.log("item list from controller : " , this.itemList)
                 this.item_selector = new pos_ar.PointOfSale.pos_item_selector(
-						this.$leftSection     ,
-						this.itemList         ,
-						this.itemGroupList    ,
-						this.itemPrices       ,
+						this.$leftSection      ,
+						this.itemList          ,
+						this.itemGroupList     ,
+						this.itemPrices        ,
+						this.selectedPriceList ,
 						item => { this.itemClick_selector(item)  }
 					)
 	}
@@ -1127,10 +1128,11 @@ pos_ar.PointOfSale.Controller = class {
 			frappe.msgprint('the connection is back (online mode)')
 		})
 	}
+
 	/*****************************  tools  **********************************/
 	getItemPrice(itemId){
-		const price = this.itemPrices.find(itemPrice => itemPrice.item_code == itemId)
-		console.log("debug heeeeeeeere : " , price )
+		const price = this.itemPrices.find(itemPrice => itemPrice.item_code == itemId && itemPrice.price_list == this.selectedPriceList.name)
+		console.log("debug heeeeeeeere : " , price , "price list ==> " , price.price_list )
 		return price ? price.price_list_rate  : 0
         }
 
