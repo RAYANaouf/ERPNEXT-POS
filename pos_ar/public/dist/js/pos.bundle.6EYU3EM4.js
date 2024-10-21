@@ -1221,11 +1221,10 @@
 
   // ../pos_ar/pos_ar/pos_ar/page/pos/pos_selected_item_cart.js
   pos_ar.PointOfSale.pos_selected_item_cart = class {
-    constructor(wrapper, selectedItemMaps, priceLists, selectedPriceList, salesTaxes, invoiceData, selectedTab, selectedItem, selectedField, onSelectedItemClick, onTabClick, onKeyPressed, createNewTab, onCheckoutClick) {
+    constructor(wrapper, selectedItemMaps, priceLists, salesTaxes, invoiceData, selectedTab, selectedItem, selectedField, onSelectedItemClick, onTabClick, onKeyPressed, createNewTab, onCheckoutClick) {
       this.wrapper = wrapper;
       this.selected_item_maps = selectedItemMaps;
       this.price_lists = priceLists;
-      this.selected_price_list = selectedPriceList;
       this.sales_taxes = salesTaxes;
       this.invoice_data = invoiceData;
       this.selected_tab = selectedTab;
@@ -1594,7 +1593,6 @@
       this.invoice_data.netTotal = netTotal;
     }
     calculateVAT() {
-      console.log("VAT ========> start ");
       this.sales_taxes.forEach((tax) => {
         let saleTaxAmount = 0;
         let taxPercentage = tax.rate / 100;
@@ -1630,6 +1628,9 @@
       const grandTotal_HTML = document.getElementById("grandTotalValue");
       grandTotal_HTML.textContent = grandTotal.toFixed(2);
       this.invoice_data.grandTotal = grandTotal;
+    }
+    recalculateRateBaseOnPriceList() {
+      const priceList = this.selected_item_maps.get(this.selected_tab.tabName).priceList;
     }
     makeItemHighlight(itemElement) {
       const selectedItemsContainer = document.getElementById("selectedItemsContainer");
@@ -2718,4 +2719,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.VEE74PMQ.js.map
+//# sourceMappingURL=pos.bundle.6EYU3EM4.js.map

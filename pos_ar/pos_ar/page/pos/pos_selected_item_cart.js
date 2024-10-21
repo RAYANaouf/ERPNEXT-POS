@@ -5,7 +5,6 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 		wrapper           ,
 		selectedItemMaps  ,
 		priceLists        ,
-		selectedPriceList ,
 		salesTaxes        ,
 		invoiceData       ,
 		selectedTab       ,
@@ -20,7 +19,6 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 		this.wrapper                 = wrapper;
 		this.selected_item_maps      = selectedItemMaps;
 		this.price_lists             = priceLists      ;
-		this.selected_price_list     = selectedPriceList ;
 		this.sales_taxes             = salesTaxes      ;
 		this.invoice_data            = invoiceData     ;
 		this.selected_tab            = selectedTab     ;
@@ -531,13 +529,6 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 		this.priceListInput.on('input' , (event) =>{
 			this.selected_item_maps.get(this.selected_tab.tabName).priceList = event.target.value;
 		})
-		/*this.price_lists.on('input' , (event)=>{
-			console.log("selected price list ==> " , this.selected_price_list.name);
-			console.log("selected price list ==> " , event.target.value);
-			this.selected_price_list.name = event.target.value;
-			console.log("selected price list ==> " , this.selected_price_list.name);
-
-		})*/
 
 	}
 
@@ -559,9 +550,6 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 	}
 
 	calculateVAT(){
-
-		console.log("VAT ========> start ");
-
 		this.sales_taxes.forEach( tax =>{
 			let saleTaxAmount = 0 ;
 			let taxPercentage = (tax.rate / 100)
@@ -571,7 +559,6 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 			tax_HTML.textContent = this.taxes_map.get(tax.name);
 
 		})
-
 	}
 
 	calculateTotalTaxAmount(){
@@ -585,11 +572,9 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 
 	calculateQnatity(){
 		let quantity = 0;
-
 		this.selected_item_maps.get(this.selected_tab.tabName).items.forEach( item => {
 			quantity += item.qty
 		})
-
 		const totalQuantity_HTML = document.getElementById("totalQuantityValue");
 		totalQuantity_HTML.textContent = quantity;
 	}
@@ -604,14 +589,18 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 		})
 
 		grandTotal = (netTotal + taxAmount) ;
-
-
 		const grandTotal_HTML = document.getElementById("grandTotalValue");
 		grandTotal_HTML.textContent = (grandTotal).toFixed(2);
 
 		this.invoice_data.grandTotal = grandTotal
-
 	}
+
+
+	recalculateRateBaseOnPriceList(){
+		const priceList = this.selected_item_maps.get(this.selected_tab.tabName).priceList
+		
+	}
+
 
 	makeItemHighlight(itemElement){
 		const selectedItemsContainer = document.getElementById("selectedItemsContainer");
