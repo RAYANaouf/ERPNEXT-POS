@@ -3,11 +3,12 @@
 pos_ar.PointOfSale.pos_item_selector = class {
 
 	constructor(
-		wrapper ,
-		item_list ,
-		item_group_list ,
-		item_prices,
-		selectedPriceList,
+		wrapper           ,
+		item_list         ,
+		item_group_list   ,
+		item_prices       ,
+		selectedPriceList ,
+		getItemPrice      ,
 		onItemClick
 	){
 		this.wrapper             = wrapper           ;
@@ -15,8 +16,8 @@ pos_ar.PointOfSale.pos_item_selector = class {
 		this.item_group_list     = item_group_list   ;
 		this.item_prices         = item_prices       ;
 		this.selected_price_list = selectedPriceList ;
+		this.get_item_price      = getItemPrice      ;
 		this.on_item_click       = onItemClick       ;
-
 
 		//class functions invocation
 		this.start_item_selector();
@@ -106,7 +107,7 @@ pos_ar.PointOfSale.pos_item_selector = class {
 
                 	const price = document.createElement("div");
                 	price.classList.add("itemPrice");
-                	price.textContent = this.getItemPrice(item.name) + " DA";
+                	price.textContent = this.get_item_price(item.name , this.selected_price_list.name) + " DA";
                 	itemBox.appendChild(price);
 
 
@@ -184,12 +185,4 @@ pos_ar.PointOfSale.pos_item_selector = class {
 
 		return filtredItemList ;
 	}
-
-
-	getItemPrice(itemId){
-		const price = this.item_prices.find(itemPrice => itemPrice.item_code == itemId && itemPrice.price_list == this.selected_price_list.name)
-		return price ? price.price_list_rate  : 0
-	}
-
-
 }

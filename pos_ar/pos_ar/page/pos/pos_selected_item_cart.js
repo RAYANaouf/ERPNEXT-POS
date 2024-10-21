@@ -232,7 +232,8 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 
 	refreshSelectedItem(){
 
-
+		//refresh price list:
+		this.priceListInput.val(this.selected_item_maps.get(this.selected_tab.tabName).priceList)
 
 		const selectedItemsContainer = document.getElementById("selectedItemsContainer");
 		selectedItemsContainer.innerHTML = "";
@@ -490,18 +491,18 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 
 		this.discountInput.on('input' , (event)=> {
 			if(event.target.value == ''){
-				this.selected_item_maps.get(selected_tab.tabName).additional_discount_percentage = 0
+				this.selected_item_maps.get(this.selected_tab.tabName).additional_discount_percentage = 0
 				this.invoice_data.discount = 0 ;
 				return;
 			}
 			else if(event.target.value > 100){
-				this.selected_item_maps.get(selected_tab.tabName).additional_discount_percentage = 100
+				this.selected_item_maps.get(this.selected_tab.tabName).additional_discount_percentage = 100
 				this.invoice_data.discount = 100 ;
 				return;
 			}
 
 
-			this.selected_item_maps.get(selected_tab.tabName).additional_discount_percentage = parseFloat(event.target.value)
+			this.selected_item_maps.get(this.selected_tab.tabName).additional_discount_percentage = parseFloat(event.target.value)
 			this.invoice_data.discount = parseFloat(event.target.value)
 
 			//recalculation
@@ -528,7 +529,7 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 
 
 		this.priceListInput.on('input' , (event) =>{
-			console.log("price list input ==> " , event.target.value)
+			this.selected_item_maps.get(this.selected_tab.tabName).priceList = event.target.value;
 		})
 		/*this.price_lists.on('input' , (event)=>{
 			console.log("selected price list ==> " , this.selected_price_list.name);

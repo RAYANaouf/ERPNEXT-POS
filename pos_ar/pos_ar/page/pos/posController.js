@@ -123,6 +123,7 @@ pos_ar.PointOfSale.Controller = class {
 		new_pos_invoice.update_stock      = 1
 		new_pos_invoice.docstatus         = 0
 		new_pos_invoice.status            = 'Draft'
+		new_pos_invoice.priceList         = this.priceLists[0].name
 
 		this.selectedItemMaps.set("C1" , new_pos_invoice)
 		this.selectedTab.tabName = `C1`
@@ -321,6 +322,7 @@ pos_ar.PointOfSale.Controller = class {
 						this.itemGroupList     ,
 						this.itemPrices        ,
 						this.selectedPriceList ,
+						this.getItemPrice.bind(this),
 						item => { this.itemClick_selector(item)  }
 					)
 	}
@@ -417,29 +419,18 @@ pos_ar.PointOfSale.Controller = class {
 
 
 	itemClick_selector(item){
-
 		const  itemCloned = structuredClone(item);
-
-
 		itemCloned.discount_amount     = 0;
 		itemCloned.discount_percentage = 0;
-
-
 		this.addItemToPosInvoice( item )
 
-
-
-
 		console.log("updated ===> " , this.selectedItemMaps )
-
 
 		this.selected_item_cart.calculateNetTotal();
 		this.selected_item_cart.calculateVAT();
 		this.selected_item_cart.calculateQnatity();
 		this.selected_item_cart.calculateGrandTotal();
 		this.selected_item_cart.refreshSelectedItem();
-
-
 	}
 
 	onSelectedItemClick(item){
@@ -1122,8 +1113,8 @@ pos_ar.PointOfSale.Controller = class {
 	}
 
 	/*****************************  tools  **********************************/
-	getItemPrice(itemId){
-		const price = this.itemPrices.find(itemPrice => itemPrice.item_code == itemId && itemPrice.price_list == this.selectedPriceList.name)
+	getItemPrice(itemId , priceList){
+		const price = this.itemPrices.find(itemPrice => itemPrice.item_code == itemId && itemPrice.price_list == priceList)
 		return price ? price.price_list_rate  : 0
         }
 
@@ -1160,11 +1151,8 @@ pos_ar.PointOfSale.Controller = class {
 
 
 	addItemToPosInvoice( clickedItem ){
-
-
 		let clonedItem = {} ;
 		Object.assign(clonedItem , clickedItem)
-
 
 		console.log("clicked item ::: " , clickedItem)
 
@@ -1184,7 +1172,7 @@ pos_ar.PointOfSale.Controller = class {
 			clonedItem.discount_amount     = 0 ;
 			clonedItem.discount_percentage = 0 ;
 			clonedItem.qty                 = 1 ;
-			clonedItem.rate                = this.getItemPrice(clickedItem.name);
+			clonedItem.rate                = this.getItemPrice(clickedItem.name , this.selectedItemMaps.get(this.selectedTab.tabName).priceList);
 			posItems.push(clonedItem)
 		}
 
@@ -1246,6 +1234,10 @@ pos_ar.PointOfSale.Controller = class {
 			}
 		})
 		return salesTax;
+	}
+
+	recalculateBasedOnPriceList(){
+		
 	}
 
         /*********************  get data functions ******************************/

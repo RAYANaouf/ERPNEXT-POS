@@ -97,6 +97,7 @@
       new_pos_invoice.update_stock = 1;
       new_pos_invoice.docstatus = 0;
       new_pos_invoice.status = "Draft";
+      new_pos_invoice.priceList = this.priceLists[0].name;
       this.selectedItemMaps.set("C1", new_pos_invoice);
       this.selectedTab.tabName = `C1`;
       this.sales_taxes = this.getSalesTaxes(this.selectedItemMaps.get(this.selectedTab.tabName));
@@ -260,6 +261,7 @@
         this.itemGroupList,
         this.itemPrices,
         this.selectedPriceList,
+        this.getItemPrice.bind(this),
         (item) => {
           this.itemClick_selector(item);
         }
@@ -766,8 +768,8 @@
         frappe.msgprint("the connection is back (online mode)");
       });
     }
-    getItemPrice(itemId) {
-      const price = this.itemPrices.find((itemPrice) => itemPrice.item_code == itemId && itemPrice.price_list == this.selectedPriceList.name);
+    getItemPrice(itemId, priceList) {
+      const price = this.itemPrices.find((itemPrice) => itemPrice.item_code == itemId && itemPrice.price_list == priceList);
       return price ? price.price_list_rate : 0;
     }
     checkServiceWorker() {
@@ -800,7 +802,7 @@
         clonedItem.discount_amount = 0;
         clonedItem.discount_percentage = 0;
         clonedItem.qty = 1;
-        clonedItem.rate = this.getItemPrice(clickedItem.name);
+        clonedItem.rate = this.getItemPrice(clickedItem.name, this.selectedItemMaps.get(this.selectedTab.tabName).priceList);
         posItems.push(clonedItem);
       }
     }
@@ -853,6 +855,8 @@
         }
       });
       return salesTax;
+    }
+    recalculateBasedOnPriceList() {
     }
     async fetchCustomers() {
       try {
@@ -978,12 +982,13 @@
 
   // ../pos_ar/pos_ar/pos_ar/page/pos/pos_item_selector.js
   pos_ar.PointOfSale.pos_item_selector = class {
-    constructor(wrapper, item_list, item_group_list, item_prices, selectedPriceList, onItemClick) {
+    constructor(wrapper, item_list, item_group_list, item_prices, selectedPriceList, getItemPrice, onItemClick) {
       this.wrapper = wrapper;
       this.item_list = item_list;
       this.item_group_list = item_group_list;
       this.item_prices = item_prices;
       this.selected_price_list = selectedPriceList;
+      this.get_item_price = getItemPrice;
       this.on_item_click = onItemClick;
       this.start_item_selector();
     }
@@ -1052,7 +1057,7 @@
         itemBox.appendChild(itemName);
         const price = document.createElement("div");
         price.classList.add("itemPrice");
-        price.textContent = this.getItemPrice(item.name) + " DA";
+        price.textContent = this.get_item_price(item.name, this.selected_price_list.name) + " DA";
         itemBox.appendChild(price);
         itemsContainer_html.appendChild(itemBox);
       });
@@ -1102,10 +1107,6 @@
         getFiltredItems(group);
       });
       return filtredItemList;
-    }
-    getItemPrice(itemId) {
-      const price = this.item_prices.find((itemPrice) => itemPrice.item_code == itemId && itemPrice.price_list == this.selected_price_list.name);
-      return price ? price.price_list_rate : 0;
     }
   };
 
@@ -1368,6 +1369,7 @@
       });
     }
     refreshSelectedItem() {
+      this.priceListInput.val(this.selected_item_maps.get(this.selected_tab.tabName).priceList);
       const selectedItemsContainer = document.getElementById("selectedItemsContainer");
       selectedItemsContainer.innerHTML = "";
       this.selected_item_maps.get(this.selected_tab.tabName).items.forEach((item) => {
@@ -1549,15 +1551,15 @@
       });
       this.discountInput.on("input", (event2) => {
         if (event2.target.value == "") {
-          this.selected_item_maps.get(selected_tab.tabName).additional_discount_percentage = 0;
+          this.selected_item_maps.get(this.selected_tab.tabName).additional_discount_percentage = 0;
           this.invoice_data.discount = 0;
           return;
         } else if (event2.target.value > 100) {
-          this.selected_item_maps.get(selected_tab.tabName).additional_discount_percentage = 100;
+          this.selected_item_maps.get(this.selected_tab.tabName).additional_discount_percentage = 100;
           this.invoice_data.discount = 100;
           return;
         }
-        this.selected_item_maps.get(selected_tab.tabName).additional_discount_percentage = parseFloat(event2.target.value);
+        this.selected_item_maps.get(this.selected_tab.tabName).additional_discount_percentage = parseFloat(event2.target.value);
         this.invoice_data.discount = parseFloat(event2.target.value);
         console.log("value ::: ", this.invoice_data.discount);
         this.calculateNetTotal();
@@ -1576,7 +1578,7 @@
         this.calculateGrandTotal();
       });
       this.priceListInput.on("input", (event2) => {
-        console.log("price list input ==> ", event2.target.value);
+        this.selected_item_maps.get(this.selected_tab.tabName).priceList = event2.target.value;
       });
     }
     calculateNetTotal() {
@@ -2716,4 +2718,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.PUHK2VDN.js.map
+//# sourceMappingURL=pos.bundle.VEE74PMQ.js.map
