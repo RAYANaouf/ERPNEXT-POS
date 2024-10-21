@@ -335,19 +335,19 @@ pos_ar.PointOfSale.Controller = class {
 									this.backHome.bind(this),
 									this.onSync.bind(this),
 									this.onMenuClick.bind(this)
-									)
+								)
 	}
         init_selected_item(){
 		this.selected_item_cart  = new pos_ar.PointOfSale.pos_selected_item_cart(
 									this.$rightSection ,
 									this.selectedItemMaps,
 									this.priceLists   ,
-									this.selectedPriceList ,
 									this.sales_taxes  ,
 									this.invoiceData  ,
 									this.selectedTab  ,
 									this.selectedItem ,
 									this.selectedField,
+									this.getItemPrice.bind(this),
 									item => {
 										this.onSelectedItemClick(item)
 									},
@@ -359,7 +359,7 @@ pos_ar.PointOfSale.Controller = class {
 									},
 									this.createNewTab.bind(this),
 									this.onCheckout.bind(this)
-									)
+								)
 	}
 
 	init_item_details(){

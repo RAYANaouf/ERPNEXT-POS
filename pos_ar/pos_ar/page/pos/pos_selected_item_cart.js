@@ -2,21 +2,22 @@
 pos_ar.PointOfSale.pos_selected_item_cart = class{
 
 	constructor(
-		wrapper           ,
-		selectedItemMaps  ,
-		priceLists        ,
-		salesTaxes        ,
-		invoiceData       ,
-		selectedTab       ,
-		selectedItem      ,
-		selectedField     ,
+		wrapper            ,
+		selectedItemMaps   ,
+		priceLists         ,
+		salesTaxes         ,
+		invoiceData        ,
+		selectedTab        ,
+		selectedItem       ,
+		selectedField      ,
+		getItemPrice       ,
 		onSelectedItemClick,
-		onTabClick        ,
-		onKeyPressed      ,
-		createNewTab      ,
-		onCheckoutClick   ,
+		onTabClick         ,
+		onKeyPressed       ,
+		createNewTab       ,
+		onCheckoutClick    ,
 	){
-		this.wrapper                 = wrapper;
+		this.wrapper                 = wrapper         ;
 		this.selected_item_maps      = selectedItemMaps;
 		this.price_lists             = priceLists      ;
 		this.sales_taxes             = salesTaxes      ;
@@ -24,6 +25,7 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 		this.selected_tab            = selectedTab     ;
 		this.selected_item           = selectedItem    ;
 		this.selected_field          = selectedField   ;
+		this.get_item_price          = getItemPrice    ;
 		this.on_key_pressed          = onKeyPressed    ;
 		this.on_checkout_click       = onCheckoutClick ;
 		this.on_selected_item_click  = onSelectedItemClick;
@@ -194,9 +196,6 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 			//update UI
 			this.refreshTabs();
 			this.refreshSelectedItem();
-			this.calculateNetTotal();
-			this.calculateQnatity();
-			this.calculateGrandTotal();
 
 			this.on_tab_click(clickedTab);
 
@@ -528,6 +527,12 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 
 		this.priceListInput.on('input' , (event) =>{
 			this.selected_item_maps.get(this.selected_tab.tabName).priceList = event.target.value;
+
+			//reset items rate:
+			this.resetItemRateBaseOnPriceList()
+			//update the UI
+			this.refreshSelectedItem()
+
 		})
 
 	}
@@ -596,9 +601,11 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 	}
 
 
-	recalculateRateBaseOnPriceList(){
-		const priceList = this.selected_item_maps.get(this.selected_tab.tabName).priceList
-		
+	resetItemRateBaseOnPriceList(){
+		this.selected_item_maps.get(this.selected_tab.tabName).items.forEach( item  => {
+			item.rate = this.get_item_price(item.name , this.selected_item_maps.get(this.selected_tab.tabName).priceList)
+		})
+		console.log("resting ==> " , this.selected_item_maps.get(this.selected_tab.tabName));
 	}
 
 

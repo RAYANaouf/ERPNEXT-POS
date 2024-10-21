@@ -282,12 +282,12 @@
         this.$rightSection,
         this.selectedItemMaps,
         this.priceLists,
-        this.selectedPriceList,
         this.sales_taxes,
         this.invoiceData,
         this.selectedTab,
         this.selectedItem,
         this.selectedField,
+        this.getItemPrice.bind(this),
         (item) => {
           this.onSelectedItemClick(item);
         },
@@ -1221,7 +1221,7 @@
 
   // ../pos_ar/pos_ar/pos_ar/page/pos/pos_selected_item_cart.js
   pos_ar.PointOfSale.pos_selected_item_cart = class {
-    constructor(wrapper, selectedItemMaps, priceLists, salesTaxes, invoiceData, selectedTab, selectedItem, selectedField, onSelectedItemClick, onTabClick, onKeyPressed, createNewTab, onCheckoutClick) {
+    constructor(wrapper, selectedItemMaps, priceLists, salesTaxes, invoiceData, selectedTab, selectedItem, selectedField, getItemPrice, onSelectedItemClick, onTabClick, onKeyPressed, createNewTab, onCheckoutClick) {
       this.wrapper = wrapper;
       this.selected_item_maps = selectedItemMaps;
       this.price_lists = priceLists;
@@ -1230,6 +1230,7 @@
       this.selected_tab = selectedTab;
       this.selected_item = selectedItem;
       this.selected_field = selectedField;
+      this.get_item_price = getItemPrice;
       this.on_key_pressed = onKeyPressed;
       this.on_checkout_click = onCheckoutClick;
       this.on_selected_item_click = onSelectedItemClick;
@@ -1348,9 +1349,6 @@
         console.log("clicked tab : ", clickedTab, "selected one : ", this.selected_tab, " clicked element : ", event2.target);
         this.refreshTabs();
         this.refreshSelectedItem();
-        this.calculateNetTotal();
-        this.calculateQnatity();
-        this.calculateGrandTotal();
         this.on_tab_click(clickedTab);
       });
       this.tabs_container.find(".tabDeleteBtn").on("click", (event2) => {
@@ -1578,6 +1576,8 @@
       });
       this.priceListInput.on("input", (event2) => {
         this.selected_item_maps.get(this.selected_tab.tabName).priceList = event2.target.value;
+        this.resetItemRateBaseOnPriceList();
+        this.refreshSelectedItem();
       });
     }
     calculateNetTotal() {
@@ -1629,8 +1629,11 @@
       grandTotal_HTML.textContent = grandTotal.toFixed(2);
       this.invoice_data.grandTotal = grandTotal;
     }
-    recalculateRateBaseOnPriceList() {
-      const priceList = this.selected_item_maps.get(this.selected_tab.tabName).priceList;
+    resetItemRateBaseOnPriceList() {
+      this.selected_item_maps.get(this.selected_tab.tabName).items.forEach((item) => {
+        item.rate = this.get_item_price(item.name, this.selected_item_maps.get(this.selected_tab.tabName).priceList);
+      });
+      console.log("resting ==> ", this.selected_item_maps.get(this.selected_tab.tabName));
     }
     makeItemHighlight(itemElement) {
       const selectedItemsContainer = document.getElementById("selectedItemsContainer");
@@ -2719,4 +2722,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.6EYU3EM4.js.map
+//# sourceMappingURL=pos.bundle.ZYT4O56C.js.map
