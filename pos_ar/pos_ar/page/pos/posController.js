@@ -315,7 +315,6 @@ pos_ar.PointOfSale.Controller = class {
         }
 
         init_item_selector(){
-		console.log("item list from controller : " , this.itemList)
                 this.item_selector = new pos_ar.PointOfSale.pos_item_selector(
 						this.$leftSection      ,
 						this.itemList          ,
@@ -363,7 +362,6 @@ pos_ar.PointOfSale.Controller = class {
 	}
 
 	init_item_details(){
-		console.log("warehouse ==> " , this.selectedPosProfile.warehouse)
 		this.item_details = new pos_ar.PointOfSale.pos_item_details(
 									this.$leftSection,
 									this.selectedPosProfile.warehouse,
@@ -424,8 +422,6 @@ pos_ar.PointOfSale.Controller = class {
 		itemCloned.discount_percentage = 0;
 		this.addItemToPosInvoice( item )
 
-		console.log("updated ===> " , this.selectedItemMaps )
-
 		this.selected_item_cart.calculateNetTotal();
 		this.selected_item_cart.calculateVAT();
 		this.selected_item_cart.calculateQnatity();
@@ -434,16 +430,8 @@ pos_ar.PointOfSale.Controller = class {
 	}
 
 	onSelectedItemClick(item){
-
-
 		this.selectedItem = structuredClone(item)
 
-		console.log("selected item clicked ::: " , this.selectedItem);
-
-
-		console.log("item_details :: " , this.item_details)
-		console.log("item_selector :: " , this.item_selector)
-		console.log("payment_cart :: " , this.payment_cart)
 		//show
 		this.item_details.show_cart();
 		this.selected_item_cart.showKeyboard();
@@ -467,10 +455,7 @@ pos_ar.PointOfSale.Controller = class {
 		if(this.checkIfRateZero(this.selectedItemMaps.get(this.selectedTab.tabName))){
 			frappe.throw("Item with rate equal 0")
 		}
-		console.log("result : " , this.checkIfRateZero(this.selectedItemMaps.get(this.selectedTab.tabName)))
 		const pos_checkout = this.selectedItemMaps.get(this.selectedTab.tabName);
-		console.log("pos on checkout : " , pos_checkout);
-
 		this.db.savePosInvoice(
 					pos_checkout ,
 					(event) => {
@@ -616,9 +601,6 @@ pos_ar.PointOfSale.Controller = class {
 			this.selectedItemMaps.set(`C${tab}` , message)
 			this.selectedTab.tabName = `C${tab}`
 
-
-			console.log("change ::: item map ==> " , this.selectedItemMaps , " selected tab ==> " , this.selectedTab)
-
 			//show
 			this.item_selector.showCart();
 			this.customer_box.showActionBar();
@@ -727,10 +709,6 @@ pos_ar.PointOfSale.Controller = class {
 
 	onKeyPressed( action  , key){
 
-		console.log("<<we are in onKeyPressed function >>")
-		console.log("action ::: " , action , " key ::: " , key)
-		console.log("selected field ==> " , this.selectedField.field_name)
-
 		if(action == "quantity"){
 			this.item_details.requestFocus("quantity")
 		}
@@ -802,8 +780,6 @@ pos_ar.PointOfSale.Controller = class {
 				if( this.selectedField.field_name ==  "quantity" ){
 					const newVal = this.selectedItem.qty + key
 					this.selectedItem.qty = parseFloat(newVal);
-					console.log("we are here, with : " , this.selectedItem.qty)
-
 				}
 				else if( this.selectedField.field_name ==  "rate" ){
 					const newVal = this.selectedItem.rate + key
@@ -987,10 +963,7 @@ pos_ar.PointOfSale.Controller = class {
 
 				invoicesRef.push({'pos_invoice' : r.name , 'customer' : r.customer } )
 
-				console.log("the pos invoice :: " , r)
-
 				//this.checkIfPaid()
-
 				this.selectedItemMaps.get(this.selectedTab.tabName).status = 'Unpaid'
 
 				this.db.updatePosInvoice(
@@ -1139,7 +1112,6 @@ pos_ar.PointOfSale.Controller = class {
 
 		// Additionally, check if DOM is already loaded
 		if (document.readyState === 'complete') {
-			console.log("DOM was already loaded");
 			navigator.serviceWorker
 				.register('../assets/pos_ar/public/js/sw.js')
 				.then(reg => console.log("Service Worker registered successfully."))
@@ -1153,8 +1125,6 @@ pos_ar.PointOfSale.Controller = class {
 	addItemToPosInvoice( clickedItem ){
 		let clonedItem = {} ;
 		Object.assign(clonedItem , clickedItem)
-
-		console.log("clicked item ::: " , clickedItem)
 
 		const posInvoice = this.selectedItemMaps.get(this.selectedTab.tabName);
 		const posItems   = posInvoice.items;
@@ -1186,7 +1156,6 @@ pos_ar.PointOfSale.Controller = class {
 		posInvoice.items  = posItems.filter( item => item.name != itemId )
 
 		this.selectedItem = structuredClone({ name : ""})
-		console.log("new pos invoice : " , posInvoice.items)
 	}
 
 	editPosItemQty(itemName , qty){
@@ -1229,7 +1198,6 @@ pos_ar.PointOfSale.Controller = class {
 
 		this.sales_taxes_and_charges.forEach( tax => {
 			if(tax.parent == taxTemplateId){
-				console.log("debuging ==> parent : " , tax.parent , " taxTemplateId : " , taxTemplateId)
 				salesTax.push(tax)
 			}
 		})

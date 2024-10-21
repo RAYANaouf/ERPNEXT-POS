@@ -254,7 +254,6 @@
       this.$leftSection = this.$components_wrapper.find("#LeftSection");
     }
     init_item_selector() {
-      console.log("item list from controller : ", this.itemList);
       this.item_selector = new pos_ar.PointOfSale.pos_item_selector(
         this.$leftSection,
         this.itemList,
@@ -302,7 +301,6 @@
       );
     }
     init_item_details() {
-      console.log("warehouse ==> ", this.selectedPosProfile.warehouse);
       this.item_details = new pos_ar.PointOfSale.pos_item_details(
         this.$leftSection,
         this.selectedPosProfile.warehouse,
@@ -351,7 +349,6 @@
       itemCloned.discount_amount = 0;
       itemCloned.discount_percentage = 0;
       this.addItemToPosInvoice(item);
-      console.log("updated ===> ", this.selectedItemMaps);
       this.selected_item_cart.calculateNetTotal();
       this.selected_item_cart.calculateVAT();
       this.selected_item_cart.calculateQnatity();
@@ -360,10 +357,6 @@
     }
     onSelectedItemClick(item) {
       this.selectedItem = structuredClone(item);
-      console.log("selected item clicked ::: ", this.selectedItem);
-      console.log("item_details :: ", this.item_details);
-      console.log("item_selector :: ", this.item_selector);
-      console.log("payment_cart :: ", this.payment_cart);
       this.item_details.show_cart();
       this.selected_item_cart.showKeyboard();
       this.item_selector.hideCart();
@@ -376,9 +369,7 @@
       if (this.checkIfRateZero(this.selectedItemMaps.get(this.selectedTab.tabName))) {
         frappe.throw("Item with rate equal 0");
       }
-      console.log("result : ", this.checkIfRateZero(this.selectedItemMaps.get(this.selectedTab.tabName)));
       const pos_checkout = this.selectedItemMaps.get(this.selectedTab.tabName);
-      console.log("pos on checkout : ", pos_checkout);
       this.db.savePosInvoice(
         pos_checkout,
         (event2) => {
@@ -471,7 +462,6 @@
         const tab = this.selected_item_cart.createTabForEditPOS();
         this.selectedItemMaps.set(`C${tab}`, message);
         this.selectedTab.tabName = `C${tab}`;
-        console.log("change ::: item map ==> ", this.selectedItemMaps, " selected tab ==> ", this.selectedTab);
         this.item_selector.showCart();
         this.customer_box.showActionBar();
         this.selected_item_cart.showCart();
@@ -539,9 +529,6 @@
     }
     onKeyPressed(action, key) {
       var _a;
-      console.log("<<we are in onKeyPressed function >>");
-      console.log("action ::: ", action, " key ::: ", key);
-      console.log("selected field ==> ", this.selectedField.field_name);
       if (action == "quantity") {
         this.item_details.requestFocus("quantity");
       } else if (action == "rate") {
@@ -584,7 +571,6 @@
           if (this.selectedField.field_name == "quantity") {
             const newVal = this.selectedItem.qty + key;
             this.selectedItem.qty = parseFloat(newVal);
-            console.log("we are here, with : ", this.selectedItem.qty);
           } else if (this.selectedField.field_name == "rate") {
             const newVal = this.selectedItem.rate + key;
             this.selectedItem.rate = parseFloat(newVal);
@@ -695,7 +681,6 @@
           this.sellInvoices.get(invoiceName)
         ).then((r) => {
           invoicesRef.push({ "pos_invoice": r.name, "customer": r.customer });
-          console.log("the pos invoice :: ", r);
           this.selectedItemMaps.get(this.selectedTab.tabName).status = "Unpaid";
           this.db.updatePosInvoice(
             this.selectedItemMaps.get(this.selectedTab.tabName),
@@ -781,14 +766,12 @@
       });
       this.sw = new pos_ar.PointOfSale.Sw();
       if (document.readyState === "complete") {
-        console.log("DOM was already loaded");
         navigator.serviceWorker.register("../assets/pos_ar/public/js/sw.js").then((reg) => console.log("Service Worker registered successfully.")).catch((err) => console.log(`Service Worker registration failed: ${err}`));
       }
     }
     addItemToPosInvoice(clickedItem) {
       let clonedItem = {};
       Object.assign(clonedItem, clickedItem);
-      console.log("clicked item ::: ", clickedItem);
       const posInvoice = this.selectedItemMaps.get(this.selectedTab.tabName);
       const posItems = posInvoice.items;
       let exist = false;
@@ -811,7 +794,6 @@
       const posItems = posInvoice.items;
       posInvoice.items = posItems.filter((item) => item.name != itemId);
       this.selectedItem = structuredClone({ name: "" });
-      console.log("new pos invoice : ", posInvoice.items);
     }
     editPosItemQty(itemName, qty) {
       let items = this.selectedItemMaps.get(this.selectedTab.tabName).items;
@@ -850,7 +832,6 @@
       let salesTax = [];
       this.sales_taxes_and_charges.forEach((tax) => {
         if (tax.parent == taxTemplateId) {
-          console.log("debuging ==> parent : ", tax.parent, " taxTemplateId : ", taxTemplateId);
           salesTax.push(tax);
         }
       });
@@ -2722,4 +2703,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.ZYT4O56C.js.map
+//# sourceMappingURL=pos.bundle.GJFE55BK.js.map
