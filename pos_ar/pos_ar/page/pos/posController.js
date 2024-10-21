@@ -1130,6 +1130,7 @@ pos_ar.PointOfSale.Controller = class {
 	/*****************************  tools  **********************************/
 	getItemPrice(itemId){
 		const price = this.itemPrices.find(itemPrice => itemPrice.item_code == itemId)
+		console.log("debug heeeeeeeere : " , price )
 		return price ? price.price_list_rate  : 0
         }
 
