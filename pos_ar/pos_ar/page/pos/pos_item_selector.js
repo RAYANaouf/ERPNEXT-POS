@@ -100,7 +100,7 @@ pos_ar.PointOfSale.pos_item_selector = class {
                         	itemBox.appendChild(itemImageHolder);
                 	}
                 	const itemName = document.createElement("div");
-                	itemName.textContent = item.name ;
+                	itemName.textContent = item.description ;
                 	itemName.classList.add("itemTitle");
                 	itemBox.appendChild(itemName);
 

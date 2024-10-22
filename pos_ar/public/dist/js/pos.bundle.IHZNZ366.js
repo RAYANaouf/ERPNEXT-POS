@@ -866,7 +866,7 @@
     async fetchItems() {
       try {
         return await frappe.db.get_list("Item", {
-          fields: ["name", "item_name", "image", "item_group", "stock_uom"],
+          fields: ["name", "item_name", "image", "item_group", "description", "stock_uom"],
           filters: { disabled: 0 },
           limit: 1e5
         });
@@ -1033,7 +1033,7 @@
           itemBox.appendChild(itemImageHolder);
         }
         const itemName = document.createElement("div");
-        itemName.textContent = item.name;
+        itemName.textContent = item.description;
         itemName.classList.add("itemTitle");
         itemBox.appendChild(itemName);
         const price = document.createElement("div");
@@ -2703,4 +2703,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.GJFE55BK.js.map
+//# sourceMappingURL=pos.bundle.IHZNZ366.js.map

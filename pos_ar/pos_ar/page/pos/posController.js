@@ -1240,7 +1240,7 @@ pos_ar.PointOfSale.Controller = class {
         async fetchItems() {
                 try {
                         return await frappe.db.get_list('Item', {
-                                fields: ['name', 'item_name' , 'image' , 'item_group' , 'stock_uom' ],
+                                fields: ['name', 'item_name' , 'image' , 'item_group' , 'description' , 'stock_uom' ],
                                 filters: { disabled : 0 },
 				limit : 100000
                         })
