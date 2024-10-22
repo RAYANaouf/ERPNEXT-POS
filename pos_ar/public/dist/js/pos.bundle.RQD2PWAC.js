@@ -667,8 +667,8 @@
             console.log("failure => ", event2);
           }
         );
+        this.customer_box.setNotSynced();
       }
-      this.customer_box.setNotSynced();
       this.selectedItemMaps.delete(this.selectedTab.tabName);
       let tabs = Array.from(this.selectedItemMaps.keys());
       if (tabs.length > 0) {
@@ -2720,4 +2720,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.SDU6U6PB.js.map
+//# sourceMappingURL=pos.bundle.RQD2PWAC.js.map

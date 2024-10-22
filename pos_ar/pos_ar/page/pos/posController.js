@@ -428,23 +428,17 @@ pos_ar.PointOfSale.Controller = class {
 
 	onSelectedItemClick(item){
 		this.selectedItem = structuredClone(item)
-
 		//show
 		this.item_details.show_cart();
 		this.selected_item_cart.showKeyboard();
-
 		//close
 		this.item_selector.hideCart();
 		this.payment_cart.hideCart();
 		this.settings_cart.hideCart();
-
 		//change display
 		this.selected_item_cart.setKeyboardOrientation("landscape");
-
-
 		//refresh data
 		this.item_details.refreshDate(item);
-
 	}
 
 	onCheckout(){
@@ -851,9 +845,7 @@ pos_ar.PointOfSale.Controller = class {
 			}
 			items.push(newItem)
 		})
-
 		this.selectedItemMaps.get(this.selectedTab.tabName).items = items
-
 		if(items.length ==0)
 			return
 
@@ -885,7 +877,6 @@ pos_ar.PointOfSale.Controller = class {
 			}).catch(err=>{
 				console.log("cant push pos invoice : " , err);
 			})
-
 		}
 		else{
 			this.db.updatePosInvoice(
@@ -897,16 +888,12 @@ pos_ar.PointOfSale.Controller = class {
 							console.log("failure => " , event )
 						}
 					)
-
+			this.customer_box.setNotSynced();
 		}
-
-		this.customer_box.setNotSynced();
-
 		this.selectedItemMaps.delete(this.selectedTab.tabName)
 
 		//tabs
 		let tabs = Array.from(this.selectedItemMaps.keys())
-
 		//if there are still tabs it will just set the first as selected
 		//otherwise it will create one using the selected_item_cart class and set it as selected
 		if(tabs.length > 0){
@@ -917,9 +904,7 @@ pos_ar.PointOfSale.Controller = class {
 		else{
 			this.selected_item_cart.createNewTab();
 		}
-
 		this.onClose_payment_cart()
-
 	}
 
 
