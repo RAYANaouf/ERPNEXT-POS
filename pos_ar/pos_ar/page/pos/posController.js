@@ -23,7 +23,7 @@ pos_ar.PointOfSale.Controller = class {
                 this.selectedField         = {"field_name" : ""   }
                 this.selectedTab           = {"tabName"    : ""   }
 		this.selectedPaymentMethod = {"methodName" : ""   }
-		this.selectedCustomer      = {"name"       : "" , "customer_name" : ""}
+		this.defaultCustomer       = {"name"       : "" , "customer_name" : ""}
 		this.selectedPosProfile    = {"name"       : ""   }
 		this.selectedPriceList     = {"name"       : ""   }
 
@@ -81,7 +81,7 @@ pos_ar.PointOfSale.Controller = class {
 
 
 		if(this.customersList.length > 0){
-			this.selectedCustomer = structuredClone(this.customersList[0])
+			this.defaultCustomer = structuredClone(this.customersList[0])
 		}else{
 			frappe.warn(
 					'You dont have a customer',
@@ -110,7 +110,7 @@ pos_ar.PointOfSale.Controller = class {
 
 
 		let new_pos_invoice = frappe.model.get_new_doc('POS Invoice');
-		new_pos_invoice.customer          = this.selectedCustomer.name
+		new_pos_invoice.customer          = this.defaultCustomer.name
 		new_pos_invoice.pos_profile       = this.selectedPosProfile.name
 		new_pos_invoice.items             = [];
 		new_pos_invoice.taxes_and_charges = this.selectedPosProfile.taxes_and_charges
@@ -330,7 +330,7 @@ pos_ar.PointOfSale.Controller = class {
 		this.customer_box  = new pos_ar.PointOfSale.pos_customer_box(
 									this.$rightSection ,
 									this.customersList    ,
-									this.selectedCustomer ,
+									this.defaultCustomer ,
 									this.backHome.bind(this),
 									this.onSync.bind(this),
 									this.onMenuClick.bind(this)
@@ -451,13 +451,11 @@ pos_ar.PointOfSale.Controller = class {
 	}
 
 	onCheckout(){
-
 		if(this.checkIfRateZero(this.selectedItemMaps.get(this.selectedTab.tabName))){
 			frappe.throw("Item with rate equal 0")
 		}
-		const pos_checkout = this.selectedItemMaps.get(this.selectedTab.tabName);
 		this.db.savePosInvoice(
-					pos_checkout ,
+					this.selectedItemMaps.get(this.selectedTab.tabName) ,
 					(event) => {
 						console.log("sucess => " , event )
 					},
@@ -465,16 +463,12 @@ pos_ar.PointOfSale.Controller = class {
 						console.log("failure => " , event )
 					}
 				)
-
-
 		//show
 		this.payment_cart.showCart();
-
 		//hide
 		this.item_selector.hideCart();
 		this.item_details.hide_cart();
 		this.settings_cart.hideCart();
-
 		//change displayk
 		this.payment_cart.calculateGrandTotal()
 		this.selected_item_cart.setKeyboardOrientation("landscape");
@@ -571,7 +565,7 @@ pos_ar.PointOfSale.Controller = class {
 
 	createNewTab(counter){
 		let new_pos_invoice = frappe.model.get_new_doc('POS Invoice');
-		new_pos_invoice.customer          = this.selectedCustomer.name
+		new_pos_invoice.customer          = this.defaultCustomer.name
 		new_pos_invoice.pos_profile       = this.selectedPosProfile.name
 		new_pos_invoice.items             = [];
 		new_pos_invoice.taxes_and_charges = this.selectedPosProfile.taxes_and_charges
@@ -823,12 +817,8 @@ pos_ar.PointOfSale.Controller = class {
 
 
 	onCompleteOrder(){
-
-
-
-
 		//check if they set a customer
-		if(this.selectedCustomer.name == ""){
+		if(this.defaultCustomer.name == ""){
 			frappe.warn(
 					'Customer didnt selected!',
 					'you have to select a customer',
@@ -838,10 +828,7 @@ pos_ar.PointOfSale.Controller = class {
 					false
 			)
 		}
-
 		let items = []
-
-
 		this.selectedItemMaps.get(this.selectedTab.tabName).items.forEach(  item  =>{
 			// we still didnt implement the price_list_rate and base_price_list_rate
 			// same thing with actual_qty refering to the stock quantity
@@ -860,23 +847,19 @@ pos_ar.PointOfSale.Controller = class {
 				'income_account'          : this.selectedPosProfile.income_account,
 				'item_tax_rate'           : {}
 			}
-
 			items.push(newItem)
 		})
-
-
 
 		this.selectedItemMaps.get(this.selectedTab.tabName).items = items
 
 		if(items.length ==0)
 			return
 
-
 		this.selectedItemMaps.get(this.selectedTab.tabName).paid_amount       = this.invoiceData.paidAmount
 		this.selectedItemMaps.get(this.selectedTab.tabName).base_paid_amount  = this.invoiceData.paidAmount
 		this.selectedItemMaps.get(this.selectedTab.tabName).payments          = [{'mode_of_payment' : 'Cash' , 'amount' : this.invoiceData.paidAmount}]
 		this.selectedItemMaps.get(this.selectedTab.tabName).docstatus         = 1
-		this.selectedItemMaps.get(this.selectedTab.tabName).customer          = this.selectedCustomer.name
+		this.selectedItemMaps.get(this.selectedTab.tabName).customer          = this.defaultCustomer.name
 
 		this.sellInvoices.set(this.selectedItemMaps.get(this.selectedTab.tabName).name , this.selectedItemMaps.get(this.selectedTab.tabName));
 
@@ -884,20 +867,38 @@ pos_ar.PointOfSale.Controller = class {
 		const status = this.checkIfPaid(this.selectedItemMaps.get(this.selectedTab.tabName))
 		this.selectedItemMaps.get(this.selectedTab.tabName).status            = status
 
+		if(status == 'Unpaid'){
+			console.log("should Sync It")
+			frappe.db.insert(
+					this.selectedItemMaps.get(this.selectedTab.tabName)
+			).then(r =>{
+				this.db.updatePosInvoice(
+							this.selectedItemMaps.get(this.selectedTab.tabName) ,
+							(event) => {
+								console.log("sucess => " , event )
+							},
+							(event) => {
+								console.log("failure => " , event )
+							}
+						)
+				this.sellInvoices.delete(invoiceName)
+			}).catch(err=>{
+				console.log("cant push pos invoice : " , err);
+			})
 
-		this.db.updatePosInvoice(
-					this.selectedItemMaps.get(this.selectedTab.tabName) ,
-					(event) => {
-						console.log("sucess => " , event )
-					},
-					(event) => {
-						console.log("failure => " , event )
-					}
-				)
+		}
+		else{
+			this.db.updatePosInvoice(
+						this.selectedItemMaps.get(this.selectedTab.tabName) ,
+						(event) => {
+							console.log("sucess => " , event )
+						},
+						(event) => {
+							console.log("failure => " , event )
+						}
+					)
 
-
-
-
+		}
 
 		this.customer_box.setNotSynced();
 

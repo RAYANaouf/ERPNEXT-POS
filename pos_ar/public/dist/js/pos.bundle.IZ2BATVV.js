@@ -19,7 +19,7 @@
       this.selectedField = { "field_name": "" };
       this.selectedTab = { "tabName": "" };
       this.selectedPaymentMethod = { "methodName": "" };
-      this.selectedCustomer = { "name": "", "customer_name": "" };
+      this.defaultCustomer = { "name": "", "customer_name": "" };
       this.selectedPosProfile = { "name": "" };
       this.selectedPriceList = { "name": "" };
       this.sales_taxes = [];
@@ -60,7 +60,7 @@
       }
       Object.assign(this.selectedPosProfile, this.PosProfileList[0]);
       if (this.customersList.length > 0) {
-        this.selectedCustomer = structuredClone(this.customersList[0]);
+        this.defaultCustomer = structuredClone(this.customersList[0]);
       } else {
         frappe.warn(
           "You dont have a customer",
@@ -84,7 +84,7 @@
         );
       }
       let new_pos_invoice = frappe.model.get_new_doc("POS Invoice");
-      new_pos_invoice.customer = this.selectedCustomer.name;
+      new_pos_invoice.customer = this.defaultCustomer.name;
       new_pos_invoice.pos_profile = this.selectedPosProfile.name;
       new_pos_invoice.items = [];
       new_pos_invoice.taxes_and_charges = this.selectedPosProfile.taxes_and_charges;
@@ -270,7 +270,7 @@
       this.customer_box = new pos_ar.PointOfSale.pos_customer_box(
         this.$rightSection,
         this.customersList,
-        this.selectedCustomer,
+        this.defaultCustomer,
         this.backHome.bind(this),
         this.onSync.bind(this),
         this.onMenuClick.bind(this)
@@ -369,9 +369,8 @@
       if (this.checkIfRateZero(this.selectedItemMaps.get(this.selectedTab.tabName))) {
         frappe.throw("Item with rate equal 0");
       }
-      const pos_checkout = this.selectedItemMaps.get(this.selectedTab.tabName);
       this.db.savePosInvoice(
-        pos_checkout,
+        this.selectedItemMaps.get(this.selectedTab.tabName),
         (event2) => {
           console.log("sucess => ", event2);
         },
@@ -441,7 +440,7 @@
     }
     createNewTab(counter) {
       let new_pos_invoice = frappe.model.get_new_doc("POS Invoice");
-      new_pos_invoice.customer = this.selectedCustomer.name;
+      new_pos_invoice.customer = this.defaultCustomer.name;
       new_pos_invoice.pos_profile = this.selectedPosProfile.name;
       new_pos_invoice.items = [];
       new_pos_invoice.taxes_and_charges = this.selectedPosProfile.taxes_and_charges;
@@ -596,7 +595,7 @@
       this.item_details.refreshDate(this.selectedItem);
     }
     onCompleteOrder() {
-      if (this.selectedCustomer.name == "") {
+      if (this.defaultCustomer.name == "") {
         frappe.warn(
           "Customer didnt selected!",
           "you have to select a customer",
@@ -632,19 +631,39 @@
       this.selectedItemMaps.get(this.selectedTab.tabName).base_paid_amount = this.invoiceData.paidAmount;
       this.selectedItemMaps.get(this.selectedTab.tabName).payments = [{ "mode_of_payment": "Cash", "amount": this.invoiceData.paidAmount }];
       this.selectedItemMaps.get(this.selectedTab.tabName).docstatus = 1;
-      this.selectedItemMaps.get(this.selectedTab.tabName).customer = this.selectedCustomer.name;
+      this.selectedItemMaps.get(this.selectedTab.tabName).customer = this.defaultCustomer.name;
       this.sellInvoices.set(this.selectedItemMaps.get(this.selectedTab.tabName).name, this.selectedItemMaps.get(this.selectedTab.tabName));
       const status = this.checkIfPaid(this.selectedItemMaps.get(this.selectedTab.tabName));
       this.selectedItemMaps.get(this.selectedTab.tabName).status = status;
-      this.db.updatePosInvoice(
-        this.selectedItemMaps.get(this.selectedTab.tabName),
-        (event2) => {
-          console.log("sucess => ", event2);
-        },
-        (event2) => {
-          console.log("failure => ", event2);
-        }
-      );
+      if (status == "Unpaid") {
+        console.log("should Sync It");
+        frappe.db.insert(
+          this.selectedItemMaps.get(this.selectedTab.tabName)
+        ).then((r) => {
+          this.db.updatePosInvoice(
+            this.selectedItemMaps.get(this.selectedTab.tabName),
+            (event2) => {
+              console.log("sucess => ", event2);
+            },
+            (event2) => {
+              console.log("failure => ", event2);
+            }
+          );
+          this.sellInvoices.delete(invoiceName);
+        }).catch((err) => {
+          console.log("cant push pos invoice : ", err);
+        });
+      } else {
+        this.db.updatePosInvoice(
+          this.selectedItemMaps.get(this.selectedTab.tabName),
+          (event2) => {
+            console.log("sucess => ", event2);
+          },
+          (event2) => {
+            console.log("failure => ", event2);
+          }
+        );
+      }
       this.customer_box.setNotSynced();
       this.selectedItemMaps.delete(this.selectedTab.tabName);
       let tabs = Array.from(this.selectedItemMaps.keys());
@@ -676,9 +695,9 @@
       let failure = 0;
       let seccess = 0;
       let invoicesRef = [];
-      all_invoices.forEach((invoiceName) => {
+      all_invoices.forEach((invoiceName2) => {
         frappe.db.insert(
-          this.sellInvoices.get(invoiceName)
+          this.sellInvoices.get(invoiceName2)
         ).then((r) => {
           invoicesRef.push({ "pos_invoice": r.name, "customer": r.customer });
           this.selectedItemMaps.get(this.selectedTab.tabName).status = "Unpaid";
@@ -691,7 +710,7 @@
               console.log("failure => ", event2);
             }
           );
-          this.sellInvoices.delete(invoiceName);
+          this.sellInvoices.delete(invoiceName2);
           counter += 1;
           frappe.show_progress("Syncing Invoices...", counter, all_invoices.length, "syncing");
           if (counter == all_invoices.length) {
@@ -2635,10 +2654,10 @@
         onFailure(event2);
       };
     }
-    deletePosInvoice(invoiceName, onSuccess, onFailure) {
+    deletePosInvoice(invoiceName2, onSuccess, onFailure) {
       const transaction = this.db.transaction(["POS Invoice"], "readwrite");
       const store = transaction.objectStore("POS Invoice");
-      const request = store.delete(invoiceName);
+      const request = store.delete(invoiceName2);
       request.onsuccess = (event2) => {
         onSuccess(event2);
       };
@@ -2701,4 +2720,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.6GUXDS7V.js.map
+//# sourceMappingURL=pos.bundle.IZ2BATVV.js.map
