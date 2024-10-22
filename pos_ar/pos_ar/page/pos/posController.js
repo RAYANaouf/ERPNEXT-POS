@@ -517,13 +517,14 @@ pos_ar.PointOfSale.Controller = class {
 
 		//show
 		this.history_cart.show_cart()
+		this.customer_box.showHomeBar();
 
 		//hide
 		this.payment_cart.hideCart();
 		this.item_details.hide_cart();
 		this.item_selector.hideCart();
 		this.selected_item_cart.hideCart();
-		this.customer_box.hideActionBar();
+		this.customer_box.hideSyncBar();
 		this.settings_cart.hideCart();
 
 	}
@@ -538,8 +539,11 @@ pos_ar.PointOfSale.Controller = class {
 		else if(menu == 'settings'){
 			//show settings
 			this.settings_cart.showCart()
-			this.customer_box.hideActionBar();
+			this.customer_box.showHomeBar();
+			this.customer_box.showHomeBar();
+
 			//hide
+			this.customer_box.hideSyncBar();
 			this.item_selector.hideCart();
 			this.selected_item_cart.hideCart();
 			this.payment_cart.hideCart()  ;
@@ -551,15 +555,16 @@ pos_ar.PointOfSale.Controller = class {
 	backHome(){
 
 		//show
-		this.item_selector.showCart();
-		this.customer_box.showActionBar();
-		this.selected_item_cart.showCart()
+		this.item_selector.showCart()      ;
+		this.customer_box.showSyncBar()    ;
+		this.selected_item_cart.showCart() ;
 
 		//hide
-		this.payment_cart.hideCart()  ;
-		this.item_details.hide_cart() ;
-		this.history_cart.hide_cart() ;
-		this.settings_cart.hideCart() ;
+		this.payment_cart.hideCart()   ;
+		this.customer_box.hideHomeBar();
+		this.item_details.hide_cart()  ;
+		this.history_cart.hide_cart()  ;
+		this.settings_cart.hideCart()  ;
 
 
 	}
@@ -598,7 +603,7 @@ pos_ar.PointOfSale.Controller = class {
 
 			//show
 			this.item_selector.showCart();
-			this.customer_box.showActionBar();
+			this.customer_box.showHomeBar();
 			this.selected_item_cart.showCart()
 
 			//hide

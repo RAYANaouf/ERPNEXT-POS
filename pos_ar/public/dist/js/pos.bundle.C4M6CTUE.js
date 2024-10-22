@@ -408,11 +408,12 @@
     }
     onHistoryClick() {
       this.history_cart.show_cart();
+      this.customer_box.showHomeBar();
       this.payment_cart.hideCart();
       this.item_details.hide_cart();
       this.item_selector.hideCart();
       this.selected_item_cart.hideCart();
-      this.customer_box.hideActionBar();
+      this.customer_box.hideSyncBar();
       this.settings_cart.hideCart();
     }
     onMenuClick(menu) {
@@ -422,7 +423,9 @@
         this.onClosePOS();
       } else if (menu == "settings") {
         this.settings_cart.showCart();
-        this.customer_box.hideActionBar();
+        this.customer_box.showHomeBar();
+        this.customer_box.showHomeBar();
+        this.customer_box.hideSyncBar();
         this.item_selector.hideCart();
         this.selected_item_cart.hideCart();
         this.payment_cart.hideCart();
@@ -432,9 +435,10 @@
     }
     backHome() {
       this.item_selector.showCart();
-      this.customer_box.showActionBar();
+      this.customer_box.showSyncBar();
       this.selected_item_cart.showCart();
       this.payment_cart.hideCart();
+      this.customer_box.hideHomeBar();
       this.item_details.hide_cart();
       this.history_cart.hide_cart();
       this.settings_cart.hideCart();
@@ -463,7 +467,7 @@
         this.selectedItemMaps.set(`C${tab}`, message);
         this.selectedTab.tabName = `C${tab}`;
         this.item_selector.showCart();
-        this.customer_box.showActionBar();
+        this.customer_box.showHomeBar();
         this.selected_item_cart.showCart();
         this.item_details.hide_cart();
         this.payment_cart.hideCart();
@@ -1146,11 +1150,17 @@
       this.close_pos = this.menuItemsContainer.find("#closePosMenuItem");
       this.setting = this.menuItemsContainer.find("#settingMenuItem");
     }
-    hideActionBar() {
+    showHomeBar() {
       this.home.css("display", "flex");
     }
-    showActionBar() {
+    hideHomeBar() {
       this.home.css("display", "none");
+    }
+    showSyncBar() {
+      this.sync_btn.css("display", "flex");
+    }
+    hideSyncBar() {
+      this.sync_btn.css("display", "none");
     }
     setListeners() {
       this.sync_btn.on("click", (event2) => {
@@ -1558,6 +1568,9 @@
         this.selected_item_maps.get(this.selected_tab.tabName).priceList = event2.target.value;
         this.resetItemRateBaseOnPriceList();
         this.refreshSelectedItem();
+      });
+      this.customerInput.on("input", (event2) => {
+        this.selected_item_maps.get(this.selected_tab.tabName).customer = event2.target.value;
       });
     }
     calculateNetTotal() {
@@ -2702,4 +2715,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.Y5VWX6AP.js.map
+//# sourceMappingURL=pos.bundle.C4M6CTUE.js.map

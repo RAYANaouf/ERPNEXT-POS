@@ -57,12 +57,17 @@ pos_ar.PointOfSale.pos_customer_box = class{
 
 
 	//show and hide
-	hideActionBar(){
+	showHomeBar(){
 		this.home.css('display' , 'flex');
 	}
-
-	showActionBar(){
+	hideHomeBar(){
 		this.home.css('display' , 'none');
+	}
+	showSyncBar(){
+		this.sync_btn.css('display' , 'flex');
+	}
+	hideSyncBar(){
+		this.sync_btn.css('display' , 'none');
 	}
 
 

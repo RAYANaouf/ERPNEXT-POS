@@ -83,7 +83,6 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 		this.cartBox.append('<div id="cartFooter" class="columnBox"></div>')
 
 		this.cartTopBar = this.cartBox.find('#CartBoxTopBar')
-		//this.cartTopBar.append('<h4 class="CartTitle">Item Cart</h4>')
 		this.cartTopBar.append('<div id="selectedCustomerInput"></div>')
 		this.cartTopBar.append('<div id="selectedItemsPriceListInput"></div>')
 
@@ -104,9 +103,6 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 		this.cartHeaderTitles.append('<div id="amountTitle">  <h6>Amount  </h6></div>')
 
 		this.selectedItemContainer = this.cartBox.find('#selectedItemsContainer')
-
-
-
 
 		this.cartFooter = this.cartBox.find('#cartFooter')
 		this.cartFooter.append('<div id="cartDetails" class="columnBox"></div>')
@@ -542,14 +538,15 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 
 		this.priceListInput.on('input' , (event) =>{
 			this.selected_item_maps.get(this.selected_tab.tabName).priceList = event.target.value;
-
 			//reset items rate:
 			this.resetItemRateBaseOnPriceList()
 			//update the UI
 			this.refreshSelectedItem()
-
 		})
 
+		this.customerInput.on('input' , (event)=>{
+			this.selected_item_maps.get(this.selected_tab.tabName).customer = event.target.value;
+		})
 	}
 
 	/*************************  tools  **********************************/
