@@ -1127,6 +1127,7 @@
     }
     start_work() {
       this.prepare_customer_box();
+      this.checkForSync();
       this.setListeners();
     }
     prepare_customer_box() {
@@ -1161,6 +1162,9 @@
     }
     hideSyncBar() {
       this.sync_btn.css("display", "none");
+    }
+    checkForSync() {
+      this.sync_btn.addClass("Synced");
     }
     setListeners() {
       this.sync_btn.on("click", (event2) => {
@@ -2715,4 +2719,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.C4M6CTUE.js.map
+//# sourceMappingURL=pos.bundle.6VWWEDLU.js.map

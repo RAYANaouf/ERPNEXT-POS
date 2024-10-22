@@ -26,20 +26,28 @@
         border        : 2px solid #c0c0c0 ;
         border-radius : 16px              ;
 
-	color         : #ac6500           ;
 	font-weight   : 800               ;
 	font-size     : 20px              ;
-
+	cursor        : pointer           ;
         animation     : mymove 1.5s       ;
         box-shadow    : rgba(100, 100, 111, 0.2) 0px 2px 15px 0px;
 
+}
+#SyncBox.NotSynced{
+        border        : 2px solid #ac6500 ;
+	color         : #ac6500           ;
+}
+#SyncBox.Synced{
+        border        : 2px solid green   ;
+	color         : green             ;
 }
 #RightSection #HomeBox{
 	margin-right : 16px ;
 }
 
-#RightSection #MenuBox:hover,
-#RightSection #HomeBox:hover
+#MenuBox:hover,
+#HomeBox:hover,
+#SyncBox:hover
 {
         background     : #f0f0f0 ;
 }

@@ -23,6 +23,7 @@ pos_ar.PointOfSale.pos_customer_box = class{
 
 	start_work(){
 		this.prepare_customer_box();
+		this.checkForSync();
 		this.setListeners();
 	}
 
@@ -71,6 +72,9 @@ pos_ar.PointOfSale.pos_customer_box = class{
 	}
 
 
+	checkForSync(){
+		this.sync_btn.addClass('Synced');
+	}
 
 	setListeners(){
 
