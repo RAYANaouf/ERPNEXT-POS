@@ -1,17 +1,24 @@
 
 
 #RightSection #tabs div.tab{
-	padding    : 4px 12px 4px 12px ;
-	margin     : 0px 6px 0px 0px ;
-	background : #f9f9f9 ;
-	border        : 2.5px solid #c0c0c0 ;
-	border-bottom : none ;
-	border-radius : 12px 12px 0px 0px  ;
+	height          : 40px ;
+	padding         : 0px 12px 0px 12px ;
+	margin          : 0px 6px 0px 0px ;
+	background      : #f9f9f9 ;
+	border          : 2.5px solid #c0c0c0 ;
+	border-bottom   : none ;
+	border-radius   : 16px 16px 0px 0px  ;
 
-	cursor : pointer ; 
+	cursor          : pointer ; 
+	display         : flex    ;
+	justify-content : center  ;
+	align-items     : center  ;
 
-	position      : relative          ;
-	bottom        : -2px              ;
+	font-size       : 16px    ;
+	font-weight     : 600     ; 
+
+	position        : relative;
+	bottom          : -2px    ;
 
 }
 #RightSection #tabs div.tab.selected{
@@ -24,7 +31,7 @@
 }
 
 #RightSection #tabs div.unselected{
-	background : #f0f0f0;
+	background : #f9f9f9;
 }
 #RightSection #tabs div.tab:hover{
 	background    : #ffffff ; 
@@ -42,8 +49,6 @@ div.tab img{
         padding       : 0px 0px 16px 0px ;
         background    : #FFFFFF ;
 
-
-        box-shadow    : rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
         border        : 2px solid #c0c0c0 ;
         border-radius : 0px 16px 16px 16px ;
         overFlow-y    : auto ;

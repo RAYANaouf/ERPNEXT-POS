@@ -1,15 +1,13 @@
 #LeftSection #SelectorBox{
         width       : 100%    ;
         height      : 100%    ;
-        background  : #ffffff !important ;
 
         animation     : mymove 1s  ;
-        box-shadow    : rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
         display       : flex ;
         overflow-y    : auto ;
-
-        border        : 2px solid #c0c0c0 ;
-        border-radius : 16px;
+	border        : 2px solid #ccc ;
+	border-radius : 26px;
+	background    : #ffffff;
 }
 
 
@@ -18,6 +16,7 @@
 /*header*/
 #LeftSection #SelectorBox .header{
         height         : 45px          ;
+	margin-top      : 10px          ;
         padding        : 0px 16px      ;
         justify-content: space-between ;
 }
