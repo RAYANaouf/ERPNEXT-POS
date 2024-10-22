@@ -1117,24 +1117,24 @@
       this.back_home = backHome;
       this.on_sync = onSync;
       this.on_menu_click = onMenuClick;
-      console.log("log =+=> ", onMenuClick);
       this.online = true;
       this.show_menu = false;
       this.start_work();
     }
     start_work() {
       this.prepare_customer_box();
-      this.setCustomersInList();
       this.setListeners();
     }
     prepare_customer_box() {
       this.wrapper.append('<div id="ActionsContainerBox" class="rowBox align_center">');
       this.actionContainer = this.wrapper.find("#ActionsContainerBox");
-      this.actionContainer.append('<div id="CustomerBox" class="rowBox align_center">');
-      this.actionContainer.append('<div id="MenuBox"     class="rowBox centerItem">');
+      this.actionContainer.append('<div id="SyncBox"     class="rowBox centerItem" >');
       this.actionContainer.append('<div id="HomeBox"     class="rowBox centerItem"  style="display:none;">');
+      this.actionContainer.append('<div id="MenuBox"     class="rowBox centerItem">');
+      this.sync_btn = this.actionContainer.find("#SyncBox");
+      this.sync_btn.append("<div > Sync </div>");
       this.home = this.actionContainer.find("#HomeBox");
-      this.home.append('<img src="/assets/pos_ar/images/home.png" alt="Home" id="homeBoxIcon" >');
+      this.home.append('<img src="/assets/pos_ar/images/home.png" alt="Home" id="homeBoxIcon">');
       this.menu = this.actionContainer.find("#MenuBox");
       this.menu.append('<img src="/assets/pos_ar/images/menu.png" alt="Menu" id="MenuBtn" >');
       this.menu.append('<div id="menuItemsContainer"     class="columnBox">');
@@ -1145,24 +1145,15 @@
       this.pos_invoices = this.menuItemsContainer.find("#posInvoiceMenuItem");
       this.close_pos = this.menuItemsContainer.find("#closePosMenuItem");
       this.setting = this.menuItemsContainer.find("#settingMenuItem");
-      this.customerBox = this.actionContainer.find("#CustomerBox");
-      this.customerBox.append('<div id="syncBtn" class="Synced">Sync</div>');
-      this.sync_btn = this.customerBox.find("#syncBtn");
-    }
-    setCustomersInList() {
     }
     hideActionBar() {
-      this.customerBox.css("display", "none");
       this.home.css("display", "flex");
-      this.actionContainer.css("flex-direction", "row-reverse");
     }
     showActionBar() {
-      this.customerBox.css("display", "flex");
       this.home.css("display", "none");
-      this.actionContainer.css("flex-direction", "row");
     }
     setListeners() {
-      this.customerBox.find("#syncBtn").on("click", (event2) => {
+      this.sync_btn.on("click", (event2) => {
         this.on_sync();
       });
       this.close_pos.on("click", (event2) => {
@@ -2711,4 +2702,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.B72OTHQN.js.map
+//# sourceMappingURL=pos.bundle.Y5VWX6AP.js.map

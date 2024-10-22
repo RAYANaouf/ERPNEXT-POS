@@ -1,4 +1,7 @@
-/************* right *****************/
+#ActionsContainerBox{
+	justify-content : end ;
+        margin-bottom   : 5px ;
+}
 
 #RightSection #MenuBox, 
 #RightSection #HomeBox
@@ -6,7 +9,6 @@
 
         height : 55px  ;
 	width  : 55px  ;
-        margin-bottom  : 5px    ;
         background     : #FFFFFF ;
         border          : 2px solid #c0c0c0 ;
         border-radius   : 16px   ;
@@ -16,7 +18,22 @@
 
 	position : relative ; 
 }
+#SyncBox{
+	height        : 55px              ;
+	padding       : 0px 16px          ;
+	margin-right  : 16px              ;
+        background    : #FFFFFF           ;
+        border        : 2px solid #c0c0c0 ;
+        border-radius : 16px              ;
 
+	color         : #ac6500           ;
+	font-weight   : 800               ;
+	font-size     : 20px              ;
+
+        animation     : mymove 1.5s       ;
+        box-shadow    : rgba(100, 100, 111, 0.2) 0px 2px 15px 0px;
+
+}
 #RightSection #HomeBox{
 	margin-right : 16px ;
 }
@@ -113,53 +130,5 @@
 
 #RightSection #syncBtn.Synced:hover{
 	border  : 4px solid green;
-}
-
-#RightSection #CustomerBox #toggleButtonLabel{
-	margin-right : 8px ;
-}
-
-#RightSection #CustomerBox #toggleButton{
-	width  : 40px ;
-	height : 25px ;
-	margin-right  : 16px    ;
-	background    : #f5f5f5 ;
-	border        : 2px solid #cccccc ;
-	border-radius : 10px    ;
-
-	position   : relative ;
-	cursor     : pointer  ;
-
-	transition : border 0.4s ease ;
-}
-
-#RightSection #CustomerBox #toggleButton:hover{
-	background    : #e5e5e5 ;	
-}
-
-#RightSection #CustomerBox #toggleButtonBall{
-	width         : 15px     ;
-	height        : 15px     ;
-	margin        : 0px 3px  ;
-	background    : #d0d0d0  ;
-	border-radius : 100%     ;
-
-	position      : absolute ;
-	left          : 0px      ;
-
-	transition : left 0.4s ease , background 0.4s ease  ;
-
-}
-
-#RightSection #CustomerBox #CustomerInput{
-        margin    : 0px 16px ;
-	
-	flex-grow : 1        ;
-}
-
-
-#RightSection #CustomerBox input:focus{
-        border  : none ;
-        outline : none ;
 }
 

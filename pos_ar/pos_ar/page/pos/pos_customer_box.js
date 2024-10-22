@@ -15,22 +15,14 @@ pos_ar.PointOfSale.pos_customer_box = class{
 		this.back_home         = backHome         ;
 		this.on_sync           = onSync           ;
 		this.on_menu_click     = onMenuClick      ;
-
-
-		console.log("log =+=> " , onMenuClick)
-
-
 		//local
 		this.online  = true    ;
 		this.show_menu = false ;
 		this.start_work()      ;
 	}
 
-
-
 	start_work(){
 		this.prepare_customer_box();
-		this.setCustomersInList();
 		this.setListeners();
 	}
 
@@ -39,14 +31,15 @@ pos_ar.PointOfSale.pos_customer_box = class{
 		this.wrapper.append('<div id="ActionsContainerBox" class="rowBox align_center">');
 		this.actionContainer = this.wrapper.find('#ActionsContainerBox');
 
-		this.actionContainer.append('<div id="CustomerBox" class="rowBox align_center">');
-		this.actionContainer.append('<div id="MenuBox"     class="rowBox centerItem">');
+		this.actionContainer.append('<div id="SyncBox"     class="rowBox centerItem" >');
 		this.actionContainer.append('<div id="HomeBox"     class="rowBox centerItem"  style="display:none;">');
+		this.actionContainer.append('<div id="MenuBox"     class="rowBox centerItem">');
 
-
+		this.sync_btn = this.actionContainer.find('#SyncBox')
+		this.sync_btn.append('<div > Sync </div>')
 
 		this.home = this.actionContainer.find('#HomeBox')
-		this.home.append('<img src="/assets/pos_ar/images/home.png" alt="Home" id="homeBoxIcon" >')
+		this.home.append('<img src="/assets/pos_ar/images/home.png" alt="Home" id="homeBoxIcon">')
 
 		this.menu = this.actionContainer.find('#MenuBox')
 		this.menu.append('<img src="/assets/pos_ar/images/menu.png" alt="Menu" id="MenuBtn" >')
@@ -60,60 +53,25 @@ pos_ar.PointOfSale.pos_customer_box = class{
 		this.pos_invoices = this.menuItemsContainer.find('#posInvoiceMenuItem')
 		this.close_pos    = this.menuItemsContainer.find('#closePosMenuItem')
 		this.setting      = this.menuItemsContainer.find('#settingMenuItem')
-
-		this.customerBox = this.actionContainer.find('#CustomerBox');
-		//this.customerBox.append('<select  id="CustomerInput" placeHolder="Enter the customer"></select>')
-
-		//this.customer_selecte = this.customerBox.find('#CustomerInput')
-		this.customerBox.append('<div id="syncBtn" class="Synced">Sync</div>')
-
-		this.sync_btn = this.customerBox.find('#syncBtn')
 	}
 
-
-	setCustomersInList(){
-
-		//const customerList_html = document.getElementById("CustomerInput");
-		//customerList_html.innerHTML = "" ;
-
-		/*this.customers_list.forEach(customer =>{
-			const option = document.createElement("option");
-			option.value = customer.name;
-			option.textContent = customer.customer_name;
-			customerList_html.appendChild(option);
-		})*/
-	}
 
 	//show and hide
 	hideActionBar(){
-		this.customerBox.css('display' , 'none');
 		this.home.css('display' , 'flex');
-		this.actionContainer.css('flex-direction' , 'row-reverse')
 	}
 
 	showActionBar(){
-		this.customerBox.css('display' , 'flex');
 		this.home.css('display' , 'none');
-		this.actionContainer.css('flex-direction' , 'row')
 	}
 
 
 
 	setListeners(){
 
-		this.customerBox.find('#syncBtn').on('click' , (event)=>{
+		this.sync_btn.on('click' , (event)=>{
 			this.on_sync();
 		})
-
-		/*this.customerBox.find('#CustomerInput').on('input' , (event)=>{
-			const customer_value = event.target.value ;
-
-			this.customers_list.forEach( customer => {
-				if( customer.name == customer_value){
-					console.log("selected customer : " , customer)
-				}
-			})
-		})*/
 
 		this.close_pos.on('click' , (event)=>{
 			this.on_menu_click('close_pos');
