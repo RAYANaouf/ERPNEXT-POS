@@ -15,8 +15,8 @@
       this.warehouseList = [];
       this.PosProfileList = [];
       this.binList = [];
-      this.selectedItem = {};
-      this.selectedField = {};
+      this.selectedItem = { "name": "" };
+      this.selectedField = { "field_name": "" };
       this.selectedTab = { "tabName": "" };
       this.selectedPaymentMethod = { "methodName": "" };
       this.selectedCustomer = { "name": "", "customer_name": "" };
@@ -836,8 +836,6 @@
         }
       });
       return salesTax;
-    }
-    recalculateBasedOnPriceList() {
     }
     async fetchCustomers() {
       try {
@@ -2703,4 +2701,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.IHZNZ366.js.map
+//# sourceMappingURL=pos.bundle.6GUXDS7V.js.map
