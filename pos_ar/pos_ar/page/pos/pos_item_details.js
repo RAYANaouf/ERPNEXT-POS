@@ -27,7 +27,6 @@ pos_ar.PointOfSale.pos_item_details = class{
 
 
 	// start function
-
 	start_the_work(){
 		this.prepare_item_details_cart();
 		this.setDetailsFieldsListeners();

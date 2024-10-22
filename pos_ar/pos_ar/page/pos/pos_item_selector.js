@@ -23,15 +23,12 @@ pos_ar.PointOfSale.pos_item_selector = class {
 		this.start_item_selector();
         }
 
-
 	start_item_selector(){
 		this.prepare_select_box();
 		this.setItemGroupsInList();
 		this.setItemInFlow(this.getItemByItemGroup(""))
 		this.setListeners();
 	}
-
-
 
 	/***********************  ui  functions  ***************************************/
 	prepare_select_box(){
@@ -100,7 +97,7 @@ pos_ar.PointOfSale.pos_item_selector = class {
                         	itemBox.appendChild(itemImageHolder);
                 	}
                 	const itemName = document.createElement("div");
-                	itemName.textContent = item.description ;
+                	itemName.textContent = item.item_name ;
                 	itemName.classList.add("itemTitle");
                 	itemBox.appendChild(itemName);
 

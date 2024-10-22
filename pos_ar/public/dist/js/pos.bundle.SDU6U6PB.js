@@ -1054,7 +1054,7 @@
           itemBox.appendChild(itemImageHolder);
         }
         const itemName = document.createElement("div");
-        itemName.textContent = item.description;
+        itemName.textContent = item.item_name;
         itemName.classList.add("itemTitle");
         itemBox.appendChild(itemName);
         const price = document.createElement("div");
@@ -2720,4 +2720,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.O4S2IVFT.js.map
+//# sourceMappingURL=pos.bundle.SDU6U6PB.js.map
