@@ -1,13 +1,5 @@
 
 
-#RightSection #tabs{
-
-}
-
-
-
-
-
 #RightSection #tabs div.tab{
 	padding    : 4px 12px 4px 12px ;
 	margin     : 0px 6px 0px 0px ;
@@ -60,10 +52,14 @@ div.tab img{
 }
 
 #RightSection #CartBox #CartBoxTopBar{
-        width   : 100%;
-        padding : 0px 16px ;
+        width      : 100%     ;
+        margin-top : 16px     ; 
+	padding    : 0px 16px ;
+	justify-content: end  ;
 }
-
+#RightSection #CartBox #CartBoxTopBar #customerInput{
+	margin-right : 16px   ;
+}
 
 /*** items container***/
 

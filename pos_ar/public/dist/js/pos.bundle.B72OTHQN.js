@@ -1146,20 +1146,10 @@
       this.close_pos = this.menuItemsContainer.find("#closePosMenuItem");
       this.setting = this.menuItemsContainer.find("#settingMenuItem");
       this.customerBox = this.actionContainer.find("#CustomerBox");
-      this.customerBox.append('<select  id="CustomerInput" placeHolder="Enter the customer"></select>');
-      this.customer_selecte = this.customerBox.find("#CustomerInput");
       this.customerBox.append('<div id="syncBtn" class="Synced">Sync</div>');
       this.sync_btn = this.customerBox.find("#syncBtn");
     }
     setCustomersInList() {
-      const customerList_html = document.getElementById("CustomerInput");
-      customerList_html.innerHTML = "";
-      this.customers_list.forEach((customer) => {
-        const option = document.createElement("option");
-        option.value = customer.name;
-        option.textContent = customer.customer_name;
-        customerList_html.appendChild(option);
-      });
     }
     hideActionBar() {
       this.customerBox.css("display", "none");
@@ -1174,14 +1164,6 @@
     setListeners() {
       this.customerBox.find("#syncBtn").on("click", (event2) => {
         this.on_sync();
-      });
-      this.customerBox.find("#CustomerInput").on("input", (event2) => {
-        const customer_value = event2.target.value;
-        this.customers_list.forEach((customer) => {
-          if (customer.name == customer_value) {
-            console.log("selected customer : ", customer);
-          }
-        });
       });
       this.close_pos.on("click", (event2) => {
         this.on_menu_click("close_pos");
@@ -2729,4 +2711,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.ZJ5AABXQ.js.map
+//# sourceMappingURL=pos.bundle.B72OTHQN.js.map
