@@ -1361,6 +1361,7 @@
     }
     refreshSelectedItem() {
       this.priceListInput.val(this.selected_item_maps.get(this.selected_tab.tabName).priceList);
+      this.customerInput.val(this.selected_item_maps.get(this.selected_tab.tabName).customer);
       const selectedItemsContainer = document.getElementById("selectedItemsContainer");
       selectedItemsContainer.innerHTML = "";
       this.selected_item_maps.get(this.selected_tab.tabName).items.forEach((item) => {
@@ -2719,4 +2720,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.WU2URHCF.js.map
+//# sourceMappingURL=pos.bundle.O4S2IVFT.js.map
