@@ -281,6 +281,7 @@
         this.$rightSection,
         this.selectedItemMaps,
         this.priceLists,
+        this.customersList,
         this.sales_taxes,
         this.invoiceData,
         this.selectedTab,
@@ -631,7 +632,6 @@
       this.selectedItemMaps.get(this.selectedTab.tabName).base_paid_amount = this.invoiceData.paidAmount;
       this.selectedItemMaps.get(this.selectedTab.tabName).payments = [{ "mode_of_payment": "Cash", "amount": this.invoiceData.paidAmount }];
       this.selectedItemMaps.get(this.selectedTab.tabName).docstatus = 1;
-      this.selectedItemMaps.get(this.selectedTab.tabName).customer = this.defaultCustomer.name;
       this.sellInvoices.set(this.selectedItemMaps.get(this.selectedTab.tabName).name, this.selectedItemMaps.get(this.selectedTab.tabName));
       const status = this.checkIfPaid(this.selectedItemMaps.get(this.selectedTab.tabName));
       this.selectedItemMaps.get(this.selectedTab.tabName).status = status;
@@ -1219,10 +1219,12 @@
 
   // ../pos_ar/pos_ar/pos_ar/page/pos/pos_selected_item_cart.js
   pos_ar.PointOfSale.pos_selected_item_cart = class {
-    constructor(wrapper, selectedItemMaps, priceLists, salesTaxes, invoiceData, selectedTab, selectedItem, selectedField, getItemPrice, onSelectedItemClick, onTabClick, onKeyPressed, createNewTab, onCheckoutClick) {
+    constructor(wrapper, selectedItemMaps, priceLists, customerList, salesTaxes, invoiceData, selectedTab, selectedItem, selectedField, getItemPrice, onSelectedItemClick, onTabClick, onKeyPressed, createNewTab, onCheckoutClick) {
+      console.log("start debuging 0");
       this.wrapper = wrapper;
       this.selected_item_maps = selectedItemMaps;
       this.price_lists = priceLists;
+      this.customer_list = customerList;
       this.sales_taxes = salesTaxes;
       this.invoice_data = invoiceData;
       this.selected_tab = selectedTab;
@@ -1234,6 +1236,7 @@
       this.on_selected_item_click = onSelectedItemClick;
       this.on_tab_click = onTabClick;
       this.create_new_tab = createNewTab;
+      console.log("start debuging 1");
       this.taxes_map = /* @__PURE__ */ new Map();
       this.total_tax_amout = 0;
       this.counter = 1;
@@ -1242,7 +1245,7 @@
     }
     start_work() {
       this.prepare_selected_item_cart();
-      this.fullfillPriceList();
+      this.fulfillingSelects();
       this.setButtonsListeners();
       this.setListener();
     }
@@ -1260,8 +1263,11 @@
       this.cartBox.append('<div id="selectedItemsContainer" class="columnBox"></div>');
       this.cartBox.append('<div id="cartFooter" class="columnBox"></div>');
       this.cartTopBar = this.cartBox.find("#CartBoxTopBar");
-      this.cartTopBar.append('<h4 class="CartTitle">Item Cart</h4>');
+      this.cartTopBar.append('<div id="selectedCustomerInput"></div>');
       this.cartTopBar.append('<div id="selectedItemsPriceListInput"></div>');
+      this.customerInputContainer = this.cartTopBar.find("#selectedCustomerInput");
+      this.customerInputContainer.append('<select  id="customerInput"  placeHolder="Choice a customer">');
+      this.customerInput = this.customerInputContainer.find("#customerInput");
       this.priceListInputContainer = this.cartTopBar.find("#selectedItemsPriceListInput");
       this.priceListInputContainer.append('<select  id="PriceListInput" name="PriceList" placeHolder="Choice a Price list">');
       this.priceListInput = this.priceListInputContainer.find("#PriceListInput");
@@ -1327,9 +1333,12 @@
         this.on_checkout_click();
       });
     }
-    fullfillPriceList() {
+    fulfillingSelects() {
       this.price_lists.forEach((priceList) => {
         this.priceListInput.append(`<option value="${priceList.name}">${priceList.price_list_name}</option>`);
+      });
+      this.customer_list.forEach((customer) => {
+        this.customerInput.append(`<option value="${customer.name}">${customer.customer_name}</option>`);
       });
     }
     refreshTabs() {
@@ -2720,4 +2729,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.IZ2BATVV.js.map
+//# sourceMappingURL=pos.bundle.ZJ5AABXQ.js.map

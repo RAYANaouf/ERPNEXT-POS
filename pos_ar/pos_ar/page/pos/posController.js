@@ -338,14 +338,15 @@ pos_ar.PointOfSale.Controller = class {
 	}
         init_selected_item(){
 		this.selected_item_cart  = new pos_ar.PointOfSale.pos_selected_item_cart(
-									this.$rightSection ,
-									this.selectedItemMaps,
-									this.priceLists   ,
-									this.sales_taxes  ,
-									this.invoiceData  ,
-									this.selectedTab  ,
-									this.selectedItem ,
-									this.selectedField,
+									this.$rightSection    ,
+									this.selectedItemMaps ,
+									this.priceLists       ,
+									this.customersList    ,
+									this.sales_taxes      ,
+									this.invoiceData      ,
+									this.selectedTab      ,
+									this.selectedItem     ,
+									this.selectedField    ,
 									this.getItemPrice.bind(this),
 									item => {
 										this.onSelectedItemClick(item)
@@ -859,7 +860,6 @@ pos_ar.PointOfSale.Controller = class {
 		this.selectedItemMaps.get(this.selectedTab.tabName).base_paid_amount  = this.invoiceData.paidAmount
 		this.selectedItemMaps.get(this.selectedTab.tabName).payments          = [{'mode_of_payment' : 'Cash' , 'amount' : this.invoiceData.paidAmount}]
 		this.selectedItemMaps.get(this.selectedTab.tabName).docstatus         = 1
-		this.selectedItemMaps.get(this.selectedTab.tabName).customer          = this.defaultCustomer.name
 
 		this.sellInvoices.set(this.selectedItemMaps.get(this.selectedTab.tabName).name , this.selectedItemMaps.get(this.selectedTab.tabName));
 
