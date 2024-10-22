@@ -21,7 +21,7 @@
       this.selectedPaymentMethod = { "methodName": "" };
       this.defaultCustomer = { "name": "", "customer_name": "" };
       this.selectedPosProfile = { "name": "" };
-      this.selectedPriceList = { "name": "" };
+      this.defaultPriceList = { "name": "" };
       this.sales_taxes = [];
       this.sellInvoices = /* @__PURE__ */ new Map();
       this.POSOpeningEntry = {};
@@ -72,7 +72,7 @@
         );
       }
       if (this.priceLists.length > 0) {
-        Object.assign(this.selectedPriceList, this.priceLists[0]);
+        Object.assign(this.defaultPriceList, this.priceLists[0]);
       } else {
         frappe.warn(
           "You dont have a single price list",
@@ -97,7 +97,7 @@
       new_pos_invoice.update_stock = 1;
       new_pos_invoice.docstatus = 0;
       new_pos_invoice.status = "Draft";
-      new_pos_invoice.priceList = this.priceLists[0].name;
+      new_pos_invoice.priceList = this.defaultPriceList.name;
       this.selectedItemMaps.set("C1", new_pos_invoice);
       this.selectedTab.tabName = `C1`;
       this.sales_taxes = this.getSalesTaxes(this.selectedItemMaps.get(this.selectedTab.tabName));
@@ -259,7 +259,7 @@
         this.itemList,
         this.itemGroupList,
         this.itemPrices,
-        this.selectedPriceList,
+        this.defaultPriceList,
         this.getItemPrice.bind(this),
         (item) => {
           this.itemClick_selector(item);
@@ -458,6 +458,7 @@
       new_pos_invoice.update_stock = 1;
       new_pos_invoice.docstatus = 0;
       new_pos_invoice.status = "Draft";
+      new_pos_invoice.priceList = this.defaultPriceList.name;
       this.selectedItemMaps.set(`C${counter}`, new_pos_invoice);
       this.selectedTab.tabName = `C${counter}`;
     }
@@ -640,7 +641,6 @@
       const status = this.checkIfPaid(this.selectedItemMaps.get(this.selectedTab.tabName));
       this.selectedItemMaps.get(this.selectedTab.tabName).status = status;
       if (status == "Unpaid") {
-        console.log("should Sync It");
         frappe.db.insert(
           this.selectedItemMaps.get(this.selectedTab.tabName)
         ).then((r) => {
@@ -2719,4 +2719,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.6VWWEDLU.js.map
+//# sourceMappingURL=pos.bundle.WU2URHCF.js.map

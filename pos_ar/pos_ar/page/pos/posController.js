@@ -25,7 +25,7 @@ pos_ar.PointOfSale.Controller = class {
 		this.selectedPaymentMethod = {"methodName" : ""   }
 		this.defaultCustomer       = {"name"       : "" , "customer_name" : ""}
 		this.selectedPosProfile    = {"name"       : ""   }
-		this.selectedPriceList     = {"name"       : ""   }
+		this.defaultPriceList      = {"name"       : ""   }
 
 		//taxes
 		this.sales_taxes = [];
@@ -67,18 +67,14 @@ pos_ar.PointOfSale.Controller = class {
                 this.PosProfileList   = await this.fetchPosProfileList()
                 this.binList          = await this.fetchBinList()
 
-
 		this.sales_taxes_and_charges    = await this.fetchSalesTaxesAndCharges()
 		this.taxes_and_charges_template = await this.fetchSalesTaxesAndChargesTemplate()
-
 
 		if(this.PosProfileList.length == 0){
 			frappe.set_route("Form", "POS Profile");
 			return;
 		}
-
 		Object.assign(this.selectedPosProfile , this.PosProfileList[0])
-
 
 		if(this.customersList.length > 0){
 			this.defaultCustomer = structuredClone(this.customersList[0])
@@ -95,7 +91,7 @@ pos_ar.PointOfSale.Controller = class {
 		}
 
 		if(this.priceLists.length > 0){
-			Object.assign(this.selectedPriceList , this.priceLists[0])
+			Object.assign(this.defaultPriceList , this.priceLists[0])
 		}else{
 			frappe.warn(
 					'You dont have a single price list',
@@ -123,7 +119,7 @@ pos_ar.PointOfSale.Controller = class {
 		new_pos_invoice.update_stock      = 1
 		new_pos_invoice.docstatus         = 0
 		new_pos_invoice.status            = 'Draft'
-		new_pos_invoice.priceList         = this.priceLists[0].name
+		new_pos_invoice.priceList         = this.defaultPriceList.name
 
 		this.selectedItemMaps.set("C1" , new_pos_invoice)
 		this.selectedTab.tabName = `C1`
@@ -320,7 +316,7 @@ pos_ar.PointOfSale.Controller = class {
 						this.itemList          ,
 						this.itemGroupList     ,
 						this.itemPrices        ,
-						this.selectedPriceList ,
+						this.defaultPriceList  ,
 						this.getItemPrice.bind(this),
 						item => { this.itemClick_selector(item)  }
 					)
@@ -584,7 +580,7 @@ pos_ar.PointOfSale.Controller = class {
 		new_pos_invoice.update_stock      = 1
 		new_pos_invoice.docstatus         = 0
 		new_pos_invoice.status            = 'Draft'
-
+		new_pos_invoice.priceList         = this.defaultPriceList.name
 
 
 		this.selectedItemMaps.set(`C${counter}` , new_pos_invoice)
@@ -873,7 +869,6 @@ pos_ar.PointOfSale.Controller = class {
 		this.selectedItemMaps.get(this.selectedTab.tabName).status            = status
 
 		if(status == 'Unpaid'){
-			console.log("should Sync It")
 			frappe.db.insert(
 					this.selectedItemMaps.get(this.selectedTab.tabName)
 			).then(r =>{
