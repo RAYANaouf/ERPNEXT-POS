@@ -854,7 +854,7 @@ pos_ar.PointOfSale.Controller = class {
 		this.selectedItemMaps.get(this.selectedTab.tabName).payments          = [{'mode_of_payment' : 'Cash' , 'amount' : this.invoiceData.paidAmount}]
 		this.selectedItemMaps.get(this.selectedTab.tabName).docstatus         = 1
 
-		this.sellInvoices.set(this.selectedItemMaps.get(this.selectedTab.tabName).name , this.selectedItemMaps.get(this.selectedTab.tabName));
+		//this.sellInvoices.set(this.selectedItemMaps.get(this.selectedTab.tabName).name , this.selectedItemMaps.get(this.selectedTab.tabName));
 
 		//set status
 		const status = this.checkIfPaid(this.selectedItemMaps.get(this.selectedTab.tabName))
@@ -865,9 +865,9 @@ pos_ar.PointOfSale.Controller = class {
 					this.selectedItemMaps.get(this.selectedTab.tabName)
 			).then(r =>{
 				this.db.updatePosInvoice(
-							this.selectedItemMaps.get(this.selectedTab.tabName) ,
+							this.selectedItemMaps.get(this.selectedTab.tabName),
 							(event) => {
-								console.log("sucess => " , event )
+								console.log("sucess => "  , event )
 							},
 							(event) => {
 								console.log("failure => " , event )
@@ -879,6 +879,7 @@ pos_ar.PointOfSale.Controller = class {
 			})
 		}
 		else{
+			this.selectedItemMaps.get(this.selectedTab.tabName).synced = false ;
 			this.db.updatePosInvoice(
 						this.selectedItemMaps.get(this.selectedTab.tabName) ,
 						(event) => {
@@ -918,6 +919,15 @@ pos_ar.PointOfSale.Controller = class {
 
 		//calculate amount
 		let all_invoices = Array.from(this.sellInvoices.keys())
+
+		this.db.getToSyncPosInvoice(
+			(message)=>{
+				console.log("message : " , message);
+			},
+			(err)=>{
+				console.log("err : " , err);
+			}
+		)
 
 		if(all_invoices.length == 0){
 
@@ -1030,13 +1040,11 @@ pos_ar.PointOfSale.Controller = class {
 
 
 	onClosePOS(){
-
 		let all_tabs = Array.from(this.sellInvoices.keys())
 		//check if you still have an invoice to sync
 		if(all_tabs.length > 0){
 			frappe.throw(__(`you have ${all_tabs.length} invoice to sync first.`))
 		}
-
 		//otherwise you can close the voucher
 		let voucher               = frappe.model.get_new_doc("POS Closing Entry");
 		voucher.pos_opening_entry = this.POSOpeningEntry.name;
@@ -1046,16 +1054,12 @@ pos_ar.PointOfSale.Controller = class {
 		voucher.posting_date      = frappe.datetime.now_date();
 		voucher.posting_time      = frappe.datetime.now_time();
 
-
 		frappe.set_route("Form", "POS Closing Entry", voucher.name);
-
 		//delete the open entry because you create the closing entr,
 		//that my the user submited it, so when the code find its name empty,
 		//it will try to fetch an open pos entry if there is no one opening,
 		//it will force the user to create one.
-		this.POSOpeningEntry.name = ''
-
-
+		this.POSOpeningEntry.name = '' ;
 	}
 
 

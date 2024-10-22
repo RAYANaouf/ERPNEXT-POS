@@ -637,7 +637,6 @@
       this.selectedItemMaps.get(this.selectedTab.tabName).base_paid_amount = this.invoiceData.paidAmount;
       this.selectedItemMaps.get(this.selectedTab.tabName).payments = [{ "mode_of_payment": "Cash", "amount": this.invoiceData.paidAmount }];
       this.selectedItemMaps.get(this.selectedTab.tabName).docstatus = 1;
-      this.sellInvoices.set(this.selectedItemMaps.get(this.selectedTab.tabName).name, this.selectedItemMaps.get(this.selectedTab.tabName));
       const status = this.checkIfPaid(this.selectedItemMaps.get(this.selectedTab.tabName));
       this.selectedItemMaps.get(this.selectedTab.tabName).status = status;
       if (status == "Unpaid") {
@@ -658,6 +657,7 @@
           console.log("cant push pos invoice : ", err);
         });
       } else {
+        this.selectedItemMaps.get(this.selectedTab.tabName).synced = false;
         this.db.updatePosInvoice(
           this.selectedItemMaps.get(this.selectedTab.tabName),
           (event2) => {
@@ -686,6 +686,14 @@
         return;
       }
       let all_invoices = Array.from(this.sellInvoices.keys());
+      this.db.getToSyncPosInvoice(
+        (message) => {
+          console.log("message : ", message);
+        },
+        (err) => {
+          console.log("err : ", err);
+        }
+      );
       if (all_invoices.length == 0) {
         frappe.msgprint({
           title: __("Sync Complete"),
@@ -2559,7 +2567,7 @@
   // ../pos_ar/pos_ar/pos_ar/page/pos/pos_db.js
   pos_ar.PointOfSale.pos_db = class POSDatabase {
     constructor() {
-      this.dbName = "POSDB_test12";
+      this.dbName = "POSDB_test13";
       this.dbVersion = 14;
       this.db = null;
       this.openDatabase();
@@ -2603,6 +2611,7 @@
         if (!db.objectStoreNames.contains("POS Invoice")) {
           const posInvoiceStore = db.createObjectStore("POS Invoice", { keyPath: "name" });
           posInvoiceStore.createIndex("docstatus", "docstatus", { unique: false });
+          posInvoiceStore.createIndex("synced", "synced", { unique: false });
         }
       };
     }
@@ -2647,6 +2656,18 @@
       const store_posInvoice = transaction_posInvoice.objectStore("POS Invoice");
       const index_docstatus_posInvoice = store_posInvoice.index("docstatus");
       const request = index_docstatus_posInvoice.getAll(0);
+      request.onsuccess = (event2) => {
+        onSuccess(event2.target.result);
+      };
+      request.onerror = (event2) => {
+        onFailure(event2);
+      };
+    }
+    getToSyncPosInvoice(onSuccess, onFailure) {
+      const transaction_posInvoice = this.db.transaction(["POS Invoice"], "readwrite");
+      const store_posInvoice = transaction_posInvoice.objectStore("POS Invoice");
+      const index_docstatus_posInvoice = store_posInvoice.index("synced");
+      const request = index_docstatus_posInvoice.getAll();
       request.onsuccess = (event2) => {
         onSuccess(event2.target.result);
       };
@@ -2720,4 +2741,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.RQD2PWAC.js.map
+//# sourceMappingURL=pos.bundle.XKUHKHUQ.js.map

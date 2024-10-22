@@ -1,7 +1,7 @@
 pos_ar.PointOfSale.pos_db  = class POSDatabase {
 
 	constructor() {
-		this.dbName = 'POSDB_test12';
+		this.dbName = 'POSDB_test13';
 		this.dbVersion = 14;
 		this.db = null;
 
@@ -10,7 +10,6 @@ pos_ar.PointOfSale.pos_db  = class POSDatabase {
 
 
 	openDatabase(){
-
 		// Let us open our database
 		const request = window.indexedDB.open( this.dbName , this.dbVersion);
 
@@ -56,7 +55,8 @@ pos_ar.PointOfSale.pos_db  = class POSDatabase {
 			}
 			if (!db.objectStoreNames.contains('POS Invoice')) {
 				const posInvoiceStore = db.createObjectStore('POS Invoice', { keyPath : 'name' });
-				posInvoiceStore.createIndex('docstatus' , 'docstatus' , {unique : false})
+				posInvoiceStore.createIndex( 'docstatus' , 'docstatus' , {unique : false} )
+				posInvoiceStore.createIndex( 'synced'    , 'synced'    , {unique : false} )
 			}
 		};
 	}
@@ -121,6 +121,23 @@ pos_ar.PointOfSale.pos_db  = class POSDatabase {
 		const index_docstatus_posInvoice = store_posInvoice.index('docstatus');
 
 		const request = index_docstatus_posInvoice.getAll(0);
+
+		request.onsuccess = (event) => {
+			onSuccess(event.target.result);
+		};
+
+		request.onerror = (event) => {
+			onFailure(event);
+		};
+
+	}
+
+	getToSyncPosInvoice(onSuccess , onFailure){
+		const transaction_posInvoice     = this.db.transaction(['POS Invoice'] , "readwrite");
+		const store_posInvoice           = transaction_posInvoice.objectStore('POS Invoice');
+		const index_docstatus_posInvoice = store_posInvoice.index('synced');
+
+		const request = index_docstatus_posInvoice.getAll();
 
 		request.onsuccess = (event) => {
 			onSuccess(event.target.result);
