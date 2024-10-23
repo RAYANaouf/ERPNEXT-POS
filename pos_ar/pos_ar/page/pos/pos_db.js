@@ -1,7 +1,7 @@
 pos_ar.PointOfSale.pos_db  = class POSDatabase {
 
 	constructor() {
-		this.dbName = 'POSDB_test16';
+		this.dbName = 'POSDB_test17';
 		this.dbVersion = 1;
 		this.db = null;
 

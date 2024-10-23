@@ -660,9 +660,9 @@
           console.log("cant push pos invoice : ", err);
         });
       } else {
-        this.selectedItemMaps.get(this.selectedTab.tabName).synced = false;
+        pos.synced = false;
         this.db.updatePosInvoice(
-          this.selectedItemMaps.get(this.selectedTab.tabName),
+          pos,
           (event2) => {
             console.log("sucess => ", event2);
           },
@@ -2569,7 +2569,7 @@
   // ../pos_ar/pos_ar/pos_ar/page/pos/pos_db.js
   pos_ar.PointOfSale.pos_db = class POSDatabase {
     constructor() {
-      this.dbName = "POSDB_test16";
+      this.dbName = "POSDB_test17";
       this.dbVersion = 1;
       this.db = null;
       this.openDatabase();
@@ -2744,4 +2744,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.ITQSTHPO.js.map
+//# sourceMappingURL=pos.bundle.R3PFIFOP.js.map

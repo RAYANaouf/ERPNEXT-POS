@@ -850,6 +850,8 @@ pos_ar.PointOfSale.Controller = class {
 		const status = this.checkIfPaid(this.selectedItemMaps.get(this.selectedTab.tabName))
 		this.selectedItemMaps.get(this.selectedTab.tabName).status            = status
 
+		//copy the pos is important otherwise it will deleted and the selectedTab change and then it will save the
+		//wrong one. because insert take a while after the callback will called.
 		const pos = structuredClone(this.selectedItemMaps.get(this.selectedTab.tabName))
 
 		if(status == 'Unpaid'){
@@ -871,9 +873,9 @@ pos_ar.PointOfSale.Controller = class {
 			})
 		}
 		else{
-			this.selectedItemMaps.get(this.selectedTab.tabName).synced = false ;
+			pos.synced = false ;
 			this.db.updatePosInvoice(
-						this.selectedItemMaps.get(this.selectedTab.tabName) ,
+						pos ,
 						(event) => {
 							console.log("sucess => " , event )
 						},
