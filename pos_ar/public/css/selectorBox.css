@@ -5,7 +5,7 @@
         animation     : mymove 1s  ;
         display       : flex ;
         overflow-y    : auto ;
-	border        : 2px solid #ccc ;
+	border        : 4px solid #ccc ;
 	border-radius : 26px;
 	background    : #ffffff;
 }

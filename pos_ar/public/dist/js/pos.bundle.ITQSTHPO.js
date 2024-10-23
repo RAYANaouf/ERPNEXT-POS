@@ -369,7 +369,9 @@
     onCheckout() {
       if (this.checkIfRateZero(this.selectedItemMaps.get(this.selectedTab.tabName))) {
         frappe.throw("Item with rate equal 0");
+        return;
       }
+      this.selectedItemMaps.get(this.selectedTab.tabName).synced = false;
       this.db.savePosInvoice(
         this.selectedItemMaps.get(this.selectedTab.tabName),
         (event2) => {
@@ -610,6 +612,7 @@
           "Done",
           false
         );
+        return;
       }
       let items = [];
       this.selectedItemMaps.get(this.selectedTab.tabName).items.forEach((item) => {
@@ -625,8 +628,7 @@
           "discount_percentage": item.discount_percentage,
           "discount_amount": item.discount_amount,
           "warehouse": this.selectedPosProfile.warehouse,
-          "income_account": this.selectedPosProfile.income_account,
-          "item_tax_rate": {}
+          "income_account": this.selectedPosProfile.income_account
         };
         items.push(newItem);
       });
@@ -639,20 +641,21 @@
       this.selectedItemMaps.get(this.selectedTab.tabName).docstatus = 1;
       const status = this.checkIfPaid(this.selectedItemMaps.get(this.selectedTab.tabName));
       this.selectedItemMaps.get(this.selectedTab.tabName).status = status;
+      const pos = structuredClone(this.selectedItemMaps.get(this.selectedTab.tabName));
       if (status == "Unpaid") {
+        pos.synced = true;
         frappe.db.insert(
-          this.selectedItemMaps.get(this.selectedTab.tabName)
+          pos
         ).then((r) => {
           this.db.updatePosInvoice(
-            this.selectedItemMaps.get(this.selectedTab.tabName),
+            pos,
             (event2) => {
-              console.log("sucess => ", event2);
+              console.log("db sucess => ", event2);
             },
             (event2) => {
               console.log("failure => ", event2);
             }
           );
-          this.sellInvoices.delete(invoiceName);
         }).catch((err) => {
           console.log("cant push pos invoice : ", err);
         });
@@ -707,11 +710,10 @@
       let failure = 0;
       let seccess = 0;
       let invoicesRef = [];
-      all_invoices.forEach((invoiceName2) => {
+      all_invoices.forEach((invoiceName) => {
         frappe.db.insert(
-          this.sellInvoices.get(invoiceName2)
+          this.sellInvoices.get(invoiceName)
         ).then((r) => {
-          invoicesRef.push({ "pos_invoice": r.name, "customer": r.customer });
           this.selectedItemMaps.get(this.selectedTab.tabName).status = "Unpaid";
           this.db.updatePosInvoice(
             this.selectedItemMaps.get(this.selectedTab.tabName),
@@ -722,7 +724,7 @@
               console.log("failure => ", event2);
             }
           );
-          this.sellInvoices.delete(invoiceName2);
+          this.sellInvoices.delete(invoiceName);
           counter += 1;
           frappe.show_progress("Syncing Invoices...", counter, all_invoices.length, "syncing");
           if (counter == all_invoices.length) {
@@ -2567,8 +2569,8 @@
   // ../pos_ar/pos_ar/pos_ar/page/pos/pos_db.js
   pos_ar.PointOfSale.pos_db = class POSDatabase {
     constructor() {
-      this.dbName = "POSDB_test13";
-      this.dbVersion = 14;
+      this.dbName = "POSDB_test16";
+      this.dbVersion = 1;
       this.db = null;
       this.openDatabase();
     }
@@ -2637,6 +2639,7 @@
       const store = transaction.objectStore("POS Invoice");
       const request = store.put(posInvoice);
       request.onsuccess = (event2) => {
+        console.log("save the : ", posInvoice);
         onSuccess(event2);
       };
       request.onerror = (event2) => {
@@ -2675,10 +2678,10 @@
         onFailure(event2);
       };
     }
-    deletePosInvoice(invoiceName2, onSuccess, onFailure) {
+    deletePosInvoice(invoiceName, onSuccess, onFailure) {
       const transaction = this.db.transaction(["POS Invoice"], "readwrite");
       const store = transaction.objectStore("POS Invoice");
-      const request = store.delete(invoiceName2);
+      const request = store.delete(invoiceName);
       request.onsuccess = (event2) => {
         onSuccess(event2);
       };
@@ -2741,4 +2744,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.XKUHKHUQ.js.map
+//# sourceMappingURL=pos.bundle.ITQSTHPO.js.map

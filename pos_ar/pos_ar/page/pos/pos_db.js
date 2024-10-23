@@ -1,8 +1,8 @@
 pos_ar.PointOfSale.pos_db  = class POSDatabase {
 
 	constructor() {
-		this.dbName = 'POSDB_test13';
-		this.dbVersion = 14;
+		this.dbName = 'POSDB_test16';
+		this.dbVersion = 1;
 		this.db = null;
 
 		this.openDatabase()
@@ -98,6 +98,7 @@ pos_ar.PointOfSale.pos_db  = class POSDatabase {
 		const request = store.put(posInvoice);
 
 		request.onsuccess = (event) => {
+			console.log("save the : " , posInvoice)
 			onSuccess(event);
 		};
 

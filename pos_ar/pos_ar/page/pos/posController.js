@@ -11,7 +11,6 @@ pos_ar.PointOfSale.Controller = class {
                 this.itemPrices        = []
                 this.priceLists        = []
 
-
 		let initPos = frappe.model.get_new_doc('POS Invoice')
 		initPos.items = [];
                 this.selectedItemMaps  = new Map()
@@ -444,9 +443,11 @@ pos_ar.PointOfSale.Controller = class {
 	onCheckout(){
 		if(this.checkIfRateZero(this.selectedItemMaps.get(this.selectedTab.tabName))){
 			frappe.throw("Item with rate equal 0")
+			return ;
 		}
+		this.selectedItemMaps.get(this.selectedTab.tabName).synced = false ;
 		this.db.savePosInvoice(
-					this.selectedItemMaps.get(this.selectedTab.tabName) ,
+					this.selectedItemMaps.get(this.selectedTab.tabName),
 					(event) => {
 						console.log("sucess => " , event )
 					},
@@ -470,45 +471,35 @@ pos_ar.PointOfSale.Controller = class {
 
 
 	onClose_details(){
-
 		//show
 		this.item_selector.showCart();
-
 		//hide
 		this.payment_cart.hideCart() ;
 		this.item_details.hide_cart();
 		this.selected_item_cart.hideKeyboard();
 		this.settings_cart.hideCart();
-
 		//change display
 		this.selected_item_cart.setKeyboardOrientation("portrait");
 		this.selected_item_cart.cleanHeighlight();
-
 	}
 
 	onClose_payment_cart(){
-
 		//show
 		this.item_selector.showCart();
-
 		//hide
 		this.item_details.hide_cart();
 		this.payment_cart.hideCart();
 		this.selected_item_cart.hideKeyboard();
 		this.settings_cart.hideCart();
-
 		//update ui
 		this.selected_item_cart.setKeyboardOrientation("portrait");
 		this.selected_item_cart.cleanHeighlight();
-
 	}
 
 	onHistoryClick(){
-
 		//show
 		this.history_cart.show_cart()
 		this.customer_box.showHomeBar();
-
 		//hide
 		this.payment_cart.hideCart();
 		this.item_details.hide_cart();
@@ -516,7 +507,6 @@ pos_ar.PointOfSale.Controller = class {
 		this.selected_item_cart.hideCart();
 		this.customer_box.hideSyncBar();
 		this.settings_cart.hideCart();
-
 	}
 
 	onMenuClick(menu){
@@ -823,6 +813,7 @@ pos_ar.PointOfSale.Controller = class {
 					'Done',
 					false
 			)
+			return ;
 		}
 		let items = []
 		this.selectedItemMaps.get(this.selectedTab.tabName).items.forEach(  item  =>{
@@ -841,7 +832,6 @@ pos_ar.PointOfSale.Controller = class {
 				'discount_amount'         : item.discount_amount,
 				'warehouse'               : this.selectedPosProfile.warehouse,
 				'income_account'          : this.selectedPosProfile.income_account,
-				'item_tax_rate'           : {}
 			}
 			items.push(newItem)
 		})
@@ -860,20 +850,22 @@ pos_ar.PointOfSale.Controller = class {
 		const status = this.checkIfPaid(this.selectedItemMaps.get(this.selectedTab.tabName))
 		this.selectedItemMaps.get(this.selectedTab.tabName).status            = status
 
+		const pos = structuredClone(this.selectedItemMaps.get(this.selectedTab.tabName))
+
 		if(status == 'Unpaid'){
+			pos.synced = true
 			frappe.db.insert(
-					this.selectedItemMaps.get(this.selectedTab.tabName)
+				pos
 			).then(r =>{
 				this.db.updatePosInvoice(
-							this.selectedItemMaps.get(this.selectedTab.tabName),
+							pos,
 							(event) => {
-								console.log("sucess => "  , event )
+								console.log("db sucess => "  , event )
 							},
 							(event) => {
 								console.log("failure => " , event )
 							}
 						)
-				this.sellInvoices.delete(invoiceName)
 			}).catch(err=>{
 				console.log("cant push pos invoice : " , err);
 			})
@@ -956,8 +948,6 @@ pos_ar.PointOfSale.Controller = class {
 			frappe.db.insert(
 					this.sellInvoices.get(invoiceName)
 			).then(r =>{
-
-				invoicesRef.push({'pos_invoice' : r.name , 'customer' : r.customer } )
 
 				//this.checkIfPaid()
 				this.selectedItemMaps.get(this.selectedTab.tabName).status = 'Unpaid'
