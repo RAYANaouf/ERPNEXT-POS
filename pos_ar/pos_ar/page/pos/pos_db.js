@@ -1,7 +1,7 @@
 pos_ar.PointOfSale.pos_db  = class POSDatabase {
 
 	constructor() {
-		this.dbName = 'POSDB_test17';
+		this.dbName = 'POSDB_test18';
 		this.dbVersion = 1;
 		this.db = null;
 
@@ -56,7 +56,6 @@ pos_ar.PointOfSale.pos_db  = class POSDatabase {
 			if (!db.objectStoreNames.contains('POS Invoice')) {
 				const posInvoiceStore = db.createObjectStore('POS Invoice', { keyPath : 'name' });
 				posInvoiceStore.createIndex( 'docstatus' , 'docstatus' , {unique : false} )
-				posInvoiceStore.createIndex( 'synced'    , 'synced'    , {unique : false} )
 			}
 		};
 	}
@@ -133,24 +132,21 @@ pos_ar.PointOfSale.pos_db  = class POSDatabase {
 
 	}
 
-	getToSyncPosInvoice(onSuccess , onFailure){
+	getNotSyncedPosNumber(onSuccess , onFailure){
 		const transaction_posInvoice     = this.db.transaction(['POS Invoice'] , "readwrite");
 		const store_posInvoice           = transaction_posInvoice.objectStore('POS Invoice');
-		const index_docstatus_posInvoice = store_posInvoice.index('synced');
 
-		const request = index_docstatus_posInvoice.getAll();
+		const request = store_posInvoice.getAll();
 
-		request.onsuccess = (event) => {
-			onSuccess(event.target.result);
-		};
-
-		request.onerror = (event) => {
-			onFailure(event);
-		};
-
+		request.onsuccess = (result) => {
+			const filtredResult = result.target.result.filter(invoice => invoice.synced == false )
+			console.log("the unsynced pos ::: " , filtredResult)
+			onSuccess(result.target.result.length);
+		}
+		request.onerror = (err) => {
+			onFailure(err);
+		}
 	}
-
-
 
 	// New delete function to remove a POS Invoice
 	deletePosInvoice(invoiceName, onSuccess, onFailure) {

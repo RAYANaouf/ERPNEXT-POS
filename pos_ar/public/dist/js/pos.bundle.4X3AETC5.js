@@ -35,6 +35,7 @@
       await this.prepare_app_defaults();
       await this.checkForPOSEntry();
       await this.prepare_components();
+      this.checkUnSyncedPos();
       this.setListeners();
     }
     async refreshApp() {
@@ -801,6 +802,16 @@
       if (document.readyState === "complete") {
         navigator.serviceWorker.register("../assets/pos_ar/public/js/sw.js").then((reg) => console.log("Service Worker registered successfully.")).catch((err) => console.log(`Service Worker registration failed: ${err}`));
       }
+    }
+    checkUnSyncedPos() {
+      this.db.getNotSyncedPosNumber(
+        (result) => {
+          console.log(`there are ${result} POS to sync`);
+        },
+        (err) => {
+          console.log(`error occured when check unSynced POS : ${err} `);
+        }
+      );
     }
     addItemToPosInvoice(clickedItem) {
       let clonedItem = {};
@@ -2334,7 +2345,7 @@
       this.wrapper.find("#RightSection").append('<div id="historyRightContainer" class="columnBox"></div>');
       this.left_container = this.wrapper.find("#historyLeftContainer");
       this.right_container = this.wrapper.find("#historyRightContainer");
-      this.left_container.append('<div id="PosContentHeader" class="rowBox" ><div class="c1 columnBox"><div id="posCustomer">Customer</div><div id="posSoldBy">Sold by : User</div></div><div class="c2 columnBox"><div id="posCost">0,0000 DA</div><div id="posId">ACC-PSINV-2024-ID</div><div id="posStatus">POS Status</div></div></div>');
+      this.left_container.append('<div id="PosContentHeader" class="rowBox" ><div class="c1 columnBox"><div id="posCustomer">Customer</div><div id="posSoldBy"></div></div><div class="c2 columnBox"><div id="posCost">0,0000 DA</div><div id="posId">ACC-PSINV-2024-ID</div><div id="posStatus">POS Status</div></div></div>');
       this.pos_header = this.left_container.find("#PosContentHeader");
       this.left_container.append('<div id="posContent" class="columnBox"></div>');
       this.pos_content = this.left_container.find("#posContent");
@@ -2368,7 +2379,6 @@
     }
     refreshData() {
       this.right_data_container.html("");
-      console.log("looke at here now : ", this.filtered_pos_list);
       this.filtered_pos_list.forEach((record) => {
         var _a;
         const posContainer = document.createElement("div");
@@ -2569,7 +2579,7 @@
   // ../pos_ar/pos_ar/pos_ar/page/pos/pos_db.js
   pos_ar.PointOfSale.pos_db = class POSDatabase {
     constructor() {
-      this.dbName = "POSDB_test17";
+      this.dbName = "POSDB_test18";
       this.dbVersion = 1;
       this.db = null;
       this.openDatabase();
@@ -2613,7 +2623,6 @@
         if (!db.objectStoreNames.contains("POS Invoice")) {
           const posInvoiceStore = db.createObjectStore("POS Invoice", { keyPath: "name" });
           posInvoiceStore.createIndex("docstatus", "docstatus", { unique: false });
-          posInvoiceStore.createIndex("synced", "synced", { unique: false });
         }
       };
     }
@@ -2666,16 +2675,17 @@
         onFailure(event2);
       };
     }
-    getToSyncPosInvoice(onSuccess, onFailure) {
+    getNotSyncedPosNumber(onSuccess, onFailure) {
       const transaction_posInvoice = this.db.transaction(["POS Invoice"], "readwrite");
       const store_posInvoice = transaction_posInvoice.objectStore("POS Invoice");
-      const index_docstatus_posInvoice = store_posInvoice.index("synced");
-      const request = index_docstatus_posInvoice.getAll();
-      request.onsuccess = (event2) => {
-        onSuccess(event2.target.result);
+      const request = store_posInvoice.getAll();
+      request.onsuccess = (result) => {
+        const filtredResult = result.target.result.filter((invoice) => invoice.synced == false);
+        console.log("the unsynced pos ::: ", filtredResult);
+        onSuccess(result.target.result.length);
       };
-      request.onerror = (event2) => {
-        onFailure(event2);
+      request.onerror = (err) => {
+        onFailure(err);
       };
     }
     deletePosInvoice(invoiceName, onSuccess, onFailure) {
@@ -2744,4 +2754,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.R3PFIFOP.js.map
+//# sourceMappingURL=pos.bundle.4X3AETC5.js.map

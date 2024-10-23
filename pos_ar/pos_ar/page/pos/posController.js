@@ -45,6 +45,7 @@ pos_ar.PointOfSale.Controller = class {
 		await  this.prepare_app_defaults();
 		await  this.checkForPOSEntry()
                 await  this.prepare_components();
+		this.checkUnSyncedPos();
 		this.setListeners();
 	}
 
@@ -1103,6 +1104,16 @@ pos_ar.PointOfSale.Controller = class {
 
 	}
 
+	checkUnSyncedPos(){
+		this.db.getNotSyncedPosNumber(
+			(result)=>{
+				console.log(`there are ${result} POS to sync`)
+			},
+			(err)=>{
+				console.log(`error occured when check unSynced POS : ${err} `)
+			}
+		)
+	}
 
 	addItemToPosInvoice( clickedItem ){
 		let clonedItem = {} ;

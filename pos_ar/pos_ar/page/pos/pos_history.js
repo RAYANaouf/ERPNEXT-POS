@@ -72,7 +72,7 @@ pos_ar.PointOfSale.pos_history = class {
 
 
 		//pos details  the container of the pos details
-		this.left_container.append('<div id="PosContentHeader" class="rowBox" ><div class="c1 columnBox"><div id="posCustomer">Customer</div><div id="posSoldBy">Sold by : User</div></div><div class="c2 columnBox"><div id="posCost">0,0000 DA</div><div id="posId">ACC-PSINV-2024-ID</div><div id="posStatus">POS Status</div></div></div>')
+		this.left_container.append('<div id="PosContentHeader" class="rowBox" ><div class="c1 columnBox"><div id="posCustomer">Customer</div><div id="posSoldBy"></div></div><div class="c2 columnBox"><div id="posCost">0,0000 DA</div><div id="posId">ACC-PSINV-2024-ID</div><div id="posStatus">POS Status</div></div></div>')
 
 		//first this.selected_pos.taxes_and_charges = ""section is the header information
 		this.pos_header = this.left_container.find('#PosContentHeader');
@@ -136,8 +136,6 @@ pos_ar.PointOfSale.pos_history = class {
 	refreshData(){
 		this.right_data_container.html('');
 
-		console.log("looke at here now : " , this.filtered_pos_list)
-
 		this.filtered_pos_list.forEach( record => {
 
 			const posContainer = document.createElement('div');
@@ -145,14 +143,11 @@ pos_ar.PointOfSale.pos_history = class {
 			posContainer.classList.add('columnBox')
 			posContainer.classList.add('align_content')
 
-
-
 			//line 1
 			const l1           = document.createElement('div')
 			l1.classList.add('l1')
 			l1.classList.add('rowBox')
 			l1.classList.add('align_content')
-
 
 			const posName      = document.createElement('div')
 			posName.classList.add('posName')
@@ -163,7 +158,6 @@ pos_ar.PointOfSale.pos_history = class {
 
 			l1.appendChild(posName)
 			l1.appendChild(posCost)
-
 
 			///////////// line 2
 			const l2           = document.createElement('div')
@@ -230,6 +224,7 @@ pos_ar.PointOfSale.pos_history = class {
 
 
 		this.pos_header.find('#posCustomer').text(this.selected_pos.customer?? "CustomerName")
+		//this.pos_header.find('#posSoldBy').text('Sold By : ' + this.selected_pos.owner?? "saler")
 		//it is not the paid amount it should be the total invoice amount
 		this.pos_header.find('#posCost').text(this.selected_pos.paid_amount??0 + "DA")
 		this.pos_header.find('#posId').text(this.selected_pos.name?? "POS Invoice Name")
