@@ -671,7 +671,8 @@
             console.log("failure => ", event2);
           }
         );
-        this.customer_box.setNotSynced();
+        this.unsyncedPos += 1;
+        this.customer_box.setNotSynced(this.unsyncedPos);
       }
       this.selectedItemMaps.delete(this.selectedTab.tabName);
       let tabs = Array.from(this.selectedItemMaps.keys());
@@ -689,16 +690,7 @@
         this.checkForPOSEntry();
         return;
       }
-      let all_invoices = Array.from(this.sellInvoices.keys());
-      this.db.getToSyncPosInvoice(
-        (message) => {
-          console.log("message : ", message);
-        },
-        (err) => {
-          console.log("err : ", err);
-        }
-      );
-      if (all_invoices.length == 0) {
+      if (this.unsyncedPos == 0) {
         frappe.msgprint({
           title: __("Sync Complete"),
           indicator: "green",
@@ -706,37 +698,43 @@
         });
         return;
       }
-      frappe.show_progress("Syncing Invoices...", 0, all_invoices.length, "syncing");
       let counter = 0;
       let failure = 0;
       let seccess = 0;
-      let invoicesRef = [];
-      all_invoices.forEach((invoiceName) => {
-        frappe.db.insert(
-          this.sellInvoices.get(invoiceName)
-        ).then((r) => {
-          this.selectedItemMaps.get(this.selectedTab.tabName).status = "Unpaid";
-          this.db.updatePosInvoice(
-            this.selectedItemMaps.get(this.selectedTab.tabName),
-            (event2) => {
-              console.log("sucess => ", event2);
-            },
-            (event2) => {
-              console.log("failure => ", event2);
-            }
-          );
-          this.sellInvoices.delete(invoiceName);
-          counter += 1;
-          frappe.show_progress("Syncing Invoices...", counter, all_invoices.length, "syncing");
-          if (counter == all_invoices.length) {
-            frappe.hide_progress();
-            this.customer_box.setSynced();
-          }
-        }).catch((err) => {
-          counter += 1;
-          failure += 1;
-        });
-      });
+      this.db.getNotSyncedPos(
+        (allUnsyncedPos) => {
+          frappe.show_progress("Syncing Invoices...", 0, allUnsyncedPos.length, "syncing");
+          allUnsyncedPos.forEach((pos) => {
+            frappe.db.insert(
+              pos
+            ).then((r) => {
+              const updatedPos = structuredClone(pos);
+              updatedPos.synced = true;
+              this.db.updatePosInvoice(
+                updatedPos,
+                (event2) => {
+                  console.log("sucess => ", event2);
+                },
+                (event2) => {
+                  console.log("failure => ", event2);
+                }
+              );
+              counter += 1;
+              frappe.show_progress("Syncing Invoices...", counter, allUnsyncedPos.length, "syncing");
+              if (counter == all_invoices.length) {
+                frappe.hide_progress();
+                this.customer_box.setSynced();
+              }
+            }).catch((err) => {
+              counter += 1;
+              failure += 1;
+            });
+          });
+        },
+        (err) => {
+          console.log("cant get the unseced POS from local");
+        }
+      );
     }
     checkIfPaid(pos) {
       let netTotal = 0;
@@ -807,6 +805,8 @@
       this.db.getNotSyncedPosNumber(
         (result) => {
           console.log(`there are ${result} POS to sync`);
+          this.unsyncedPos = result;
+          this.customer_box.setNotSynced(result);
         },
         (err) => {
           console.log(`error occured when check unSynced POS : ${err} `);
@@ -1158,7 +1158,8 @@
       this.actionContainer.append('<div id="HomeBox"     class="rowBox centerItem"  style="display:none;">');
       this.actionContainer.append('<div id="MenuBox"     class="rowBox centerItem">');
       this.sync_btn = this.actionContainer.find("#SyncBox");
-      this.sync_btn.append("<div > Sync </div>");
+      this.sync_btn.append('<div id="syncBoxContent"> Sync </div>');
+      this.sync_btn_content = this.sync_btn.find("#syncBoxContent");
       this.home = this.actionContainer.find("#HomeBox");
       this.home.append('<img src="/assets/pos_ar/images/home.png" alt="Home" id="homeBoxIcon">');
       this.menu = this.actionContainer.find("#MenuBox");
@@ -1218,10 +1219,12 @@
     setSynced() {
       this.sync_btn.addClass("Synced");
       this.sync_btn.removeClass("NotSynced");
+      this.sync_btn_content.html(`Synced`);
     }
-    setNotSynced() {
+    setNotSynced(counter) {
       this.sync_btn.addClass("NotSynced");
       this.sync_btn.removeClass("Synced");
+      this.sync_btn_content.html(`Sync (${counter})`);
     }
   };
 
@@ -2681,8 +2684,19 @@
       const request = store_posInvoice.getAll();
       request.onsuccess = (result) => {
         const filtredResult = result.target.result.filter((invoice) => invoice.synced == false);
-        console.log("the unsynced pos ::: ", filtredResult);
-        onSuccess(result.target.result.length);
+        onSuccess(filtredResult.length);
+      };
+      request.onerror = (err) => {
+        onFailure(err);
+      };
+    }
+    getNotSyncedPos(onSuccess, onFailure) {
+      const transaction_posInvoice = this.db.transaction(["POS Invoice"], "readwrite");
+      const store_posInvoice = transaction_posInvoice.objectStore("POS Invoice");
+      const request = store_posInvoice.getAll();
+      request.onsuccess = (result) => {
+        const filtredResult = result.target.result.filter((invoice) => invoice.synced == false);
+        onSuccess(filtredResult);
       };
       request.onerror = (err) => {
         onFailure(err);
@@ -2754,4 +2768,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.4X3AETC5.js.map
+//# sourceMappingURL=pos.bundle.WXJ3YSAQ.js.map

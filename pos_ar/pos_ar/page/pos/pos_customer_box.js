@@ -37,7 +37,8 @@ pos_ar.PointOfSale.pos_customer_box = class{
 		this.actionContainer.append('<div id="MenuBox"     class="rowBox centerItem">');
 
 		this.sync_btn = this.actionContainer.find('#SyncBox')
-		this.sync_btn.append('<div > Sync </div>')
+		this.sync_btn.append('<div id="syncBoxContent"> Sync </div>')
+		this.sync_btn_content = this.sync_btn.find('#syncBoxContent')
 
 		this.home = this.actionContainer.find('#HomeBox')
 		this.home.append('<img src="/assets/pos_ar/images/home.png" alt="Home" id="homeBoxIcon">')
@@ -119,11 +120,13 @@ pos_ar.PointOfSale.pos_customer_box = class{
 	setSynced(){
 		this.sync_btn.addClass('Synced')
 		this.sync_btn.removeClass('NotSynced')
+		this.sync_btn_content.html(`Synced`)
 	}
 
-	setNotSynced(){
+	setNotSynced(counter){
 		this.sync_btn.addClass('NotSynced')
 		this.sync_btn.removeClass('Synced')
+		this.sync_btn_content.html(`Sync (${counter})`)
 	}
 
 

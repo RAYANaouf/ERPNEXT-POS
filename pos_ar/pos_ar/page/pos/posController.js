@@ -884,7 +884,8 @@ pos_ar.PointOfSale.Controller = class {
 							console.log("failure => " , event )
 						}
 					)
-			this.customer_box.setNotSynced();
+			this.unsyncedPos += 1 ;
+			this.customer_box.setNotSynced(this.unsyncedPos);
 		}
 		this.selectedItemMaps.delete(this.selectedTab.tabName)
 
@@ -912,20 +913,8 @@ pos_ar.PointOfSale.Controller = class {
 			return;
 		}
 
-		//calculate amount
-		let all_invoices = Array.from(this.sellInvoices.keys())
-
-		this.db.getToSyncPosInvoice(
-			(message)=>{
-				console.log("message : " , message);
-			},
-			(err)=>{
-				console.log("err : " , err);
-			}
-		)
-
-		if(all_invoices.length == 0){
-
+		//check if there is a pos to sync
+		if(this.unsyncedPos == 0){
 			// with options
 			frappe.msgprint({
 				title: __('Sync Complete'),
@@ -933,57 +922,54 @@ pos_ar.PointOfSale.Controller = class {
 				message: __('All data is already synchronized.')
 			});
 			return;
-
 		}
 
-		//progress
-		frappe.show_progress('Syncing Invoices...' , 0 , all_invoices.length , 'syncing')
 
 		let counter     = 0  ;
 		let failure     = 0  ;
 		let seccess     = 0  ;
-		let invoicesRef = [] ;
 
-		all_invoices.forEach(invoiceName =>{
-			// we still didnt implement the  base_paid_amount and amount_eligible_for_commissionseen
-			// value in deafault pos ==>  ["Administrator"]. i think it is an array.
+		this.db.getNotSyncedPos(
+			(allUnsyncedPos) =>{
 
-			frappe.db.insert(
-					this.sellInvoices.get(invoiceName)
-			).then(r =>{
+				//create progress bar
+				frappe.show_progress('Syncing Invoices...' , 0 , allUnsyncedPos.length , 'syncing')
 
-				//this.checkIfPaid()
-				this.selectedItemMaps.get(this.selectedTab.tabName).status = 'Unpaid'
+				allUnsyncedPos.forEach(pos=>{
+					// we still didnt implement the  base_paid_amount and amount_eligible_for_commissionseen
+					// value in deafault pos ==>  ["Administrator"]. i think it is an array.
+					frappe.db.insert(
+						pos
+					).then(r =>{
+						const updatedPos = structuredClone(pos)
+						updatedPos.synced = true;
+						this.db.updatePosInvoice(
+								updatedPos,
+								(event) => {
+									console.log("sucess => " , event )
+								},
+								(event) => {
+									console.log("failure => " , event )
+								}
+							)
+						counter += 1 ;
+						frappe.show_progress('Syncing Invoices...' , counter , allUnsyncedPos.length , 'syncing')
+						//if the last pos save seccessfully then hide the progress bar
+						if(counter == all_invoices.length){
+							frappe.hide_progress();
+							this.customer_box.setSynced();
+						}
+					}).catch(err =>{
+						counter += 1 ;
+						failure += 1 ;
+					})
+				})
+			},
+			(err) =>{
+				console.log("cant get the unseced POS from local")
+			}
+		);
 
-				this.db.updatePosInvoice(
-							this.selectedItemMaps.get(this.selectedTab.tabName) ,
-							(event) => {
-								console.log("sucess => " , event )
-							},
-							(event) => {
-								console.log("failure => " , event )
-							}
-						)
-
-
-
-				this.sellInvoices.delete(invoiceName)
-
-				counter += 1 ;
-
-				frappe.show_progress('Syncing Invoices...' , counter , all_invoices.length , 'syncing')
-
-				if(counter == all_invoices.length){
-					frappe.hide_progress();
-					this.customer_box.setSynced();
-				}
-
-			}).catch(err=>{
-				counter += 1 ;
-				failure += 1 ;
-			})
-
-		})
 
 	}
 
@@ -1108,6 +1094,8 @@ pos_ar.PointOfSale.Controller = class {
 		this.db.getNotSyncedPosNumber(
 			(result)=>{
 				console.log(`there are ${result} POS to sync`)
+				this.unsyncedPos = result
+				this.customer_box.setNotSynced(result);
 			},
 			(err)=>{
 				console.log(`error occured when check unSynced POS : ${err} `)

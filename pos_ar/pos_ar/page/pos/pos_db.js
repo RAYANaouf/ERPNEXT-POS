@@ -140,8 +140,23 @@ pos_ar.PointOfSale.pos_db  = class POSDatabase {
 
 		request.onsuccess = (result) => {
 			const filtredResult = result.target.result.filter(invoice => invoice.synced == false )
-			console.log("the unsynced pos ::: " , filtredResult)
-			onSuccess(result.target.result.length);
+			onSuccess(filtredResult.length);
+		}
+		request.onerror = (err) => {
+			onFailure(err);
+		}
+	}
+
+
+	getNotSyncedPos(onSuccess , onFailure){
+		const transaction_posInvoice     = this.db.transaction(['POS Invoice'] , "readwrite");
+		const store_posInvoice           = transaction_posInvoice.objectStore('POS Invoice');
+
+		const request = store_posInvoice.getAll();
+
+		request.onsuccess = (result) => {
+			const filtredResult = result.target.result.filter(invoice => invoice.synced == false )
+			onSuccess(filtredResult);
 		}
 		request.onerror = (err) => {
 			onFailure(err);
