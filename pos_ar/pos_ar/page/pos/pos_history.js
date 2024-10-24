@@ -349,7 +349,6 @@ pos_ar.PointOfSale.pos_history = class {
 
 
 
-
 	/************************************* set listeners  ***********************************************/
 	//set listeners
 	setListener(){
@@ -412,6 +411,10 @@ pos_ar.PointOfSale.pos_history = class {
 			this.on_click('return' , null );
 		})
 
+		this.printBtn.on('click' , (event)=>{
+			this.print_receipt()
+		})
+
 	}
 
 	/******************************************** functions  ********************************************************/
@@ -429,5 +432,15 @@ pos_ar.PointOfSale.pos_history = class {
                 console.log("sales tax :=:=> " , salesTax);
                 return salesTax;
 	}
+
+	print_receipt() {
+		frappe.utils.print_doc(
+			'POS Invoice',
+			this.selected_pos.name,
+			'POS Invoice',
+			null,
+			'fr'
+		);
+        }
 
 }

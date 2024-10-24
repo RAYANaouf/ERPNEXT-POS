@@ -724,6 +724,7 @@
               if (counter == allUnsyncedPos.length) {
                 frappe.hide_progress();
                 this.customer_box.setSynced();
+                this.unsyncedPos = 0;
               }
             }).catch((err) => {
               counter += 1;
@@ -2568,6 +2569,9 @@
       this.returnBtn.on("click", (event2) => {
         this.on_click("return", null);
       });
+      this.printBtn.on("click", (event2) => {
+        this.print_receipt();
+      });
     }
     getSalesTaxes(pos) {
       const taxTemplateId = pos.taxes_and_charges;
@@ -2580,6 +2584,15 @@
       });
       console.log("sales tax :=:=> ", salesTax);
       return salesTax;
+    }
+    print_receipt() {
+      frappe.utils.print_doc(
+        "POS Invoice",
+        this.selected_pos.name,
+        "POS Invoice",
+        null,
+        "fr"
+      );
     }
   };
 
@@ -2772,4 +2785,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.52IAG2DV.js.map
+//# sourceMappingURL=pos.bundle.D4Y5PEFW.js.map

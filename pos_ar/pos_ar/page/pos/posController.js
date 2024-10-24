@@ -954,6 +954,7 @@ pos_ar.PointOfSale.Controller = class {
 						if(counter == allUnsyncedPos.length){
 							frappe.hide_progress();
 							this.customer_box.setSynced();
+							this.unsyncedPos = 0;
 						}
 					}).catch(err =>{
 						counter += 1 ;
