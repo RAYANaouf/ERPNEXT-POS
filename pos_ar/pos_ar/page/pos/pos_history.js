@@ -434,13 +434,13 @@ pos_ar.PointOfSale.pos_history = class {
 	}
 
 	print_receipt() {
-		frappe.utils.print_doc(
-			'POS Invoice',
-			this.selected_pos.name,
-			'POS Invoice',
-			null,
-			'fr'
-		);
+		// Open a new window and print the HTML content
+		const printWindow = window.open('', '_blank');
+		printWindow.document.write('');
+		printWindow.document.close();
+		printWindow.focus();
+		printWindow.print();
+		printWindow.close();
         }
 
 }

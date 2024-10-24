@@ -2586,13 +2586,12 @@
       return salesTax;
     }
     print_receipt() {
-      frappe.utils.print_doc(
-        "POS Invoice",
-        this.selected_pos.name,
-        "POS Invoice",
-        null,
-        "fr"
-      );
+      const printWindow = window.open("", "_blank");
+      printWindow.document.write("");
+      printWindow.document.close();
+      printWindow.focus();
+      printWindow.print();
+      printWindow.close();
     }
   };
 
@@ -2785,4 +2784,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.D4Y5PEFW.js.map
+//# sourceMappingURL=pos.bundle.5TIYZLEV.js.map
