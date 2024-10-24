@@ -721,7 +721,7 @@
               );
               counter += 1;
               frappe.show_progress("Syncing Invoices...", counter, allUnsyncedPos.length, "syncing");
-              if (counter == all_invoices.length) {
+              if (counter == allUnsyncedPos.length) {
                 frappe.hide_progress();
                 this.customer_box.setSynced();
               }
@@ -806,7 +806,11 @@
         (result) => {
           console.log(`there are ${result} POS to sync`);
           this.unsyncedPos = result;
-          this.customer_box.setNotSynced(result);
+          if (this.unsyncedPos == 0) {
+            this.customer_box.setSynced(result);
+          } else {
+            this.customer_box.setNotSynced(result);
+          }
         },
         (err) => {
           console.log(`error occured when check unSynced POS : ${err} `);
@@ -2768,4 +2772,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.WXJ3YSAQ.js.map
+//# sourceMappingURL=pos.bundle.52IAG2DV.js.map

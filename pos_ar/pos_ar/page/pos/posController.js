@@ -906,13 +906,10 @@ pos_ar.PointOfSale.Controller = class {
 
 
 	onSync(){
-
-
 		if(this.POSOpeningEntry.name == '' ){
 			this.checkForPOSEntry();
 			return;
 		}
-
 		//check if there is a pos to sync
 		if(this.unsyncedPos == 0){
 			// with options
@@ -923,7 +920,6 @@ pos_ar.PointOfSale.Controller = class {
 			});
 			return;
 		}
-
 
 		let counter     = 0  ;
 		let failure     = 0  ;
@@ -955,7 +951,7 @@ pos_ar.PointOfSale.Controller = class {
 						counter += 1 ;
 						frappe.show_progress('Syncing Invoices...' , counter , allUnsyncedPos.length , 'syncing')
 						//if the last pos save seccessfully then hide the progress bar
-						if(counter == all_invoices.length){
+						if(counter == allUnsyncedPos.length){
 							frappe.hide_progress();
 							this.customer_box.setSynced();
 						}
@@ -1095,7 +1091,12 @@ pos_ar.PointOfSale.Controller = class {
 			(result)=>{
 				console.log(`there are ${result} POS to sync`)
 				this.unsyncedPos = result
-				this.customer_box.setNotSynced(result);
+				if(this.unsyncedPos == 0){
+					this.customer_box.setSynced(result);
+				}
+				else{
+					this.customer_box.setNotSynced(result);
+				}
 			},
 			(err)=>{
 				console.log(`error occured when check unSynced POS : ${err} `)
