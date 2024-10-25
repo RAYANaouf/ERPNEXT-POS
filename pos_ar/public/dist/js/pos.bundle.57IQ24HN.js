@@ -2596,6 +2596,7 @@
       let tax = 17 * 3500 / 100;
       invoiceHTML += `<p><span style="font-size:20px;font-weight:600;">VAT 17% @17.0 : </span> ${tax} DA </p>`;
       invoiceHTML += `<p style="font-size:24px;font-weight:500;" ><span style="font-size:26px;font-weight:800;">Grand Total : </span> ${tax + 3500} DA </p>`;
+      invoiceHTML += "<table><tr><th>Grand Total</th><th>Paid amount</th><th>Change amount</th></tr><tr><td><div>4095 DA</div></td><td><div>4200 DA</div></td><td><div>105 DA</div></td></tr></table>";
       const printWindow = window.open("", "_blank");
       printWindow.document.write(invoiceHTML);
       printWindow.document.close();
@@ -2794,4 +2795,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.XUGKQQLQ.js.map
+//# sourceMappingURL=pos.bundle.57IQ24HN.js.map
