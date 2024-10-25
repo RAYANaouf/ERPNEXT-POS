@@ -2586,8 +2586,18 @@
       return salesTax;
     }
     print_receipt() {
+      console.log("pos invoice : ", this.selected_pos);
+      let invoiceHTML = `<style>#company_container {width: 100% ; height: 60px ; display:flex; justify-content:center; align-items:center; font-size : 35px;border-bottom : 2px dashed #000000;}#invoice_title {width: 100% ; height:45px; display:flex; justify-content:center; align-items:center; font-size : 20px;}table{border: 1px solid #505050; border-spacing:0px;width: 100%;}tr{width:100%; height:35px;}tr:nth-child(1){background:#cccccc;}th{border-right:1px solid #505050;border-bottom:1px solid #505050;border-top:1px solid #505050;}td>div{height:35px; width:100%;display:flex; justify-content:center; align-items:center;}</style><div id="company_container" > <p>Optilance</p></div><div id="invoice_title"> <p>Invoice</p></div><div><p style="font-size:18px;">Creation time : ${this.selected_pos.creation_time}<p></div><div><p style="font-size:18px;">Customer: ${this.selected_pos.customer}<p></div><table><tr><th>Item</th><th>Qty</th><th>Price</th>`;
+      this.selected_pos.items.forEach((item) => {
+        invoiceHTML += `<tr> <td><div>${item.item_name}</div></td>  <td><div>${item.qty}</div></td>  <td><div>${item.rate}</div></td>  </tr>`;
+      });
+      invoiceHTML += "</table>";
+      invoiceHTML += '<p><span style="font-size:20px;font-weight:600;" >Net Total : </span> 3500 DA </p>';
+      let tax = 17 * 3500 / 100;
+      invoiceHTML += `<p><span style="font-size:20px;font-weight:600;">VAT 17% @17.0 : </span> ${tax} DA </p>`;
+      invoiceHTML += `<p style="font-size:24px;font-weight:500;" ><span style="font-size:26px;font-weight:800;">Grand Total : </span> ${tax + 3500} DA </p>`;
       const printWindow = window.open("", "_blank");
-      printWindow.document.write("");
+      printWindow.document.write(invoiceHTML);
       printWindow.document.close();
       printWindow.focus();
       printWindow.print();
@@ -2784,4 +2794,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.5TIYZLEV.js.map
+//# sourceMappingURL=pos.bundle.XUGKQQLQ.js.map
