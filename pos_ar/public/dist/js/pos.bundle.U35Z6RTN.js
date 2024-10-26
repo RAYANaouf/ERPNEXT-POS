@@ -336,6 +336,7 @@
         this.wrapper,
         this.db,
         this.sales_taxes_and_charges,
+        this.selectedPosProfile,
         this.historyCartClick.bind(this)
       );
     }
@@ -961,7 +962,7 @@
     async fetchPosProfileList() {
       try {
         return await frappe.db.get_list("POS Profile", {
-          fields: ["name", "warehouse", "income_account", "write_off_account", "write_off_cost_center", "taxes_and_charges", "tax_category"],
+          fields: ["name", "warehouse", "company", "income_account", "write_off_account", "write_off_cost_center", "taxes_and_charges", "tax_category"],
           filters: { disabled: 0 },
           limit: 1e5
         });
@@ -2307,11 +2308,11 @@
 
   // ../pos_ar/pos_ar/pos_ar/page/pos/pos_history.js
   pos_ar.PointOfSale.pos_history = class {
-    constructor(wrapper, db, salesTaxesAndCharges, onClick) {
+    constructor(wrapper, db, salesTaxesAndCharges, selectedPosProfile, onClick) {
       this.wrapper = wrapper;
       this.db = db;
       this.sales_taxes_and_charges = salesTaxesAndCharges;
-      this.on_click = onClick;
+      this.selected_pos_profile = selectedPosProfile, this.on_click = onClick;
       this.localPosInvoice = { lastTime: null, pos_invoices: [] };
       this.filter = "";
       this.filtered_pos_list = [];
@@ -2587,16 +2588,16 @@
     }
     print_receipt() {
       console.log("pos invoice : ", this.selected_pos);
-      let invoiceHTML = `<style>#company_container {width: 100% ; height: 60px ; display:flex; justify-content:center; align-items:center; font-size : 35px;border-bottom : 2px dashed #000000;}#invoice_title {width: 100% ; height:45px; display:flex; justify-content:center; align-items:center; font-size : 20px;}table{border: 1px solid #505050; border-spacing:0px;width: 100%;}tr{width:100%; height:35px;}tr:nth-child(1){background:#cccccc;}th{border-right:1px solid #505050;border-bottom:1px solid #505050;border-top:1px solid #505050;}td>div{height:35px; width:100%;display:flex; justify-content:center; align-items:center;}</style><div id="company_container" > <p>Optilance</p></div><div id="invoice_title"> <p>Invoice</p></div><div><p style="font-size:18px;">Creation time : ${this.selected_pos.creation_time}<p></div><div><p style="font-size:18px;">Customer: ${this.selected_pos.customer}<p></div><table><tr><th>Item</th><th>Qty</th><th>Price</th>`;
+      let invoiceHTML = `<style>#company_container {width: 100% ; height: 60px ; display:flex; align-items:center; font-size : 26px;}table{border: 1px solid #505050; border-spacing:0px;width: 100%; margin-top:16px;}tr{width:100%; height:35px;}tr:nth-child(1){background:#cccccc;}th{border-right:1px solid #505050;border-bottom:1px solid #505050;border-top:1px solid #505050;}td{border-right:1px solid #505050;}td>div{height:35px; width:100%;display:flex; justify-content:center; align-items:center;}</style><div style="display:flex; flex-direction:column;"><div id="company_container"><div style="flex-grow:1; border-bottom:1px dashed #505050; border-top:1px dashed #505050; "></div><p style="margin:0px 25px;">${this.selected_pos_profile.company}</p><div style="flex-grow:1; border-bottom:1px dashed #505050; border-top:1px dashed #505050;"></div></div><div>Clien: ${this.selected_pos.customer}</div><div>Date : 24-10-2024</div><div>temp : 13:09</div><table><tr><th>Item</th><th>Qty</th><th>Prix</th>`;
       this.selected_pos.items.forEach((item) => {
         invoiceHTML += `<tr> <td><div>${item.item_name}</div></td>  <td><div>${item.qty}</div></td>  <td><div>${item.rate}</div></td>  </tr>`;
       });
       invoiceHTML += "</table>";
-      invoiceHTML += '<p><span style="font-size:20px;font-weight:600;" >Net Total : </span> 3500 DA </p>';
       let tax = 17 * 3500 / 100;
-      invoiceHTML += `<p><span style="font-size:20px;font-weight:600;">VAT 17% @17.0 : </span> ${tax} DA </p>`;
       invoiceHTML += `<p style="font-size:24px;font-weight:500;" ><span style="font-size:26px;font-weight:800;">Grand Total : </span> ${tax + 3500} DA </p>`;
-      invoiceHTML += "<table><tr><th>Grand Total</th><th>Paid amount</th><th>Change amount</th></tr><tr><td><div>4095 DA</div></td><td><div>4200 DA</div></td><td><div>105 DA</div></td></tr></table>";
+      invoiceHTML += "<table><tr><th>Name</th><th>Amount</th></tr><tr><td><div>Grand Total</div></td> <td><div>10300 DA</div></td></tr><tr><td><div>Paid Amount</div></td> <td><div>12000 DA</div></td></tr><tr><td><div>Change Amount</div></td> <td><div>1700 DA</div></td></tr></table>";
+      invoiceHTML += '<div style="width:100%; display:flex; align-items:center; margin-top:30px;"><div style="flex-grow:1; border-bottom:2px dashed #505050;"></div><div style="margin:30px 25px;"> Thank You, Come Again</div><div style="flex-grow:1;border-bottom:2px dashed #505050;"></div></div>';
+      invoiceHTML += "</div>";
       const printWindow = window.open("", "_blank");
       printWindow.document.write(invoiceHTML);
       printWindow.document.close();
@@ -2795,4 +2796,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.57IQ24HN.js.map
+//# sourceMappingURL=pos.bundle.U35Z6RTN.js.map

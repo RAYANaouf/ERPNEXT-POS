@@ -4,18 +4,22 @@ pos_ar.PointOfSale.pos_history = class {
 		wrapper,
 		db,
 		salesTaxesAndCharges,
+		selectedPosProfile,
 		onClick
 	){
 		this.wrapper   = wrapper;
 		this.db        = db;
 		this.sales_taxes_and_charges = salesTaxesAndCharges
+		this.selected_pos_profile = selectedPosProfile,
 		this.on_click  = onClick;
+
 		//local data
 		this.localPosInvoice   = { lastTime : null , pos_invoices : [] }
 		this.filter            = "" ;
 		this.filtered_pos_list = [] ;
 		this.selected_pos      = null ;
 		this.start_work();
+
 	}
 
 	start_work(){
@@ -430,18 +434,12 @@ pos_ar.PointOfSale.pos_history = class {
 		let invoiceHTML ='<style>'+
 				'#company_container {'+
 					'width: 100% ; height: 60px ; '+
-					'display:flex; justify-content:center; align-items:center; '+
-					'font-size : 35px;'+
-					'border-bottom : 2px dashed #000000;'+
-				'}'+
-				'#invoice_title {'+
-					'width: 100% ; height:45px; '+
-					'display:flex; justify-content:center; align-items:center; '+
-					'font-size : 20px;'+
+					'display:flex; align-items:center; '+
+					'font-size : 26px;'+
 				'}'+
 				'table{'+
 					'border: 1px solid #505050; border-spacing:0px;'+
-					'width: 100%;'+
+					'width: 100%; margin-top:16px;'+
 				'}'+
 				'tr{'+
 					'width:100%; height:35px;'+
@@ -454,26 +452,31 @@ pos_ar.PointOfSale.pos_history = class {
 					'border-bottom:1px solid #505050;'+
 					'border-top:1px solid #505050;'+
 				'}'+
+				'td{'+
+					'border-right:1px solid #505050;'+
+				'}'+
 				'td>div{'+
 					'height:35px; width:100%;'+
 					'display:flex; justify-content:center; align-items:center;'+
 				'}'+
 				'</style>'+
-
-				'<div id="company_container" >' +
-					' <p>Optilance</p>'+
-				'</div>'+
-				'<div id="invoice_title">' +
-					' <p>Invoice</p>'+
-				'</div>'+
-				'<div>'+
-					`<p style="font-size:18px;">Creation time : ${this.selected_pos.creation_time}<p>`+
+				'<div style="display:flex; flex-direction:column;">'+
+				'<div id="company_container">' +
+					'<div style="flex-grow:1; border-bottom:1px dashed #505050; border-top:1px dashed #505050; "></div>'+
+					`<p style="margin:0px 25px;">${this.selected_pos_profile.company}</p>`+
+					'<div style="flex-grow:1; border-bottom:1px dashed #505050; border-top:1px dashed #505050;"></div>'+
 				'</div>'+
 				'<div>'+
-					`<p style="font-size:18px;">Customer: ${this.selected_pos.customer}<p>`+
+					`Clien: ${this.selected_pos.customer}`+
+				'</div>'+
+				'<div>'+
+					`Date : 24-10-2024`+
+				'</div>'+
+				'<div>'+
+					`temp : 13:09`+
 				'</div>'+
 				'<table>'+
-					'<tr><th>Item</th><th>Qty</th><th>Price</th>'
+					'<tr><th>Item</th><th>Qty</th><th>Prix</th>'
 
 		this.selected_pos.items.forEach(item => {
 			invoiceHTML += `<tr> <td><div>${item.item_name}</div></td>  <td><div>${item.qty}</div></td>  <td><div>${item.rate}</div></td>  </tr>`
@@ -481,20 +484,34 @@ pos_ar.PointOfSale.pos_history = class {
 
 		invoiceHTML += '</table>'
 
-		invoiceHTML += '<p><span style="font-size:20px;font-weight:600;" >Net Total : </span> 3500 DA </p>'
+		//invoiceHTML += '<p><span style="font-size:20px;font-weight:600;" >Net Total : </span> 3500 DA </p>'
 		let tax = 17 * 3500 / 100
-		invoiceHTML += `<p><span style="font-size:20px;font-weight:600;">VAT 17% @17.0 : </span> ${tax} DA </p>`
+		//invoiceHTML += `<p><span style="font-size:20px;font-weight:600;">VAT 17% @17.0 : </span> ${tax} DA </p>`
 		invoiceHTML += `<p style="font-size:24px;font-weight:500;" ><span style="font-size:26px;font-weight:800;">Grand Total : </span> ${tax + 3500} DA </p>`
-
 
 		invoiceHTML +='<table>'+
 			'<tr>'+
-				'<th>Grand Total</th><th>Paid amount</th><th>Change amount</th>'+
+				'<th>Name</th><th>Amount</th>'+
 			'</tr>'+
 			'<tr>'+
-				'<td><div>4095 DA</div></td><td><div>4200 DA</div></td><td><div>105 DA</div></td>'+
+				'<td><div>Grand Total</div></td> <td><div>10300 DA</div></td>'+
+			'</tr>'+
+			'<tr>'+
+				'<td><div>Paid Amount</div></td> <td><div>12000 DA</div></td>'+
+			'</tr>'+
+			'<tr>'+
+				'<td><div>Change Amount</div></td> <td><div>1700 DA</div></td>'+
 			'</tr>'+
 		'</table>'
+
+		invoiceHTML +=
+		'<div style="width:100%; display:flex; align-items:center; margin-top:30px;">'+
+			'<div style="flex-grow:1; border-bottom:2px dashed #505050;"></div>'+
+			'<div style="margin:30px 25px;"> Thank You, Come Again</div>'+
+			'<div style="flex-grow:1;border-bottom:2px dashed #505050;"></div>'+
+		'</div>'
+
+		invoiceHTML += '</div>'
 		// Open a new window and print the HTML content
 		const printWindow = window.open('', '_blank');
 		printWindow.document.write(invoiceHTML);

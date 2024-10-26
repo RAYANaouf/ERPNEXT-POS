@@ -395,6 +395,7 @@ pos_ar.PointOfSale.Controller = class {
 									this.wrapper,
 									this.db,
 									this.sales_taxes_and_charges,
+									this.selectedPosProfile,
 									this.historyCartClick.bind(this)
 								)
         }
@@ -1274,7 +1275,7 @@ pos_ar.PointOfSale.Controller = class {
         async fetchPosProfileList(){
                 try{
                         return await frappe.db.get_list('POS Profile' , {
-                                fields  : ['name' , 'warehouse' , 'income_account' , 'write_off_account' , 'write_off_cost_center' , 'taxes_and_charges' , 'tax_category'],
+                                fields  : ['name' , 'warehouse' , 'company' , 'income_account' , 'write_off_account' , 'write_off_cost_center' , 'taxes_and_charges' , 'tax_category'],
                                 filters : { disabled : 0},
 				limit : 100000
                         })
