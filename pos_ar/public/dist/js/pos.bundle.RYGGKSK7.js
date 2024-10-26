@@ -22,7 +22,6 @@
       this.defaultCustomer = { "name": "", "customer_name": "" };
       this.selectedPosProfile = { "name": "" };
       this.defaultPriceList = { "name": "" };
-      this.sales_taxes = [];
       this.sellInvoices = /* @__PURE__ */ new Map();
       this.POSOpeningEntry = {};
       this.invoiceData = { netTotal: 0, grandTotal: 0, paidAmount: 0, toChange: 0, discount: 0 };
@@ -53,13 +52,13 @@
       this.warehouseList = await this.fetchWarehouseList();
       this.PosProfileList = await this.fetchPosProfileList();
       this.binList = await this.fetchBinList();
-      this.sales_taxes_and_charges = await this.fetchSalesTaxesAndCharges();
-      this.taxes_and_charges_template = await this.fetchSalesTaxesAndChargesTemplate();
       if (this.PosProfileList.length == 0) {
         frappe.set_route("Form", "POS Profile");
         return;
       }
       Object.assign(this.selectedPosProfile, this.PosProfileList[0]);
+      console.log("pos profile : ", this.selectedPosProfile);
+      this.taxes_and_charges_template = await this.fetchSalesTaxesAndChargesTemplate(this.selectedPosProfile.taxes_and_charges);
       if (this.customersList.length > 0) {
         this.defaultCustomer = structuredClone(this.customersList[0]);
       } else {
@@ -101,7 +100,6 @@
       new_pos_invoice.priceList = this.defaultPriceList.name;
       this.selectedItemMaps.set("C1", new_pos_invoice);
       this.selectedTab.tabName = `C1`;
-      this.sales_taxes = this.getSalesTaxes(this.selectedItemMaps.get(this.selectedTab.tabName));
     }
     prepare_container() {
       this.wrapper.append('<link rel="stylesheet" type="text/css" href="/assets/pos_ar/css/selectorBox.css">');
@@ -283,7 +281,7 @@
         this.selectedItemMaps,
         this.priceLists,
         this.customersList,
-        this.sales_taxes,
+        this.taxes_and_charges_template.taxes,
         this.invoiceData,
         this.selectedTab,
         this.selectedItem,
@@ -337,6 +335,7 @@
         this.db,
         this.sales_taxes_and_charges,
         this.selectedPosProfile,
+        this.taxes_and_charges_template,
         this.historyCartClick.bind(this)
       );
     }
@@ -625,8 +624,9 @@
           "qty": item.qty,
           "description": item.name,
           "image": item.image,
-          "expense_account": "Cost of Goods Sold - MS",
           "use_serial_batch_fields": 1,
+          "cost_center": this.selectedPosProfile.cost_center,
+          "income_account": this.selectedPosProfile.income_account,
           "discount_percentage": item.discount_percentage,
           "discount_amount": item.discount_amount,
           "warehouse": this.selectedPosProfile.warehouse,
@@ -746,9 +746,7 @@
       pos.items.forEach((item) => {
         netTotal += item.qty * item.rate;
       });
-      const taxTemplate = pos.taxes_and_charges;
-      const taxes = this.getSalesTaxes(pos);
-      taxes.forEach((tax) => {
+      this.taxes_and_charges_template.taxes.forEach((tax) => {
         allTaxes += tax.rate / 100 * netTotal;
       });
       discount = pos.additional_discount_percentage / 100 * netTotal;
@@ -877,16 +875,6 @@
         }
       });
     }
-    getSalesTaxes(pos) {
-      const taxTemplateId = pos.taxes_and_charges;
-      let salesTax = [];
-      this.sales_taxes_and_charges.forEach((tax) => {
-        if (tax.parent == taxTemplateId) {
-          salesTax.push(tax);
-        }
-      });
-      return salesTax;
-    }
     async fetchCustomers() {
       try {
         return await frappe.db.get_list("Customer", {
@@ -962,34 +950,18 @@
     async fetchPosProfileList() {
       try {
         return await frappe.db.get_list("POS Profile", {
-          fields: ["name", "warehouse", "company", "income_account", "write_off_account", "write_off_cost_center", "taxes_and_charges", "tax_category"],
+          fields: ["name", "warehouse", "company", "income_account", "cost_center", "write_off_account", "write_off_cost_center", "taxes_and_charges", "tax_category"],
           filters: { disabled: 0 },
-          limit: 1e5
+          limit: 100
         });
       } catch (error) {
         console.error("Error fetching Warehouse list : ", error);
         return [];
       }
     }
-    async fetchSalesTaxesAndChargesTemplate() {
+    async fetchSalesTaxesAndChargesTemplate(templateId) {
       try {
-        return await frappe.db.get_list("Sales Taxes and Charges Template", {
-          fields: ["name", "title", "is_default", "company", "tax_category", "taxes"],
-          filters: { disabled: 0 },
-          limit: 1e5
-        });
-      } catch (error) {
-        console.error("Error fetching Warehouse list : ", error);
-        return [];
-      }
-    }
-    async fetchSalesTaxesAndCharges() {
-      try {
-        return await frappe.db.get_list("Sales Taxes and Charges", {
-          fields: ["name", "cost_center", "description", "included_in_print_rate", "rate", "included_in_paid_amount", "parent"],
-          filters: { parenttype: "Sales Taxes and Charges Template" },
-          limit: 1e5
-        });
+        return await frappe.db.get_doc("Sales Taxes and Charges Template", this.selectedPosProfile.taxes_and_charges);
       } catch (error) {
         console.error("Error fetching Warehouse list : ", error);
         return [];
@@ -2308,11 +2280,13 @@
 
   // ../pos_ar/pos_ar/pos_ar/page/pos/pos_history.js
   pos_ar.PointOfSale.pos_history = class {
-    constructor(wrapper, db, salesTaxesAndCharges, selectedPosProfile, onClick) {
+    constructor(wrapper, db, salesTaxesAndCharges, selectedPosProfile, salesTaxTemplate, onClick) {
       this.wrapper = wrapper;
       this.db = db;
       this.sales_taxes_and_charges = salesTaxesAndCharges;
-      this.selected_pos_profile = selectedPosProfile, this.on_click = onClick;
+      this.selected_pos_profile = selectedPosProfile;
+      this.sales_tax_template = salesTaxTemplate;
+      this.on_click = onClick;
       this.localPosInvoice = { lastTime: null, pos_invoices: [] };
       this.filter = "";
       this.filtered_pos_list = [];
@@ -2468,10 +2442,9 @@
         netTotal += item.rate * item.qty;
       });
       this.totalList.append(`<div class="rowBox align_item"> <div class="name rowBox align_center">Net Total</div> <div class="price rowBox align_center">${netTotal} DA</div> </div>`);
-      const salesTaxes = this.getSalesTaxes(this.selected_pos);
       let allTax = 0;
       if (this.selected_pos.taxes_and_charges != "" && this.selected_pos.taxes_and_charges != null) {
-        salesTaxes.forEach((tax) => {
+        this.sales_tax_template.taxes.forEach((tax) => {
           allTax += tax.rate / 100 * netTotal;
           this.totalList.append(`<div class="rowBox align_item"> <div class="name rowBox align_center">${tax.description}</div> <div class="price rowBox align_center">${tax.rate / 100 * netTotal} DA</div> </div>`);
         });
@@ -2574,18 +2547,6 @@
         this.print_receipt();
       });
     }
-    getSalesTaxes(pos) {
-      const taxTemplateId = pos.taxes_and_charges;
-      let salesTax = [];
-      this.sales_taxes_and_charges.forEach((tax) => {
-        if (tax.parent == taxTemplateId) {
-          console.log("debuging ==> parent : ", tax.parent, " taxTemplateId : ", taxTemplateId);
-          salesTax.push(tax);
-        }
-      });
-      console.log("sales tax :=:=> ", salesTax);
-      return salesTax;
-    }
     print_receipt() {
       console.log("pos invoice : ", this.selected_pos);
       let invoiceHTML = `<style>#company_container {width: 100% ; height: 60px ; display:flex; align-items:center; font-size : 26px;}table{border: 1px solid #505050; border-spacing:0px;width: 100%; margin-top:16px;}tr{width:100%; height:35px;}tr:nth-child(1){background:#cccccc;}th{border-right:1px solid #505050;border-bottom:1px solid #505050;border-top:1px solid #505050;}td{border-right:1px solid #505050;}td>div{height:35px; width:100%;display:flex; justify-content:center; align-items:center;}</style><div style="display:flex; flex-direction:column;"><div id="company_container"><div style="flex-grow:1; border-bottom:1px dashed #505050; border-top:1px dashed #505050; "></div><p style="margin:0px 25px;">${this.selected_pos_profile.company}</p><div style="flex-grow:1; border-bottom:1px dashed #505050; border-top:1px dashed #505050;"></div></div><div>Clien: ${this.selected_pos.customer}</div><div>Date : 24-10-2024</div><div>temp : 13:09</div><table><tr><th>Item</th><th>Qty</th><th>Prix</th>`;
@@ -2610,7 +2571,7 @@
   // ../pos_ar/pos_ar/pos_ar/page/pos/pos_db.js
   pos_ar.PointOfSale.pos_db = class POSDatabase {
     constructor() {
-      this.dbName = "POSDB_test18";
+      this.dbName = "POSDB_test19";
       this.dbVersion = 1;
       this.db = null;
       this.openDatabase();
@@ -2796,4 +2757,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.U35Z6RTN.js.map
+//# sourceMappingURL=pos.bundle.RYGGKSK7.js.map

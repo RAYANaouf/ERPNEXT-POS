@@ -26,9 +26,6 @@ pos_ar.PointOfSale.Controller = class {
 		this.selectedPosProfile    = {"name"       : ""   }
 		this.defaultPriceList      = {"name"       : ""   }
 
-		//taxes
-		this.sales_taxes = [];
-
 		//sell invoice
 		this.sellInvoices    = new Map();
 		this.POSOpeningEntry = {}
@@ -67,14 +64,17 @@ pos_ar.PointOfSale.Controller = class {
                 this.PosProfileList   = await this.fetchPosProfileList()
                 this.binList          = await this.fetchBinList()
 
-		this.sales_taxes_and_charges    = await this.fetchSalesTaxesAndCharges()
-		this.taxes_and_charges_template = await this.fetchSalesTaxesAndChargesTemplate()
 
 		if(this.PosProfileList.length == 0){
 			frappe.set_route("Form", "POS Profile");
 			return;
 		}
+
 		Object.assign(this.selectedPosProfile , this.PosProfileList[0])
+
+		console.log("pos profile : " , this.selectedPosProfile)
+
+		this.taxes_and_charges_template = await this.fetchSalesTaxesAndChargesTemplate(this.selectedPosProfile.taxes_and_charges)
 
 		if(this.customersList.length > 0){
 			this.defaultCustomer = structuredClone(this.customersList[0])
@@ -123,10 +123,6 @@ pos_ar.PointOfSale.Controller = class {
 
 		this.selectedItemMaps.set("C1" , new_pos_invoice)
 		this.selectedTab.tabName = `C1`
-
-
-		// calculate the tax after setting the default pos profile because it use it to get the tax
-		this.sales_taxes  = this.getSalesTaxes(this.selectedItemMaps.get(this.selectedTab.tabName))
 
         }
 
@@ -338,7 +334,7 @@ pos_ar.PointOfSale.Controller = class {
 									this.selectedItemMaps ,
 									this.priceLists       ,
 									this.customersList    ,
-									this.sales_taxes      ,
+									this.taxes_and_charges_template.taxes ,
 									this.invoiceData      ,
 									this.selectedTab      ,
 									this.selectedItem     ,
@@ -396,6 +392,7 @@ pos_ar.PointOfSale.Controller = class {
 									this.db,
 									this.sales_taxes_and_charges,
 									this.selectedPosProfile,
+									this.taxes_and_charges_template,
 									this.historyCartClick.bind(this)
 								)
         }
@@ -828,8 +825,10 @@ pos_ar.PointOfSale.Controller = class {
 				'qty'                     : item.qty,
 				'description'             : item.name,
 				'image'                   : item.image,
-				'expense_account'         : 'Cost of Goods Sold - MS',
+				//'expense_account'         : 'Cost of Goods Sold - MS',
 				'use_serial_batch_fields' : 1,
+				'cost_center'             : this.selectedPosProfile.cost_center,
+				'income_account'          : this.selectedPosProfile.income_account,
 				'discount_percentage'     : item.discount_percentage,
 				'discount_amount'         : item.discount_amount,
 				'warehouse'               : this.selectedPosProfile.warehouse,
@@ -984,19 +983,14 @@ pos_ar.PointOfSale.Controller = class {
 			netTotal += item.qty * item.rate
 		})
 
-		//taxes
-		const taxTemplate = pos.taxes_and_charges
-		const taxes       = this.getSalesTaxes(pos)
-		taxes.forEach(tax =>{
+		this.taxes_and_charges_template.taxes.forEach(tax =>{
 			allTaxes += (tax.rate / 100) * netTotal
 		})
 
 		//discount
 		discount = (pos.additional_discount_percentage / 100) * netTotal
 
-
 		grandTotal  = netTotal + allTaxes - discount
-
 
 		if(pos.paid_amount == 0){
 			return "Unpaid"
@@ -1175,20 +1169,6 @@ pos_ar.PointOfSale.Controller = class {
 		})
 	}
 
-	getSalesTaxes(pos){
-
-		const taxTemplateId = pos.taxes_and_charges
-		let   salesTax      = []
-
-		this.sales_taxes_and_charges.forEach( tax => {
-			if(tax.parent == taxTemplateId){
-				salesTax.push(tax)
-			}
-		})
-		return salesTax;
-	}
-
-
         /*********************  get data functions ******************************/
 
 
@@ -1275,9 +1255,9 @@ pos_ar.PointOfSale.Controller = class {
         async fetchPosProfileList(){
                 try{
                         return await frappe.db.get_list('POS Profile' , {
-                                fields  : ['name' , 'warehouse' , 'company' , 'income_account' , 'write_off_account' , 'write_off_cost_center' , 'taxes_and_charges' , 'tax_category'],
+                                fields  : ['name' , 'warehouse' , 'company' , 'income_account' , 'cost_center' , 'write_off_account' , 'write_off_cost_center' , 'taxes_and_charges' , 'tax_category'],
                                 filters : { disabled : 0},
-				limit : 100000
+				limit : 100
                         })
                 }
                 catch(error){
@@ -1286,29 +1266,9 @@ pos_ar.PointOfSale.Controller = class {
                 }
         }
 
-
-        async fetchSalesTaxesAndChargesTemplate(){
+        async fetchSalesTaxesAndChargesTemplate(templateId){
                 try{
-                        return await frappe.db.get_list('Sales Taxes and Charges Template' , {
-                                fields  : ['name' , 'title' , 'is_default' , 'company' , 'tax_category' , 'taxes' ],
-                                filters : { disabled : 0},
-				limit : 100000
-                        })
-                }
-                catch(error){
-                        console.error('Error fetching Warehouse list : ' , error)
-                        return [];
-                }
-        }
-
-
-        async fetchSalesTaxesAndCharges(){
-                try{
-                        return await frappe.db.get_list('Sales Taxes and Charges' , {
-				fields  : ['name'  ,  'cost_center' , 'description' , 'included_in_print_rate' , 'rate' , 'included_in_paid_amount' , 'parent' ],
-                                filters : { parenttype : 'Sales Taxes and Charges Template'},
-				limit : 100000
-                        })
+			return await frappe.db.get_doc('Sales Taxes and Charges Template' , this.selectedPosProfile.taxes_and_charges)
                 }
                 catch(error){
                         console.error('Error fetching Warehouse list : ' , error)

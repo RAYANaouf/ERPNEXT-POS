@@ -5,12 +5,14 @@ pos_ar.PointOfSale.pos_history = class {
 		db,
 		salesTaxesAndCharges,
 		selectedPosProfile,
+		salesTaxTemplate,
 		onClick
 	){
 		this.wrapper   = wrapper;
 		this.db        = db;
 		this.sales_taxes_and_charges = salesTaxesAndCharges
-		this.selected_pos_profile = selectedPosProfile,
+		this.selected_pos_profile    = selectedPosProfile;
+		this.sales_tax_template      = salesTaxTemplate;
 		this.on_click  = onClick;
 
 		//local data
@@ -253,12 +255,9 @@ pos_ar.PointOfSale.pos_history = class {
 		this.totalList.append(`<div class="rowBox align_item"> <div class="name rowBox align_center">Net Total</div> <div class="price rowBox align_center">${netTotal} DA</div> </div>`)
 
 
-		/////////taxes
-		const salesTaxes = this.getSalesTaxes(this.selected_pos);
-
 		let allTax = 0
 		if(this.selected_pos.taxes_and_charges != "" && this.selected_pos.taxes_and_charges != null){
-			salesTaxes.forEach( tax =>{
+			this.sales_tax_template.taxes.forEach( tax =>{
 				allTax += (tax.rate/100) * netTotal
 				this.totalList.append(`<div class="rowBox align_item"> <div class="name rowBox align_center">${tax.description}</div> <div class="price rowBox align_center">${(tax.rate/100) * netTotal} DA</div> </div>`)
 			})
@@ -412,21 +411,6 @@ pos_ar.PointOfSale.pos_history = class {
 	}
 
 	/******************************************** functions  ********************************************************/
-	getSalesTaxes(pos){
-
-		const taxTemplateId = pos.taxes_and_charges
-                let   salesTax      = []
-
-                this.sales_taxes_and_charges.forEach( tax => {
-                        if(tax.parent == taxTemplateId){
-                                console.log("debuging ==> parent : " , tax.parent , " taxTemplateId : " , taxTemplateId)
-                                salesTax.push(tax)
-                        }
-                })
-                console.log("sales tax :=:=> " , salesTax);
-                return salesTax;
-	}
-
 	print_receipt() {
 
 		console.log("pos invoice : " , this.selected_pos)
