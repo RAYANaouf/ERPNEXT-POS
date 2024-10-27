@@ -61,7 +61,7 @@
       Object.assign(this.selectedPosProfile, this.PosProfileList[0]);
       if (this.selectedPosProfile.taxes_and_charges != null) {
         this.taxes_and_charges_template = await this.fetchSalesTaxesAndChargesTemplate(this.selectedPosProfile.taxes_and_charges);
-        this.taxes_and_charges = taxes_and_charges_template.taxes;
+        this.taxes_and_charges = this.taxes_and_charges_template.taxes;
       }
       if (this.customersList.length > 0) {
         this.defaultCustomer = structuredClone(this.customersList[0]);
@@ -2721,6 +2721,7 @@
       this.wrapper.find("#LeftSection").append('<div id="settingsRightContainer" class="columnBox"></div>');
       this.rightContainer = this.wrapper.find("#settingsRightContainer");
       this.leftContainer = this.wrapper.find("#settingsLeftContainer");
+      this.leftContainer.addClass("columnBox");
       this.rightContainer.append('<h4 class="CartTitle">POS Settings</h4>');
       this.rightContainer.append('<div id="settingsCartContent" class="rowBox"> <div class="c1 columnBox"></div>   <div class="c2 columnBox"></div> </div>');
       this.c1 = this.rightContainer.find("div.c1");
@@ -2745,6 +2746,10 @@
       this.c2.append(`<input name="write_off_cost_center" value="${this.selected_pos_profile.write_off_cost_center}" disabled>`);
       this.c2.append(`<label for="taxes_and_charges">POS taxes and charges</label>`);
       this.c2.append(`<input name="taxes_and_charges" value="${this.selected_pos_profile.taxes_and_charges}" disabled>`);
+      this.leftContainer.append("<div>POS Profile</div>");
+      this.leftContainer.append("<div>Default Values</div>");
+      this.leftContainer.append("<div>Generale Settings</div>");
+      this.leftContainer.append("<div>About Us</div>");
     }
     showCart() {
       console.log("show");
@@ -2758,4 +2763,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.7NIASUH3.js.map
+//# sourceMappingURL=pos.bundle.H33DXISW.js.map

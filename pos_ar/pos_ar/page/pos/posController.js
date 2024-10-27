@@ -76,7 +76,7 @@ pos_ar.PointOfSale.Controller = class {
 
 		if(this.selectedPosProfile.taxes_and_charges != null){
 			this.taxes_and_charges_template = await this.fetchSalesTaxesAndChargesTemplate(this.selectedPosProfile.taxes_and_charges)
-			this.taxes_and_charges = taxes_and_charges_template.taxes
+			this.taxes_and_charges = this.taxes_and_charges_template.taxes
 		}
 
 		if(this.customersList.length > 0){

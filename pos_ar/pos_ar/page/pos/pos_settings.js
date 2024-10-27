@@ -22,6 +22,7 @@ pos_ar.PointOfSale.pos_settings = class{
 
 		this.rightContainer = this.wrapper.find('#settingsRightContainer')
 		this.leftContainer  = this.wrapper.find('#settingsLeftContainer')
+		this.leftContainer.addClass('columnBox')
 
 		this.rightContainer.append('<h4 class="CartTitle">POS Settings</h4>')
 		this.rightContainer.append('<div id="settingsCartContent" class="rowBox"> <div class="c1 columnBox"></div>   <div class="c2 columnBox"></div> </div>')
@@ -62,7 +63,10 @@ pos_ar.PointOfSale.pos_settings = class{
 		//this.c2.append(`<input name="lastUpdate" value="${frappe.datetime.now_datetime()}" disabled>`)
 
 		//left section
-
+		this.leftContainer.append('<div>POS Profile</div>')
+		this.leftContainer.append('<div>Default Values</div>')
+		this.leftContainer.append('<div>Generale Settings</div>')
+		this.leftContainer.append('<div>About Us</div>')
 	}
 
 	showCart(){
