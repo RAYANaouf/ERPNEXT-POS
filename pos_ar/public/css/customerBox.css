@@ -188,3 +188,25 @@
 	z-index : 10 ;
 	animation : mymove 0.2s ;
 }
+
+#checkInOutDialog #checkTypeContainer{
+	width  : 100% ;
+
+	display:flex;
+}
+
+
+#checkTypeContainer .checkType{
+	height : 70px ;
+	border : 2px solid #f0f0f0;
+	border-radius : 16px ;
+
+	flex-grow : 1 ;
+}
+
+#checkTypeContainer .checkType.selected{
+	border : 2px solid #ac6500;
+}
+#checkTypeContainer #checkInType{
+	margin-right : 16px ;
+}

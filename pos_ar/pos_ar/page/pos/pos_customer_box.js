@@ -65,8 +65,15 @@ pos_ar.PointOfSale.pos_customer_box = class{
 		//check in out dialog
 		this.wrapper.append('<div id="darkFloatingBackground"></div>')
 		this.dark_floating_background = this.wrapper.find('#darkFloatingBackground');
+
 		this.wrapper.append('<div id="checkInOutDialog"></div>')
 		this.check_in_out_dialog = this.wrapper.find('#checkInOutDialog');
+		this.check_in_out_dialog.css('flex-direction','column')
+
+		this.check_in_out_dialog.append('<div id="checkTypeContainer"></div>')
+		this.check_type_container = this.check_in_out_dialog.find('#checkTypeContainer')
+		this.check_type_container.append('<div id="checkInType"  class="rowBox centerItem checkType selected "><div>Check In</div>  <img src=""></div>')
+		this.check_type_container.append('<div id="checkOutType" class="rowBox centerItem checkType">  <div>Check Out</div>  <img src="">  </div>')
 	}
 
 
