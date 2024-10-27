@@ -36,46 +36,77 @@ pos_ar.PointOfSale.Controller = class {
         }
 
 	 async start_app(){
-		this.db = new pos_ar.PointOfSale.pos_db();
-		this.prepare_container();
-		await  this.prepare_app_defaults();
-		await  this.checkForPOSEntry()
-                await  this.prepare_components();
-		this.checkUnSyncedPos();
-		this.setListeners();
+		try{
+			//init db
+			this.db = new pos_ar.PointOfSale.pos_db();
+			this.prepare_container();
+			//prepare app data
+			await  this.prepare_app_data();
+
+			console.log("to see if the code reach here")
+
+			//proceed with other initialization only if app data are set correctly
+			await  this.checkForPOSEntry()
+			await  this.prepare_components();
+			this.checkUnSyncedPos();
+			this.setListeners();
+		}catch(err){
+			console.error("halfware POS Err ==> " , err)
+		}
 	}
 
+	async prepare_app_data(){
+		try{
+			this.customersList    = await this.fetchCustomers()
+			this.itemGroupList    = await this.fetchItemGroups()
+        	        this.itemList         = await this.fetchItems()
+        	        this.itemPrices       = await this.fetchItemPrice()
+			this.priceLists       = await this.fetchPriceList()
+			this.warehouseList    = await this.fetchWarehouseList()
+			this.PosProfileList   = await this.fetchPosProfileList()
+			this.binList          = await this.fetchBinList()
 
-	async refreshApp(){
-		this.$components_wrapper.text('');
-		await  this.checkForPOSEntry()
-                await  this.prepare_components();
-		this.setListeners();
-	}
+			await this.handleAppData();
 
-	async prepare_app_defaults(){
-                this.customersList    = await this.fetchCustomers()
-		this.itemGroupList    = await this.fetchItemGroups()
-                this.itemList         = await this.fetchItems()
-                this.itemPrices       = await this.fetchItemPrice()
-                this.priceLists       = await this.fetchPriceList()
-                this.warehouseList    = await this.fetchWarehouseList()
-                this.PosProfileList   = await this.fetchPosProfileList()
-                this.binList          = await this.fetchBinList()
+			let new_pos_invoice = frappe.model.get_new_doc('POS Invoice');
+			new_pos_invoice.customer          = this.defaultCustomer.name
+			new_pos_invoice.pos_profile       = this.selectedPosProfile.name
+			new_pos_invoice.items             = [];
+			new_pos_invoice.taxes_and_charges = this.selectedPosProfile.taxes_and_charges
+			new_pos_invoice.additional_discount_percentage = this.invoiceData.discount
+			new_pos_invoice.paid_amount       = 0
+			new_pos_invoice.base_paid_amount  = 0
+			new_pos_invoice.creation_time     = frappe.datetime.now_datetime()
+			new_pos_invoice.payments          = [{'mode_of_payment' : 'Cash' , 'amount' : 0}]
+			new_pos_invoice.is_pos            = 1
+			new_pos_invoice.update_stock      = 1
+			new_pos_invoice.docstatus         = 0
+			new_pos_invoice.status            = 'Draft'
+			new_pos_invoice.priceList         = this.defaultPriceList.name
+
+			this.selectedItemMaps.set("C1" , new_pos_invoice)
+			this.selectedTab.tabName = `C1`
+		}catch(err){
+			console.error("Hlafware POS Error ==> " , err)
+			throw err;
+		}
+        }
 
 
+	async handleAppData(){
+		//check pos profile
 		if(this.PosProfileList.length == 0){
 			frappe.set_route("Form", "POS Profile");
-			return;
+			throw new Error("there is no pos profile")
 		}
-
+		//set default val
 		Object.assign(this.selectedPosProfile , this.PosProfileList[0])
-
+		//check takes and get it if it exist on pos profile
 		if(this.selectedPosProfile.taxes_and_charges != null){
 			this.taxes_and_charges_template = await this.fetchSalesTaxesAndChargesTemplate(this.selectedPosProfile.taxes_and_charges)
 			this.taxes_and_charges = this.taxes_and_charges_template.taxes
 		}
-
+		//check customer
 		if(this.customersList.length > 0){
 			this.defaultCustomer = structuredClone(this.customersList[0])
 		}else{
@@ -83,13 +114,14 @@ pos_ar.PointOfSale.Controller = class {
 					'You dont have a customer',
 					'please create a customer to continue',
 					()=>{
+						frappe.set_route("Form", "Customer");
 					},
-					'Done',
+					'Create',
 					false
 			)
-
+			throw new Error("there is no customer")
 		}
-
+		//check price list
 		if(this.priceLists.length > 0){
 			Object.assign(this.defaultPriceList , this.priceLists[0])
 		}else{
@@ -97,38 +129,13 @@ pos_ar.PointOfSale.Controller = class {
 					'You dont have a single price list',
 					'please create a priceList to continue',
 					()=>{
+						frappe.set_route("Form", "Price List");
 					},
-					'Done',
+					'Create',
 					false
 			)
-
+			throw new Error("there is no price list")
 		}
-
-
-		let new_pos_invoice = frappe.model.get_new_doc('POS Invoice');
-		new_pos_invoice.customer          = this.defaultCustomer.name
-		new_pos_invoice.pos_profile       = this.selectedPosProfile.name
-		new_pos_invoice.items             = [];
-		new_pos_invoice.taxes_and_charges = this.selectedPosProfile.taxes_and_charges
-		new_pos_invoice.additional_discount_percentage = this.invoiceData.discount
-		new_pos_invoice.paid_amount       = 0
-		new_pos_invoice.base_paid_amount  = 0
-		new_pos_invoice.creation_time     = frappe.datetime.now_datetime()
-		new_pos_invoice.payments          = [{'mode_of_payment' : 'Cash' , 'amount' : 0}]
-		new_pos_invoice.is_pos            = 1
-		new_pos_invoice.update_stock      = 1
-		new_pos_invoice.docstatus         = 0
-		new_pos_invoice.status            = 'Draft'
-		new_pos_invoice.priceList         = this.defaultPriceList.name
-
-		this.selectedItemMaps.set("C1" , new_pos_invoice)
-		this.selectedTab.tabName = `C1`
-
-        }
-
-
-	handleAppData(){
-		
 	}
 
         /***********************  ui ******************************************/
@@ -281,7 +288,7 @@ pos_ar.PointOfSale.Controller = class {
 					args: { pos_profile, company, balance_details },
 					freeze: true,
 				});
-				!res.exc && me.prepare_app_defaults(res.message);
+				!res.exc && me.prepare_app_data(res.message);
 
 				Object.assign(me.POSOpeningEntry    ,  {'name' : res.message.name , 'pos_profile' : res.message.pos_profile ,  'period_start_date' : res.message.period_start_date , 'company' : res.message.company } )
 

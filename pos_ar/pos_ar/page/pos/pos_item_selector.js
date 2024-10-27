@@ -67,7 +67,7 @@ pos_ar.PointOfSale.pos_item_selector = class {
         	const itemsContainer_html = document.getElementById("itemsContainer");
         	itemsContainer_html.innerHTML = "";
 
-		for(let i=0 ; i<filtered_item_list.length && i<1000 ; i++){
+		for(let i=0 ; i<filtered_item_list.length && i<800 ; i++){
 			let item = filtered_item_list[i];
                 	const itemBox = document.createElement("div");
                 	itemBox.classList.add("itemBox");
