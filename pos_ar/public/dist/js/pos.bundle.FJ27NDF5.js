@@ -1142,9 +1142,13 @@
     prepare_customer_box() {
       this.wrapper.append('<div id="ActionsContainerBox" class="rowBox align_center">');
       this.actionContainer = this.wrapper.find("#ActionsContainerBox");
+      this.actionContainer.append('<div id="VoucherBox"  class="rowBox" >');
       this.actionContainer.append('<div id="SyncBox"     class="rowBox centerItem" >');
       this.actionContainer.append('<div id="HomeBox"     class="rowBox centerItem"  style="display:none;">');
       this.actionContainer.append('<div id="MenuBox"     class="rowBox centerItem">');
+      this.voucherContainer = this.actionContainer.find("#VoucherBox");
+      this.voucherContainer.append('<div id="moneyTracker">00.00 DA</div>');
+      this.voucherContainer.append('<div id="exchangeBtn"><img src="/assets/pos_ar/images/exchange.png"></div>');
       this.sync_btn = this.actionContainer.find("#SyncBox");
       this.sync_btn.append('<div id="syncBoxContent"> Sync </div>');
       this.sync_btn_content = this.sync_btn.find("#syncBoxContent");
@@ -2582,7 +2586,7 @@
   // ../pos_ar/pos_ar/pos_ar/page/pos/pos_db.js
   pos_ar.PointOfSale.pos_db = class POSDatabase {
     constructor() {
-      this.dbName = "POSDB_test20";
+      this.dbName = "POSDB_test21";
       this.dbVersion = 1;
       this.db = null;
       this.openDatabase();
@@ -2787,4 +2791,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.HTV3W22A.js.map
+//# sourceMappingURL=pos.bundle.FJ27NDF5.js.map

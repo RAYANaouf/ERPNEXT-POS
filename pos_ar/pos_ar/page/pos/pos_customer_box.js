@@ -32,17 +32,26 @@ pos_ar.PointOfSale.pos_customer_box = class{
 		this.wrapper.append('<div id="ActionsContainerBox" class="rowBox align_center">');
 		this.actionContainer = this.wrapper.find('#ActionsContainerBox');
 
+		this.actionContainer.append('<div id="VoucherBox"  class="rowBox" >');
 		this.actionContainer.append('<div id="SyncBox"     class="rowBox centerItem" >');
 		this.actionContainer.append('<div id="HomeBox"     class="rowBox centerItem"  style="display:none;">');
 		this.actionContainer.append('<div id="MenuBox"     class="rowBox centerItem">');
 
+		/**************  voucher container  ********************/
+		this.voucherContainer = this.actionContainer.find('#VoucherBox')
+		//money traker
+		this.voucherContainer.append('<div id="moneyTracker">00.00 DA</div>')
+		//exchange btn
+		this.voucherContainer.append('<div id="exchangeBtn"><img src="/assets/pos_ar/images/exchange.png"></div>')
+
+		//sync btn
 		this.sync_btn = this.actionContainer.find('#SyncBox')
 		this.sync_btn.append('<div id="syncBoxContent"> Sync </div>')
 		this.sync_btn_content = this.sync_btn.find('#syncBoxContent')
-
+		//home btn
 		this.home = this.actionContainer.find('#HomeBox')
 		this.home.append('<img src="/assets/pos_ar/images/home.png" alt="Home" id="homeBoxIcon">')
-
+		//menu btn
 		this.menu = this.actionContainer.find('#MenuBox')
 		this.menu.append('<img src="/assets/pos_ar/images/menu.png" alt="Menu" id="MenuBtn" >')
 		this.menu.append('<div id="menuItemsContainer"     class="columnBox">');
