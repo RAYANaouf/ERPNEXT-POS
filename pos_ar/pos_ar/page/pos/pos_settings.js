@@ -13,22 +13,28 @@ pos_ar.PointOfSale.pos_settings = class{
 
 	start_work(){
 		this.prepareSettingsCart();
+		this.setListener();
 	}
 
 
 	prepareSettingsCart(){
-		this.wrapper.find('#RightSection').append('<div id="settingsLeftContainer" class="columnBox"></div>')
-		this.wrapper.find('#LeftSection').append('<div id="settingsRightContainer" class="columnBox"></div>')
+		this.wrapper.find('#RightSection').append('<div id="settingsRightContainer" class="columnBox"></div>')
+		this.wrapper.find('#LeftSection').append('<div id="settingsLeftContainer" class="columnBox"></div>')
 
-		this.rightContainer = this.wrapper.find('#settingsRightContainer')
-		this.leftContainer  = this.wrapper.find('#settingsLeftContainer')
+		this.leftContainer = this.wrapper.find('#settingsLeftContainer')
+		this.rightContainer  = this.wrapper.find('#settingsRightContainer')
 		this.leftContainer.addClass('columnBox')
 
-		this.rightContainer.append('<h4 class="CartTitle">POS Settings</h4>')
-		this.rightContainer.append('<div id="settingsCartContent" class="rowBox"> <div class="c1 columnBox"></div>   <div class="c2 columnBox"></div> </div>')
+		//left container
+		this.leftContainer.append('<h4 class="CartTitle" style="margin-bottom:35px; font-size:35px;" >POS Settings</h4>')
+		this.leftContainer.append('<div id="settingsCartContentsContainer">  </div>')
+		this.contentsContainer = this.leftContainer.find('#settingsCartContentsContainer');
 
-		this.c1 = this.rightContainer.find('div.c1')
-		this.c2 = this.rightContainer.find('div.c2')
+		//pos profile:
+		this.contentsContainer.append('<div id="posProfileContent" class="contentContainer rowBox" style="width:100%;"> <div class="c1 columnBox"></div>   <div class="c2 columnBox"></div> </div>')
+		this.pos_profile_content = this.contentsContainer.find('#posProfileContent')
+		this.c1 = this.pos_profile_content.find('div.c1')
+		this.c2 = this.pos_profile_content.find('div.c2')
 
 		this.c1.append('<label for="pos_profile"> POS Profile </label>')
 		this.c1.append('<select  name="pos_profile" id="posProfileSelect" ></select>')
@@ -62,22 +68,37 @@ pos_ar.PointOfSale.pos_settings = class{
 		//this.c2.append(`<label for="lastUpdate">POS last update</label>`)
 		//this.c2.append(`<input name="lastUpdate" value="${frappe.datetime.now_datetime()}" disabled>`)
 
-		//left section
-		this.leftContainer.append('<div>POS Profile</div>')
-		this.leftContainer.append('<div>Default Values</div>')
-		this.leftContainer.append('<div>Generale Settings</div>')
-		this.leftContainer.append('<div>About Us</div>')
+		//right section
+		this.rightContainer.append('<div class="settings_tab active" >POS Profile</div>')
+		this.rightContainer.append('<div class="settings_tab" >Default Values</div>')
+		this.rightContainer.append('<div class="settings_tab" >Generale Settings</div>')
+		this.rightContainer.append('<div class="settings_tab" >About Us</div>')
+
 	}
 
 	showCart(){
-		console.log("show")
 		this.rightContainer.css('display' , 'flex')
 		this.leftContainer.css('display' , 'flex')
 	}
 	hideCart(){
-		console.log("hide")
 		this.rightContainer.css('display' , 'none')
 		this.leftContainer.css('display' , 'none')
+	}
+
+	/*********************** set listener  ********************************/
+
+	setListener(){
+		const tabs = document.querySelectorAll('.settings_tab');
+		const all_content = document.querySelectorAll('.contentContainer')
+
+		tabs.forEach((tab , index)=>{
+			tab.addEventListener('click' , ()=>{
+				tabs.forEach(tab => {
+					tab.classList.remove('active');
+				})
+				tab.classList.add('active');
+			})
+		})
 	}
 
 
