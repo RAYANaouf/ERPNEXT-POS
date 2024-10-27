@@ -9,12 +9,10 @@
       this.itemList = [];
       this.itemPrices = [];
       this.priceLists = [];
-      let initPos = frappe.model.get_new_doc("POS Invoice");
-      initPos.items = [];
-      this.selectedItemMaps = /* @__PURE__ */ new Map();
       this.warehouseList = [];
       this.PosProfileList = [];
       this.binList = [];
+      this.selectedItemMaps = /* @__PURE__ */ new Map();
       this.selectedItem = { "name": "" };
       this.selectedField = { "field_name": "" };
       this.selectedTab = { "tabName": "" };
@@ -24,7 +22,6 @@
       this.defaultPriceList = { "name": "" };
       this.taxes_and_charges_template = null;
       this.taxes_and_charges = [];
-      this.sellInvoices = /* @__PURE__ */ new Map();
       this.POSOpeningEntry = {};
       this.invoiceData = { netTotal: 0, grandTotal: 0, paidAmount: 0, toChange: 0, discount: 0 };
       this.db = null;
@@ -104,6 +101,8 @@
       new_pos_invoice.priceList = this.defaultPriceList.name;
       this.selectedItemMaps.set("C1", new_pos_invoice);
       this.selectedTab.tabName = `C1`;
+    }
+    handleAppData() {
     }
     prepare_container() {
       this.wrapper.append('<link rel="stylesheet" type="text/css" href="/assets/pos_ar/css/selectorBox.css">');
@@ -765,8 +764,7 @@
       return pos.items.some((item) => item.rate == 0);
     }
     onClosePOS() {
-      let all_tabs = Array.from(this.sellInvoices.keys());
-      if (all_tabs.length > 0) {
+      if (this.unsyncedPos > 0) {
         frappe.throw(__(`you have ${all_tabs.length} invoice to sync first.`));
       }
       let voucher = frappe.model.get_new_doc("POS Closing Entry");
@@ -2777,4 +2775,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.3XB4L5BJ.js.map
+//# sourceMappingURL=pos.bundle.AHMZMVNA.js.map

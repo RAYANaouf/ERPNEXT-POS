@@ -10,13 +10,11 @@ pos_ar.PointOfSale.Controller = class {
                 this.itemList          = []
                 this.itemPrices        = []
                 this.priceLists        = []
-
-		let initPos = frappe.model.get_new_doc('POS Invoice')
-		initPos.items = [];
-                this.selectedItemMaps  = new Map()
                 this.warehouseList     = []
                 this.PosProfileList    = []
                 this.binList           = []
+
+                this.selectedItemMaps  = new Map()
 
                 this.selectedItem               = {"name"       : ""   }
                 this.selectedField              = {"field_name" : ""   }
@@ -29,7 +27,6 @@ pos_ar.PointOfSale.Controller = class {
 		this.taxes_and_charges          = [];
 
 		//sell invoice
-		this.sellInvoices    = new Map();
 		this.POSOpeningEntry = {}
 
 		this.invoiceData = { netTotal : 0 , grandTotal : 0 , paidAmount : 0 , toChange : 0 , discount : 0}
@@ -129,6 +126,10 @@ pos_ar.PointOfSale.Controller = class {
 
         }
 
+
+	handleAppData(){
+		
+	}
 
         /***********************  ui ******************************************/
 
@@ -846,8 +847,6 @@ pos_ar.PointOfSale.Controller = class {
 		this.selectedItemMaps.get(this.selectedTab.tabName).payments          = [{'mode_of_payment' : 'Cash' , 'amount' : this.invoiceData.paidAmount}]
 		this.selectedItemMaps.get(this.selectedTab.tabName).docstatus         = 1
 
-		//this.sellInvoices.set(this.selectedItemMaps.get(this.selectedTab.tabName).name , this.selectedItemMaps.get(this.selectedTab.tabName));
-
 		//set status
 		const status = this.checkIfPaid(this.selectedItemMaps.get(this.selectedTab.tabName))
 		this.selectedItemMaps.get(this.selectedTab.tabName).status            = status
@@ -1012,9 +1011,8 @@ pos_ar.PointOfSale.Controller = class {
 
 
 	onClosePOS(){
-		let all_tabs = Array.from(this.sellInvoices.keys())
 		//check if you still have an invoice to sync
-		if(all_tabs.length > 0){
+		if(this.unsyncedPos > 0){
 			frappe.throw(__(`you have ${all_tabs.length} invoice to sync first.`))
 		}
 		//otherwise you can close the voucher
