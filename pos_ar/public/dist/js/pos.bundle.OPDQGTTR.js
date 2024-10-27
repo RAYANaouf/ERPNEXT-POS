@@ -881,7 +881,7 @@
       try {
         return await frappe.db.get_list("Customer", {
           fields: ["name", "customer_name"],
-          filters: {},
+          filters: { disabled: 0 },
           limit: 1e5
         });
       } catch (error) {
@@ -2763,4 +2763,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.H33DXISW.js.map
+//# sourceMappingURL=pos.bundle.OPDQGTTR.js.map

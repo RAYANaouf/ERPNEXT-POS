@@ -1177,7 +1177,7 @@ pos_ar.PointOfSale.Controller = class {
                 try {
                         return await frappe.db.get_list('Customer', {
                                 fields: ['name', 'customer_name' ],
-                                filters: {},
+                                filters: { disabled : 0},
 				limit : 100000
                         })
                 } catch (error) {
