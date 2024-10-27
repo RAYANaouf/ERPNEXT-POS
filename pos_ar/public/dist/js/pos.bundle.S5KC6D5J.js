@@ -1142,16 +1142,14 @@
     prepare_customer_box() {
       this.wrapper.append('<div id="ActionsContainerBox" class="rowBox align_center">');
       this.actionContainer = this.wrapper.find("#ActionsContainerBox");
-      this.actionContainer.append('<div id="VoucherBox"  class="rowBox" >');
       this.actionContainer.append('<div id="SyncBox"     class="rowBox centerItem" >');
       this.actionContainer.append('<div id="HomeBox"     class="rowBox centerItem"  style="display:none;">');
+      this.actionContainer.append('<div id="exchangeBtn" class="rowBox centerItem" style="margin-right:16px;" >  <img src="/assets/pos_ar/images/exchange.png">  </div>');
       this.actionContainer.append('<div id="MenuBox"     class="rowBox centerItem">');
-      this.voucherContainer = this.actionContainer.find("#VoucherBox");
-      this.voucherContainer.append('<div id="moneyTracker">00.00 DA</div>');
-      this.voucherContainer.append('<div id="exchangeBtn"><img src="/assets/pos_ar/images/exchange.png"></div>');
       this.sync_btn = this.actionContainer.find("#SyncBox");
       this.sync_btn.append('<div id="syncBoxContent"> Sync </div>');
       this.sync_btn_content = this.sync_btn.find("#syncBoxContent");
+      this.exchange_btn = this.actionContainer.find("#exchangeBtn");
       this.home = this.actionContainer.find("#HomeBox");
       this.home.append('<img src="/assets/pos_ar/images/home.png" alt="Home" id="homeBoxIcon">');
       this.menu = this.actionContainer.find("#MenuBox");
@@ -1164,6 +1162,10 @@
       this.pos_invoices = this.menuItemsContainer.find("#posInvoiceMenuItem");
       this.close_pos = this.menuItemsContainer.find("#closePosMenuItem");
       this.setting = this.menuItemsContainer.find("#settingMenuItem");
+      this.wrapper.append('<div id="darkFloatingBackground"></div>');
+      this.dark_floating_background = this.wrapper.find("#darkFloatingBackground");
+      this.wrapper.append('<div id="checkInOutDialog"></div>');
+      this.check_in_out_dialog = this.wrapper.find("#checkInOutDialog");
     }
     showHomeBar() {
       this.home.css("display", "flex");
@@ -1176,6 +1178,14 @@
     }
     hideSyncBar() {
       this.sync_btn.css("display", "none");
+    }
+    showCheckInOutDialog() {
+      this.check_in_out_dialog.css("display", "flex");
+      this.dark_floating_background.css("display", "flex");
+    }
+    hideCheckInOutDialog() {
+      this.check_in_out_dialog.css("display", "none");
+      this.dark_floating_background.css("display", "none");
     }
     checkForSync() {
       this.sync_btn.addClass("Synced");
@@ -1206,6 +1216,12 @@
       });
       this.home.on("click", (event2) => {
         this.back_home();
+      });
+      this.exchange_btn.on("click", (event2) => {
+        this.showCheckInOutDialog();
+      });
+      this.dark_floating_background.on("click", (event2) => {
+        this.hideCheckInOutDialog();
       });
     }
     setSynced() {
@@ -2791,4 +2807,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.FJ27NDF5.js.map
+//# sourceMappingURL=pos.bundle.S5KC6D5J.js.map

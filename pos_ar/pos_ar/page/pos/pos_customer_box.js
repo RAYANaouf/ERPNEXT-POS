@@ -32,22 +32,19 @@ pos_ar.PointOfSale.pos_customer_box = class{
 		this.wrapper.append('<div id="ActionsContainerBox" class="rowBox align_center">');
 		this.actionContainer = this.wrapper.find('#ActionsContainerBox');
 
-		this.actionContainer.append('<div id="VoucherBox"  class="rowBox" >');
 		this.actionContainer.append('<div id="SyncBox"     class="rowBox centerItem" >');
 		this.actionContainer.append('<div id="HomeBox"     class="rowBox centerItem"  style="display:none;">');
+		this.actionContainer.append('<div id="exchangeBtn" class="rowBox centerItem" style="margin-right:16px;" >  <img src="/assets/pos_ar/images/exchange.png">  </div>');
 		this.actionContainer.append('<div id="MenuBox"     class="rowBox centerItem">');
 
-		/**************  voucher container  ********************/
-		this.voucherContainer = this.actionContainer.find('#VoucherBox')
-		//money traker
-		this.voucherContainer.append('<div id="moneyTracker">00.00 DA</div>')
-		//exchange btn
-		this.voucherContainer.append('<div id="exchangeBtn"><img src="/assets/pos_ar/images/exchange.png"></div>')
+
 
 		//sync btn
 		this.sync_btn = this.actionContainer.find('#SyncBox')
 		this.sync_btn.append('<div id="syncBoxContent"> Sync </div>')
 		this.sync_btn_content = this.sync_btn.find('#syncBoxContent')
+		//exchange btn
+		this.exchange_btn = this.actionContainer.find('#exchangeBtn')
 		//home btn
 		this.home = this.actionContainer.find('#HomeBox')
 		this.home.append('<img src="/assets/pos_ar/images/home.png" alt="Home" id="homeBoxIcon">')
@@ -64,6 +61,12 @@ pos_ar.PointOfSale.pos_customer_box = class{
 		this.pos_invoices = this.menuItemsContainer.find('#posInvoiceMenuItem')
 		this.close_pos    = this.menuItemsContainer.find('#closePosMenuItem')
 		this.setting      = this.menuItemsContainer.find('#settingMenuItem')
+
+		//check in out dialog
+		this.wrapper.append('<div id="darkFloatingBackground"></div>')
+		this.dark_floating_background = this.wrapper.find('#darkFloatingBackground');
+		this.wrapper.append('<div id="checkInOutDialog"></div>')
+		this.check_in_out_dialog = this.wrapper.find('#checkInOutDialog');
 	}
 
 
@@ -79,6 +82,15 @@ pos_ar.PointOfSale.pos_customer_box = class{
 	}
 	hideSyncBar(){
 		this.sync_btn.css('display' , 'none');
+	}
+
+	showCheckInOutDialog(){
+		this.check_in_out_dialog.css('display','flex')
+		this.dark_floating_background.css('display','flex')
+	}
+	hideCheckInOutDialog(){
+		this.check_in_out_dialog.css('display','none')
+		this.dark_floating_background.css('display','none')
 	}
 
 
@@ -124,6 +136,13 @@ pos_ar.PointOfSale.pos_customer_box = class{
 			this.back_home()
 		})
 
+		this.exchange_btn.on('click' , (event)=>{
+			this.showCheckInOutDialog();
+		})
+
+		this.dark_floating_background.on('click' , (event)=>{
+			this.hideCheckInOutDialog();
+		})
 	}
 
 	setSynced(){
