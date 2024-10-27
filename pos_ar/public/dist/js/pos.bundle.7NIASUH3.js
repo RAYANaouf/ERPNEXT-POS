@@ -22,6 +22,8 @@
       this.defaultCustomer = { "name": "", "customer_name": "" };
       this.selectedPosProfile = { "name": "" };
       this.defaultPriceList = { "name": "" };
+      this.taxes_and_charges_template = null;
+      this.taxes_and_charges = [];
       this.sellInvoices = /* @__PURE__ */ new Map();
       this.POSOpeningEntry = {};
       this.invoiceData = { netTotal: 0, grandTotal: 0, paidAmount: 0, toChange: 0, discount: 0 };
@@ -57,8 +59,10 @@
         return;
       }
       Object.assign(this.selectedPosProfile, this.PosProfileList[0]);
-      console.log("pos profile : ", this.selectedPosProfile);
-      this.taxes_and_charges_template = await this.fetchSalesTaxesAndChargesTemplate(this.selectedPosProfile.taxes_and_charges);
+      if (this.selectedPosProfile.taxes_and_charges != null) {
+        this.taxes_and_charges_template = await this.fetchSalesTaxesAndChargesTemplate(this.selectedPosProfile.taxes_and_charges);
+        this.taxes_and_charges = taxes_and_charges_template.taxes;
+      }
       if (this.customersList.length > 0) {
         this.defaultCustomer = structuredClone(this.customersList[0]);
       } else {
@@ -281,7 +285,7 @@
         this.selectedItemMaps,
         this.priceLists,
         this.customersList,
-        this.taxes_and_charges_template.taxes,
+        this.taxes_and_charges,
         this.invoiceData,
         this.selectedTab,
         this.selectedItem,
@@ -333,9 +337,8 @@
       this.history_cart = new pos_ar.PointOfSale.pos_history(
         this.wrapper,
         this.db,
-        this.sales_taxes_and_charges,
         this.selectedPosProfile,
-        this.taxes_and_charges_template,
+        this.taxes_and_charges,
         this.historyCartClick.bind(this)
       );
     }
@@ -745,7 +748,7 @@
       pos.items.forEach((item) => {
         netTotal += item.qty * item.rate;
       });
-      this.taxes_and_charges_template.taxes.forEach((tax) => {
+      this.taxes_and_charges.forEach((tax) => {
         allTaxes += tax.rate / 100 * netTotal;
       });
       discount = pos.additional_discount_percentage / 100 * netTotal;
@@ -1209,7 +1212,6 @@
   // ../pos_ar/pos_ar/pos_ar/page/pos/pos_selected_item_cart.js
   pos_ar.PointOfSale.pos_selected_item_cart = class {
     constructor(wrapper, selectedItemMaps, priceLists, customerList, salesTaxes, invoiceData, selectedTab, selectedItem, selectedField, getItemPrice, onSelectedItemClick, onTabClick, onKeyPressed, createNewTab, onCheckoutClick) {
-      console.log("start debuging 0");
       this.wrapper = wrapper;
       this.selected_item_maps = selectedItemMaps;
       this.price_lists = priceLists;
@@ -2280,12 +2282,11 @@
 
   // ../pos_ar/pos_ar/pos_ar/page/pos/pos_history.js
   pos_ar.PointOfSale.pos_history = class {
-    constructor(wrapper, db, salesTaxesAndCharges, selectedPosProfile, salesTaxTemplate, onClick) {
+    constructor(wrapper, db, selectedPosProfile, salesTaxes, onClick) {
       this.wrapper = wrapper;
       this.db = db;
-      this.sales_taxes_and_charges = salesTaxesAndCharges;
       this.selected_pos_profile = selectedPosProfile;
-      this.sales_tax_template = salesTaxTemplate;
+      this.sales_taxes = salesTaxes;
       this.on_click = onClick;
       this.localPosInvoice = { lastTime: null, pos_invoices: [] };
       this.filter = "";
@@ -2444,7 +2445,7 @@
       this.totalList.append(`<div class="rowBox align_item"> <div class="name rowBox align_center">Net Total</div> <div class="price rowBox align_center">${netTotal} DA</div> </div>`);
       let allTax = 0;
       if (this.selected_pos.taxes_and_charges != "" && this.selected_pos.taxes_and_charges != null) {
-        this.sales_tax_template.taxes.forEach((tax) => {
+        this.sales_taxes.forEach((tax) => {
           allTax += tax.rate / 100 * netTotal;
           this.totalList.append(`<div class="rowBox align_item"> <div class="name rowBox align_center">${tax.description}</div> <div class="price rowBox align_center">${tax.rate / 100 * netTotal} DA</div> </div>`);
         });
@@ -2757,4 +2758,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.U3JZN5AW.js.map
+//# sourceMappingURL=pos.bundle.7NIASUH3.js.map

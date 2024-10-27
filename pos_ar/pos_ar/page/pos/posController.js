@@ -18,13 +18,15 @@ pos_ar.PointOfSale.Controller = class {
                 this.PosProfileList    = []
                 this.binList           = []
 
-                this.selectedItem          = {"name"       : ""   }
-                this.selectedField         = {"field_name" : ""   }
-                this.selectedTab           = {"tabName"    : ""   }
-		this.selectedPaymentMethod = {"methodName" : ""   }
-		this.defaultCustomer       = {"name"       : "" , "customer_name" : ""}
-		this.selectedPosProfile    = {"name"       : ""   }
-		this.defaultPriceList      = {"name"       : ""   }
+                this.selectedItem               = {"name"       : ""   }
+                this.selectedField              = {"field_name" : ""   }
+                this.selectedTab                = {"tabName"    : ""   }
+		this.selectedPaymentMethod      = {"methodName" : ""   }
+		this.defaultCustomer            = {"name"       : "" , "customer_name" : ""}
+		this.selectedPosProfile         = {"name"       : ""   }
+		this.defaultPriceList           = {"name"       : ""   }
+		this.taxes_and_charges_template = null;
+		this.taxes_and_charges          = [];
 
 		//sell invoice
 		this.sellInvoices    = new Map();
@@ -72,9 +74,10 @@ pos_ar.PointOfSale.Controller = class {
 
 		Object.assign(this.selectedPosProfile , this.PosProfileList[0])
 
-		console.log("pos profile : " , this.selectedPosProfile)
-
-		this.taxes_and_charges_template = await this.fetchSalesTaxesAndChargesTemplate(this.selectedPosProfile.taxes_and_charges)
+		if(this.selectedPosProfile.taxes_and_charges != null){
+			this.taxes_and_charges_template = await this.fetchSalesTaxesAndChargesTemplate(this.selectedPosProfile.taxes_and_charges)
+			this.taxes_and_charges = taxes_and_charges_template.taxes
+		}
 
 		if(this.customersList.length > 0){
 			this.defaultCustomer = structuredClone(this.customersList[0])
@@ -334,7 +337,7 @@ pos_ar.PointOfSale.Controller = class {
 									this.selectedItemMaps ,
 									this.priceLists       ,
 									this.customersList    ,
-									this.taxes_and_charges_template.taxes ,
+									this.taxes_and_charges,
 									this.invoiceData      ,
 									this.selectedTab      ,
 									this.selectedItem     ,
@@ -390,9 +393,8 @@ pos_ar.PointOfSale.Controller = class {
 		this.history_cart = new pos_ar.PointOfSale.pos_history(
 									this.wrapper,
 									this.db,
-									this.sales_taxes_and_charges,
 									this.selectedPosProfile,
-									this.taxes_and_charges_template,
+									this.taxes_and_charges,
 									this.historyCartClick.bind(this)
 								)
         }
@@ -982,7 +984,7 @@ pos_ar.PointOfSale.Controller = class {
 			netTotal += item.qty * item.rate
 		})
 
-		this.taxes_and_charges_template.taxes.forEach(tax =>{
+		this.taxes_and_charges.forEach(tax =>{
 			allTaxes += (tax.rate / 100) * netTotal
 		})
 

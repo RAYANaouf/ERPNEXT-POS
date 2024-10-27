@@ -3,16 +3,14 @@ pos_ar.PointOfSale.pos_history = class {
 	constructor(
 		wrapper,
 		db,
-		salesTaxesAndCharges,
 		selectedPosProfile,
-		salesTaxTemplate,
+		salesTaxes,
 		onClick
 	){
 		this.wrapper   = wrapper;
 		this.db        = db;
-		this.sales_taxes_and_charges = salesTaxesAndCharges
 		this.selected_pos_profile    = selectedPosProfile;
-		this.sales_tax_template      = salesTaxTemplate;
+		this.sales_taxes             = salesTaxes;
 		this.on_click  = onClick;
 
 		//local data
@@ -21,7 +19,6 @@ pos_ar.PointOfSale.pos_history = class {
 		this.filtered_pos_list = [] ;
 		this.selected_pos      = null ;
 		this.start_work();
-
 	}
 
 	start_work(){
@@ -257,7 +254,7 @@ pos_ar.PointOfSale.pos_history = class {
 
 		let allTax = 0
 		if(this.selected_pos.taxes_and_charges != "" && this.selected_pos.taxes_and_charges != null){
-			this.sales_tax_template.taxes.forEach( tax =>{
+			this.sales_taxes.forEach( tax =>{
 				allTax += (tax.rate/100) * netTotal
 				this.totalList.append(`<div class="rowBox align_item"> <div class="name rowBox align_center">${tax.description}</div> <div class="price rowBox align_center">${(tax.rate/100) * netTotal} DA</div> </div>`)
 			})

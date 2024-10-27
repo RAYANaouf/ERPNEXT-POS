@@ -19,8 +19,6 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 		onCheckoutClick    ,
 	){
 
-		console.log("start debuging 0")
-
 		this.wrapper                 = wrapper         ;
 		this.selected_item_maps      = selectedItemMaps;
 		this.price_lists             = priceLists      ;
