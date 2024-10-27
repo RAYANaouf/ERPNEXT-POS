@@ -1,5 +1,3 @@
-
-
 pos_ar.PointOfSale.pos_item_selector = class {
 
 	constructor(
@@ -68,7 +66,9 @@ pos_ar.PointOfSale.pos_item_selector = class {
 	setItemInFlow(filtered_item_list){
         	const itemsContainer_html = document.getElementById("itemsContainer");
         	itemsContainer_html.innerHTML = "";
-        	filtered_item_list.forEach(item =>{
+
+		for(let i=0 ; i<filtered_item_list.length && i<1000 ; i++){
+			let item = filtered_item_list[i];
                 	const itemBox = document.createElement("div");
                 	itemBox.classList.add("itemBox");
                 	itemBox.classList.add("columnBox");
@@ -77,7 +77,6 @@ pos_ar.PointOfSale.pos_item_selector = class {
                 	itemBox.addEventListener('click' , event => {
 				this.on_item_click(item);
                 	});
-
 
                 	if(item.image){
                         	const itemImage = document.createElement("img");
@@ -101,17 +100,57 @@ pos_ar.PointOfSale.pos_item_selector = class {
                 	itemName.classList.add("itemTitle");
                 	itemBox.appendChild(itemName);
 
+                	const price = document.createElement("div");
+                	price.classList.add("itemPrice");
+                	price.textContent = this.get_item_price(item.name , this.selected_price_list.name) + " DA";
+                	itemBox.appendChild(price);
+                	itemsContainer_html.appendChild(itemBox);
+
+		}
+/*
+		filtered_item_list.forEach(item =>{
+                	const itemBox = document.createElement("div");
+                	itemBox.classList.add("itemBox");
+                	itemBox.classList.add("columnBox");
+                	itemBox.classList.add("C_A_Center");
+
+                	itemBox.addEventListener('click' , event => {
+				this.on_item_click(item);
+                	});
+
+                	if(item.image){
+                        	const itemImage = document.createElement("img");
+                        	itemImage.classList.add("itemImage");
+                        	itemImage.src = item.image
+                        	itemBox.appendChild(itemImage);
+                	}
+                	else{
+                        	const itemImageHolder = document.createElement("div");
+                        	itemImageHolder.classList.add("itemImage");
+                        	itemImageHolder.classList.add("rowBox");
+                        	itemImageHolder.classList.add("centerItem");
+                        	const firstLatter = document.createElement("h1");
+                        	firstLatter.textContent = item.item_name[0];
+                        	firstLatter.style.color = "#707070";
+                        	itemImageHolder.appendChild(firstLatter);
+                        	itemBox.appendChild(itemImageHolder);
+                	}
+                	const itemName = document.createElement("div");
+                	itemName.textContent = item.item_name ;
+                	itemName.classList.add("itemTitle");
+                	itemBox.appendChild(itemName);
 
                 	const price = document.createElement("div");
                 	price.classList.add("itemPrice");
                 	price.textContent = this.get_item_price(item.name , this.selected_price_list.name) + " DA";
                 	itemBox.appendChild(price);
-
-
                 	itemsContainer_html.appendChild(itemBox);
         	});
-
+*/
 	}
+
+
+
 
 	//show and hide
 	showCart(){

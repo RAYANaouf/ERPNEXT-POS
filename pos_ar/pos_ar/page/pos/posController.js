@@ -828,7 +828,6 @@ pos_ar.PointOfSale.Controller = class {
 				//'expense_account'         : 'Cost of Goods Sold - MS',
 				'use_serial_batch_fields' : 1,
 				'cost_center'             : this.selectedPosProfile.cost_center,
-				'income_account'          : this.selectedPosProfile.income_account,
 				'discount_percentage'     : item.discount_percentage,
 				'discount_amount'         : item.discount_amount,
 				'warehouse'               : this.selectedPosProfile.warehouse,

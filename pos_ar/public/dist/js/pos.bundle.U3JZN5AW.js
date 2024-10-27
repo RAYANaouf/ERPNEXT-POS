@@ -626,7 +626,6 @@
           "image": item.image,
           "use_serial_batch_fields": 1,
           "cost_center": this.selectedPosProfile.cost_center,
-          "income_account": this.selectedPosProfile.income_account,
           "discount_percentage": item.discount_percentage,
           "discount_amount": item.discount_amount,
           "warehouse": this.selectedPosProfile.warehouse,
@@ -1028,7 +1027,8 @@
     setItemInFlow(filtered_item_list) {
       const itemsContainer_html = document.getElementById("itemsContainer");
       itemsContainer_html.innerHTML = "";
-      filtered_item_list.forEach((item) => {
+      for (let i = 0; i < filtered_item_list.length && i < 1e3; i++) {
+        let item = filtered_item_list[i];
         const itemBox = document.createElement("div");
         itemBox.classList.add("itemBox");
         itemBox.classList.add("columnBox");
@@ -1061,7 +1061,7 @@
         price.textContent = this.get_item_price(item.name, this.selected_price_list.name) + " DA";
         itemBox.appendChild(price);
         itemsContainer_html.appendChild(itemBox);
-      });
+      }
     }
     showCart() {
       this.selectorBox.css("display", "flex");
@@ -2254,12 +2254,12 @@
       this.refreshData();
     }
     calculateGrandTotal() {
-      this.payment_details.find("#paymentGrandTotalValue").text(`${this.invoice_data.grandTotal} DA`);
+      this.payment_details.find("#paymentGrandTotalValue").text(`${this.invoice_data.grandTotal.toFixed(2)} DA`);
       this.generateProposedPaidAmount(this.invoice_data.grandTotal);
     }
     calculateToChange() {
       this.invoice_data.toChange = this.invoice_data.paidAmount - this.invoice_data.grandTotal;
-      this.payment_details.find("#paimentToChangeValue").text(`${this.invoice_data.toChange} DA`);
+      this.payment_details.find("#paimentToChangeValue").text(`${this.invoice_data.toChange.toFixed(2)} DA`);
     }
     refreshPaidAmount() {
       this.payment_details.find("#paimentPaidAmountValue").text(`${this.invoice_data.paidAmount} DA`);
@@ -2571,7 +2571,7 @@
   // ../pos_ar/pos_ar/pos_ar/page/pos/pos_db.js
   pos_ar.PointOfSale.pos_db = class POSDatabase {
     constructor() {
-      this.dbName = "POSDB_test19";
+      this.dbName = "POSDB_test20";
       this.dbVersion = 1;
       this.db = null;
       this.openDatabase();
@@ -2757,4 +2757,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.RYGGKSK7.js.map
+//# sourceMappingURL=pos.bundle.U3JZN5AW.js.map

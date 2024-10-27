@@ -61,6 +61,8 @@ pos_ar.PointOfSale.pos_settings = class{
 		//this.c2.append(`<label for="lastUpdate">POS last update</label>`)
 		//this.c2.append(`<input name="lastUpdate" value="${frappe.datetime.now_datetime()}" disabled>`)
 
+		//left section
+
 	}
 
 	showCart(){

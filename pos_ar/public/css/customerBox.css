@@ -6,7 +6,6 @@
 #RightSection #MenuBox, 
 #RightSection #HomeBox
 {
-
         height : 55px  ;
 	width  : 55px  ;
         background     : #FFFFFF ;
@@ -17,6 +16,12 @@
         box-shadow: rgba(100, 100, 111, 0.2) 0px 2px 15px 0px;
 
 	position : relative ; 
+	cursor   : pointer  ;
+}
+#RightSection #MenuBox:hover, 
+#RightSection #HomeBox:hover
+{
+	background     : #f0f0f0 ;
 }
 #SyncBox{
 	height        : 55px              ;

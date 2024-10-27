@@ -333,13 +333,13 @@ pos_ar.PointOfSale.pos_payment_cart = class{
 
 
 	calculateGrandTotal(){
-		this.payment_details.find('#paymentGrandTotalValue').text(`${this.invoice_data.grandTotal} DA`)
+		this.payment_details.find('#paymentGrandTotalValue').text(`${this.invoice_data.grandTotal.toFixed(2)} DA`)
 		this.generateProposedPaidAmount(this.invoice_data.grandTotal);
 	}
 
 	calculateToChange(){
 		this.invoice_data.toChange = (this.invoice_data.paidAmount - this.invoice_data.grandTotal)
-		this.payment_details.find('#paimentToChangeValue').text(`${this.invoice_data.toChange} DA`)
+		this.payment_details.find('#paimentToChangeValue').text(`${this.invoice_data.toChange.toFixed(2)} DA`)
 	}
 
 	refreshPaidAmount(){
