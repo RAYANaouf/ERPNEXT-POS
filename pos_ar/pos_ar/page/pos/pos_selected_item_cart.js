@@ -320,6 +320,9 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 	}
 
 	createNewTab(){
+			if(this.tabs_container.find('div.tab').length >= 7){
+				return;
+			}
 			this.counter += 1 ;
 			this.create_new_tab(this.counter);
 			//update UI

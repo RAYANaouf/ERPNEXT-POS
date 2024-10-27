@@ -1424,6 +1424,9 @@
       this.calculateGrandTotal();
     }
     createNewTab() {
+      if (this.tabs_container.find("div.tab").length >= 7) {
+        return;
+      }
       this.counter += 1;
       this.create_new_tab(this.counter);
       this.refreshTabs();
@@ -2784,4 +2787,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.5FSGVQO3.js.map
+//# sourceMappingURL=pos.bundle.HTV3W22A.js.map
