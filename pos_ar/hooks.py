@@ -227,5 +227,9 @@ app_include_js = "/assets/pos_ar/js/pos.bundle.js"
 # }
 
 fixtures = [
-	'Custom Field','DocType'
+	'Custom Field',
+	{
+		'dt'      : 'DocType',
+		'filters' : [['name' , 'in' , ['check_in_out']]]
+	}
 ]
