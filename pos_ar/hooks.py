@@ -227,5 +227,5 @@ app_include_js = "/assets/pos_ar/js/pos.bundle.js"
 # }
 
 fixtures = [
-	'Custom Field'
+	'Custom Field','DocType'
 ]
