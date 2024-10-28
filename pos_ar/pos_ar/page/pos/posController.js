@@ -835,7 +835,6 @@ pos_ar.PointOfSale.Controller = class {
 				'qty'                     : item.qty,
 				'description'             : item.name,
 				'image'                   : item.image,
-				//'expense_account'         : 'Cost of Goods Sold - MS',
 				'use_serial_batch_fields' : 1,
 				'cost_center'             : this.selectedPosProfile.cost_center,
 				'discount_percentage'     : item.discount_percentage,
@@ -861,6 +860,8 @@ pos_ar.PointOfSale.Controller = class {
 		//copy the pos is important otherwise it will deleted and the selectedTab change and then it will save the
 		//wrong one. because insert take a while after the callback will called.
 		const pos = structuredClone(this.selectedItemMaps.get(this.selectedTab.tabName))
+		console.log("sync : " , pos)
+
 
 		if(status == 'Unpaid'){
 			pos.synced = true
@@ -909,6 +910,7 @@ pos_ar.PointOfSale.Controller = class {
 			this.selected_item_cart.createNewTab();
 		}
 		this.onClose_payment_cart()
+
 	}
 
 
@@ -917,6 +919,7 @@ pos_ar.PointOfSale.Controller = class {
 			this.checkForPOSEntry();
 			return;
 		}
+
 		//check if there is a pos to sync
 		if(this.unsyncedPos == 0){
 			// with options

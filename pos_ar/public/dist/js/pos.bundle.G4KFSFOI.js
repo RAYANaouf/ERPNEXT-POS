@@ -654,6 +654,7 @@
       const status = this.checkIfPaid(this.selectedItemMaps.get(this.selectedTab.tabName));
       this.selectedItemMaps.get(this.selectedTab.tabName).status = status;
       const pos = structuredClone(this.selectedItemMaps.get(this.selectedTab.tabName));
+      console.log("sync : ", pos);
       if (status == "Unpaid") {
         pos.synced = true;
         frappe.db.insert(
@@ -1171,6 +1172,13 @@
       this.check_type_container = this.check_in_out_dialog.find("#checkTypeContainer");
       this.check_type_container.append('<div id="checkInType"  class="rowBox centerItem checkType selected "><div>Check In</div>  <img src=""></div>');
       this.check_type_container.append('<div id="checkOutType" class="rowBox centerItem checkType">  <div>Check Out</div>  <img src="">  </div>');
+      this.check_in_box = this.check_type_container.find("#checkInType");
+      this.check_out_box = this.check_type_container.find("#checkOutType");
+      this.check_in_out_dialog.append('<div class="inputGroup">  <input autocomplete="off" required="" type="number" id="check_in_out_input"><label for="name">Name</label>   </div>');
+      this.check_in_out_input = this.check_in_out_dialog.find("#check_in_out_input");
+      this.check_in_out_dialog.append('<div id="btnsContainers" class="rowBox"> <div id="cancelBtn" class="dialogBtn rowBox centerItem">Cancel</div><div id="confirmBtn" class="dialogBtn rowBox centerItem">Done</div> </div>');
+      this.cancel_dialog_btn = this.check_in_out_dialog.find("cancelBtn");
+      this.confirm_dialog_btn = this.check_in_out_dialog.find("confirmBtn");
     }
     showHomeBar() {
       this.home.css("display", "flex");
@@ -1189,15 +1197,25 @@
       this.dark_floating_background.css("display", "flex");
     }
     hideCheckInOutDialog() {
+      this.checkAmount = 0;
       this.check_in_out_dialog.css("display", "none");
       this.dark_floating_background.css("display", "none");
+      this.check_in_out_input.val(0);
     }
     checkForSync() {
       this.sync_btn.addClass("Synced");
     }
     setListeners() {
       this.sync_btn.on("click", (event2) => {
-        this.on_sync();
+        frappe.confirm(
+          "Are you sure you want to sync",
+          () => {
+            this.on_sync();
+          },
+          () => {
+            return;
+          }
+        );
       });
       this.close_pos.on("click", (event2) => {
         this.on_menu_click("close_pos");
@@ -1227,6 +1245,25 @@
       });
       this.dark_floating_background.on("click", (event2) => {
         this.hideCheckInOutDialog();
+      });
+      this.check_in_box.on("click", (event2) => {
+        this.check_in_box.css("border", "3px solid #ac6500");
+        this.check_in_box.css("background", "#ffffff");
+        this.check_out_box.css("border", "2px solid #e0e0e0");
+        this.check_out_box.css("background", "#fafafa");
+      });
+      this.check_out_box.on("click", (event2) => {
+        this.check_out_box.css("border", "3px solid #ac6500");
+        this.check_out_box.css("background", "#ffffff");
+        this.check_in_box.css("border", "2px solid #e0e0e0");
+        this.check_in_box.css("background", "#fafafa");
+      });
+      this.check_in_out_input.on("input", (event2) => {
+      });
+      this.cancel_dialog_btn.on("click", (event2) => {
+        this.hideCheckInOutDialog();
+      });
+      this.confirm_dialog_btn.on("click", (event2) => {
       });
     }
     setSynced() {
@@ -2607,7 +2644,7 @@
   // ../pos_ar/pos_ar/pos_ar/page/pos/pos_db.js
   pos_ar.PointOfSale.pos_db = class POSDatabase {
     constructor() {
-      this.dbName = "POSDB_test21";
+      this.dbName = "POSDB_test22";
       this.dbVersion = 1;
       this.db = null;
       this.openDatabase();
@@ -2812,4 +2849,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.DUX233EB.js.map
+//# sourceMappingURL=pos.bundle.G4KFSFOI.js.map

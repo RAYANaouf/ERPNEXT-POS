@@ -1,4 +1,3 @@
-
 pos_ar.PointOfSale.pos_customer_box = class{
 
 	constructor(
@@ -16,8 +15,10 @@ pos_ar.PointOfSale.pos_customer_box = class{
 		this.on_sync           = onSync           ;
 		this.on_menu_click     = onMenuClick      ;
 		//local
-		this.online  = true    ;
-		this.show_menu = false ;
+		this.online       = true  ;
+		this.show_menu    = false ;
+
+
 		this.start_work()      ;
 	}
 
@@ -36,8 +37,6 @@ pos_ar.PointOfSale.pos_customer_box = class{
 		this.actionContainer.append('<div id="HomeBox"     class="rowBox centerItem"  style="display:none;">');
 		this.actionContainer.append('<div id="exchangeBtn" class="rowBox centerItem" style="margin-right:16px;" >  <img src="/assets/pos_ar/images/exchange.png">  </div>');
 		this.actionContainer.append('<div id="MenuBox"     class="rowBox centerItem">');
-
-
 
 		//sync btn
 		this.sync_btn = this.actionContainer.find('#SyncBox')
@@ -74,6 +73,16 @@ pos_ar.PointOfSale.pos_customer_box = class{
 		this.check_type_container = this.check_in_out_dialog.find('#checkTypeContainer')
 		this.check_type_container.append('<div id="checkInType"  class="rowBox centerItem checkType selected "><div>Check In</div>  <img src=""></div>')
 		this.check_type_container.append('<div id="checkOutType" class="rowBox centerItem checkType">  <div>Check Out</div>  <img src="">  </div>')
+		//check type
+		this.check_in_box  = this.check_type_container.find('#checkInType')
+		this.check_out_box = this.check_type_container.find('#checkOutType')
+		//input
+		this.check_in_out_dialog.append('<div class="inputGroup">  <input autocomplete="off" required="" type="number" id="check_in_out_input"><label for="name">Name</label>   </div>')
+		this.check_in_out_input = this.check_in_out_dialog.find('#check_in_out_input');
+		//cancel and confirm btn
+		this.check_in_out_dialog.append('<div id="btnsContainers" class="rowBox"> <div id="cancelBtn" class="dialogBtn rowBox centerItem">Cancel</div><div id="confirmBtn" class="dialogBtn rowBox centerItem">Done</div> </div>')
+		this.cancel_dialog_btn = this.check_in_out_dialog.find('cancelBtn')
+		this.confirm_dialog_btn = this.check_in_out_dialog.find('confirmBtn')
 	}
 
 
@@ -96,8 +105,10 @@ pos_ar.PointOfSale.pos_customer_box = class{
 		this.dark_floating_background.css('display','flex')
 	}
 	hideCheckInOutDialog(){
+		this.checkAmount = 0 ;
 		this.check_in_out_dialog.css('display','none')
 		this.dark_floating_background.css('display','none')
+		this.check_in_out_input.val(0)
 	}
 
 
@@ -108,7 +119,13 @@ pos_ar.PointOfSale.pos_customer_box = class{
 	setListeners(){
 
 		this.sync_btn.on('click' , (event)=>{
-			this.on_sync();
+			frappe.confirm('Are you sure you want to sync',
+			()=>{
+				this.on_sync();
+			},
+			()=>{
+				return;
+			})
 		})
 
 		this.close_pos.on('click' , (event)=>{
@@ -149,6 +166,30 @@ pos_ar.PointOfSale.pos_customer_box = class{
 
 		this.dark_floating_background.on('click' , (event)=>{
 			this.hideCheckInOutDialog();
+		})
+
+		this.check_in_box.on('click' , (event)=>{
+			this.check_in_box.css('border' , '3px solid #ac6500')
+			this.check_in_box.css('background' , '#ffffff')
+			this.check_out_box.css('border' , '2px solid #e0e0e0')
+			this.check_out_box.css('background' , '#fafafa')
+		})
+
+		this.check_out_box.on('click' , (event)=>{
+			this.check_out_box.css('border' , '3px solid #ac6500')
+			this.check_out_box.css('background' , '#ffffff')
+			this.check_in_box.css('border' , '2px solid #e0e0e0')
+			this.check_in_box.css('background' , '#fafafa')
+		})
+
+		this.check_in_out_input.on('input' , (event)=>{
+		})
+
+		this.cancel_dialog_btn.on('click' , (event)=>{
+			this.hideCheckInOutDialog();
+		})
+		this.confirm_dialog_btn.on('click' , (event)=>{
+			
 		})
 	}
 

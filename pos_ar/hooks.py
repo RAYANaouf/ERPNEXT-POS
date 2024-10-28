@@ -226,3 +226,6 @@ app_include_js = "/assets/pos_ar/js/pos.bundle.js"
 # 	"Logging DocType Name": 30  # days to retain logs
 # }
 
+fixtures = [
+	'Custom Field'
+]
