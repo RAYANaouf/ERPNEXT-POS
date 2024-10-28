@@ -336,6 +336,7 @@ pos_ar.PointOfSale.Controller = class {
 									this.defaultCustomer ,
 									this.backHome.bind(this),
 									this.onSync.bind(this),
+									this.saveCheckInOut.bind(this),
 									this.onMenuClick.bind(this)
 								)
 	}
@@ -447,6 +448,17 @@ pos_ar.PointOfSale.Controller = class {
 		this.selected_item_cart.setKeyboardOrientation("landscape");
 		//refresh data
 		this.item_details.refreshDate(item);
+	}
+
+	saveCheckInOut(checkInOut){
+		this.db.saveCheckInOut(
+			checkInOut,
+			(res)=>{
+				console.log('res : ' , res)
+			},(err)=>{
+				console.log('err to save checkInOut : ' , err)
+			}
+		)
 	}
 
 	onCheckout(){

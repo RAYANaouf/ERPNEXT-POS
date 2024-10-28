@@ -6,6 +6,7 @@ pos_ar.PointOfSale.pos_customer_box = class{
 		selectedCustomer ,
 		backHome         ,
 		onSync           ,
+		saveCheckInOut   ,
 		onMenuClick      ,
 	){
 		this.wrapper           = wrapper          ;
@@ -14,10 +15,11 @@ pos_ar.PointOfSale.pos_customer_box = class{
 		this.back_home         = backHome         ;
 		this.on_sync           = onSync           ;
 		this.on_menu_click     = onMenuClick      ;
+		this.save_check_in_out = saveCheckInOut   ;
+
 		//local
 		this.online       = true  ;
 		this.show_menu    = false ;
-
 
 		this.start_work()      ;
 	}
@@ -76,13 +78,16 @@ pos_ar.PointOfSale.pos_customer_box = class{
 		//check type
 		this.check_in_box  = this.check_type_container.find('#checkInType')
 		this.check_out_box = this.check_type_container.find('#checkOutType')
+		this.check_in_out_type = 'In'
 		//input
-		this.check_in_out_dialog.append('<div class="inputGroup">  <input autocomplete="off" required="" type="number" id="check_in_out_input"><label for="name">Name</label>   </div>')
+		this.check_in_out_dialog.append('<div class="inputGroup">  <input autocomplete="off" required="" type="number" id="check_in_out_input"><label for="name">Amount</label>   </div>')
+		this.check_in_out_dialog.append('<div class="inputGroup">  <textarea type="text" id="check_in_out_note_textarea"></textarea><label for="name">Reason</label>   </div>')
 		this.check_in_out_input = this.check_in_out_dialog.find('#check_in_out_input');
+		this.check_in_out_note  = this.check_in_out_dialog.find('#check_in_out_note_textarea');
 		//cancel and confirm btn
 		this.check_in_out_dialog.append('<div id="btnsContainers" class="rowBox"> <div id="cancelBtn" class="dialogBtn rowBox centerItem">Cancel</div><div id="confirmBtn" class="dialogBtn rowBox centerItem">Done</div> </div>')
-		this.cancel_dialog_btn = this.check_in_out_dialog.find('cancelBtn')
-		this.confirm_dialog_btn = this.check_in_out_dialog.find('confirmBtn')
+		this.cancel_dialog_btn = this.check_in_out_dialog.find('#cancelBtn')
+		this.confirm_dialog_btn = this.check_in_out_dialog.find('#confirmBtn')
 	}
 
 
@@ -169,6 +174,7 @@ pos_ar.PointOfSale.pos_customer_box = class{
 		})
 
 		this.check_in_box.on('click' , (event)=>{
+			this.check_in_out_type = 'In';
 			this.check_in_box.css('border' , '3px solid #ac6500')
 			this.check_in_box.css('background' , '#ffffff')
 			this.check_out_box.css('border' , '2px solid #e0e0e0')
@@ -176,6 +182,7 @@ pos_ar.PointOfSale.pos_customer_box = class{
 		})
 
 		this.check_out_box.on('click' , (event)=>{
+			this.check_in_out_type = 'Out';
 			this.check_out_box.css('border' , '3px solid #ac6500')
 			this.check_out_box.css('background' , '#ffffff')
 			this.check_in_box.css('border' , '2px solid #e0e0e0')
@@ -186,10 +193,24 @@ pos_ar.PointOfSale.pos_customer_box = class{
 		})
 
 		this.cancel_dialog_btn.on('click' , (event)=>{
+			console.log("cancel")
 			this.hideCheckInOutDialog();
 		})
 		this.confirm_dialog_btn.on('click' , (event)=>{
-			
+			const checkInOut         = frappe.model.get_new_doc('check_in_out')
+			checkInOut.creation_time = frappe.datetime.now_datetime();
+			checkInOut.user          = frappe.session.user;
+			checkInOut.check_type    = this.check_in_out_type;
+			checkInOut.amount        = this.check_in_out_input.val()
+			checkInOut.reason        = this.check_in_out_note.val()
+			//valid inputs
+			if(this.check_in_out_input.val() <= 0 && this.check_in_out_note.val() == ''){
+				frappe.msgprint('you should fulfilled fileds.')
+				return;
+			}
+			this.save_check_in_out(checkInOut);
+			this.hideCheckInOutDialog();
+			console.log('checkInOut : ' , checkInOut);
 		})
 	}
 

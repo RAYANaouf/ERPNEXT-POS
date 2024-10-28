@@ -284,6 +284,7 @@
         this.defaultCustomer,
         this.backHome.bind(this),
         this.onSync.bind(this),
+        this.saveCheckInOut.bind(this),
         this.onMenuClick.bind(this)
       );
     }
@@ -377,6 +378,17 @@
       this.settings_cart.hideCart();
       this.selected_item_cart.setKeyboardOrientation("landscape");
       this.item_details.refreshDate(item);
+    }
+    saveCheckInOut(checkInOut) {
+      this.db.saveCheckInOut(
+        checkInOut,
+        (res) => {
+          console.log("res : ", res);
+        },
+        (err) => {
+          console.log("err to save checkInOut : ", err);
+        }
+      );
     }
     onCheckout() {
       if (this.checkIfRateZero(this.selectedItemMaps.get(this.selectedTab.tabName))) {
@@ -1124,13 +1136,14 @@
 
   // ../pos_ar/pos_ar/pos_ar/page/pos/pos_customer_box.js
   pos_ar.PointOfSale.pos_customer_box = class {
-    constructor(wrapper, customersList, selectedCustomer, backHome, onSync, onMenuClick) {
+    constructor(wrapper, customersList, selectedCustomer, backHome, onSync, saveCheckInOut, onMenuClick) {
       this.wrapper = wrapper;
       this.customers_list = customersList;
       this.selected_customer = selectedCustomer;
       this.back_home = backHome;
       this.on_sync = onSync;
       this.on_menu_click = onMenuClick;
+      this.save_check_in_out = saveCheckInOut;
       this.online = true;
       this.show_menu = false;
       this.start_work();
@@ -1174,11 +1187,14 @@
       this.check_type_container.append('<div id="checkOutType" class="rowBox centerItem checkType">  <div>Check Out</div>  <img src="">  </div>');
       this.check_in_box = this.check_type_container.find("#checkInType");
       this.check_out_box = this.check_type_container.find("#checkOutType");
-      this.check_in_out_dialog.append('<div class="inputGroup">  <input autocomplete="off" required="" type="number" id="check_in_out_input"><label for="name">Name</label>   </div>');
+      this.check_in_out_type = "In";
+      this.check_in_out_dialog.append('<div class="inputGroup">  <input autocomplete="off" required="" type="number" id="check_in_out_input"><label for="name">Amount</label>   </div>');
+      this.check_in_out_dialog.append('<div class="inputGroup">  <textarea type="text" id="check_in_out_note_textarea"></textarea><label for="name">Reason</label>   </div>');
       this.check_in_out_input = this.check_in_out_dialog.find("#check_in_out_input");
+      this.check_in_out_note = this.check_in_out_dialog.find("#check_in_out_note_textarea");
       this.check_in_out_dialog.append('<div id="btnsContainers" class="rowBox"> <div id="cancelBtn" class="dialogBtn rowBox centerItem">Cancel</div><div id="confirmBtn" class="dialogBtn rowBox centerItem">Done</div> </div>');
-      this.cancel_dialog_btn = this.check_in_out_dialog.find("cancelBtn");
-      this.confirm_dialog_btn = this.check_in_out_dialog.find("confirmBtn");
+      this.cancel_dialog_btn = this.check_in_out_dialog.find("#cancelBtn");
+      this.confirm_dialog_btn = this.check_in_out_dialog.find("#confirmBtn");
     }
     showHomeBar() {
       this.home.css("display", "flex");
@@ -1247,12 +1263,14 @@
         this.hideCheckInOutDialog();
       });
       this.check_in_box.on("click", (event2) => {
+        this.check_in_out_type = "In";
         this.check_in_box.css("border", "3px solid #ac6500");
         this.check_in_box.css("background", "#ffffff");
         this.check_out_box.css("border", "2px solid #e0e0e0");
         this.check_out_box.css("background", "#fafafa");
       });
       this.check_out_box.on("click", (event2) => {
+        this.check_in_out_type = "Out";
         this.check_out_box.css("border", "3px solid #ac6500");
         this.check_out_box.css("background", "#ffffff");
         this.check_in_box.css("border", "2px solid #e0e0e0");
@@ -1261,9 +1279,23 @@
       this.check_in_out_input.on("input", (event2) => {
       });
       this.cancel_dialog_btn.on("click", (event2) => {
+        console.log("cancel");
         this.hideCheckInOutDialog();
       });
       this.confirm_dialog_btn.on("click", (event2) => {
+        const checkInOut = frappe.model.get_new_doc("check_in_out");
+        checkInOut.creation_time = frappe.datetime.now_datetime();
+        checkInOut.user = frappe.session.user;
+        checkInOut.check_type = this.check_in_out_type;
+        checkInOut.amount = this.check_in_out_input.val();
+        checkInOut.reason = this.check_in_out_note.val();
+        if (this.check_in_out_input.val() <= 0 && this.check_in_out_note.val() == "") {
+          frappe.msgprint("you should fulfilled fileds.");
+          return;
+        }
+        this.save_check_in_out(checkInOut);
+        this.hideCheckInOutDialog();
+        console.log("checkInOut : ", checkInOut);
       });
     }
     setSynced() {
@@ -2644,7 +2676,7 @@
   // ../pos_ar/pos_ar/pos_ar/page/pos/pos_db.js
   pos_ar.PointOfSale.pos_db = class POSDatabase {
     constructor() {
-      this.dbName = "POSDB_test22";
+      this.dbName = "POSDB_test23";
       this.dbVersion = 1;
       this.db = null;
       this.openDatabase();
@@ -2689,6 +2721,9 @@
           const posInvoiceStore = db.createObjectStore("POS Invoice", { keyPath: "name" });
           posInvoiceStore.createIndex("docstatus", "docstatus", { unique: false });
         }
+        if (!db.objectStoreNames.contains("check_in_out")) {
+          db.createObjectStore("check_in_out", { keyPath: "name" });
+        }
       };
     }
     setupDatabase() {
@@ -2713,7 +2748,6 @@
       const store = transaction.objectStore("POS Invoice");
       const request = store.put(posInvoice);
       request.onsuccess = (event2) => {
-        console.log("save the : ", posInvoice);
         onSuccess(event2);
       };
       request.onerror = (event2) => {
@@ -2773,6 +2807,25 @@
       };
       request.onerror = (event2) => {
         onFailure(event2);
+      };
+    }
+    saveCheckInOut(checkInOut, onSuccess, onFailure) {
+      const transaction = this.db.transaction(["check_in_out"], "readwrite");
+      const store = transaction.objectStore("check_in_out");
+      const request = store.put(checkInOut);
+      request.onsuccess = (event2) => {
+        onSuccess(event2);
+      };
+      request.onerror = (event2) => {
+        onFailure(event2);
+      };
+    }
+    getAllCheckInOut(onSuccess, onFailure) {
+      const transaction = this.db.transaction(["check_in_out"], "readwrite");
+      const store = transaction.objectStore("check_in_out");
+      const result = store.getAll().onsuccess = (event2) => {
+        const value = event2.target.result;
+        onSuccess(value);
       };
     }
   };
@@ -2849,4 +2902,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.G4KFSFOI.js.map
+//# sourceMappingURL=pos.bundle.E3CROTFI.js.map

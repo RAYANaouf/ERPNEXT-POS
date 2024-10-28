@@ -157,6 +157,7 @@
 
 /****************************************** check in out dialog ****************************************/
 #checkInOutDialog{
+	max-height : 80vh    ;
 	width      : 70%     ;
 	background : #ffffff ;
 	border     : 3px solid #ac6500 ;	
@@ -164,6 +165,7 @@
 
 	display   : none     ;
 	overflow  : hidden   ;
+	overflow-y: auto     ;
 	position  : absolute ;
 	top       : 50%      ;
 	left      : 50%      ;
@@ -220,7 +222,7 @@
 	position   : relative;
 }
 
-
+/********** amount input ***********/
 #checkInOutDialog .inputGroup input {
  	width  : 100%;
 	height : 55px;
@@ -260,6 +262,30 @@
   border-color: rgb(150, 150, 200);
 }
 
+
+
+/************** note textarea *****************/
+#checkInOutDialog .inputGroup textarea {
+ 	width  : 100%;
+ 	padding: 0.8em;
+ 	background-color: transparent;
+ 	border: 2px solid rgb(200, 200, 200);
+ 	border-radius: 12px;
+ 
+	font-size   : 18px;
+	font-weight : 600 ;
+
+ 	outline: none;
+}
+#checkInOutDialog .inputGroup :is(textarea:focus, textarea:valid)~label {
+  transform: translateY(-50%) scale(.9);
+  margin: 0em;
+  margin-left: 1.3em;
+  padding: 0.4em;
+  background-color: #FFFFFF;
+}
+
+/***************** buttons container ******************/
 #btnsContainers{
 	height     : 75px ;
 	width      : calc(100%-16px) ;
@@ -267,7 +293,7 @@
 	border-top : 2px solid #ac6500 ;
 }
 #btnsContainers div.dialogBtn{
-	height : 100% ;
+	height : 75px ;
 	width  : 50%  ;
 
 	font-size   : 20px ;
@@ -276,6 +302,11 @@
 	cursor    : pointer ;
 }
 
+#confirmBtn{
+	border-left : 2px solid #ac6500 ;
+	font-weight : 700     ;
+	color       : #ac6500 ;
+}
 
 #btnsContainers div.dialogBtn:hover{
 	background : #f0f0f0 ;

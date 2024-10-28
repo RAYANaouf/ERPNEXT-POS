@@ -1,7 +1,7 @@
 pos_ar.PointOfSale.pos_db  = class POSDatabase {
 
 	constructor() {
-		this.dbName = 'POSDB_test22';
+		this.dbName = 'POSDB_test23';
 		this.dbVersion = 1;
 		this.db = null;
 
@@ -57,6 +57,9 @@ pos_ar.PointOfSale.pos_db  = class POSDatabase {
 				const posInvoiceStore = db.createObjectStore('POS Invoice', { keyPath : 'name' });
 				posInvoiceStore.createIndex( 'docstatus' , 'docstatus' , {unique : false} )
 			}
+			if (!db.objectStoreNames.contains('check_in_out')) {
+				db.createObjectStore('check_in_out', { keyPath : 'name' });
+			}
 		};
 	}
 
@@ -72,6 +75,7 @@ pos_ar.PointOfSale.pos_db  = class POSDatabase {
 
 
 
+	/****************************** pos invoice *********************************/
 	savePosInvoice(posInvoice , onSuccess , onFailure){
 
 		const transaction = this.db.transaction(['POS Invoice'] , "readwrite");
@@ -88,7 +92,6 @@ pos_ar.PointOfSale.pos_db  = class POSDatabase {
 
 	}
 
-
 	updatePosInvoice(posInvoice, onSuccess, onFailure) {
 		const transaction = this.db.transaction(['POS Invoice'], "readwrite");
 		const store = transaction.objectStore('POS Invoice');
@@ -97,7 +100,6 @@ pos_ar.PointOfSale.pos_db  = class POSDatabase {
 		const request = store.put(posInvoice);
 
 		request.onsuccess = (event) => {
-			console.log("save the : " , posInvoice)
 			onSuccess(event);
 		};
 
@@ -178,6 +180,32 @@ pos_ar.PointOfSale.pos_db  = class POSDatabase {
 		};
 	}
 
+
+	/********************************* check_in_out ***********************************************/
+	saveCheckInOut(checkInOut , onSuccess , onFailure){
+
+		const transaction = this.db.transaction(['check_in_out'] , "readwrite");
+		const store       = transaction.objectStore('check_in_out')
+		const request     = store.put(checkInOut)
+
+		request.onsuccess = (event) => {
+			onSuccess(event);
+		};
+
+		request.onerror = (event) => {
+			onFailure(event);
+		};
+
+	}
+
+	getAllCheckInOut(onSuccess , onFailure){
+		const transaction = this.db.transaction(['check_in_out'] , "readwrite");
+		const store       = transaction.objectStore('check_in_out');
+		const result      = store.getAll().onsuccess = (event) => {
+			const value = event.target.result
+			onSuccess(value);
+		}
+	}
 
 
 }
