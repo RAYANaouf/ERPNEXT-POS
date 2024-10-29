@@ -161,7 +161,7 @@
 	width      : 70%     ;
 	background : #ffffff ;
 	border     : 3px solid #ac6500 ;	
-	border-radius : 16px ;
+	border-radius : 25px ;
 
 	display   : none     ;
 	overflow  : hidden   ;
@@ -175,7 +175,7 @@
 }
 #darkFloatingBackground{
 	height : 100%;
-	width  : 100%;
+	width  : 100vw;
 	background : #000000cc;
 
 	display : none     ;

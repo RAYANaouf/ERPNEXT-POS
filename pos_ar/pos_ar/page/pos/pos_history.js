@@ -18,6 +18,7 @@ pos_ar.PointOfSale.pos_history = class {
 		this.filter            = "" ;
 		this.filtered_pos_list = [] ;
 		this.selected_pos      = null ;
+
 		this.start_work();
 	}
 

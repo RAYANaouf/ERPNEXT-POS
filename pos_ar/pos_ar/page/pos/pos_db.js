@@ -137,8 +137,9 @@ pos_ar.PointOfSale.pos_db  = class POSDatabase {
 	getNotSyncedPosNumber(onSuccess , onFailure){
 		const transaction_posInvoice     = this.db.transaction(['POS Invoice'] , "readwrite");
 		const store_posInvoice           = transaction_posInvoice.objectStore('POS Invoice');
+		const index_docstatus_posInvoice = store_posInvoice.index('docstatus');
 
-		const request = store_posInvoice.getAll();
+		const request = index_docstatus_posInvoice.getAll(1);
 
 		request.onsuccess = (result) => {
 			const filtredResult = result.target.result.filter(invoice => invoice.synced == false )
@@ -153,8 +154,9 @@ pos_ar.PointOfSale.pos_db  = class POSDatabase {
 	getNotSyncedPos(onSuccess , onFailure){
 		const transaction_posInvoice     = this.db.transaction(['POS Invoice'] , "readwrite");
 		const store_posInvoice           = transaction_posInvoice.objectStore('POS Invoice');
+		const index_docstatus_posInvoice = store_posInvoice.index('docstatus');
 
-		const request = store_posInvoice.getAll();
+		const request = index_docstatus_posInvoice.getAll(1);
 
 		request.onsuccess = (result) => {
 			const filtredResult = result.target.result.filter(invoice => invoice.synced == false )

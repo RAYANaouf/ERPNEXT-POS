@@ -115,6 +115,7 @@
     }
     prepare_container() {
       this.wrapper.append('<link rel="stylesheet" type="text/css" href="/assets/pos_ar/css/selectorBox.css">');
+      this.wrapper.append('<link rel="stylesheet" type="text/css" href="/assets/pos_ar/css/checkInOutCart.css">');
       this.wrapper.append('<link rel="stylesheet" type="text/css" href="/assets/pos_ar/css/itemDetailsCart.css">');
       this.wrapper.append('<link rel="stylesheet" type="text/css" href="/assets/pos_ar/css/paymentMethodCart.css">');
       this.wrapper.append('<link rel="stylesheet" type="text/css" href="/assets/pos_ar/css/customerBox.css">');
@@ -131,6 +132,7 @@
       this.init_item_details();
       this.init_paymentCart();
       this.init_historyCart();
+      this.init_checkInOutCart();
       this.init_settingsCart();
     }
     async checkForPOSEntry() {
@@ -351,6 +353,13 @@
         this.historyCartClick.bind(this)
       );
     }
+    init_checkInOutCart() {
+      this.check_in_out_cart = new pos_ar.PointOfSale.pos_check_in_out(
+        this.wrapper,
+        this.db
+      );
+      console.log("check_in_out_cart : ", this.check_in_out_cart);
+    }
     init_settingsCart() {
       this.settings_cart = new pos_ar.PointOfSale.pos_settings(
         this.wrapper,
@@ -432,31 +441,40 @@
       this.selected_item_cart.setKeyboardOrientation("portrait");
       this.selected_item_cart.cleanHeighlight();
     }
-    onHistoryClick() {
-      this.history_cart.show_cart();
-      this.customer_box.showHomeBar();
-      this.payment_cart.hideCart();
-      this.item_details.hide_cart();
-      this.item_selector.hideCart();
-      this.selected_item_cart.hideCart();
-      this.customer_box.hideSyncBar();
-      this.settings_cart.hideCart();
-    }
     onMenuClick(menu) {
       if (menu == "recent_pos") {
-        this.onHistoryClick();
+        this.history_cart.show_cart();
+        this.customer_box.showHomeBar();
+        this.payment_cart.hideCart();
+        this.item_details.hide_cart();
+        this.item_selector.hideCart();
+        this.selected_item_cart.hideCart();
+        this.customer_box.hideSyncBar();
+        this.settings_cart.hideCart();
+        this.check_in_out_cart.hideCart();
       } else if (menu == "close_pos") {
         this.onClosePOS();
       } else if (menu == "settings") {
         this.settings_cart.showCart();
         this.customer_box.showHomeBar();
-        this.customer_box.showHomeBar();
-        this.customer_box.hideSyncBar();
         this.item_selector.hideCart();
         this.selected_item_cart.hideCart();
-        this.payment_cart.hideCart();
         this.item_details.hide_cart();
+        this.payment_cart.hideCart();
         this.history_cart.hide_cart();
+        this.check_in_out_cart.hideCart();
+        this.customer_box.hideSyncBar();
+      } else if (menu == "checkInOut") {
+        console.log("init_checkInOutCart : ", this.check_in_out_cart);
+        this.check_in_out_cart.showCart();
+        this.customer_box.showHomeBar();
+        this.item_selector.hideCart();
+        this.selected_item_cart.hideCart();
+        this.item_details.hide_cart();
+        this.payment_cart.hideCart();
+        this.history_cart.hide_cart();
+        this.settings_cart.hideCart();
+        this.customer_box.hideSyncBar();
       }
     }
     backHome() {
@@ -468,6 +486,7 @@
       this.item_details.hide_cart();
       this.history_cart.hide_cart();
       this.settings_cart.hideCart();
+      this.check_in_out_cart.hideCart();
     }
     createNewTab(counter) {
       let new_pos_invoice = frappe.model.get_new_doc("POS Invoice");
@@ -1171,9 +1190,11 @@
       this.menu.append('<div id="menuItemsContainer"     class="columnBox">');
       this.menuItemsContainer = this.actionContainer.find("#menuItemsContainer");
       this.menuItemsContainer.append('<div id="posInvoiceMenuItem" class="menuItem">Recent POS Invoices</div>');
+      this.menuItemsContainer.append('<div id="checkInOutMenuItem" class="menuItem">Check In/Out</div>');
       this.menuItemsContainer.append('<div id="closePosMenuItem"   class="menuItem">Close the POS</div>');
       this.menuItemsContainer.append('<div id="settingMenuItem"    class="menuItem">Setting</div>');
       this.pos_invoices = this.menuItemsContainer.find("#posInvoiceMenuItem");
+      this.check_in_out = this.menuItemsContainer.find("#checkInOutMenuItem");
       this.close_pos = this.menuItemsContainer.find("#closePosMenuItem");
       this.setting = this.menuItemsContainer.find("#settingMenuItem");
       this.wrapper.append('<div id="darkFloatingBackground"></div>');
@@ -1241,6 +1262,9 @@
       });
       this.setting.on("click", (event2) => {
         this.on_menu_click("settings");
+      });
+      this.check_in_out.on("click", (event2) => {
+        this.on_menu_click("checkInOut");
       });
       this.menu.on("click", (event2) => {
         if (this.show_menu) {
@@ -2777,7 +2801,8 @@
     getNotSyncedPosNumber(onSuccess, onFailure) {
       const transaction_posInvoice = this.db.transaction(["POS Invoice"], "readwrite");
       const store_posInvoice = transaction_posInvoice.objectStore("POS Invoice");
-      const request = store_posInvoice.getAll();
+      const index_docstatus_posInvoice = store_posInvoice.index("docstatus");
+      const request = index_docstatus_posInvoice.getAll(1);
       request.onsuccess = (result) => {
         const filtredResult = result.target.result.filter((invoice) => invoice.synced == false);
         onSuccess(filtredResult.length);
@@ -2789,7 +2814,8 @@
     getNotSyncedPos(onSuccess, onFailure) {
       const transaction_posInvoice = this.db.transaction(["POS Invoice"], "readwrite");
       const store_posInvoice = transaction_posInvoice.objectStore("POS Invoice");
-      const request = store_posInvoice.getAll();
+      const index_docstatus_posInvoice = store_posInvoice.index("docstatus");
+      const request = index_docstatus_posInvoice.getAll(1);
       request.onsuccess = (result) => {
         const filtredResult = result.target.result.filter((invoice) => invoice.synced == false);
         onSuccess(filtredResult);
@@ -2901,5 +2927,32 @@
       });
     }
   };
+
+  // ../pos_ar/pos_ar/pos_ar/page/pos/pos_check_in_out.js
+  pos_ar.PointOfSale.pos_check_in_out = class {
+    constructor(wrapper, db) {
+      console.log(" hello from checkInOut class!");
+      this.wrapper = wrapper;
+      this.db = db;
+      this.start_work();
+    }
+    start_work() {
+      this.prepare_checkInOut_cart();
+    }
+    prepare_checkInOut_cart() {
+      this.wrapper.find("#LeftSection").append('<div id="checkInOutLeftContainer" class="columnBox"></div>');
+      this.wrapper.find("#RightSection").append('<div id="checkInOutRightContainer" class="columnBox"></div>');
+      this.left_container = this.wrapper.find("#checkInOutLeftContainer");
+      this.right_container = this.wrapper.find("#checkInOutRightContainer");
+    }
+    showCart() {
+      this.left_container.css("display", "flex");
+      this.right_container.css("display", "flex");
+    }
+    hideCart() {
+      this.left_container.css("display", "none");
+      this.right_container.css("display", "none");
+    }
+  };
 })();
-//# sourceMappingURL=pos.bundle.E3CROTFI.js.map
+//# sourceMappingURL=pos.bundle.MJYM2RWE.js.map

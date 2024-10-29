@@ -143,6 +143,7 @@ pos_ar.PointOfSale.Controller = class {
         prepare_container(){
                 //append css styles
                 this.wrapper.append('<link rel="stylesheet" type="text/css" href="/assets/pos_ar/css/selectorBox.css">')
+                this.wrapper.append('<link rel="stylesheet" type="text/css" href="/assets/pos_ar/css/checkInOutCart.css">')
                 this.wrapper.append('<link rel="stylesheet" type="text/css" href="/assets/pos_ar/css/itemDetailsCart.css">')
                 this.wrapper.append('<link rel="stylesheet" type="text/css" href="/assets/pos_ar/css/paymentMethodCart.css">')
                 this.wrapper.append('<link rel="stylesheet" type="text/css" href="/assets/pos_ar/css/customerBox.css">')
@@ -154,7 +155,6 @@ pos_ar.PointOfSale.Controller = class {
         }
 
 	prepare_components(){
-
 		this.set_right_and_left_sections();
 		this.init_item_selector();
 		this.init_customer_box();
@@ -162,11 +162,11 @@ pos_ar.PointOfSale.Controller = class {
 		this.init_item_details();
 		this.init_paymentCart();
 		this.init_historyCart();
+		this.init_checkInOutCart();
 		this.init_settingsCart();
 	}
 
 	async checkForPOSEntry(){
-
 		try{
 			const r = await frappe.db.get_list('POS Opening Entry' , {
 					filters :{
@@ -191,9 +191,7 @@ pos_ar.PointOfSale.Controller = class {
 			frappe.throw('Error checking for POS Opening Entry.')
 			return false;
 		}
-
 	}
-
 
 
 
@@ -408,6 +406,15 @@ pos_ar.PointOfSale.Controller = class {
 								)
         }
 
+        init_checkInOutCart(){
+		this.check_in_out_cart = new pos_ar.PointOfSale.pos_check_in_out(
+									this.wrapper,
+									this.db
+								)
+
+		console.log("check_in_out_cart : " , this.check_in_out_cart)
+        }
+
 
         init_settingsCart(){
 		this.settings_cart = new pos_ar.PointOfSale.pos_settings(
@@ -517,22 +524,19 @@ pos_ar.PointOfSale.Controller = class {
 		this.selected_item_cart.cleanHeighlight();
 	}
 
-	onHistoryClick(){
-		//show
-		this.history_cart.show_cart()
-		this.customer_box.showHomeBar();
-		//hide
-		this.payment_cart.hideCart();
-		this.item_details.hide_cart();
-		this.item_selector.hideCart();
-		this.selected_item_cart.hideCart();
-		this.customer_box.hideSyncBar();
-		this.settings_cart.hideCart();
-	}
-
 	onMenuClick(menu){
 		if(menu == 'recent_pos'){
-			this.onHistoryClick()
+			//show
+			this.history_cart.show_cart()
+			this.customer_box.showHomeBar();
+			//hide
+			this.payment_cart.hideCart();
+			this.item_details.hide_cart();
+			this.item_selector.hideCart();
+			this.selected_item_cart.hideCart();
+			this.customer_box.hideSyncBar();
+			this.settings_cart.hideCart();
+			this.check_in_out_cart.hideCart();
 		}
 		else if(menu == 'close_pos'){
 			this.onClosePOS()
@@ -541,15 +545,31 @@ pos_ar.PointOfSale.Controller = class {
 			//show settings
 			this.settings_cart.showCart()
 			this.customer_box.showHomeBar();
+			//hide
+			this.item_selector.hideCart();
+			this.selected_item_cart.hideCart();
+			this.item_details.hide_cart() ;
+			this.payment_cart.hideCart()  ;
+			this.history_cart.hide_cart() ;
+			this.check_in_out_cart.hideCart();
+			//hide section
+			this.customer_box.hideSyncBar();
+		}
+		else if(menu == 'checkInOut'){
+			console.log("init_checkInOutCart : " , this.check_in_out_cart)
+			//show
+			this.check_in_out_cart.showCart();
 			this.customer_box.showHomeBar();
 
 			//hide
-			this.customer_box.hideSyncBar();
 			this.item_selector.hideCart();
 			this.selected_item_cart.hideCart();
-			this.payment_cart.hideCart()  ;
 			this.item_details.hide_cart() ;
+			this.payment_cart.hideCart()  ;
 			this.history_cart.hide_cart() ;
+			this.settings_cart.hideCart() ;
+			//hide section
+			this.customer_box.hideSyncBar();
 		}
 	}
 
@@ -566,6 +586,7 @@ pos_ar.PointOfSale.Controller = class {
 		this.item_details.hide_cart()  ;
 		this.history_cart.hide_cart()  ;
 		this.settings_cart.hideCart()  ;
+		this.check_in_out_cart.hideCart();
 
 
 	}
