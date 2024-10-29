@@ -1311,9 +1311,9 @@
         checkInOut.creation_time = frappe.datetime.now_datetime();
         checkInOut.user = frappe.session.user;
         checkInOut.check_type = this.check_in_out_type;
-        checkInOut.amount = this.check_in_out_input.val();
+        checkInOut.amount = parseFloat(this.check_in_out_input.val());
         checkInOut.reason = this.check_in_out_note.val();
-        if (this.check_in_out_input.val() <= 0 && this.check_in_out_note.val() == "") {
+        if (parseFloat(this.check_in_out_input.val()) <= 0 || this.check_in_out_note.val() == "") {
           frappe.msgprint("you should fulfilled fileds.");
           return;
         }
@@ -2700,7 +2700,7 @@
   // ../pos_ar/pos_ar/pos_ar/page/pos/pos_db.js
   pos_ar.PointOfSale.pos_db = class POSDatabase {
     constructor() {
-      this.dbName = "POSDB_test23";
+      this.dbName = "POSDB_test24";
       this.dbVersion = 1;
       this.db = null;
       this.openDatabase();
@@ -2954,7 +2954,12 @@
       this.tab_out = this.tab_container.find("#tabCheckOut");
       this.right_container.append('<div id="checkInOutList" class="columnBox"></div>');
       this.check_in_out_list = this.right_container.find("#checkInOutList");
-      console.log("debuging ==> ", this.check_in_out_list);
+      const header = '<div id="detailsCheckInOutHeader" class="rowBox" ><div class="checkInAmount columnBox" ><div class="rowBox centerItem" style="width:100%;height:50%;"><div style="font-size:25px; font-weight:700;">Check In</div></div><div id="TotalCheckInValue" class="rowBox centerItem" style="height:50%; width:100%;">...DA</div></div><div class="checkOutAmount columnBox" ><div class="rowBox centerItem" style="width:100%;height:50%;" ><div style="font-size:25px; font-weight:700;">Check Out</div></div><div id="TotalCheckOutValue" class="rowBox centerItem" style="width:100%;height:50%;"> ...DA </div></div><div class="totalCheckInOutAmount columnBox centerItem"><div class="rowBox centerItem" style="width:100%;height:50%;"><div style="font-size:25px; font-weight:700;">Total</div></div><div id="TotalCheckInOutValue" class="rowBox centerItem" style="height:50%; width:100%;">...DA</div></div></div>';
+      this.left_container.append(header);
+      this.details_checkInOut_details = this.left_container.find("#detailsCheckInOutHeader");
+      this.check_in_amount = this.details_checkInOut_details.find("#TotalCheckInValue");
+      this.check_out_amount = this.details_checkInOut_details.find("#TotalCheckOutValue");
+      this.check_total_in_out_amount = this.details_checkInOut_details.find("#TotalCheckInOutValue");
     }
     refreshCheckInOutList() {
       this.check_in_out_list.empty();
@@ -2965,6 +2970,24 @@
         console.log("checkInOut ==> ", checkInOutObject);
         this.check_in_out_list.append(checkInOutObject);
       });
+    }
+    refreshCheckInOutDetails() {
+      this.check_total_in_out_amount.html("");
+      this.check_in_amount.html("");
+      this.check_out_amount.html("");
+      let inAmount = 0;
+      let outAmount = 0;
+      let allAmount = 0;
+      this.checkList.forEach((item) => {
+        allAmount += parseFloat(item.amount) || 0;
+        if (item.check_type == "In")
+          inAmount += parseFloat(item.amount) || 0;
+        else if (item.check_type == "Out")
+          outAmount += parseFloat(item.amount) || 0;
+      });
+      this.check_in_amount.append(`${inAmount.toFixed(2)} DA`);
+      this.check_out_amount.append(`${outAmount.toFixed(2)} DA`);
+      this.check_total_in_out_amount.append(`${allAmount.toFixed(2)} DA`);
     }
     showCart() {
       this.left_container.css("display", "flex");
@@ -3002,6 +3025,7 @@
         (res) => {
           this.checkList = res;
           this.refreshCheckInOutList();
+          this.refreshCheckInOutDetails();
           console.log("res : ", res);
         },
         (err) => {
@@ -3011,4 +3035,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.WDT5FSJF.js.map
+//# sourceMappingURL=pos.bundle.ARPCF25F.js.map

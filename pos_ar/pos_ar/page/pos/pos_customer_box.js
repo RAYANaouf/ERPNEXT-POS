@@ -207,10 +207,10 @@ pos_ar.PointOfSale.pos_customer_box = class{
 			checkInOut.creation_time = frappe.datetime.now_datetime();
 			checkInOut.user          = frappe.session.user;
 			checkInOut.check_type    = this.check_in_out_type;
-			checkInOut.amount        = this.check_in_out_input.val()
+			checkInOut.amount        = parseFloat(this.check_in_out_input.val());
 			checkInOut.reason        = this.check_in_out_note.val()
 			//valid inputs
-			if(this.check_in_out_input.val() <= 0 && this.check_in_out_note.val() == ''){
+			if(parseFloat(this.check_in_out_input.val()) <= 0 || this.check_in_out_note.val() == ''){
 				frappe.msgprint('you should fulfilled fileds.')
 				return;
 			}

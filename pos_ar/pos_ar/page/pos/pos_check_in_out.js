@@ -29,6 +29,7 @@ pos_ar.PointOfSale.pos_check_in_out = class {
 		this.left_container  = this.wrapper.find('#checkInOutLeftContainer')
 		this.right_container = this.wrapper.find('#checkInOutRightContainer')
 
+		///////////////////right section
 		//checkInOut tab
 		this.right_container.append('<div id="checkInOutTabContainer" class="rowBox">  <div id="tabAll" class="tab selected">All</div> <div id="tabCheckIn" class="tab">Check In</div> <div id="tabCheckOut" class="tab">Check Out</div>  </div>')
 		this.tab_container = this.right_container.find('#checkInOutTabContainer')
@@ -38,7 +39,37 @@ pos_ar.PointOfSale.pos_check_in_out = class {
 		//checkInOut list
 		this.right_container.append('<div id="checkInOutList" class="columnBox"></div>')
 		this.check_in_out_list = this.right_container.find('#checkInOutList')
-		console.log("debuging ==> " , this.check_in_out_list)
+
+		//////////////////now left section
+		const header =
+			'<div id="detailsCheckInOutHeader" class="rowBox" >'+
+				'<div class="checkInAmount columnBox" >'+
+					'<div class="rowBox centerItem" style="width:100%;height:50%;">'+
+						'<div style="font-size:25px; font-weight:700;">Check In</div>'+
+					'</div>'+
+					'<div id="TotalCheckInValue" class="rowBox centerItem" style="height:50%; width:100%;">...DA</div>'+
+				'</div>'+
+				'<div class="checkOutAmount columnBox" >'+
+					'<div class="rowBox centerItem" style="width:100%;height:50%;" >'+
+						'<div style="font-size:25px; font-weight:700;">Check Out</div>'+
+					'</div>'+
+					'<div id="TotalCheckOutValue" class="rowBox centerItem" style="width:100%;height:50%;"> ...DA </div>'+
+				'</div>'+
+				'<div class="totalCheckInOutAmount columnBox centerItem">'+
+					'<div class="rowBox centerItem" style="width:100%;height:50%;">'+
+						'<div style="font-size:25px; font-weight:700;">Total</div>'+
+					'</div>'+
+					'<div id="TotalCheckInOutValue" class="rowBox centerItem" style="height:50%; width:100%;">...DA</div>'+
+				'</div>'+
+			'</div>'
+		this.left_container.append(header)
+		this.details_checkInOut_details = this.left_container.find('#detailsCheckInOutHeader')
+
+		//Amounts
+		this.check_in_amount           = this.details_checkInOut_details.find('#TotalCheckInValue')
+		this.check_out_amount          = this.details_checkInOut_details.find('#TotalCheckOutValue')
+		this.check_total_in_out_amount = this.details_checkInOut_details.find('#TotalCheckInOutValue')
+
 	}
 
 	refreshCheckInOutList(){
@@ -60,6 +91,27 @@ pos_ar.PointOfSale.pos_check_in_out = class {
 			this.check_in_out_list.append(checkInOutObject)
 		})
 
+	}
+
+	refreshCheckInOutDetails(){
+		this.check_total_in_out_amount.html('');
+		this.check_in_amount.html('');
+		this.check_out_amount.html('');
+
+		let inAmount  = 0.00 ;
+		let outAmount = 0.00 ;
+		let allAmount = 0.00 ;
+
+		this.checkList.forEach(item =>{
+			allAmount += parseFloat(item.amount) || 0.00;
+			if(item.check_type == 'In')
+				inAmount += parseFloat(item.amount) || 0.00;
+			else if(item.check_type == 'Out')
+				outAmount += parseFloat(item.amount) || 0.00;
+		})
+		this.check_in_amount.append(`${inAmount.toFixed(2)} DA`)
+		this.check_out_amount.append(`${outAmount.toFixed(2)} DA`)
+		this.check_total_in_out_amount.append(`${allAmount.toFixed(2)} DA`)
 	}
 
 	//show && hide functions
@@ -107,6 +159,7 @@ pos_ar.PointOfSale.pos_check_in_out = class {
 			(res)=>{
 				this.checkList = res ;
 				this.refreshCheckInOutList();
+				this.refreshCheckInOutDetails();
 				console.log("res : " , res)
 			},(err)=>{
 				console.log("err : " , err)
