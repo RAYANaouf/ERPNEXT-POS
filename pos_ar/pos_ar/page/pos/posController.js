@@ -574,7 +574,6 @@ pos_ar.PointOfSale.Controller = class {
 	}
 
 	backHome(){
-
 		//show
 		this.item_selector.showCart()      ;
 		this.customer_box.showSyncBar()    ;
@@ -587,8 +586,6 @@ pos_ar.PointOfSale.Controller = class {
 		this.history_cart.hide_cart()  ;
 		this.settings_cart.hideCart()  ;
 		this.check_in_out_cart.hideCart();
-
-
 	}
 
 	createNewTab(counter){

@@ -1,3 +1,7 @@
+
+/********************** left section ************************/
+/************************************************************/
+
 #checkInOutLeftContainer{
 	width     : 100% ;
 	height    : 100% ;
@@ -9,4 +13,89 @@
 	animation : mymove 1s ;
 	display   : none ;
 	overflow-y    : auto ;
+}
+
+
+
+
+/******************* right section *************************/
+/***********************************************************/
+
+#checkInOutRightContainer{
+        width     : 100% ;
+        padding   : 4px 16px 4px 16px ;
+        background    : #FFFFFF ;
+        border        : 4px solid #c0c0c0 ;
+        border-radius : 16px;
+
+        flex-grow : 1 ;
+
+        animation : mymove 1s ;
+        display   : none ;
+
+        overflow-y    : auto ;
+}
+
+/** tab container **/
+#checkInOutTabContainer{
+	width         : 100% ;
+	height        : 75px ;
+	border-bottom : 1px solid #f0f0f0 ;
+}
+#checkInOutTabContainer div.tab{
+	height    : 100% ;
+
+	font-weight : 500  ;
+	font-size   : 14px ;
+	color       : #333 ;
+
+	flex-grow : 1    ;
+	display   : flex ;
+	justify-content : center  ;
+	align-items     : center  ;
+	cursor          : pointer ;
+}
+#checkInOutTabContainer div.tab:hover{
+	background : #ac650040;
+}
+#checkInOutTabContainer div.tab.selected{
+	border-bottom : 3px solid #ac6500 ;
+
+	font-weight : 600     ;
+	font-size   : 20px    ;
+	color       : #6a3e00 ;
+
+}
+
+/** checkInOut List **/
+#checkInOutList{
+	width  : 100% ;
+
+	flex-grow : 1 ;
+}
+
+#checkInOutList .checkInOutItem{
+	width  : 100% ;
+	height : 70px ;
+
+	border-bottom : 2px solid #c0c0c0 ;
+	cursor        : pointer           ;
+}
+#checkInOutList .checkInOutItem:hover{
+	background : #f9f9f9 ;
+}
+#checkInOutList .checkInOutItem div{
+	width : 33.334% ;
+
+	display         : flex   ;
+	justify-content : center ;
+	align-items     : center ;
+}
+#checkInOutList .checkInOutItem div.type{
+	font-size : 20px ;
+	font-weight : 600 ;
+}
+#checkInOutList .checkInOutItem div.amount{
+	font-size : 20px ;
+	font-weight : 600 ;
 }
