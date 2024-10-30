@@ -825,6 +825,8 @@
       });
     }
     getItemPrice(itemId, priceList) {
+      console.log("item : ", itemId, "price list : ", priceList);
+      console.log("all item price ==> ", this.itemPrices);
       const price = this.itemPrices.find((itemPrice) => itemPrice.item_code == itemId && itemPrice.price_list == priceList);
       return price ? price.price_list_rate : 0;
     }
@@ -954,7 +956,7 @@
       try {
         return await frappe.db.get_list("Item Price", {
           fields: ["name", "item_code", "item_name", "price_list", "price_list_rate"],
-          filters: { price_list: "Standard Selling" },
+          filters: {},
           limit: 1e5
         });
       } catch (error) {
@@ -3084,4 +3086,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.YCP7WO2C.js.map
+//# sourceMappingURL=pos.bundle.WI5N6TXF.js.map
