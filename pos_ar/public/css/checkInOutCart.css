@@ -59,7 +59,7 @@
 }
 #detailsCheckInOutContent span.value{
 	color       : #505050 ;
-	font-size   : 18px    ;
+	font-size   : 20px    ;
 	font-weight : 600     ;
 }
 
@@ -67,7 +67,7 @@
 #detailsCheckInOutContent div.l1,
 #detailsCheckInOutContent div.l2,
 #detailsCheckInOutContent div.l3{
-	margin : 20px 0px ;
+	margin : 16px 0px ;
 	justify-content : space-between;
 }
 #detailsCheckInOutContent div.l3 div.title{
@@ -82,8 +82,10 @@
 	border : 3px solid #c0c0c0;
 	border-radius : 16px ;
 
-	font-size : 18px;
-	font-weight : 600 ;
+	font-size   : 18px   ;
+	font-weight : 600    ;
+
+	overflow    : hidden ;
 }
 
 
