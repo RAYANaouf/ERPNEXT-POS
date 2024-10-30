@@ -63,13 +63,30 @@ pos_ar.PointOfSale.pos_check_in_out = class {
 				'</div>'+
 			'</div>'
 		this.left_container.append(header)
-		this.details_checkInOut_details = this.left_container.find('#detailsCheckInOutHeader')
+		this.details_checkInOut_header = this.left_container.find('#detailsCheckInOutHeader')
 
 		//Amounts
-		this.check_in_amount           = this.details_checkInOut_details.find('#TotalCheckInValue')
-		this.check_out_amount          = this.details_checkInOut_details.find('#TotalCheckOutValue')
-		this.check_total_in_out_amount = this.details_checkInOut_details.find('#TotalCheckInOutValue')
+		this.check_in_amount           = this.details_checkInOut_header.find('#TotalCheckInValue')
+		this.check_out_amount          = this.details_checkInOut_header.find('#TotalCheckOutValue')
+		this.check_total_in_out_amount = this.details_checkInOut_header.find('#TotalCheckInOutValue')
 
+
+		// one checkInOut details content
+		this.left_container.append('<div id="detailsCheckInOutContent" class="columnBox"></div>')
+		this.detailsCheckInOutContent = this.left_container.find('#detailsCheckInOutContent')
+		const details =
+			'<div class="l1 rowBox">'+
+				'<div>Check Type : <span id="selectedCheckInOutType"> THE_TYPE </span></div>'+
+				'<div> THE_DATE</div>'+
+			'</div>'+
+			'<div class="l2">'+
+				'<div>Owner : <span>THE OWNER</span></div>'+
+			'</div>'+
+			'<div class="l3">'+
+				'<div> THE REASON</div>'+
+				'<textarea id="selectedCheckInOutReason"></textarea>'+
+			'</div>'
+		this.detailsCheckInOutContent.append(details)
 	}
 
 	refreshCheckInOutList(){
@@ -87,7 +104,6 @@ pos_ar.PointOfSale.pos_check_in_out = class {
 					`<div class="amount">       ${checkInOut.amount} DA</div>`+
 				'</div>'
 
-			console.log("checkInOut ==> " , checkInOutObject)
 			this.check_in_out_list.append(checkInOutObject)
 		})
 

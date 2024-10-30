@@ -2956,10 +2956,14 @@
       this.check_in_out_list = this.right_container.find("#checkInOutList");
       const header = '<div id="detailsCheckInOutHeader" class="rowBox" ><div class="checkInAmount columnBox" ><div class="rowBox centerItem" style="width:100%;height:50%;"><div style="font-size:25px; font-weight:700;">Check In</div></div><div id="TotalCheckInValue" class="rowBox centerItem" style="height:50%; width:100%;">...DA</div></div><div class="checkOutAmount columnBox" ><div class="rowBox centerItem" style="width:100%;height:50%;" ><div style="font-size:25px; font-weight:700;">Check Out</div></div><div id="TotalCheckOutValue" class="rowBox centerItem" style="width:100%;height:50%;"> ...DA </div></div><div class="totalCheckInOutAmount columnBox centerItem"><div class="rowBox centerItem" style="width:100%;height:50%;"><div style="font-size:25px; font-weight:700;">Total</div></div><div id="TotalCheckInOutValue" class="rowBox centerItem" style="height:50%; width:100%;">...DA</div></div></div>';
       this.left_container.append(header);
-      this.details_checkInOut_details = this.left_container.find("#detailsCheckInOutHeader");
-      this.check_in_amount = this.details_checkInOut_details.find("#TotalCheckInValue");
-      this.check_out_amount = this.details_checkInOut_details.find("#TotalCheckOutValue");
-      this.check_total_in_out_amount = this.details_checkInOut_details.find("#TotalCheckInOutValue");
+      this.details_checkInOut_header = this.left_container.find("#detailsCheckInOutHeader");
+      this.check_in_amount = this.details_checkInOut_header.find("#TotalCheckInValue");
+      this.check_out_amount = this.details_checkInOut_header.find("#TotalCheckOutValue");
+      this.check_total_in_out_amount = this.details_checkInOut_header.find("#TotalCheckInOutValue");
+      this.left_container.append('<div id="detailsCheckInOutContent" class="columnBox"></div>');
+      this.detailsCheckInOutContent = this.left_container.find("#detailsCheckInOutContent");
+      const details = '<div class="l1 rowBox"><div>Check Type : <span id="selectedCheckInOutType"> THE_TYPE </span></div><div> THE_DATE</div></div><div class="l2"><div>Owner : <span>THE OWNER</span></div></div><div class="l3"><div> THE REASON</div><textarea id="selectedCheckInOutReason"></textarea></div>';
+      this.detailsCheckInOutContent.append(details);
     }
     refreshCheckInOutList() {
       this.check_in_out_list.empty();
@@ -2967,7 +2971,6 @@
       filteredList.forEach((checkInOut) => {
         const rotationStyle = checkInOut.check_type === "In" ? "transform:rotate(180deg);" : "";
         const checkInOutObject = `<div class="checkInOutItem rowBox" ><div class="type">         <img src="/assets/pos_ar/images/arrow.png" style="width:35px;height:35px;${rotationStyle}"><div>${checkInOut.check_type}</div> </div><div class="creationTime"> ${checkInOut.creation_time} </div><div class="amount">       ${checkInOut.amount} DA</div></div>`;
-        console.log("checkInOut ==> ", checkInOutObject);
         this.check_in_out_list.append(checkInOutObject);
       });
     }
@@ -3035,4 +3038,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.ARPCF25F.js.map
+//# sourceMappingURL=pos.bundle.LOCGTTS6.js.map
