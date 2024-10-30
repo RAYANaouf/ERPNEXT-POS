@@ -803,6 +803,7 @@
       return pos.items.some((item) => item.rate == 0);
     }
     onClosePOS() {
+      console.log("on close ==> ", this.check_in_out_cart.checkList);
       if (this.unsyncedPos > 0) {
         frappe.throw(__(`you have ${all_tabs.length} invoice to sync first.`));
       }
@@ -813,6 +814,14 @@
       voucher.user = frappe.session.user;
       voucher.posting_date = frappe.datetime.now_date();
       voucher.posting_time = frappe.datetime.now_time();
+      this.check_in_out_cart.checkList.forEach((check) => {
+        let child = frappe.model.add_child(voucher, "check_in_out", "custom_check_in_out");
+        child.check_type = check.check_type;
+        child.creation_time = check.creation_time;
+        child.amount = check.amount;
+        child.reason = check.reason;
+        child.user = check.owner;
+      });
       frappe.set_route("Form", "POS Closing Entry", voucher.name);
       this.POSOpeningEntry.name = "";
     }
@@ -3086,4 +3095,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.WI5N6TXF.js.map
+//# sourceMappingURL=pos.bundle.PUET2U6Z.js.map
