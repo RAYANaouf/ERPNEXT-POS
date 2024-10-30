@@ -58,7 +58,7 @@ pos_ar.PointOfSale.pos_customer_box = class{
 		this.menuItemsContainer.append('<div id="posInvoiceMenuItem" class="menuItem">Recent POS Invoices</div>')
 		this.menuItemsContainer.append('<div id="checkInOutMenuItem" class="menuItem">Check In/Out</div>')
 		this.menuItemsContainer.append('<div id="closePosMenuItem"   class="menuItem">Close the POS</div>')
-		this.menuItemsContainer.append('<div id="settingMenuItem"    class="menuItem">Setting</div>')
+		this.menuItemsContainer.append('<div id="settingMenuItem"    class="menuItem">About</div>')
 
 		this.pos_invoices = this.menuItemsContainer.find('#posInvoiceMenuItem')
 		this.check_in_out = this.menuItemsContainer.find('#checkInOutMenuItem')

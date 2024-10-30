@@ -190,6 +190,8 @@ pos_ar.PointOfSale.pos_check_in_out = class {
 		this.checkReason.get(0).style.height = this.checkReason.get(0).scrollHeight + 'px'
 	}
 
+
+
 	//show && hide functions
 	showCart(){
 		this.left_container.css('display','flex')

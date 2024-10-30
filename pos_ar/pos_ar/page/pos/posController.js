@@ -458,6 +458,7 @@ pos_ar.PointOfSale.Controller = class {
 			checkInOut,
 			(res)=>{
 				console.log('res : ' , res)
+				this.check_in_out_cart.getAllCheckInOut();
 			},(err)=>{
 				console.log('err to save checkInOut : ' , err)
 			}
@@ -1047,9 +1048,6 @@ pos_ar.PointOfSale.Controller = class {
 
 
 	onClosePOS(){
-
-		console.log("on close ==> " , this.check_in_out_cart.checkList)
-
 		//check if you still have an invoice to sync
 		if(this.unsyncedPos > 0){
 			frappe.throw(__(`you have ${all_tabs.length} invoice to sync first.`))

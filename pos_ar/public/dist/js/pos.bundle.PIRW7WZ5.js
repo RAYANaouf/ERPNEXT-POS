@@ -391,6 +391,7 @@
         checkInOut,
         (res) => {
           console.log("res : ", res);
+          this.check_in_out_cart.getAllCheckInOut();
         },
         (err) => {
           console.log("err to save checkInOut : ", err);
@@ -803,7 +804,6 @@
       return pos.items.some((item) => item.rate == 0);
     }
     onClosePOS() {
-      console.log("on close ==> ", this.check_in_out_cart.checkList);
       if (this.unsyncedPos > 0) {
         frappe.throw(__(`you have ${all_tabs.length} invoice to sync first.`));
       }
@@ -1201,7 +1201,7 @@
       this.menuItemsContainer.append('<div id="posInvoiceMenuItem" class="menuItem">Recent POS Invoices</div>');
       this.menuItemsContainer.append('<div id="checkInOutMenuItem" class="menuItem">Check In/Out</div>');
       this.menuItemsContainer.append('<div id="closePosMenuItem"   class="menuItem">Close the POS</div>');
-      this.menuItemsContainer.append('<div id="settingMenuItem"    class="menuItem">Setting</div>');
+      this.menuItemsContainer.append('<div id="settingMenuItem"    class="menuItem">About</div>');
       this.pos_invoices = this.menuItemsContainer.find("#posInvoiceMenuItem");
       this.check_in_out = this.menuItemsContainer.find("#checkInOutMenuItem");
       this.close_pos = this.menuItemsContainer.find("#closePosMenuItem");
@@ -2891,7 +2891,7 @@
       this.c1 = this.pos_profile_content.find("div.c1");
       this.c2 = this.pos_profile_content.find("div.c2");
       this.c1.append('<label for="pos_profile"> POS Profile </label>');
-      this.c1.append('<select  name="pos_profile" id="posProfileSelect" ></select>');
+      this.c1.append('<select  name="pos_profile" id="posProfileSelect" disabled ></select>');
       this.pos_profile_select = this.c1.find("#posProfileSelect");
       this.pos_profile_list.forEach((posProfile) => {
         if (posProfile.name == this.selected_pos_profile.name) {
@@ -2914,6 +2914,8 @@
       this.rightContainer.append('<div class="settings_tab" >Default Values</div>');
       this.rightContainer.append('<div class="settings_tab" >Generale Settings</div>');
       this.rightContainer.append('<div class="settings_tab" >About Us</div>');
+    }
+    refreshLeftSection() {
     }
     showCart() {
       this.rightContainer.css("display", "flex");
@@ -3095,4 +3097,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.PUET2U6Z.js.map
+//# sourceMappingURL=pos.bundle.PIRW7WZ5.js.map

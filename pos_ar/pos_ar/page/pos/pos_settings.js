@@ -37,7 +37,7 @@ pos_ar.PointOfSale.pos_settings = class{
 		this.c2 = this.pos_profile_content.find('div.c2')
 
 		this.c1.append('<label for="pos_profile"> POS Profile </label>')
-		this.c1.append('<select  name="pos_profile" id="posProfileSelect" ></select>')
+		this.c1.append('<select  name="pos_profile" id="posProfileSelect" disabled ></select>')
 
 		this.pos_profile_select = this.c1.find('#posProfileSelect')
 		this.pos_profile_list.forEach( posProfile =>{
@@ -74,6 +74,10 @@ pos_ar.PointOfSale.pos_settings = class{
 		this.rightContainer.append('<div class="settings_tab" >Generale Settings</div>')
 		this.rightContainer.append('<div class="settings_tab" >About Us</div>')
 
+	}
+
+	refreshLeftSection(){
+		
 	}
 
 	showCart(){
