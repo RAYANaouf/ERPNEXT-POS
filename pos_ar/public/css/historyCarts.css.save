@@ -1,0 +1,336 @@
+/******************* left container   ***********************/
+
+#historyLeftContainer{
+	width     : 100% ;
+	height    : 100% ;
+	padding   : 4px 16px 4px 16px ;
+	background    : #FFFFFF ;
+	border        : 4px solid #c0c0c0 ;
+	border-radius : 16px;
+
+	animation : mymove 1s ;
+	display   : none ;
+
+	overflow-y    : auto ;
+}
+
+/*********************   left container  *****************************/
+
+
+/****** pos header  *******/
+#PosContentHeader{
+	padding : 16px 16px 25px 16px;
+}
+
+#PosContentHeader>div{
+	flex-grow : 1 ;
+}
+
+#PosContentHeader>div.c2{
+	align-items : end ;
+}
+
+#posCustomer{
+	font-size   : 45px ;
+	font-weight : 800  ;
+}
+
+#posSoldBy{
+	font-size   : 25px ;
+	font-weight : 500  ;	
+}
+
+#posCost{
+	width       : max-content ;
+	font-size   : 45px ;
+	font-weight : 800  ;	
+}
+#posId {
+	width       : max-content ;
+	font-size   : 25px ;
+	font-weight : 700  ;	
+}
+#posStatus {
+	width       : max-content ;
+	font-size   : 25px ;
+	font-weight : 700  ;	
+}
+#posStatus.Paid,
+#posStatus.Consolidated {
+	color : green ;
+}
+#posStatus.Draft {
+	color : orange ;
+}
+#posStatus.Unpaid {
+	color : red ;
+}
+
+
+
+/****** pos content  *******/
+
+/* titles */
+.posSectionTitle{
+	margin      : 20px 0px 10px 0px;
+	font-size   : 22px ;
+	font-weight : 700  ;	
+}
+/* button action */
+.actionBtn{
+	margin  : 16px     ;
+	padding : 8px 16px ;
+	background    : #f0f0f0 ;
+	border  : 2px solid #cccccc ;
+	border-radius : 16px    ;
+
+	flex-grow     : 1       ;
+}
+.actionBtn:hover{
+	background   : #e0e0e0 ;
+	border-color : #c0c0c0 ;
+}
+
+/* make the main section take the extra empty space */
+
+#posContent{
+	flex-grow : 1 ;
+}
+
+#posItemList,
+#posTotalList,
+#posMethodList{
+	padding       : 0px  16px    ;
+	background    : #efefef ;
+	border-radius : 12px    ;
+}
+
+#posItemList>div ,
+#posTotalList>div,
+#posMethodList>div{
+	padding : 16px 0px ;
+}
+
+#posItemList>div>div{
+	width : 33.3333333334% ;
+}
+
+#posItemList>div>div.itemCost{
+	justify-content : end  ;
+	font-size   : 16px ;
+	font-weight : 600  ;
+}
+#posItemList>div>div.itemQuantity{
+	justify-content : end  ;
+	font-size   : 16px ;
+	font-weight : 600  ;
+}
+
+#posItemList>div .itemName{
+	font-size   : 20px ;
+	font-weight : 600  ;
+}
+
+
+
+#posTotalList div.name,
+#posMethodList div.name{
+	font-size   : 20px ;
+	font-weight : 600  ;
+	width       : 50%  ; 
+}
+
+#posTotalList div.price,
+#posMethodList div.price{
+	font-size   : 20px ;
+	font-weight : 600  ;
+	width       : 50%  ; 
+	justify-content : end ;
+}
+#posTotalList div.grandTotalName{
+	font-size   : 25px ;
+	font-weight : 800  ;
+	width       : 50%  ; 
+}
+
+#posTotalList div.grandTotalPrice{
+	font-size   : 25px ;
+	font-weight : 800  ;
+	width       : 50%  ; 
+	justify-content : end ;
+}
+
+
+
+/*********************  right container  *****************************/
+
+#historyRightContainer{
+	width     : 100% ;
+	padding   : 4px 16px 4px 16px ;
+	background    : #FFFFFF ;
+	border        : 4px solid #c0c0c0 ;
+	border-radius : 16px;
+
+	flex-grow : 1 ;
+
+	animation : mymove 1s ;
+	display   : none ;
+
+	overflow-y    : auto ;
+}
+
+#historyRightContainer #historyRightContainerHeader{
+	height : 55px ;
+	width  : calc(100% - 32px) ;
+}
+
+
+#historyRightContainer #historyRightSearchContainer{
+	width  : calc(100%) ;
+}
+
+#historyInput{
+	margin-left : 16px ;
+	flex-grow : 1 ;
+}
+
+
+
+
+
+/** recent orders containers **/
+#historyRecentInvoicesContainer .posInvoiceContainer{
+
+	margin        : 8px 0px 8px 0 ;
+	padding       : 16px    ;
+	border        : 2px solid #cccccc ;
+	border-radius : 16px    ;
+	
+	cursor        : pointer ;
+}
+
+#historyRecentInvoicesContainer .posInvoiceContainer:hover{
+	background : #f5f5f5 ;
+}
+
+#historyRecentInvoicesContainer .posInvoiceContainer .l1{
+	width : 100% ;
+}
+
+#historyRecentInvoicesContainer .posInvoiceContainer div.posName{
+	flex-grow  : 1     ;
+}
+
+#historyRecentInvoicesContainer .posInvoiceContainer .l2{
+	width       : 100% ;
+	margin-top  : 6px  ;
+}
+
+#historyRecentInvoicesContainer .posInvoiceContainer .l2 .customer{
+
+	flex-grow : 1 ;
+
+}
+#historyRecentInvoicesContainer .posInvoiceContainer .l2 .customerLogo{
+	width  : 16px ;
+	height : 16px ;
+
+	margin-right : 6px ;
+}
+
+#historyRecentInvoicesContainer .posInvoiceContainer .l2 .customerName{
+
+}
+
+/*****************************************************************************************/
+/*****************************************************************************************/
+/*****************************************************************************************/
+/****************************         settings        ************************************/
+/*****************************************************************************************/
+/*****************************************************************************************/
+/*****************************************************************************************/
+
+
+/*** right container ***/
+#settingsRightContainer{
+	width     : 100% ;
+	height    : 100% ;
+	background    : #FFFFFF ;
+	border        : 2px solid #c0c0c0 ;
+	border-radius : 16px;
+
+	animation : mymove 1s ;
+	display   : none ;
+	box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+
+	overflow-y    : auto ;	
+}
+.settings_tab{
+	width       : %100     ;
+	padding     : 0px 20px ;
+	font-size   : 25px     ;
+	font-weight : 600      ;
+
+	flex-grow       : 1      ;
+	display         : flex   ;
+	justify-content : center ;
+	align-items     : center ;
+
+	cursor          : pointer;
+}
+.settings_tab:hover{
+	background  : #f0f0f0 ;
+}
+
+.settings_tab.active{
+	border-left : 6px solid #ac6500;
+	background  : #ac650030        ;
+}
+
+/*** right container ***/
+#settingsLeftContainer{
+	width     : 100% ;
+	height    : 100% ;
+	padding   : 4px 25px 4px 25px ;
+	background    : #FFFFFF ;
+	border        : 2px solid #c0c0c0 ;
+	border-radius : 16px;
+
+	animation : mymove 1s ;
+	display   : none ;
+	box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+
+	overflow-y    : auto ;		
+}
+
+
+#settingsCartContent{
+
+	width : 100% ;
+	flex  : 1    ;
+	margin-top : 25px ;
+}
+
+#posProfileContent>div.c1{
+	width  : 50%  ;
+	height : 100% ;
+
+	margin-right : 35px ;
+
+}
+
+#posProfileContent>div.c2{
+	width  : 50%  ;
+	height : 100% ;
+}
+
+
+
+#posProfileContent div.c1>input,
+#posProfileContent div.c1>select,
+#posProfileContent div.c2>input,
+#posProfileContent div.c2>select{
+
+	margin-bottom : 16px ;
+
+}

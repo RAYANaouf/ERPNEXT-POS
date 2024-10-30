@@ -10,6 +10,7 @@ pos_ar.PointOfSale.pos_check_in_out = class {
 		//local
 		this.checkList = [];
 		this.filter    = 'All';
+		this.selectedCheckInOut = null;
 
 		this.start_work();
 	}
@@ -76,17 +77,24 @@ pos_ar.PointOfSale.pos_check_in_out = class {
 		this.detailsCheckInOutContent = this.left_container.find('#detailsCheckInOutContent')
 		const details =
 			'<div class="l1 rowBox">'+
-				'<div>Check Type : <span id="selectedCheckInOutType"> THE_TYPE </span></div>'+
-				'<div> THE_DATE</div>'+
+				'<div><span class="key">Check Type :<span> <span id="selectedCheckInOutType" class="value"> THE_TYPE </span></div>'+
+				'<div><span class="value" id="selectedCheckInOutCreationTime"> THE_DATE </span></div>'+
 			'</div>'+
-			'<div class="l2">'+
-				'<div>Owner : <span>THE OWNER</span></div>'+
+			'<div class="l2 rowBox">'+
+				'<div><span class="key">Amount :</span> <span id="selectedCheckInOutAmount" class="value">THE AMOUNT</span></div>'+
+				'<div><span id="selectedCheckInOutOwner" class="value">THE OWNER</span></div>'+
 			'</div>'+
 			'<div class="l3">'+
-				'<div> THE REASON</div>'+
-				'<textarea id="selectedCheckInOutReason"></textarea>'+
+				'<div class="title">Reason</div>'+
+				'<textarea id="selectedCheckInOutReason" disabled ></textarea>'+
 			'</div>'
 		this.detailsCheckInOutContent.append(details)
+
+		this.checkType         = this.detailsCheckInOutContent.find('#selectedCheckInOutType')
+		this.checkAmount       = this.detailsCheckInOutContent.find('#selectedCheckInOutAmount')
+		this.checkCreationTime = this.detailsCheckInOutContent.find('#selectedCheckInOutCreationTime')
+		this.checkOwner        = this.detailsCheckInOutContent.find('#selectedCheckInOutOwner')
+		this.checkReason       = this.detailsCheckInOutContent.find('#selectedCheckInOutReason')
 	}
 
 	refreshCheckInOutList(){
@@ -95,21 +103,49 @@ pos_ar.PointOfSale.pos_check_in_out = class {
 		const filteredList = this.checkList.filter( item => item.check_type == this.filter || this.filter == 'All')
 
 		filteredList.forEach(checkInOut =>{
-			//retate the arrow up image if the type is In
-			const rotationStyle = checkInOut.check_type === 'In' ? 'transform:rotate(180deg);' : '' ;
-			const checkInOutObject =
-				'<div class="checkInOutItem rowBox" >'+
-					`<div class="type">         <img src="/assets/pos_ar/images/arrow.png" style="width:35px;height:35px;${rotationStyle}"><div>${checkInOut.check_type}</div> </div>`+
-					`<div class="creationTime"> ${checkInOut.creation_time} </div>`+
-					`<div class="amount">       ${checkInOut.amount} DA</div>`+
-				'</div>'
+
+			const checkInOutObject = document.createElement('div')
+			checkInOutObject.classList.add('checkInOutItem','rowBox')
+			//type div container
+			const type_div = document.createElement('div')
+			type_div.classList.add('type')
+			//type img image
+			const type_img = document.createElement('img')
+			type_img.src = '/assets/pos_ar/images/arrow.png'
+			type_img.style.width  = '35px'
+			type_img.style.height = '35px'
+			type_img.transform    = checkInOut.check_type === 'In' ? 'rotate(180deg);' : ''
+			//type div value
+			const type_value_div       = document.createElement('div')
+			type_value_div.textContent = checkInOut.check_type
+			//creation time
+			const creationTimeDiv = document.createElement('div');
+			creationTimeDiv.classList.add('creationTime')
+			creationTimeDiv.textContent = checkInOut.creation_time;
+			//amount div
+			const amountDiv       = document.createElement('div')
+			amountDiv.classList.add('amount')
+			amountDiv.textContent = checkInOut.amount + ' DA'
+			//linking stage
+			type_div.append(type_img)
+			type_div.append(type_value_div)
+			checkInOutObject.append(type_div)
+			checkInOutObject.append(creationTimeDiv)
+			checkInOutObject.append(amountDiv)
+
+
+			//set listener
+			checkInOutObject.addEventListener('click' , ()=>{
+				this.selectedCheckInOut = checkInOut ;
+				this.refreshCheckInOutDetails()
+			});
 
 			this.check_in_out_list.append(checkInOutObject)
 		})
 
 	}
 
-	refreshCheckInOutDetails(){
+	refreshCheckInOutAmount(){
 		this.check_total_in_out_amount.html('');
 		this.check_in_amount.html('');
 		this.check_out_amount.html('');
@@ -128,6 +164,30 @@ pos_ar.PointOfSale.pos_check_in_out = class {
 		this.check_in_amount.append(`${inAmount.toFixed(2)} DA`)
 		this.check_out_amount.append(`${outAmount.toFixed(2)} DA`)
 		this.check_total_in_out_amount.append(`${allAmount.toFixed(2)} DA`)
+	}
+
+	refreshCheckInOutDetails(){
+
+		if(this.selectedCheckInOut == null)
+			return;
+
+		this.checkType.html('')
+		this.checkCreationTime.html('')
+		this.checkReason.html('')
+		this.checkOwner.html('')
+		this.checkAmount.html('')
+
+		console.log("check ==> " , this.selectedCheckInOut)
+
+		this.checkType.append(this.selectedCheckInOut.check_type)
+		this.checkCreationTime.append(this.selectedCheckInOut.creation_time)
+		this.checkAmount.append(this.selectedCheckInOut.amount + ' DA')
+		this.checkReason.append(this.selectedCheckInOut.reason)
+		this.checkOwner.append(this.selectedCheckInOut.owner)
+
+		console.log("this.checkReason.scrollHeight : " , this.checkReason.get(0).scrollHeight)
+		this.checkReason.get(0).style.height = 'auto';
+		this.checkReason.get(0).style.height = this.checkReason.get(0).scrollHeight + 'px'
 	}
 
 	//show && hide functions
@@ -175,7 +235,7 @@ pos_ar.PointOfSale.pos_check_in_out = class {
 			(res)=>{
 				this.checkList = res ;
 				this.refreshCheckInOutList();
-				this.refreshCheckInOutDetails();
+				this.refreshCheckInOutAmount();
 				console.log("res : " , res)
 			},(err)=>{
 				console.log("err : " , err)

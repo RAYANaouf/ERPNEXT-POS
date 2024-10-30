@@ -43,8 +43,6 @@ pos_ar.PointOfSale.Controller = class {
 			//prepare app data
 			await  this.prepare_app_data();
 
-			console.log("to see if the code reach here")
-
 			//proceed with other initialization only if app data are set correctly
 			await  this.checkForPOSEntry()
 			await  this.prepare_components();
@@ -411,8 +409,6 @@ pos_ar.PointOfSale.Controller = class {
 									this.wrapper,
 									this.db
 								)
-
-		console.log("check_in_out_cart : " , this.check_in_out_cart)
         }
 
 
