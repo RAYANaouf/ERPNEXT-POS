@@ -98,7 +98,7 @@
         throw new Error("there is no customer");
       }
       if (this.priceLists.length > 0) {
-        Object.assign(this.defaultPriceList, this.priceLists[0]);
+        this.defaultPriceList.name = this.selectedPosProfile.selling_price_list;
       } else {
         frappe.warn(
           "You dont have a single price list",
@@ -989,7 +989,7 @@
     async fetchPosProfileList() {
       try {
         return await frappe.db.get_list("POS Profile", {
-          fields: ["name", "warehouse", "company", "income_account", "cost_center", "write_off_account", "write_off_cost_center", "taxes_and_charges", "tax_category"],
+          fields: ["name", "warehouse", "company", "selling_price_list", "income_account", "cost_center", "write_off_account", "write_off_cost_center", "taxes_and_charges", "tax_category"],
           filters: { disabled: 0 },
           limit: 100
         });
@@ -3084,4 +3084,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.GRN3AGTT.js.map
+//# sourceMappingURL=pos.bundle.YCP7WO2C.js.map
