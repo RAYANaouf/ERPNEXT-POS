@@ -2898,6 +2898,17 @@
         onFailure(event2);
       };
     }
+    deleteAllSettings(onSuccess, onFailure) {
+      const transaction = this.db.transaction(["POS Invoice"], "readwrite");
+      const store = transaction.objectStore("POS Invoice");
+      const request = store.clear();
+      request.onsuccess = (event2) => {
+        onSuccess(event2);
+      };
+      request.onerror = (event2) => {
+        onFailure(event2);
+      };
+    }
     saveCheckInOut(checkInOut, onSuccess, onFailure) {
       const transaction = this.db.transaction(["check_in_out"], "readwrite");
       const store = transaction.objectStore("check_in_out");
@@ -2917,6 +2928,17 @@
         onSuccess(value);
       };
     }
+    deleteAllCheckInOut(onSuccess, onFailure) {
+      const transaction = this.db.transaction(["check_in_out"], "readwrite");
+      const store = transaction.objectStore("check_in_out");
+      const request = store.clear();
+      request.onsuccess = (event2) => {
+        onSuccess(event2);
+      };
+      request.onerror = (event2) => {
+        onFailure(event2);
+      };
+    }
     updateSettings(settings, onSuccess, onFailure) {
       const transaction = this.db.transaction(["POS Settings"], "readwrite");
       const store = transaction.objectStore("POS Settings");
@@ -2934,6 +2956,17 @@
       const request = store.get(1);
       request.onsuccess = (event2) => {
         onSuccess(event2.target.result);
+      };
+      request.onerror = (event2) => {
+        onFailure(event2);
+      };
+    }
+    deleteAllSettings(onSuccess, onFailure) {
+      const transaction = this.db.transaction(["POS Settings"], "readwrite");
+      const store = transaction.objectStore("POS Settings");
+      const request = store.clear();
+      request.onsuccess = (event2) => {
+        onSuccess(event2);
       };
       request.onerror = (event2) => {
         onFailure(event2);
@@ -3289,4 +3322,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.WJP3YERP.js.map
+//# sourceMappingURL=pos.bundle.TABMK5FR.js.map

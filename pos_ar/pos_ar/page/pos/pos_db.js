@@ -186,6 +186,22 @@ pos_ar.PointOfSale.pos_db  = class POSDatabase {
 		};
 	}
 
+	deleteAllSettings(onSuccess, onFailure) {
+		const transaction = this.db.transaction(['POS Invoice'], 'readwrite');
+		const store = transaction.objectStore('POS Invoice');
+
+		const request = store.clear(); // Clear all entries in the store
+
+		request.onsuccess = (event) => {
+			onSuccess(event);
+		};
+
+		request.onerror = (event) => {
+			onFailure(event);
+		};
+	}
+
+
 
 	/********************************* check_in_out ***********************************************/
 	saveCheckInOut(checkInOut , onSuccess , onFailure){
@@ -211,6 +227,21 @@ pos_ar.PointOfSale.pos_db  = class POSDatabase {
 			const value = event.target.result
 			onSuccess(value);
 		}
+	}
+
+	deleteAllCheckInOut(onSuccess, onFailure) {
+		const transaction = this.db.transaction(['check_in_out'], 'readwrite');
+		const store = transaction.objectStore('check_in_out');
+
+		const request = store.clear(); // Clear all entries in the store
+
+		request.onsuccess = (event) => {
+			onSuccess(event);
+		};
+
+		request.onerror = (event) => {
+			onFailure(event);
+		};
 	}
 
 	/****************************** pos settings *********************************/
@@ -248,5 +279,19 @@ pos_ar.PointOfSale.pos_db  = class POSDatabase {
 		};
 	}
 
+	deleteAllSettings(onSuccess, onFailure) {
+		const transaction = this.db.transaction(['POS Settings'], 'readwrite');
+		const store = transaction.objectStore('POS Settings');
+
+		const request = store.clear(); // Clear all entries in the store
+
+		request.onsuccess = (event) => {
+			onSuccess(event);
+		};
+
+		request.onerror = (event) => {
+			onFailure(event);
+		};
+	}
 
 }
