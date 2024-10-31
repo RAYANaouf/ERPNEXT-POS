@@ -311,6 +311,7 @@
     init_selected_item() {
       this.selected_item_cart = new pos_ar.PointOfSale.pos_selected_item_cart(
         this.$rightSection,
+        this.settings_data,
         this.selectedItemMaps,
         this.priceLists,
         this.customersList,
@@ -1383,8 +1384,9 @@
 
   // ../pos_ar/pos_ar/pos_ar/page/pos/pos_selected_item_cart.js
   pos_ar.PointOfSale.pos_selected_item_cart = class {
-    constructor(wrapper, selectedItemMaps, priceLists, customerList, brandList, salesTaxes, invoiceData, selectedTab, selectedItem, selectedField, getItemPrice, onSelectedItemClick, onTabClick, onKeyPressed, createNewTab, onCheckoutClick) {
+    constructor(wrapper, settingsData, selectedItemMaps, priceLists, customerList, brandList, salesTaxes, invoiceData, selectedTab, selectedItem, selectedField, getItemPrice, onSelectedItemClick, onTabClick, onKeyPressed, createNewTab, onCheckoutClick) {
       this.wrapper = wrapper;
+      this.settings_data = settingsData;
       this.selected_item_maps = selectedItemMaps;
       this.price_lists = priceLists;
       this.customer_list = customerList;
@@ -1501,6 +1503,13 @@
       });
     }
     fulfillingSelects() {
+      if (this.settings_data.settings.itemPriceBasedOn == "brand") {
+        this.brandInputContainer.css("display", "flex");
+        this.priceListInputContainer.css("display", "none");
+      } else if (this.settings_data.settings.itemPriceBasedOn == "priceList") {
+        this.priceListInputContainer.css("display", "flex");
+        this.brandInputContainer.css("display", "none");
+      }
       this.price_lists.forEach((priceList) => {
         this.priceListInput.append(`<option value="${priceList.name}">${priceList.price_list_name}</option>`);
       });
@@ -1544,6 +1553,13 @@
       });
     }
     refreshSelectedItem() {
+      if (this.settings_data.settings.itemPriceBasedOn == "brand") {
+        this.brandInputContainer.css("display", "flex");
+        this.priceListInputContainer.css("display", "none");
+      } else if (this.settings_data.settings.itemPriceBasedOn == "priceList") {
+        this.priceListInputContainer.css("display", "flex");
+        this.brandInputContainer.css("display", "none");
+      }
       this.priceListInput.val(this.selected_item_maps.get(this.selected_tab.tabName).priceList);
       this.customerInput.val(this.selected_item_maps.get(this.selected_tab.tabName).customer);
       const selectedItemsContainer = document.getElementById("selectedItemsContainer");
@@ -1668,6 +1684,13 @@
       this.cartBox.css("display", "none");
     }
     showCart() {
+      if (this.settings_data.settings.itemPriceBasedOn == "brand") {
+        this.brandInputContainer.css("display", "flex");
+        this.priceListInputContainer.css("display", "none");
+      } else if (this.settings_data.settings.itemPriceBasedOn == "priceList") {
+        this.priceListInputContainer.css("display", "flex");
+        this.brandInputContainer.css("display", "none");
+      }
       this.tabs_bar.css("display", "flex");
       this.cartBox.css("display", "flex");
     }
@@ -2760,7 +2783,7 @@
     }
     static async openDatabase() {
       return new Promise((resolve, reject) => {
-        const request = window.indexedDB.open("POSDB_test26", 2);
+        const request = window.indexedDB.open("POSDB_test29", 1);
         request.onerror = (event2) => {
           reject(request.error);
         };
@@ -2801,7 +2824,7 @@
             db.createObjectStore("check_in_out", { keyPath: "name" });
           }
           if (!db.objectStoreNames.contains("POS Settings")) {
-            db.createObjectStore("POS Settings", { autoIncrement: true });
+            db.createObjectStore("POS Settings", { keyPath: "id" });
           }
         };
       });
@@ -2922,6 +2945,15 @@
       };
     }
     getSettings(onSuccess, onFailure) {
+      const transaction = this.db.transaction(["POS Settings"], "readwrite");
+      const store = transaction.objectStore("POS Settings");
+      const request = store.get(1);
+      request.onsuccess = (event2) => {
+        onSuccess(event2.target.result);
+      };
+      request.onerror = (event2) => {
+        onFailure(event2);
+      };
     }
   };
 
@@ -3220,11 +3252,17 @@
     constructor(db) {
       this.db = db;
       this.price_bases = ["brand", "priceList"];
-      this.db.updateSettings(
-        {},
+      this.db.getSettings(
         (res) => {
+          if (res && res.itemPriceBasedOn) {
+            this.settings = res;
+          } else {
+            this.settings = {
+              itemPriceBasedOn: "brand"
+            };
+          }
           console.log("first test : ", res);
-          this.settings = res;
+          console.log("first test settings : ", this.settings);
         },
         (err) => {
           console.log("error when trying to get the setting from local, so we use the default.");
@@ -3258,4 +3296,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.RZ67CD4P.js.map
+//# sourceMappingURL=pos.bundle.QJFCJBMU.js.map

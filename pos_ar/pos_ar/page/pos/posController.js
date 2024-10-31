@@ -347,6 +347,7 @@ pos_ar.PointOfSale.Controller = class {
         init_selected_item(){
 		this.selected_item_cart  = new pos_ar.PointOfSale.pos_selected_item_cart(
 									this.$rightSection    ,
+									this.settings_data    ,
 									this.selectedItemMaps ,
 									this.priceLists       ,
 									this.customersList    ,

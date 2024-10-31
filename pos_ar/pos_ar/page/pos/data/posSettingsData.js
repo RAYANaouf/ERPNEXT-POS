@@ -7,11 +7,21 @@ pos_ar.PointOfSale.posSettingsData = class{
 		//Array of valid price bases
 		this.price_bases = ['brand' , 'priceList']
 		//Default setting (it could be more)
-		this.db.updateSettings(
-			{},
+		this.db.getSettings(
 			(res)=>{
+
+				if(res && res.itemPriceBasedOn){
+					this.settings = res
+				}else{
+					//default
+					this.settings = {
+						itemPriceBasedOn : 'brand'
+					}
+				}
+
 				console.log("first test : " , res)
-				this.settings = res
+				console.log("first test settings : " , this.settings)
+
 			},
 			(err)=>{
 				console.log("error when trying to get the setting from local, so we use the default.")

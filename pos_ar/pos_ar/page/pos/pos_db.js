@@ -10,7 +10,7 @@ pos_ar.PointOfSale.pos_db  = class POSDatabase {
 		return new Promise((resolve , reject) => {
 
 			// Let us open our database
-			const request = window.indexedDB.open( 'POSDB_test26' , 2);
+			const request = window.indexedDB.open( 'POSDB_test29' , 1);
 
 			request.onerror = (event) => {
 				// Do something with request.error!
@@ -58,7 +58,7 @@ pos_ar.PointOfSale.pos_db  = class POSDatabase {
 					db.createObjectStore('check_in_out', { keyPath : 'name' });
 				}
 				if (!db.objectStoreNames.contains('POS Settings')) {
-					db.createObjectStore('POS Settings', { autoIncrement : true });
+					db.createObjectStore('POS Settings', { keyPath : 'id' });
 				}
 
 			};
@@ -218,7 +218,6 @@ pos_ar.PointOfSale.pos_db  = class POSDatabase {
 	/*****************************************************************************/
 
 	updateSettings(settings , onSuccess , onFailure){
-
 		const transaction = this.db.transaction(['POS Settings'] , "readwrite");
 		const store       = transaction.objectStore('POS Settings')
 		const request     = store.put({id : 1 , ...settings});
@@ -230,14 +229,13 @@ pos_ar.PointOfSale.pos_db  = class POSDatabase {
 		request.onerror = (event) => {
 			onFailure(event);
 		};
-
 	}
 
 
 	getSettings(onSuccess, onFailure) {
 
-		//const transaction = this.db.transaction(['POS Settings'], 'readwrite');
-		/*const store = transaction.objectStore('POS Settings');
+		const transaction = this.db.transaction(['POS Settings'], 'readwrite');
+		const store = transaction.objectStore('POS Settings');
 
 		const request = store.get(1); // Get the settings using the unique ID
 
@@ -247,7 +245,7 @@ pos_ar.PointOfSale.pos_db  = class POSDatabase {
 
 		request.onerror = (event) => {
 			onFailure(event);
-		};*/
+		};
 	}
 
 

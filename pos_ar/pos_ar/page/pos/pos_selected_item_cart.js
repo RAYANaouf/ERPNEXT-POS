@@ -3,6 +3,7 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 
 	constructor(
 		wrapper            ,
+		settingsData       ,
 		selectedItemMaps   ,
 		priceLists         ,
 		customerList       ,
@@ -21,6 +22,7 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 	){
 
 		this.wrapper                 = wrapper         ;
+		this.settings_data           = settingsData    ;
 		this.selected_item_maps      = selectedItemMaps;
 		this.price_lists             = priceLists      ;
 		this.customer_list           = customerList    ;
@@ -173,6 +175,16 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 	}
 
 	fulfillingSelects(){
+
+		if(this.settings_data.settings.itemPriceBasedOn == 'brand'){
+			this.brandInputContainer.css('display' , 'flex' )
+			this.priceListInputContainer.css('display' , 'none')
+		}else if(this.settings_data.settings.itemPriceBasedOn == 'priceList'){
+			this.priceListInputContainer.css('display' , 'flex')
+			this.brandInputContainer.css('display' , 'none' )
+		}
+
+
 		this.price_lists.forEach(priceList =>{
 			this.priceListInput.append(`<option value="${priceList.name}">${priceList.price_list_name}</option>`)
 		})
@@ -246,6 +258,15 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 
 
 	refreshSelectedItem(){
+
+		//when refresh it should make sure of this
+		if(this.settings_data.settings.itemPriceBasedOn == 'brand'){
+			this.brandInputContainer.css('display' , 'flex' )
+			this.priceListInputContainer.css('display' , 'none')
+		}else if(this.settings_data.settings.itemPriceBasedOn == 'priceList'){
+			this.priceListInputContainer.css('display' , 'flex')
+			this.brandInputContainer.css('display' , 'none' )
+		}
 
 		//refresh price list:
 		this.priceListInput.val(this.selected_item_maps.get(this.selected_tab.tabName).priceList)
@@ -421,6 +442,14 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 	}
 	//hide
 	showCart(){
+		//when show  it should make sure of this (if the user edit the setting and come back)
+		if(this.settings_data.settings.itemPriceBasedOn == 'brand'){
+			this.brandInputContainer.css('display' , 'flex' )
+			this.priceListInputContainer.css('display' , 'none')
+		}else if(this.settings_data.settings.itemPriceBasedOn == 'priceList'){
+			this.priceListInputContainer.css('display' , 'flex')
+			this.brandInputContainer.css('display' , 'none' )
+		}
 		this.tabs_bar.css('display' , 'flex');
 		this.cartBox.css('display' , 'flex');
 	}
