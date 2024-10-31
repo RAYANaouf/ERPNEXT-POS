@@ -1,8 +1,8 @@
-pos_ar.PointOfSale.data.posSettingsData = class{
+pos_ar.PointOfSale.posSettingsData = class{
 
 
 	constructor(){
-		// Array of valid price bases
+		//Array of valid price bases
 		this.price_bases = ['brand' , 'priceList']
 		//Default setting (it could be more)
 		this.settings = {

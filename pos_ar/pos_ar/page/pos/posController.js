@@ -4,6 +4,9 @@ pos_ar.PointOfSale.Controller = class {
                 this.wrapper = $(wrapper).find(".layout-main-section");
                 this.page    = wrapper.page ;
 
+
+
+
 		//logic variable
                 this.customersList     = []
                 this.itemGroupList     = []
@@ -39,6 +42,9 @@ pos_ar.PointOfSale.Controller = class {
 		try{
 			//init db
 			this.db = new pos_ar.PointOfSale.pos_db();
+			//data classes
+			this.settings_data = new pos_ar.PointOfSale.posSettingsData(this.db)
+
 			this.prepare_container();
 			//prepare app data
 			await  this.prepare_app_data();
@@ -315,6 +321,7 @@ pos_ar.PointOfSale.Controller = class {
         }
 
         init_item_selector(){
+
                 this.item_selector = new pos_ar.PointOfSale.pos_item_selector(
 						this.$leftSection      ,
 						this.itemList          ,
@@ -417,8 +424,10 @@ pos_ar.PointOfSale.Controller = class {
         init_settingsCart(){
 		this.settings_cart = new pos_ar.PointOfSale.pos_settings(
 									this.wrapper,
+									this.settings_data,
 									this.PosProfileList,
-									this.selectedPosProfile
+									this.selectedPosProfile,
+									this.onSettingsChange.bind(this)
 								)
         }
 
@@ -465,6 +474,13 @@ pos_ar.PointOfSale.Controller = class {
 				console.log('err to save checkInOut : ' , err)
 			}
 		)
+	}
+
+
+	onSettingsChange(settingName){
+		if(settingName == "itemPriceBasedOn"){
+			//refreshing selected_item_cart and item_selector_cart
+		}
 	}
 
 	onCheckout(){

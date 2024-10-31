@@ -2,13 +2,16 @@ pos_ar.PointOfSale.pos_settings = class{
 
 	constructor(
 		wrapper,
+		settingsData,
 		posProfileList,
-		selectedPosProfile
+		selectedPosProfile,
+		onSettingsChange,
 	){
 		this.wrapper              = wrapper            ;
+		this.settings_data        = settingData        ;
 		this.pos_profile_list     = posProfileList     ;
 		this.selected_pos_profile = selectedPosProfile ;
-
+		this.on_settings_change   = onSettingsChange   ;
 		//scene
 		this.scene = 'pos_profile'
 

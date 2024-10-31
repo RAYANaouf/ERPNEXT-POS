@@ -8,3 +8,7 @@ import "../../pos_ar/page/pos/pos_history.js"
 import "../../pos_ar/page/pos/pos_db.js"
 import "../../pos_ar/page/pos/pos_settings.js"
 import "../../pos_ar/page/pos/pos_check_in_out.js"
+
+//data classes
+import "../../pos_ar/page/pos/data/posSettingsData.js"
+
