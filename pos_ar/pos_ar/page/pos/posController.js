@@ -485,6 +485,7 @@ pos_ar.PointOfSale.Controller = class {
 		}
 	}
 
+
 	onCheckout(){
 		if(this.checkIfRateZero(this.selectedItemMaps.get(this.selectedTab.tabName))){
 			frappe.throw("Item with rate equal 0")
@@ -513,7 +514,6 @@ pos_ar.PointOfSale.Controller = class {
 		this.selected_item_cart.showKeyboard();
 
 	}
-
 
 	onClose_details(){
 		//show
@@ -573,7 +573,6 @@ pos_ar.PointOfSale.Controller = class {
 			this.customer_box.hideSyncBar();
 		}
 		else if(menu == 'checkInOut'){
-			console.log("init_checkInOutCart : " , this.check_in_out_cart)
 			//show
 			this.check_in_out_cart.showCart();
 			this.customer_box.showHomeBar();

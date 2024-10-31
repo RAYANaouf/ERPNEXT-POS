@@ -492,7 +492,6 @@
         this.check_in_out_cart.hideCart();
         this.customer_box.hideSyncBar();
       } else if (menu == "checkInOut") {
-        console.log("init_checkInOutCart : ", this.check_in_out_cart);
         this.check_in_out_cart.showCart();
         this.customer_box.showHomeBar();
         this.item_selector.hideCart();
@@ -3290,4 +3289,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.LVI3NQ2C.js.map
+//# sourceMappingURL=pos.bundle.WJP3YERP.js.map
