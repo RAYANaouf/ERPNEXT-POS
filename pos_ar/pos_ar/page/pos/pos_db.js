@@ -1,66 +1,70 @@
 pos_ar.PointOfSale.pos_db  = class POSDatabase {
 
-	constructor() {
-		this.dbName = 'POSDB_test24';
-		this.dbVersion = 1;
-		this.db = null;
-
-		this.openDatabase()
+	constructor(db) {
+		this.db = db;
+		this.setupDatabase();
 	}
 
 
-	openDatabase(){
-		// Let us open our database
-		const request = window.indexedDB.open( this.dbName , this.dbVersion);
+	static async openDatabase(){
+		return new Promise((resolve , reject) => {
 
-		request.onerror = (event) => {
-			// Do something with request.error!
-			console.log(" there is an error : " , request.error)
-		};
+			// Let us open our database
+			const request = window.indexedDB.open( 'POSDB_test26' , 2);
 
-		request.onsuccess = (event) => {
-			// Do something with request.result!
-			this.db = event.target.result;
-			this.setupDatabase()
-			console.log(" the db is opend successefully : " , event.target.result)
-		};
+			request.onerror = (event) => {
+				// Do something with request.error!
+				reject(request.error)
+			};
 
- 		request.onupgradeneeded = (event) => {
-		 	const db = event.target.result;
+			request.onsuccess = (event) => {
+				// Do something with request.result!
+				resolve(new pos_ar.PointOfSale.pos_db(event.target.result))
+			};
 
-			// Create object stores (tables)
-			if (!db.objectStoreNames.contains('Customer')) {
-				db.createObjectStore('Customer', { keyPath: 'name' });
-			}
-			if (!db.objectStoreNames.contains('Item Group')) {
-				db.createObjectStore('Item Group', { keyPath: 'name' });
-			}
-			if (!db.objectStoreNames.contains('Item')) {
-				db.createObjectStore('Item', { keyPath: 'name' });
-			}
-			if (!db.objectStoreNames.contains('Item Price')) {
-				db.createObjectStore('Item Price', { keyPath: 'name' });
-			}
-			if (!db.objectStoreNames.contains('Price List')) {
-				db.createObjectStore('Price List', { keyPath: 'name' });
-			}
-			if (!db.objectStoreNames.contains('Warehouse')) {
-				db.createObjectStore('Warehouse', { keyPath: 'name' });
-			}
-			if (!db.objectStoreNames.contains('POS Profile')) {
-				db.createObjectStore('POS Profile', { keyPath: 'name' });
-			}
-			if (!db.objectStoreNames.contains('Bin')) {
-				db.createObjectStore('Bin', { keyPath: 'name' });
-			}
-			if (!db.objectStoreNames.contains('POS Invoice')) {
-				const posInvoiceStore = db.createObjectStore('POS Invoice', { keyPath : 'name' });
-				posInvoiceStore.createIndex( 'docstatus' , 'docstatus' , {unique : false} )
-			}
-			if (!db.objectStoreNames.contains('check_in_out')) {
-				db.createObjectStore('check_in_out', { keyPath : 'name' });
-			}
-		};
+ 			request.onupgradeneeded = (event) => {
+			 	const db = event.target.result;
+
+				// Create object stores (tables)
+				if (!db.objectStoreNames.contains('Customer')) {
+					db.createObjectStore('Customer', { keyPath: 'name' });
+				}
+				if (!db.objectStoreNames.contains('Item Group')) {
+					db.createObjectStore('Item Group', { keyPath: 'name' });
+				}
+				if (!db.objectStoreNames.contains('Item')) {
+					db.createObjectStore('Item', { keyPath: 'name' });
+				}
+				if (!db.objectStoreNames.contains('Item Price')) {
+					db.createObjectStore('Item Price', { keyPath: 'name' });
+				}
+				if (!db.objectStoreNames.contains('Price List')) {
+					db.createObjectStore('Price List', { keyPath: 'name' });
+				}
+				if (!db.objectStoreNames.contains('Warehouse')) {
+					db.createObjectStore('Warehouse', { keyPath: 'name' });
+				}
+				if (!db.objectStoreNames.contains('POS Profile')) {
+					db.createObjectStore('POS Profile', { keyPath: 'name' });
+				}
+				if (!db.objectStoreNames.contains('Bin')) {
+					db.createObjectStore('Bin', { keyPath: 'name' });
+				}
+				if (!db.objectStoreNames.contains('POS Invoice')) {
+					const posInvoiceStore = db.createObjectStore('POS Invoice', { keyPath : 'name' });
+					posInvoiceStore.createIndex( 'docstatus' , 'docstatus' , {unique : false} )
+				}
+				if (!db.objectStoreNames.contains('check_in_out')) {
+					db.createObjectStore('check_in_out', { keyPath : 'name' });
+				}
+				if (!db.objectStoreNames.contains('POS Settings')) {
+					db.createObjectStore('POS Settings', { autoIncrement : true });
+				}
+
+			};
+
+
+		})
 	}
 
 
@@ -207,6 +211,43 @@ pos_ar.PointOfSale.pos_db  = class POSDatabase {
 			const value = event.target.result
 			onSuccess(value);
 		}
+	}
+
+	/****************************** pos settings *********************************/
+	/*****************************************************************************/
+	/*****************************************************************************/
+
+	updateSettings(settings , onSuccess , onFailure){
+
+		const transaction = this.db.transaction(['POS Settings'] , "readwrite");
+		const store       = transaction.objectStore('POS Settings')
+		const request     = store.put({id : 1 , ...settings});
+
+		request.onsuccess = (event) => {
+			onSuccess(event);
+		};
+
+		request.onerror = (event) => {
+			onFailure(event);
+		};
+
+	}
+
+
+	getSettings(onSuccess, onFailure) {
+
+		//const transaction = this.db.transaction(['POS Settings'], 'readwrite');
+		/*const store = transaction.objectStore('POS Settings');
+
+		const request = store.get(1); // Get the settings using the unique ID
+
+		request.onsuccess = (event) => {
+			onSuccess(event.target.result);
+		};
+
+		request.onerror = (event) => {
+			onFailure(event);
+		};*/
 	}
 
 

@@ -41,7 +41,7 @@ pos_ar.PointOfSale.Controller = class {
 	 async start_app(){
 		try{
 			//init db
-			this.db = new pos_ar.PointOfSale.pos_db();
+			this.db = await pos_ar.PointOfSale.pos_db.openDatabase();
 			//data classes
 			this.settings_data = new pos_ar.PointOfSale.posSettingsData(this.db)
 

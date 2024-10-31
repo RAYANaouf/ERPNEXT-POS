@@ -8,7 +8,7 @@ pos_ar.PointOfSale.pos_settings = class{
 		onSettingsChange,
 	){
 		this.wrapper              = wrapper            ;
-		this.settings_data        = settingData        ;
+		this.settings_data        = settingsData       ;
 		this.pos_profile_list     = posProfileList     ;
 		this.selected_pos_profile = selectedPosProfile ;
 		this.on_settings_change   = onSettingsChange   ;
@@ -19,8 +19,6 @@ pos_ar.PointOfSale.pos_settings = class{
 	}
 
 	start_work(){
-		console.log("im here and i work")
-
 		this.prepareSettingsCart();
 		this.refreshLeftSection();
 		this.setListener();
@@ -101,6 +99,8 @@ pos_ar.PointOfSale.pos_settings = class{
 
 
 	refreshGeneralSettings(){
+
+		const priceBase = this.settings_data.settings.itemPriceBasedOn
 		//left container
 		this.leftContainer.addClass('columnBox')
 		this.leftContainer.append('<h4 class="CartTitle" style="margin-bottom:35px; font-size:35px;" >General Settings</h4>')
@@ -116,8 +116,19 @@ pos_ar.PointOfSale.pos_settings = class{
 		this.general_settings_c1.append('<label for="priceBasedOn"> Item Price Based On : </label>')
 		this.general_settings_c1.append('<select  name="priceBasedOn" id="priceBasedOnSelect" ></select>')
 		this.item_price_based_on_select = this.general_settings_c1.find('#priceBasedOnSelect')
-		this.item_price_based_on_select.append('<option value="priceList"> Price List </option>')
-		this.item_price_based_on_select.append('<option value="brand"> Brand </option>')
+
+		this.settings_data.getAllPriceBases().forEach( base =>{
+			if(this.settings_data.settings.itemPriceBasedOn == base){
+				this.item_price_based_on_select.append(`<option value="${base}" selected> ${base} </option>`)
+			}else{
+				this.item_price_based_on_select.append(`<option value="${base}"> ${base} </option>`)
+			}
+		})
+
+		//set listeners
+		this.item_price_based_on_select.on('input' , (event)=>{
+			this.settings_data.setPriceItemBasedOn(event.target.value)
+		})
 
 	}
 	refreshAboutUs(){
