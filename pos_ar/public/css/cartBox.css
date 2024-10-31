@@ -62,7 +62,8 @@ div.tab img{
 	padding    : 0px 16px ;
 	justify-content: end  ;
 }
-#RightSection #CartBox #CartBoxTopBar #customerInput{
+#RightSection #CartBox #CartBoxTopBar #customerInput,
+#RightSection #CartBox #CartBoxTopBar #brandInput{
 	margin-right : 16px   ;
 }
 

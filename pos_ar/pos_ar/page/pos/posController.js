@@ -56,6 +56,7 @@ pos_ar.PointOfSale.Controller = class {
 	async prepare_app_data(){
 		try{
 			this.customersList    = await this.fetchCustomers()
+			this.brandsList       = await this.fetchBrands()
 			this.itemGroupList    = await this.fetchItemGroups()
         	        this.itemList         = await this.fetchItems()
         	        this.itemPrices       = await this.fetchItemPrice()
@@ -342,6 +343,7 @@ pos_ar.PointOfSale.Controller = class {
 									this.selectedItemMaps ,
 									this.priceLists       ,
 									this.customersList    ,
+									this.brandsList       ,
 									this.taxes_and_charges,
 									this.invoiceData      ,
 									this.selectedTab      ,
@@ -1225,6 +1227,19 @@ pos_ar.PointOfSale.Controller = class {
                         return await frappe.db.get_list('Customer', {
                                 fields: ['name', 'customer_name' ],
                                 filters: { disabled : 0},
+				limit : 100000
+                        })
+                } catch (error) {
+                        console.error('Error fetching customers:', error);
+                        return []
+                }
+        }
+
+        async  fetchBrands() {
+                try {
+                        return await frappe.db.get_list('Brand', {
+                                fields: ['brand' ],
+                                filters: {},
 				limit : 100000
                         })
                 } catch (error) {

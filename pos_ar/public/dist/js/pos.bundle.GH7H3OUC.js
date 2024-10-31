@@ -43,6 +43,7 @@
     async prepare_app_data() {
       try {
         this.customersList = await this.fetchCustomers();
+        this.brandsList = await this.fetchBrands();
         this.itemGroupList = await this.fetchItemGroups();
         this.itemList = await this.fetchItems();
         this.itemPrices = await this.fetchItemPrice();
@@ -295,6 +296,7 @@
         this.selectedItemMaps,
         this.priceLists,
         this.customersList,
+        this.brandsList,
         this.taxes_and_charges,
         this.invoiceData,
         this.selectedTab,
@@ -937,6 +939,18 @@
         return [];
       }
     }
+    async fetchBrands() {
+      try {
+        return await frappe.db.get_list("Brand", {
+          fields: ["brand"],
+          filters: {},
+          limit: 1e5
+        });
+      } catch (error) {
+        console.error("Error fetching customers:", error);
+        return [];
+      }
+    }
     async fetchItemGroups() {
       try {
         return await frappe.db.get_list("Item Group", {
@@ -1345,11 +1359,12 @@
 
   // ../pos_ar/pos_ar/pos_ar/page/pos/pos_selected_item_cart.js
   pos_ar.PointOfSale.pos_selected_item_cart = class {
-    constructor(wrapper, selectedItemMaps, priceLists, customerList, salesTaxes, invoiceData, selectedTab, selectedItem, selectedField, getItemPrice, onSelectedItemClick, onTabClick, onKeyPressed, createNewTab, onCheckoutClick) {
+    constructor(wrapper, selectedItemMaps, priceLists, customerList, brandList, salesTaxes, invoiceData, selectedTab, selectedItem, selectedField, getItemPrice, onSelectedItemClick, onTabClick, onKeyPressed, createNewTab, onCheckoutClick) {
       this.wrapper = wrapper;
       this.selected_item_maps = selectedItemMaps;
       this.price_lists = priceLists;
       this.customer_list = customerList;
+      this.brand_list = brandList;
       this.sales_taxes = salesTaxes;
       this.invoice_data = invoiceData;
       this.selected_tab = selectedTab;
@@ -1361,7 +1376,6 @@
       this.on_selected_item_click = onSelectedItemClick;
       this.on_tab_click = onTabClick;
       this.create_new_tab = createNewTab;
-      console.log("start debuging 1");
       this.taxes_map = /* @__PURE__ */ new Map();
       this.total_tax_amout = 0;
       this.counter = 1;
@@ -1389,10 +1403,14 @@
       this.cartBox.append('<div id="cartFooter" class="columnBox"></div>');
       this.cartTopBar = this.cartBox.find("#CartBoxTopBar");
       this.cartTopBar.append('<div id="selectedCustomerInput"></div>');
+      this.cartTopBar.append('<div id="selectedBrandInput"></div>');
       this.cartTopBar.append('<div id="selectedItemsPriceListInput"></div>');
       this.customerInputContainer = this.cartTopBar.find("#selectedCustomerInput");
       this.customerInputContainer.append('<select  id="customerInput"  placeHolder="Choice a customer">');
       this.customerInput = this.customerInputContainer.find("#customerInput");
+      this.brandInputContainer = this.cartTopBar.find("#selectedBrandInput");
+      this.brandInputContainer.append('<select  id="brandInput"  placeHolder="Choice an item group">');
+      this.brandInput = this.brandInputContainer.find("#brandInput");
       this.priceListInputContainer = this.cartTopBar.find("#selectedItemsPriceListInput");
       this.priceListInputContainer.append('<select  id="PriceListInput" name="PriceList" placeHolder="Choice a Price list">');
       this.priceListInput = this.priceListInputContainer.find("#PriceListInput");
@@ -1464,6 +1482,10 @@
       });
       this.customer_list.forEach((customer) => {
         this.customerInput.append(`<option value="${customer.name}">${customer.customer_name}</option>`);
+      });
+      console.log("brand_list", this.brand_list);
+      this.brand_list.forEach((brand) => {
+        this.brandInput.append(`<option value="${brand.name}">${brand.brand}</option>`);
       });
     }
     refreshTabs() {
@@ -3097,4 +3119,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.PIRW7WZ5.js.map
+//# sourceMappingURL=pos.bundle.GH7H3OUC.js.map

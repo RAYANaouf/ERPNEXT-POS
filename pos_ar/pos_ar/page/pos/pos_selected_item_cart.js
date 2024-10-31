@@ -6,6 +6,7 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 		selectedItemMaps   ,
 		priceLists         ,
 		customerList       ,
+		brandList          ,
 		salesTaxes         ,
 		invoiceData        ,
 		selectedTab        ,
@@ -23,6 +24,7 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 		this.selected_item_maps      = selectedItemMaps;
 		this.price_lists             = priceLists      ;
 		this.customer_list           = customerList    ;
+		this.brand_list              = brandList       ;
 		this.sales_taxes             = salesTaxes      ;
 		this.invoice_data            = invoiceData     ;
 		this.selected_tab            = selectedTab     ;
@@ -34,8 +36,6 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 		this.on_selected_item_click  = onSelectedItemClick;
 		this.on_tab_click            = onTabClick      ;
 		this.create_new_tab          = createNewTab    ;
-
-		console.log("start debuging 1")
 
 		//local
 		this.taxes_map   = new Map();
@@ -82,11 +82,16 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 
 		this.cartTopBar = this.cartBox.find('#CartBoxTopBar')
 		this.cartTopBar.append('<div id="selectedCustomerInput"></div>')
+		this.cartTopBar.append('<div id="selectedBrandInput"></div>')
 		this.cartTopBar.append('<div id="selectedItemsPriceListInput"></div>')
 
 		this.customerInputContainer = this.cartTopBar.find("#selectedCustomerInput")
 		this.customerInputContainer.append('<select  id="customerInput"  placeHolder="Choice a customer">')
 		this.customerInput = this.customerInputContainer.find('#customerInput')
+
+		this.brandInputContainer = this.cartTopBar.find("#selectedBrandInput")
+		this.brandInputContainer.append('<select  id="brandInput"  placeHolder="Choice an item group">')
+		this.brandInput = this.brandInputContainer.find('#brandInput')
 
 		this.priceListInputContainer = this.cartTopBar.find("#selectedItemsPriceListInput")
 		this.priceListInputContainer.append('<select  id="PriceListInput" name="PriceList" placeHolder="Choice a Price list">')
@@ -173,6 +178,10 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 		})
 		this.customer_list.forEach(customer =>{
 			this.customerInput.append(`<option value="${customer.name}">${customer.customer_name}</option>`)
+		})
+		console.log("brand_list" , this.brand_list )
+		this.brand_list.forEach(brand =>{
+			this.brandInput.append(`<option value="${brand.name}">${brand.brand}</option>`)
 		})
 	}
 
