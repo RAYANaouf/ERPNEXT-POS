@@ -8,11 +8,18 @@ pos_ar.PointOfSale.pos_settings = class{
 		this.wrapper              = wrapper            ;
 		this.pos_profile_list     = posProfileList     ;
 		this.selected_pos_profile = selectedPosProfile ;
+
+		//scene
+		this.scene = 'pos_profile'
+
 		this.start_work()
 	}
 
 	start_work(){
+		console.log("im here and i work")
+
 		this.prepareSettingsCart();
+		this.refreshLeftSection();
 		this.setListener();
 	}
 
@@ -23,10 +30,33 @@ pos_ar.PointOfSale.pos_settings = class{
 
 		this.leftContainer = this.wrapper.find('#settingsLeftContainer')
 		this.rightContainer  = this.wrapper.find('#settingsRightContainer')
-		this.leftContainer.addClass('columnBox')
 
+
+		//right section
+		this.rightContainer.append('<div id="pos_profile_btn"      class="settings_tab active" >POS Profile</div>')
+		this.rightContainer.append('<div id="general_settings_btn" class="settings_tab"        >Generale Settings</div>')
+		this.rightContainer.append('<div id="about_us_btn"         class="settings_tab"        >About Us</div>')
+
+		this.pos_profile_btn      = this.rightContainer.find('#pos_profile_btn')
+		this.general_settings_btn = this.rightContainer.find('#general_settings_btn')
+		this.about_us_btn         = this.rightContainer.find('#about_us_btn')
+	}
+
+	refreshLeftSection(){
+		this.leftContainer.html('')
+		if(this.scene == 'pos_profile'){
+			this.refreshPosProfileScene();
+		}else if(this.scene == 'general_settings'){
+			this.refreshGeneralSettings();
+		}else if(this.scene == "about_us"){
+			this.refreshAboutUs();
+		}
+	}
+
+	refreshPosProfileScene(){
 		//left container
-		this.leftContainer.append('<h4 class="CartTitle" style="margin-bottom:35px; font-size:35px;" >POS Settings</h4>')
+		this.leftContainer.addClass('columnBox')
+		this.leftContainer.append('<h4 class="CartTitle" style="margin-bottom:35px; font-size:35px;" >POS Profile</h4>')
 		this.leftContainer.append('<div id="settingsCartContentsContainer">  </div>')
 		this.contentsContainer = this.leftContainer.find('#settingsCartContentsContainer');
 
@@ -64,21 +94,38 @@ pos_ar.PointOfSale.pos_settings = class{
 		this.c2.append(`<label for="taxes_and_charges">POS taxes and charges</label>`)
 		this.c2.append(`<input name="taxes_and_charges" value="${this.selected_pos_profile.taxes_and_charges}" disabled>`)
 
+	}
 
-		//this.c2.append(`<label for="lastUpdate">POS last update</label>`)
-		//this.c2.append(`<input name="lastUpdate" value="${frappe.datetime.now_datetime()}" disabled>`)
 
-		//right section
-		this.rightContainer.append('<div class="settings_tab active" >POS Profile</div>')
-		this.rightContainer.append('<div class="settings_tab" >Default Values</div>')
-		this.rightContainer.append('<div class="settings_tab" >Generale Settings</div>')
-		this.rightContainer.append('<div class="settings_tab" >About Us</div>')
+	refreshGeneralSettings(){
+		//left container
+		this.leftContainer.addClass('columnBox')
+		this.leftContainer.append('<h4 class="CartTitle" style="margin-bottom:35px; font-size:35px;" >General Settings</h4>')
+		this.leftContainer.append('<div id="settingsCartContentsContainer">  </div>')
+		this.contentsContainer = this.leftContainer.find('#settingsCartContentsContainer');
+
+		//settings :
+		this.contentsContainer.append('<div id="generalSettingsContent" class="contentContainer rowBox" style="width:100%;"> <div class="c1 columnBox"></div>   <div class="c2 columnBox"></div> </div>')
+		this.general_settings_content = this.contentsContainer.find('#generalSettingsContent')
+		this.general_settings_c1 = this.general_settings_content.find('div.c1')
+		this.general_settings_c2 = this.general_settings_content.find('div.c2')
+
+		this.general_settings_c1.append('<label for="priceBasedOn"> Item Price Based On : </label>')
+		this.general_settings_c1.append('<select  name="priceBasedOn" id="priceBasedOnSelect" ></select>')
+		this.item_price_based_on_select = this.general_settings_c1.find('#priceBasedOnSelect')
+		this.item_price_based_on_select.append('<option value="priceList"> Price List </option>')
+		this.item_price_based_on_select.append('<option value="brand"> Brand </option>')
+
+	}
+	refreshAboutUs(){
+		//left container
+		this.leftContainer.addClass('columnBox')
+		this.leftContainer.append('<h4 class="CartTitle" style="margin-bottom:35px; font-size:35px;" >About Us</h4>')
+		this.leftContainer.append('<div id="settingsCartContentsContainer">  </div>')
+		this.contentsContainer = this.leftContainer.find('#settingsCartContentsContainer');
 
 	}
 
-	refreshLeftSection(){
-		
-	}
 
 	showCart(){
 		this.rightContainer.css('display' , 'flex')
@@ -103,6 +150,24 @@ pos_ar.PointOfSale.pos_settings = class{
 				tab.classList.add('active');
 			})
 		})
+
+
+		this.pos_profile_btn.on('click' , (event)=>{
+			this.scene = 'pos_profile';
+			this.refreshLeftSection();
+		})
+
+
+		this.general_settings_btn.on('click' , (event)=>{
+			this.scene = 'general_settings';
+			this.refreshLeftSection()
+		})
+
+		this.about_us_btn.on('click' , (event)=>{
+			this.scene = 'about_us';
+			this.refreshLeftSection()
+		})
+
 	}
 
 

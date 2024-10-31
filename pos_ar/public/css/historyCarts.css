@@ -313,7 +313,7 @@
 	margin-top : 25px ;
 }
 
-#posProfileContent>div.c1{
+#settingsLeftContainer div.c1{
 	width  : 50%  ;
 	height : 100% ;
 
@@ -321,17 +321,17 @@
 
 }
 
-#posProfileContent>div.c2{
+#settingsLeftContainer div.c2{
 	width  : 50%  ;
 	height : 100% ;
 }
 
 
 
-#posProfileContent div.c1>input,
-#posProfileContent div.c1>select,
-#posProfileContent div.c2>input,
-#posProfileContent div.c2>select{
+#settingsLeftContainer div.c1>input,
+#settingsLeftContainer div.c1>select,
+#settingsLeftContainer div.c2>input,
+#settingsLeftContainer div.c2>select{
 
 	margin-bottom : 16px ;
 
