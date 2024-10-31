@@ -481,6 +481,7 @@ pos_ar.PointOfSale.Controller = class {
 	onSettingsChange(settingName){
 		if(settingName == "itemPriceBasedOn"){
 			//refreshing selected_item_cart and item_selector_cart
+			this.item_selector.refreshItemSelector();
 		}
 	}
 
@@ -1112,11 +1113,18 @@ pos_ar.PointOfSale.Controller = class {
 	}
 
 	/*****************************  tools  **********************************/
-	getItemPrice(itemId , priceList){
-		console.log("item : " , itemId , "price list : " , priceList)
-		console.log("all item price ==> " , this.itemPrices)
-		const price = this.itemPrices.find(itemPrice => itemPrice.item_code == itemId && itemPrice.price_list == priceList)
-		return price ? price.price_list_rate  : 0
+	getItemPrice(item , priceList){
+		//check the mode
+		const mode = this.settings_data.settings.itemPriceBasedOn
+		if(mode == 'brand'){
+			if(item.brand == null)
+				return 0 ;
+			const price = this.itemPrices.find(itemPrice => itemPrice.brand == item.brand)
+			return price ? price.price_list_rate  : 0
+		}else if(mode == 'priceList'){
+			const price = this.itemPrices.find(itemPrice => itemPrice.item_code == item.item_name && itemPrice.price_list == priceList)
+			return price ? price.price_list_rate  : 0
+		}
         }
 
 	checkServiceWorker(){
@@ -1187,7 +1195,7 @@ pos_ar.PointOfSale.Controller = class {
 			clonedItem.discount_amount     = 0 ;
 			clonedItem.discount_percentage = 0 ;
 			clonedItem.qty                 = 1 ;
-			clonedItem.rate                = this.getItemPrice(clickedItem.name , this.selectedItemMaps.get(this.selectedTab.tabName).priceList);
+			clonedItem.rate                = this.getItemPrice(clickedItem , this.selectedItemMaps.get(this.selectedTab.tabName).priceList);
 			posItems.push(clonedItem)
 		}
 
@@ -1239,7 +1247,7 @@ pos_ar.PointOfSale.Controller = class {
         /*********************  get data functions ******************************/
 
 
-        async  fetchCustomers() {
+        async fetchCustomers() {
                 try {
                         return await frappe.db.get_list('Customer', {
                                 fields: ['name', 'customer_name' ],
@@ -1252,7 +1260,7 @@ pos_ar.PointOfSale.Controller = class {
                 }
         }
 
-        async  fetchBrands() {
+        async fetchBrands() {
                 try {
                         return await frappe.db.get_list('Brand', {
                                 fields: ['brand' ],
@@ -1281,7 +1289,7 @@ pos_ar.PointOfSale.Controller = class {
         async fetchItems() {
                 try {
                         return await frappe.db.get_list('Item', {
-                                fields: ['name', 'item_name' , 'image' , 'item_group' , 'description' , 'stock_uom' ],
+                                fields: ['name', 'item_name' , 'image' , 'brand' ,'item_group' , 'description' , 'stock_uom' ],
                                 filters: { disabled : 0 },
 				limit : 100000
                         })
@@ -1294,7 +1302,7 @@ pos_ar.PointOfSale.Controller = class {
         async fetchItemPrice() {
                 try {
                         return await frappe.db.get_list('Item Price', {
-                                fields: ['name', 'item_code' , 'item_name' , 'price_list', 'price_list_rate' ],
+                                fields: ['name', 'item_code' , 'item_name' , 'price_list', 'price_list_rate' , 'brand'],
                                 filters: {},
 				limit : 100000
                         })

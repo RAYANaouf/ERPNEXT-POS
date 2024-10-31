@@ -39,13 +39,14 @@ pos_ar.PointOfSale.posSettingsData = class{
 	getAllPriceBases(){
 		return this.price_bases;
 	}
-	setPriceItemBasedOn(base){
+	setPriceItemBasedOn(base , onSuccess , onFailure){
 		if(this.price_bases.includes(base)){
 			this.settings.itemPriceBasedOn = base
 			this.db.updateSettings(
 				this.settings,
 				()=>{
 					//saved
+					onSuccess();
 					console.log("settings update is save successfuly")
 				},()=>{
 					console.error("error occured when trying to save settings")

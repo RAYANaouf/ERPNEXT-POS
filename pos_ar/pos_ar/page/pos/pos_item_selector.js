@@ -63,6 +63,14 @@ pos_ar.PointOfSale.pos_item_selector = class {
 		})
 	}
 
+	refreshItemSelector(){
+		const seachField = document.getElementById("ItemInput");
+		seachField.value = "";
+
+		const groupItemListInput = document.getElementById("ItemGroupInput");
+		this.setItemInFlow(this.getItemByItemGroup(groupItemListInput.value))
+
+	}
 	setItemInFlow(filtered_item_list){
         	const itemsContainer_html = document.getElementById("itemsContainer");
         	itemsContainer_html.innerHTML = "";
@@ -102,7 +110,7 @@ pos_ar.PointOfSale.pos_item_selector = class {
 
                 	const price = document.createElement("div");
                 	price.classList.add("itemPrice");
-                	price.textContent = this.get_item_price(item.name , this.selected_price_list.name) + " DA";
+                	price.textContent = this.get_item_price(item , this.selected_price_list.name) + " DA";
                 	itemBox.appendChild(price);
                 	itemsContainer_html.appendChild(itemBox);
 

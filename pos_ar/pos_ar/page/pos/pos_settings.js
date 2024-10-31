@@ -127,7 +127,14 @@ pos_ar.PointOfSale.pos_settings = class{
 
 		//set listeners
 		this.item_price_based_on_select.on('input' , (event)=>{
-			this.settings_data.setPriceItemBasedOn(event.target.value)
+			this.settings_data.setPriceItemBasedOn(
+				event.target.value,
+				()=>{
+					this.on_settings_change("itemPriceBasedOn")
+				},()=>{
+					console.error("error to affect the ui by the settings changes (settings.js)")
+				}
+			)
 		})
 
 	}

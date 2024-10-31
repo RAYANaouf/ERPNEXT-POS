@@ -423,6 +423,7 @@
     }
     onSettingsChange(settingName) {
       if (settingName == "itemPriceBasedOn") {
+        this.item_selector.refreshItemSelector();
       }
     }
     onCheckout() {
@@ -860,11 +861,17 @@
         frappe.msgprint("the connection is back (online mode)");
       });
     }
-    getItemPrice(itemId, priceList) {
-      console.log("item : ", itemId, "price list : ", priceList);
-      console.log("all item price ==> ", this.itemPrices);
-      const price = this.itemPrices.find((itemPrice) => itemPrice.item_code == itemId && itemPrice.price_list == priceList);
-      return price ? price.price_list_rate : 0;
+    getItemPrice(item, priceList) {
+      const mode = this.settings_data.settings.itemPriceBasedOn;
+      if (mode == "brand") {
+        if (item.brand == null)
+          return 0;
+        const price = this.itemPrices.find((itemPrice) => itemPrice.brand == item.brand);
+        return price ? price.price_list_rate : 0;
+      } else if (mode == "priceList") {
+        const price = this.itemPrices.find((itemPrice) => itemPrice.item_code == item.item_name && itemPrice.price_list == priceList);
+        return price ? price.price_list_rate : 0;
+      }
     }
     checkServiceWorker() {
       if (!("serviceWorker" in navigator)) {
@@ -910,7 +917,7 @@
         clonedItem.discount_amount = 0;
         clonedItem.discount_percentage = 0;
         clonedItem.qty = 1;
-        clonedItem.rate = this.getItemPrice(clickedItem.name, this.selectedItemMaps.get(this.selectedTab.tabName).priceList);
+        clonedItem.rate = this.getItemPrice(clickedItem, this.selectedItemMaps.get(this.selectedTab.tabName).priceList);
         posItems.push(clonedItem);
       }
     }
@@ -991,7 +998,7 @@
     async fetchItems() {
       try {
         return await frappe.db.get_list("Item", {
-          fields: ["name", "item_name", "image", "item_group", "description", "stock_uom"],
+          fields: ["name", "item_name", "image", "brand", "item_group", "description", "stock_uom"],
           filters: { disabled: 0 },
           limit: 1e5
         });
@@ -1003,7 +1010,7 @@
     async fetchItemPrice() {
       try {
         return await frappe.db.get_list("Item Price", {
-          fields: ["name", "item_code", "item_name", "price_list", "price_list_rate"],
+          fields: ["name", "item_code", "item_name", "price_list", "price_list_rate", "brand"],
           filters: {},
           limit: 1e5
         });
@@ -1114,6 +1121,12 @@
         groupItemList_html.appendChild(option);
       });
     }
+    refreshItemSelector() {
+      const seachField = document.getElementById("ItemInput");
+      seachField.value = "";
+      const groupItemListInput = document.getElementById("ItemGroupInput");
+      this.setItemInFlow(this.getItemByItemGroup(groupItemListInput.value));
+    }
     setItemInFlow(filtered_item_list) {
       const itemsContainer_html = document.getElementById("itemsContainer");
       itemsContainer_html.innerHTML = "";
@@ -1148,7 +1161,7 @@
         itemBox.appendChild(itemName);
         const price = document.createElement("div");
         price.classList.add("itemPrice");
-        price.textContent = this.get_item_price(item.name, this.selected_price_list.name) + " DA";
+        price.textContent = this.get_item_price(item, this.selected_price_list.name) + " DA";
         itemBox.appendChild(price);
         itemsContainer_html.appendChild(itemBox);
       }
@@ -1434,9 +1447,6 @@
       this.customerInputContainer = this.cartTopBar.find("#selectedCustomerInput");
       this.customerInputContainer.append('<select  id="customerInput"  placeHolder="Choice a customer">');
       this.customerInput = this.customerInputContainer.find("#customerInput");
-      this.brandInputContainer = this.cartTopBar.find("#selectedBrandInput");
-      this.brandInputContainer.append('<select  id="brandInput"  placeHolder="Choice an item group">');
-      this.brandInput = this.brandInputContainer.find("#brandInput");
       this.priceListInputContainer = this.cartTopBar.find("#selectedItemsPriceListInput");
       this.priceListInputContainer.append('<select  id="PriceListInput" name="PriceList" placeHolder="Choice a Price list">');
       this.priceListInput = this.priceListInputContainer.find("#PriceListInput");
@@ -1503,22 +1513,11 @@
       });
     }
     fulfillingSelects() {
-      if (this.settings_data.settings.itemPriceBasedOn == "brand") {
-        this.brandInputContainer.css("display", "flex");
-        this.priceListInputContainer.css("display", "none");
-      } else if (this.settings_data.settings.itemPriceBasedOn == "priceList") {
-        this.priceListInputContainer.css("display", "flex");
-        this.brandInputContainer.css("display", "none");
-      }
       this.price_lists.forEach((priceList) => {
         this.priceListInput.append(`<option value="${priceList.name}">${priceList.price_list_name}</option>`);
       });
       this.customer_list.forEach((customer) => {
         this.customerInput.append(`<option value="${customer.name}">${customer.customer_name}</option>`);
-      });
-      console.log("brand_list", this.brand_list);
-      this.brand_list.forEach((brand) => {
-        this.brandInput.append(`<option value="${brand.name}">${brand.brand}</option>`);
       });
     }
     refreshTabs() {
@@ -1553,13 +1552,6 @@
       });
     }
     refreshSelectedItem() {
-      if (this.settings_data.settings.itemPriceBasedOn == "brand") {
-        this.brandInputContainer.css("display", "flex");
-        this.priceListInputContainer.css("display", "none");
-      } else if (this.settings_data.settings.itemPriceBasedOn == "priceList") {
-        this.priceListInputContainer.css("display", "flex");
-        this.brandInputContainer.css("display", "none");
-      }
       this.priceListInput.val(this.selected_item_maps.get(this.selected_tab.tabName).priceList);
       this.customerInput.val(this.selected_item_maps.get(this.selected_tab.tabName).customer);
       const selectedItemsContainer = document.getElementById("selectedItemsContainer");
@@ -1684,13 +1676,6 @@
       this.cartBox.css("display", "none");
     }
     showCart() {
-      if (this.settings_data.settings.itemPriceBasedOn == "brand") {
-        this.brandInputContainer.css("display", "flex");
-        this.priceListInputContainer.css("display", "none");
-      } else if (this.settings_data.settings.itemPriceBasedOn == "priceList") {
-        this.priceListInputContainer.css("display", "flex");
-        this.brandInputContainer.css("display", "none");
-      }
       this.tabs_bar.css("display", "flex");
       this.cartBox.css("display", "flex");
     }
@@ -1839,7 +1824,7 @@
     }
     resetItemRateBaseOnPriceList() {
       this.selected_item_maps.get(this.selected_tab.tabName).items.forEach((item) => {
-        item.rate = this.get_item_price(item.name, this.selected_item_maps.get(this.selected_tab.tabName).priceList);
+        item.rate = this.get_item_price(item, this.selected_item_maps.get(this.selected_tab.tabName).priceList);
       });
       console.log("resting ==> ", this.selected_item_maps.get(this.selected_tab.tabName));
     }
@@ -3046,7 +3031,15 @@
         }
       });
       this.item_price_based_on_select.on("input", (event2) => {
-        this.settings_data.setPriceItemBasedOn(event2.target.value);
+        this.settings_data.setPriceItemBasedOn(
+          event2.target.value,
+          () => {
+            this.on_settings_change("itemPriceBasedOn");
+          },
+          () => {
+            console.error("error to affect the ui by the settings changes (settings.js)");
+          }
+        );
       });
     }
     refreshAboutUs() {
@@ -3278,12 +3271,13 @@
     getAllPriceBases() {
       return this.price_bases;
     }
-    setPriceItemBasedOn(base) {
+    setPriceItemBasedOn(base, onSuccess, onFailure) {
       if (this.price_bases.includes(base)) {
         this.settings.itemPriceBasedOn = base;
         this.db.updateSettings(
           this.settings,
           () => {
+            onSuccess();
             console.log("settings update is save successfuly");
           },
           () => {
@@ -3296,4 +3290,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.QJFCJBMU.js.map
+//# sourceMappingURL=pos.bundle.LVI3NQ2C.js.map

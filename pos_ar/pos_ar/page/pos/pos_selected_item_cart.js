@@ -91,10 +91,6 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 		this.customerInputContainer.append('<select  id="customerInput"  placeHolder="Choice a customer">')
 		this.customerInput = this.customerInputContainer.find('#customerInput')
 
-		this.brandInputContainer = this.cartTopBar.find("#selectedBrandInput")
-		this.brandInputContainer.append('<select  id="brandInput"  placeHolder="Choice an item group">')
-		this.brandInput = this.brandInputContainer.find('#brandInput')
-
 		this.priceListInputContainer = this.cartTopBar.find("#selectedItemsPriceListInput")
 		this.priceListInputContainer.append('<select  id="PriceListInput" name="PriceList" placeHolder="Choice a Price list">')
 		this.priceListInput = this.priceListInputContainer.find('#PriceListInput')
@@ -176,24 +172,11 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 
 	fulfillingSelects(){
 
-		if(this.settings_data.settings.itemPriceBasedOn == 'brand'){
-			this.brandInputContainer.css('display' , 'flex' )
-			this.priceListInputContainer.css('display' , 'none')
-		}else if(this.settings_data.settings.itemPriceBasedOn == 'priceList'){
-			this.priceListInputContainer.css('display' , 'flex')
-			this.brandInputContainer.css('display' , 'none' )
-		}
-
-
 		this.price_lists.forEach(priceList =>{
 			this.priceListInput.append(`<option value="${priceList.name}">${priceList.price_list_name}</option>`)
 		})
 		this.customer_list.forEach(customer =>{
 			this.customerInput.append(`<option value="${customer.name}">${customer.customer_name}</option>`)
-		})
-		console.log("brand_list" , this.brand_list )
-		this.brand_list.forEach(brand =>{
-			this.brandInput.append(`<option value="${brand.name}">${brand.brand}</option>`)
 		})
 	}
 
@@ -259,14 +242,6 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 
 	refreshSelectedItem(){
 
-		//when refresh it should make sure of this
-		if(this.settings_data.settings.itemPriceBasedOn == 'brand'){
-			this.brandInputContainer.css('display' , 'flex' )
-			this.priceListInputContainer.css('display' , 'none')
-		}else if(this.settings_data.settings.itemPriceBasedOn == 'priceList'){
-			this.priceListInputContainer.css('display' , 'flex')
-			this.brandInputContainer.css('display' , 'none' )
-		}
 
 		//refresh price list:
 		this.priceListInput.val(this.selected_item_maps.get(this.selected_tab.tabName).priceList)
@@ -442,14 +417,6 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 	}
 	//hide
 	showCart(){
-		//when show  it should make sure of this (if the user edit the setting and come back)
-		if(this.settings_data.settings.itemPriceBasedOn == 'brand'){
-			this.brandInputContainer.css('display' , 'flex' )
-			this.priceListInputContainer.css('display' , 'none')
-		}else if(this.settings_data.settings.itemPriceBasedOn == 'priceList'){
-			this.priceListInputContainer.css('display' , 'flex')
-			this.brandInputContainer.css('display' , 'none' )
-		}
 		this.tabs_bar.css('display' , 'flex');
 		this.cartBox.css('display' , 'flex');
 	}
@@ -656,8 +623,7 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 
 	resetItemRateBaseOnPriceList(){
 		this.selected_item_maps.get(this.selected_tab.tabName).items.forEach( item  => {
-			//console.log("price list : " , this.selected_item_maps.get(this.selected_tab.tabName).priceList , "item price  => " , this.get_item_price(item.name , this.selected_item_maps.get(this.selected_tab.tabName).priceList) );
-			item.rate = this.get_item_price(item.name , this.selected_item_maps.get(this.selected_tab.tabName).priceList)
+			item.rate = this.get_item_price(item , this.selected_item_maps.get(this.selected_tab.tabName).priceList)
 		})
 		console.log("resting ==> " , this.selected_item_maps.get(this.selected_tab.tabName));
 	}
