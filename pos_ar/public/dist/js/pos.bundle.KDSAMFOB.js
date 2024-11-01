@@ -48,6 +48,7 @@
       try {
         this.db = await pos_ar.PointOfSale.pos_db.openDatabase();
         this.settings_data = new pos_ar.PointOfSale.posSettingsData(this.db);
+        this.dataHandler = new pos_ar.PointOfSale.FetchHandler(this.db);
         this.prepare_container();
         await this.prepare_app_data();
         await this.checkForPOSEntry();
@@ -60,15 +61,15 @@
     }
     async prepare_app_data() {
       try {
-        this.customersList = await this.fetchCustomers();
-        this.brandsList = await this.fetchBrands();
-        this.itemGroupList = await this.fetchItemGroups();
-        this.itemList = await this.fetchItems();
-        this.itemPrices = await this.fetchItemPrice();
-        this.priceLists = await this.fetchPriceList();
-        this.warehouseList = await this.fetchWarehouseList();
-        this.PosProfileList = await this.fetchPosProfileList();
-        this.binList = await this.fetchBinList();
+        this.customersList = await this.dataHandler.fetchCustomers();
+        this.brandsList = await this.dataHandler.fetchBrands();
+        this.itemGroupList = await this.dataHandler.fetchItemGroups();
+        this.itemList = await this.dataHandler.fetchItems();
+        this.itemPrices = await this.dataHandler.fetchItemPrice();
+        this.priceLists = await this.dataHandler.fetchPriceList();
+        this.warehouseList = await this.dataHandler.fetchWarehouseList();
+        this.PosProfileList = await this.dataHandler.fetchPosProfileList();
+        this.binList = await this.dataHandler.fetchBinList();
         await this.handleAppData();
         let new_pos_invoice = frappe.model.get_new_doc("POS Invoice");
         new_pos_invoice.customer = this.defaultCustomer.name;
@@ -99,11 +100,11 @@
       }
       Object.assign(this.selectedPosProfile, this.PosProfileList[0]);
       if (this.selectedPosProfile.taxes_and_charges != null) {
-        this.taxes_and_charges_template = await this.fetchSalesTaxesAndChargesTemplate(this.selectedPosProfile.taxes_and_charges);
+        this.taxes_and_charges_template = await this.dataHandler.fetchSalesTaxesAndChargesTemplate(this.selectedPosProfile.taxes_and_charges);
         this.taxes_and_charges = this.taxes_and_charges_template.taxes;
       }
       if (this.selectedPosProfile.company != null && this.selectedPosProfile.company != "") {
-        this.company = await this.fetchCompany(this.selectedPosProfile.company);
+        this.company = await this.dataHandler.fetchCompany(this.selectedPosProfile.company);
       }
       if (this.customersList.length > 0) {
         this.defaultCustomer = structuredClone(this.customersList[0]);
@@ -961,130 +962,6 @@
           item.discount_amount = discountAmount;
         }
       });
-    }
-    async fetchCustomers() {
-      try {
-        return await frappe.db.get_list("Customer", {
-          fields: ["name", "customer_name"],
-          filters: { disabled: 0 },
-          limit: 1e5
-        });
-      } catch (error) {
-        console.error("Error fetching customers:", error);
-        return [];
-      }
-    }
-    async fetchBrands() {
-      try {
-        return await frappe.db.get_list("Brand", {
-          fields: ["brand"],
-          filters: {},
-          limit: 1e5
-        });
-      } catch (error) {
-        console.error("Error fetching customers:", error);
-        return [];
-      }
-    }
-    async fetchItemGroups() {
-      try {
-        return await frappe.db.get_list("Item Group", {
-          fields: ["name", "item_group_name", "parent_item_group", "is_group"],
-          filters: {},
-          limit: 1e5
-        });
-      } catch (error) {
-        console.error("Error fetching Item Group :", error);
-        return [];
-      }
-    }
-    async fetchItems() {
-      try {
-        return await frappe.db.get_list("Item", {
-          fields: ["name", "item_name", "image", "brand", "item_group", "description", "stock_uom"],
-          filters: { disabled: 0 },
-          limit: 1e5
-        });
-      } catch (error) {
-        console.error("Error fetching Item Group :", error);
-        return [];
-      }
-    }
-    async fetchItemPrice() {
-      try {
-        return await frappe.db.get_list("Item Price", {
-          fields: ["name", "item_code", "item_name", "price_list", "price_list_rate", "brand"],
-          filters: {},
-          limit: 1e5
-        });
-      } catch (error) {
-        console.error("Error fetching Item Group :", error);
-        return [];
-      }
-    }
-    async fetchPriceList() {
-      try {
-        return await frappe.db.get_list("Price List", {
-          fields: ["name", "price_list_name", "currency"],
-          filters: { selling: 1 },
-          limit: 1e5
-        });
-      } catch (error) {
-        console.error("Error fetching Item Group :", error);
-        return [];
-      }
-    }
-    async fetchWarehouseList() {
-      try {
-        return await frappe.db.get_list("Warehouse", {
-          fields: ["name", "warehouse_name"],
-          filters: {},
-          limit: 1e5
-        });
-      } catch (error) {
-        console.error("Error fetching Warehouse list : ", error);
-        return [];
-      }
-    }
-    async fetchPosProfileList() {
-      try {
-        return await frappe.db.get_list("POS Profile", {
-          fields: ["name", "warehouse", "company", "selling_price_list", "income_account", "cost_center", "write_off_account", "write_off_cost_center", "taxes_and_charges", "tax_category"],
-          filters: { disabled: 0 },
-          limit: 100
-        });
-      } catch (error) {
-        console.error("Error fetching pos profile list : ", error);
-        return [];
-      }
-    }
-    async fetchCompany(companyId) {
-      try {
-        return await frappe.db.get_doc("Company", companyId);
-      } catch (error) {
-        console.error("Error fetching company by companyId from the profile list : ", error);
-        return [];
-      }
-    }
-    async fetchSalesTaxesAndChargesTemplate(templateId) {
-      try {
-        return await frappe.db.get_doc("Sales Taxes and Charges Template", templateId);
-      } catch (error) {
-        console.error("Error fetching Warehouse list : ", error);
-        return [];
-      }
-    }
-    async fetchBinList() {
-      try {
-        return await frappe.db.get_list("Bin", {
-          fields: ["actual_qty", "item_code", "warehouse"],
-          filters: {},
-          limit: 1
-        });
-      } catch (error) {
-        console.error("Error fetching Bin list : ", error);
-        return [];
-      }
     }
   };
 
@@ -3345,5 +3222,136 @@
       }
     }
   };
+
+  // ../pos_ar/pos_ar/pos_ar/page/pos/remoteApi/FetchHandler.js
+  pos_ar.PointOfSale.FetchHandler = class FetchHandler {
+    constructor(db) {
+      this.db = db;
+    }
+    async fetchCustomers() {
+      try {
+        return await frappe.db.get_list("Customer", {
+          fields: ["name", "customer_name"],
+          filters: { disabled: 0 },
+          limit: 1e5
+        });
+      } catch (error) {
+        console.error("Error fetching customers:", error);
+        return [];
+      }
+    }
+    async fetchBrands() {
+      try {
+        return await frappe.db.get_list("Brand", {
+          fields: ["brand"],
+          filters: {},
+          limit: 1e5
+        });
+      } catch (error) {
+        console.error("Error fetching customers:", error);
+        return [];
+      }
+    }
+    async fetchItemGroups() {
+      try {
+        return await frappe.db.get_list("Item Group", {
+          fields: ["name", "item_group_name", "parent_item_group", "is_group"],
+          filters: {},
+          limit: 1e5
+        });
+      } catch (error) {
+        console.error("Error fetching Item Group :", error);
+        return [];
+      }
+    }
+    async fetchItems() {
+      try {
+        return await frappe.db.get_list("Item", {
+          fields: ["name", "item_name", "image", "brand", "item_group", "description", "stock_uom"],
+          filters: { disabled: 0 },
+          limit: 1e5
+        });
+      } catch (error) {
+        console.error("Error fetching Item Group :", error);
+        return [];
+      }
+    }
+    async fetchItemPrice() {
+      try {
+        return await frappe.db.get_list("Item Price", {
+          fields: ["name", "item_code", "item_name", "price_list", "price_list_rate", "brand"],
+          filters: {},
+          limit: 1e5
+        });
+      } catch (error) {
+        console.error("Error fetching Item Group :", error);
+        return [];
+      }
+    }
+    async fetchPriceList() {
+      try {
+        return await frappe.db.get_list("Price List", {
+          fields: ["name", "price_list_name", "currency"],
+          filters: { selling: 1 },
+          limit: 1e5
+        });
+      } catch (error) {
+        console.error("Error fetching Item Group :", error);
+        return [];
+      }
+    }
+    async fetchWarehouseList() {
+      try {
+        return await frappe.db.get_list("Warehouse", {
+          fields: ["name", "warehouse_name"],
+          filters: {},
+          limit: 1e5
+        });
+      } catch (error) {
+        console.error("Error fetching Warehouse list : ", error);
+        return [];
+      }
+    }
+    async fetchPosProfileList() {
+      try {
+        return await frappe.db.get_list("POS Profile", {
+          fields: ["name", "warehouse", "company", "selling_price_list", "income_account", "cost_center", "write_off_account", "write_off_cost_center", "taxes_and_charges", "tax_category"],
+          filters: { disabled: 0 },
+          limit: 100
+        });
+      } catch (error) {
+        console.error("Error fetching pos profile list : ", error);
+        return [];
+      }
+    }
+    async fetchCompany(companyId) {
+      try {
+        return await frappe.db.get_doc("Company", companyId);
+      } catch (error) {
+        console.error("Error fetching company by companyId from the profile list : ", error);
+        return [];
+      }
+    }
+    async fetchSalesTaxesAndChargesTemplate(templateId) {
+      try {
+        return await frappe.db.get_doc("Sales Taxes and Charges Template", templateId);
+      } catch (error) {
+        console.error("Error fetching Warehouse list : ", error);
+        return [];
+      }
+    }
+    async fetchBinList() {
+      try {
+        return await frappe.db.get_list("Bin", {
+          fields: ["actual_qty", "item_code", "warehouse"],
+          filters: {},
+          limit: 1
+        });
+      } catch (error) {
+        console.error("Error fetching Bin list : ", error);
+        return [];
+      }
+    }
+  };
 })();
-//# sourceMappingURL=pos.bundle.BZWJAUG4.js.map
+//# sourceMappingURL=pos.bundle.KDSAMFOB.js.map
