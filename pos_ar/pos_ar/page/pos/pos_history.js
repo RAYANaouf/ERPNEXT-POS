@@ -4,14 +4,20 @@ pos_ar.PointOfSale.pos_history = class {
 		wrapper,
 		db,
 		selectedPosProfile,
+		company,
 		salesTaxes,
 		onClick
 	){
-		this.wrapper   = wrapper;
-		this.db        = db;
-		this.selected_pos_profile    = selectedPosProfile;
-		this.sales_taxes             = salesTaxes;
-		this.on_click  = onClick;
+		this.wrapper               = wrapper;
+		this.db                    = db;
+		this.selected_pos_profile  = selectedPosProfile;
+		this.company               = company
+		this.sales_taxes           = salesTaxes;
+		this.on_click              = onClick;
+
+
+		console.log("company : " , this.company)
+		console.log("company logo : " , this.company.company_logo)
 
 		//local data
 		this.localPosInvoice   = { lastTime : null , pos_invoices : [] }
@@ -110,7 +116,7 @@ pos_ar.PointOfSale.pos_history = class {
 		this.editBtn    = this.draftActionButtonsContainer.find('#posEditBtn')
 
 
-		this.right_container.append('<div id="historyRightContainerHeader" class="rowBox align_center" ><h4 class="CartTitle">Recent Orders</h4></div>')
+		this.right_container.append('<div id="historyRightContainerHeader" class="rowBox align_center" ><h4 class="CartTitle">Recent Orders</h4><img src="/files/1661795110-optilance.png" style="width:30px;height:30px;"></div>')
 		this.right_container.append('<div id="historyRightSearchContainer" class="rowBox align_center" ></div>');
 
 		this.search_container = this.right_container.find('#historyRightSearchContainer');
@@ -412,79 +418,92 @@ pos_ar.PointOfSale.pos_history = class {
 	print_receipt() {
 
 		console.log("pos invoice : " , this.selected_pos)
+		console.log("taxes : " , this.sales_taxes)
+		let netTotal   = 0
+		let taxes      = 0
+		let grandTotal = 0
 
 		let invoiceHTML ='<style>'+
 				'#company_container {'+
-					'width: 100% ; height: 60px ; '+
+					'width: 100% ; height: 40px ; '+
 					'display:flex; align-items:center; '+
-					'font-size : 26px;'+
+					'font-size : 12px;'+
 				'}'+
 				'table{'+
 					'border: 1px solid #505050; border-spacing:0px;'+
 					'width: 100%; margin-top:16px;'+
 				'}'+
 				'tr{'+
-					'width:100%; height:35px;'+
+					'width:100%; height:20px;'+
 				'}'+
 				'tr:nth-child(1){'+
-					'background:#cccccc;'+
+					'background:#eeeeee;'+
 				'}'+
 				'th{'+
 					'border-right:1px solid #505050;'+
 					'border-bottom:1px solid #505050;'+
 					'border-top:1px solid #505050;'+
+					'font-weight : 500;'+
 				'}'+
 				'td{'+
 					'border-right:1px solid #505050;'+
 				'}'+
+				'#logContainer{'+
+					'width: 100%;height:80px;'+
+					'display : flex;'+
+					'justify-content:center;'+
+				'}'+
+				'#logContainer img{'+
+					'width:70%; height:100%;'+
+				'}'+
 				'td>div{'+
-					'height:35px; width:100%;'+
+					'height:20px; width:100%;'+
+					'font-size:12px;'+
 					'display:flex; justify-content:center; align-items:center;'+
 				'}'+
 				'</style>'+
 				'<div style="display:flex; flex-direction:column;">'+
-				'<div id="company_container">' +
-					'<div style="flex-grow:1; border-bottom:1px dashed #505050; border-top:1px dashed #505050; "></div>'+
-					`<p style="margin:0px 25px;">${this.selected_pos_profile.company}</p>`+
-					'<div style="flex-grow:1; border-bottom:1px dashed #505050; border-top:1px dashed #505050;"></div>'+
-				'</div>'+
-				'<div>'+
-					`Clien: ${this.selected_pos.customer}`+
-				'</div>'+
-				'<div>'+
-					`Date : 24-10-2024`+
-				'</div>'+
-				'<div>'+
-					`temp : 13:09`+
-				'</div>'+
-				'<table>'+
-					'<tr><th>Item</th><th>Qty</th><th>Prix</th>'
+					'<div id="logContainer"  >'+
+						'<div style="width:15%;"></div>'+
+						`<img src="${this.company.company_logo}">`+
+						'<div style="width:15%;"></div>'+
+					'</div>'+
+					'<div id="company_container">' +
+						'<div style="flex-grow:1; border-bottom:1px dashed #505050; border-top:1px dashed #505050; "></div>'+
+						`<p style="margin:0px 25px;">${this.company.company_name}</p>`+
+						'<div style="flex-grow:1; border-bottom:1px dashed #505050; border-top:1px dashed #505050;"></div>'+
+					'</div>'+
+					'<div>'+
+						`Clien: ${this.selected_pos.customer}`+
+					'</div>'+
+					'<div>'+
+						`Date : 24-10-2024`+
+					'</div>'+
+					'<div>'+
+						`temp : 13:09`+
+					'</div>'+
+					'<table>'+
+						'<tr><th>Nom</th><th>Qté</th><th>P.unité</th><th>Prix</th>'
 
 		this.selected_pos.items.forEach(item => {
-			invoiceHTML += `<tr> <td><div>${item.item_name}</div></td>  <td><div>${item.qty}</div></td>  <td><div>${item.rate}</div></td>  </tr>`
+			netTotal    += item.rate * item.qty
+			invoiceHTML += `<tr> <td><div>${item.item_name}</div></td>  <td><div>${item.qty}</div></td>  <td><div>${item.rate}</div></td>  <td><div>${item.rate * item.qty}</div></td></tr>`
 		})
 
 		invoiceHTML += '</table>'
 
-		//invoiceHTML += '<p><span style="font-size:20px;font-weight:600;" >Net Total : </span> 3500 DA </p>'
-		let tax = 17 * 3500 / 100
-		//invoiceHTML += `<p><span style="font-size:20px;font-weight:600;">VAT 17% @17.0 : </span> ${tax} DA </p>`
-		invoiceHTML += `<p style="font-size:24px;font-weight:500;" ><span style="font-size:26px;font-weight:800;">Grand Total : </span> ${tax + 3500} DA </p>`
 
-		invoiceHTML +='<table>'+
-			'<tr>'+
-				'<th>Name</th><th>Amount</th>'+
-			'</tr>'+
-			'<tr>'+
-				'<td><div>Grand Total</div></td> <td><div>10300 DA</div></td>'+
-			'</tr>'+
-			'<tr>'+
-				'<td><div>Paid Amount</div></td> <td><div>12000 DA</div></td>'+
-			'</tr>'+
-			'<tr>'+
-				'<td><div>Change Amount</div></td> <td><div>1700 DA</div></td>'+
-			'</tr>'+
-		'</table>'
+
+		invoiceHTML += `<div style="height:26px;"> <p style="font-size:18px;font-weight:500;" ><span style="font-size:18px;font-weight:700;">Net Total : </span> ${netTotal} DA </p> </div>`
+		invoiceHTML += `<div style="height:26px;"> <p style="font-size:18px;font-weight:500;" ><span style="font-size:18px;font-weight:700;">Discount : </span> ${this.selected_pos.additional_discount_percentage * netTotal} DA </p> </div>`
+
+		this.sales_taxes.forEach(tax => {
+			taxes += tax.rate
+			invoiceHTML += `<div style="height:26px;"> <p style="font-size:18px;font-weight:500;" ><span style="font-size:18px;font-weight:700;">${tax.description} : </span> ${tax.rate} % </p> </div>`
+		})
+
+		invoiceHTML += `<div style="height:26px;"> <p style="font-size:18px;font-weight:500;" ><span style="font-size:18px;font-weight:700;">Grand Total : </span> ${netTotal+(netTotal*(taxes/100)) - this.selected_pos.additional_discount_percentage * netTotal} DA </p> </div>`
+
 
 		invoiceHTML +=
 		'<div style="width:100%; display:flex; align-items:center; margin-top:30px;">'+

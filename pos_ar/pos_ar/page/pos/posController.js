@@ -70,7 +70,6 @@ pos_ar.PointOfSale.Controller = class {
 			this.warehouseList    = await this.fetchWarehouseList()
 			this.PosProfileList   = await this.fetchPosProfileList()
 			this.binList          = await this.fetchBinList()
-
 			await this.handleAppData();
 
 			let new_pos_invoice = frappe.model.get_new_doc('POS Invoice');
@@ -111,6 +110,11 @@ pos_ar.PointOfSale.Controller = class {
 			this.taxes_and_charges_template = await this.fetchSalesTaxesAndChargesTemplate(this.selectedPosProfile.taxes_and_charges)
 			this.taxes_and_charges = this.taxes_and_charges_template.taxes
 		}
+		//check company and get it if it exist on pos profile
+		if(this.selectedPosProfile.company != null && this.selectedPosProfile.company != ''){
+			this.company = await this.fetchCompany(this.selectedPosProfile.company)
+		}
+
 		//check customer
 		if(this.customersList.length > 0){
 			this.defaultCustomer = structuredClone(this.customersList[0])
@@ -409,6 +413,7 @@ pos_ar.PointOfSale.Controller = class {
 									this.wrapper,
 									this.db,
 									this.selectedPosProfile,
+									this.company,
 									this.taxes_and_charges,
 									this.historyCartClick.bind(this)
 								)
@@ -1348,14 +1353,24 @@ pos_ar.PointOfSale.Controller = class {
                         })
                 }
                 catch(error){
-                        console.error('Error fetching Warehouse list : ' , error)
+                        console.error('Error fetching pos profile list : ' , error)
+                        return [];
+                }
+        }
+
+        async fetchCompany(companyId){
+                try{
+			return await frappe.db.get_doc('Company' , companyId)
+                }
+                catch(error){
+                        console.error('Error fetching company by companyId from the profile list : ' , error)
                         return [];
                 }
         }
 
         async fetchSalesTaxesAndChargesTemplate(templateId){
                 try{
-			return await frappe.db.get_doc('Sales Taxes and Charges Template' , this.selectedPosProfile.taxes_and_charges)
+			return await frappe.db.get_doc('Sales Taxes and Charges Template' , templateId)
                 }
                 catch(error){
                         console.error('Error fetching Warehouse list : ' , error)
