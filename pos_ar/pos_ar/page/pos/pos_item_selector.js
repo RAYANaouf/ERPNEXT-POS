@@ -146,7 +146,7 @@ pos_ar.PointOfSale.pos_item_selector = class {
 
 	//filter list by item code or barcode
 	filterListByItemData( value ){
-		return this.item_list.filter(item => item.name.toLowerCase().includes(value) || item.scan_barcode == value || item.item_name.toLowerCase().includes(value))
+		return this.item_list.filter(item => item.name.toLowerCase().includes(value.toLowerCase()) || item.scan_barcode == value || item.item_name.toLowerCase().includes(value.toLowerCase()))
 	}
 
 
