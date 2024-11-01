@@ -40,7 +40,7 @@ pos_ar.PointOfSale.pos_item_selector = class {
 		this.header.append('<div id="inputsBox" class="rowBox align_center"></div>')
 
 		this.inputBox     = this.header.find("#inputsBox");
-		this.inputBox.append('<input type="text" autocomplete="off"  maxlength="140" placeholder="Search by item code, serial number or barcode" id="ItemInput" name="item" placeHolder="Enter the customer">')
+		this.inputBox.append('<input type="text" autocomplete="off"  maxlength="140" placeholder="Search by item code, item name or barcode" id="ItemInput" name="item" placeHolder="Enter the customer">')
 		this.inputBox.append('<input list="ItemGroupList"  id="ItemGroupInput" name="ItemGroup" placeHolder="Item Group">')
 		this.inputBox.append('<datalist id="ItemGroupList"></datalist>')
 
@@ -146,7 +146,7 @@ pos_ar.PointOfSale.pos_item_selector = class {
 
 	//filter list by item code or barcode
 	filterListByItemData( value ){
-		return this.item_list.filter(item => item.name.toLowerCase().includes(value) || item.scan_barcode == value)
+		return this.item_list.filter(item => item.name.toLowerCase().includes(value) || item.scan_barcode == value || item.item_name.toLowerCase().includes(value))
 	}
 
 
