@@ -49,6 +49,7 @@
         this.db = await pos_ar.PointOfSale.pos_db.openDatabase();
         this.settings_data = new pos_ar.PointOfSale.posSettingsData(this.db);
         this.dataHandler = new pos_ar.PointOfSale.FetchHandler(this.db);
+        this.appData = new pos_ar.PointOfSale.posAppData(this.db);
         this.prepare_container();
         await this.prepare_app_data();
         await this.checkForPOSEntry();
@@ -296,8 +297,8 @@
         this.itemPrices,
         this.defaultPriceList,
         this.getItemPrice.bind(this),
-        (item) => {
-          this.itemClick_selector(item);
+        (item2) => {
+          this.itemClick_selector(item2);
         }
       );
     }
@@ -326,8 +327,8 @@
         this.selectedItem,
         this.selectedField,
         this.getItemPrice.bind(this),
-        (item) => {
-          this.onSelectedItemClick(item);
+        (item2) => {
+          this.onSelectedItemClick(item2);
         },
         (tab) => {
           this.onClose_details();
@@ -393,26 +394,26 @@
         this.onSettingsChange.bind(this)
       );
     }
-    itemClick_selector(item) {
-      const itemCloned = structuredClone(item);
+    itemClick_selector(item2) {
+      const itemCloned = structuredClone(item2);
       itemCloned.discount_amount = 0;
       itemCloned.discount_percentage = 0;
-      this.addItemToPosInvoice(item);
+      this.addItemToPosInvoice(item2);
       this.selected_item_cart.calculateNetTotal();
       this.selected_item_cart.calculateVAT();
       this.selected_item_cart.calculateQnatity();
       this.selected_item_cart.calculateGrandTotal();
       this.selected_item_cart.refreshSelectedItem();
     }
-    onSelectedItemClick(item) {
-      this.selectedItem = structuredClone(item);
+    onSelectedItemClick(item2) {
+      this.selectedItem = structuredClone(item2);
       this.item_details.show_cart();
       this.selected_item_cart.showKeyboard();
       this.item_selector.hideCart();
       this.payment_cart.hideCart();
       this.settings_cart.hideCart();
       this.selected_item_cart.setKeyboardOrientation("landscape");
-      this.item_details.refreshDate(item);
+      this.item_details.refreshDate(item2);
     }
     saveCheckInOut(checkInOut) {
       this.db.saveCheckInOut(
@@ -689,18 +690,18 @@
         return;
       }
       let items = [];
-      this.selectedItemMaps.get(this.selectedTab.tabName).items.forEach((item) => {
+      this.selectedItemMaps.get(this.selectedTab.tabName).items.forEach((item2) => {
         let newItem = {
-          "item_name": item.name,
-          "item_code": item.name,
-          "rate": item.rate,
-          "qty": item.qty,
-          "description": item.name,
-          "image": item.image,
+          "item_name": item2.name,
+          "item_code": item2.name,
+          "rate": item2.rate,
+          "qty": item2.qty,
+          "description": item2.name,
+          "image": item2.image,
           "use_serial_batch_fields": 1,
           "cost_center": this.selectedPosProfile.cost_center,
-          "discount_percentage": item.discount_percentage,
-          "discount_amount": item.discount_amount,
+          "discount_percentage": item2.discount_percentage,
+          "discount_amount": item2.discount_amount,
           "warehouse": this.selectedPosProfile.warehouse,
           "income_account": this.selectedPosProfile.income_account
         };
@@ -816,8 +817,8 @@
       let grandTotal = 0;
       let allTaxes = 0;
       let discount = 0;
-      pos.items.forEach((item) => {
-        netTotal += item.qty * item.rate;
+      pos.items.forEach((item2) => {
+        netTotal += item2.qty * item2.rate;
       });
       this.taxes_and_charges.forEach((tax) => {
         allTaxes += tax.rate / 100 * netTotal;
@@ -833,7 +834,7 @@
       }
     }
     checkIfRateZero(pos) {
-      return pos.items.some((item) => item.rate == 0);
+      return pos.items.some((item2) => item2.rate == 0);
     }
     onClosePOS() {
       if (this.unsyncedPos > 0) {
@@ -865,15 +866,15 @@
         frappe.msgprint("the connection is back (online mode)");
       });
     }
-    getItemPrice(item, priceList) {
+    getItemPrice(item2, priceList) {
       const mode = this.settings_data.settings.itemPriceBasedOn;
       if (mode == "brand") {
-        if (item.brand == null)
+        if (item2.brand == null)
           return 0;
-        const price = this.itemPrices.find((itemPrice) => itemPrice.brand == item.brand);
+        const price = this.itemPrices.find((itemPrice2) => itemPrice2.brand == item2.brand);
         return price ? price.price_list_rate : 0;
       } else if (mode == "priceList") {
-        const price = this.itemPrices.find((itemPrice) => itemPrice.item_code == item.item_name && itemPrice.price_list == priceList);
+        const price = this.itemPrices.find((itemPrice2) => itemPrice2.item_code == item2.item_name && itemPrice2.price_list == priceList);
         return price ? price.price_list_rate : 0;
       }
     }
@@ -911,10 +912,10 @@
       const posInvoice = this.selectedItemMaps.get(this.selectedTab.tabName);
       const posItems = posInvoice.items;
       let exist = false;
-      posItems.forEach((item) => {
-        if (item.name == clickedItem.name) {
+      posItems.forEach((item2) => {
+        if (item2.name == clickedItem.name) {
           exist = true;
-          item.qty += 1;
+          item2.qty += 1;
         }
       });
       if (!exist) {
@@ -928,38 +929,38 @@
     deleteItemFromPOsInvoice(itemId) {
       const posInvoice = this.selectedItemMaps.get(this.selectedTab.tabName);
       const posItems = posInvoice.items;
-      posInvoice.items = posItems.filter((item) => item.name != itemId);
+      posInvoice.items = posItems.filter((item2) => item2.name != itemId);
       this.selectedItem = structuredClone({ name: "" });
     }
     editPosItemQty(itemName, qty) {
       let items = this.selectedItemMaps.get(this.selectedTab.tabName).items;
-      items.forEach((item) => {
-        if (item.name == itemName) {
-          item.qty = qty;
+      items.forEach((item2) => {
+        if (item2.name == itemName) {
+          item2.qty = qty;
         }
       });
     }
     editPosItemRate(itemName, rate) {
       let items = this.selectedItemMaps.get(this.selectedTab.tabName).items;
-      items.forEach((item) => {
-        if (item.name == itemName) {
-          item.rate = rate;
+      items.forEach((item2) => {
+        if (item2.name == itemName) {
+          item2.rate = rate;
         }
       });
     }
     editPosItemDiscountPercentage(itemName, discountPercentage) {
       let items = this.selectedItemMaps.get(this.selectedTab.tabName).items;
-      items.forEach((item) => {
-        if (item.name == itemName) {
-          item.discount_percentage = discountPercentage;
+      items.forEach((item2) => {
+        if (item2.name == itemName) {
+          item2.discount_percentage = discountPercentage;
         }
       });
     }
     editPosItemDiscountAmount(itemName, discountAmount) {
       let items = this.selectedItemMaps.get(this.selectedTab.tabName).items;
-      items.forEach((item) => {
-        if (item.name == itemName) {
-          item.discount_amount = discountAmount;
+      items.forEach((item2) => {
+        if (item2.name == itemName) {
+          item2.discount_amount = discountAmount;
         }
       });
     }
@@ -1019,18 +1020,18 @@
       const itemsContainer_html = document.getElementById("itemsContainer");
       itemsContainer_html.innerHTML = "";
       for (let i = 0; i < filtered_item_list.length && i < 800; i++) {
-        let item = filtered_item_list[i];
+        let item2 = filtered_item_list[i];
         const itemBox = document.createElement("div");
         itemBox.classList.add("itemBox");
         itemBox.classList.add("columnBox");
         itemBox.classList.add("C_A_Center");
         itemBox.addEventListener("click", (event2) => {
-          this.on_item_click(item);
+          this.on_item_click(item2);
         });
-        if (item.image) {
+        if (item2.image) {
           const itemImage = document.createElement("img");
           itemImage.classList.add("itemImage");
-          itemImage.src = item.image;
+          itemImage.src = item2.image;
           itemBox.appendChild(itemImage);
         } else {
           const itemImageHolder = document.createElement("div");
@@ -1038,18 +1039,18 @@
           itemImageHolder.classList.add("rowBox");
           itemImageHolder.classList.add("centerItem");
           const firstLatter = document.createElement("h1");
-          firstLatter.textContent = item.item_name[0];
+          firstLatter.textContent = item2.item_name[0];
           firstLatter.style.color = "#707070";
           itemImageHolder.appendChild(firstLatter);
           itemBox.appendChild(itemImageHolder);
         }
         const itemName = document.createElement("div");
-        itemName.textContent = item.item_name;
+        itemName.textContent = item2.item_name;
         itemName.classList.add("itemTitle");
         itemBox.appendChild(itemName);
         const price = document.createElement("div");
         price.classList.add("itemPrice");
-        price.textContent = this.get_item_price(item, this.selected_price_list.name) + " DA";
+        price.textContent = this.get_item_price(item2, this.selected_price_list.name) + " DA";
         itemBox.appendChild(price);
         itemsContainer_html.appendChild(itemBox);
       }
@@ -1071,7 +1072,7 @@
       });
     }
     filterListByItemData(value) {
-      return this.item_list.filter((item) => item.name.toLowerCase().includes(value.toLowerCase()) || item.scan_barcode == value || item.item_name.toLowerCase().includes(value.toLowerCase()));
+      return this.item_list.filter((item2) => item2.name.toLowerCase().includes(value.toLowerCase()) || item2.scan_barcode == value || item2.item_name.toLowerCase().includes(value.toLowerCase()));
     }
     getItemByItemGroup(item_group) {
       let groups = [];
@@ -1089,9 +1090,9 @@
       getChild(item_group);
       let filtredItemList = [];
       let getFiltredItems = (group) => {
-        this.item_list.forEach((item) => {
-          if (item.item_group == group) {
-            filtredItemList.push(item);
+        this.item_list.forEach((item2) => {
+          if (item2.item_group == group) {
+            filtredItemList.push(item2);
           }
         });
       };
@@ -1444,46 +1445,46 @@
       this.customerInput.val(this.selected_item_maps.get(this.selected_tab.tabName).customer);
       const selectedItemsContainer = document.getElementById("selectedItemsContainer");
       selectedItemsContainer.innerHTML = "";
-      this.selected_item_maps.get(this.selected_tab.tabName).items.forEach((item) => {
+      this.selected_item_maps.get(this.selected_tab.tabName).items.forEach((item2) => {
         const itemElement = document.createElement("div");
         const leftGroup = document.createElement("div");
         const rightGroup = document.createElement("div");
         const itemName = document.createElement("h5");
         const itemQuantity = document.createElement("div");
-        const itemPrice = document.createElement("div");
-        if (item.image) {
+        const itemPrice2 = document.createElement("div");
+        if (item2.image) {
           const itemImage = document.createElement("img");
-          itemImage.src = item.image;
+          itemImage.src = item2.image;
           itemImage.classList.add("selectedItemImage");
           leftGroup.appendChild(itemImage);
         } else {
           const itemImageHolder = document.createElement("div");
           const itemImageLatter = document.createElement("div");
           itemImageHolder.classList.add("selectedItemImage", "rowBox", "centerItem");
-          itemImageLatter.textContent = item.name[0];
+          itemImageLatter.textContent = item2.name[0];
           itemImageHolder.appendChild(itemImageLatter);
           leftGroup.appendChild(itemImageHolder);
         }
-        itemName.textContent = item.name;
+        itemName.textContent = item2.name;
         itemName.classList.add("selectedItemName");
         leftGroup.appendChild(itemName);
-        itemQuantity.textContent = item.qty;
+        itemQuantity.textContent = item2.qty;
         itemQuantity.classList.add("itemQuantity");
         rightGroup.appendChild(itemQuantity);
-        itemPrice.textContent = item.rate - item.discount_amount + " DA";
-        itemPrice.classList.add("itemPrice");
-        rightGroup.appendChild(itemPrice);
+        itemPrice2.textContent = item2.rate - item2.discount_amount + " DA";
+        itemPrice2.classList.add("itemPrice");
+        rightGroup.appendChild(itemPrice2);
         leftGroup.classList.add("rowBox", "align_center", "leftGroup");
         itemElement.appendChild(leftGroup);
         rightGroup.classList.add("rowBox", "align_center", "rightGroup");
         itemElement.appendChild(rightGroup);
         itemElement.classList.add("rowBox", "align_center", "row_sbtw", "ItemElement", "pointer");
-        if (item.name == this.selected_item.name)
+        if (item2.name == this.selected_item.name)
           itemElement.classList.add("selected");
         itemElement.addEventListener("click", (event2) => {
           console.log("we are click");
           this.makeItemHighlight(itemElement);
-          this.on_selected_item_click(item);
+          this.on_selected_item_click(item2);
         });
         selectedItemsContainer.appendChild(itemElement);
       });
@@ -1663,8 +1664,8 @@
     }
     calculateNetTotal() {
       let netTotal = 0;
-      this.selected_item_maps.get(this.selected_tab.tabName).items.forEach((item) => {
-        netTotal += item.rate * item.qty;
+      this.selected_item_maps.get(this.selected_tab.tabName).items.forEach((item2) => {
+        netTotal += item2.rate * item2.qty;
       });
       if (this.invoice_data.discount > 0) {
         netTotal -= netTotal * (this.invoice_data.discount / 100);
@@ -1692,8 +1693,8 @@
     }
     calculateQnatity() {
       let quantity = 0;
-      this.selected_item_maps.get(this.selected_tab.tabName).items.forEach((item) => {
-        quantity += item.qty;
+      this.selected_item_maps.get(this.selected_tab.tabName).items.forEach((item2) => {
+        quantity += item2.qty;
       });
       const totalQuantity_HTML = document.getElementById("totalQuantityValue");
       totalQuantity_HTML.textContent = quantity;
@@ -1711,8 +1712,8 @@
       this.invoice_data.grandTotal = grandTotal;
     }
     resetItemRateBaseOnPriceList() {
-      this.selected_item_maps.get(this.selected_tab.tabName).items.forEach((item) => {
-        item.rate = this.get_item_price(item, this.selected_item_maps.get(this.selected_tab.tabName).priceList);
+      this.selected_item_maps.get(this.selected_tab.tabName).items.forEach((item2) => {
+        item2.rate = this.get_item_price(item2, this.selected_item_maps.get(this.selected_tab.tabName).priceList);
       });
       console.log("resting ==> ", this.selected_item_maps.get(this.selected_tab.tabName));
     }
@@ -1787,7 +1788,7 @@
       this.c2.append('<div class="columnBox"><label for="itemDetailsDiscountMontantInput">Discount (montant)</label><input type="float" id="itemDetailsDiscountMontantInput" class="pointerCursor"></div>');
       this.c2.append('<div class="columnBox"><label for="itemDetailsPriceListRateInput">Price List Rate</label><input type="text" id="itemDetailsPriceListRateInput" disabled></div>');
     }
-    refreshDate(item) {
+    refreshDate(item2) {
       var _a, _b;
       const imageContainer = document.getElementById("detailsItemImage");
       const name = document.getElementById("detailsItemName");
@@ -1802,32 +1803,32 @@
       const uom = document.getElementById("itemDetailsUomInput");
       const priceList = document.getElementById("detailsItemPriceListInput");
       const priceListRate = document.getElementById("itemDetailsPriceListRateInput");
-      if (item.image) {
+      if (item2.image) {
         const image = document.createElement("img");
-        image.src = item.image;
+        image.src = item2.image;
         imageContainer.innerHTML = "";
         imageContainer.appendChild(image);
       } else {
         const image = document.createElement("div");
-        image.textContent = item.item_name[0];
+        image.textContent = item2.item_name[0];
         image.style.fontSize = "xx-large";
         image.style.fontWeight = "700";
         imageContainer.innerHTML = "";
         imageContainer.appendChild(image);
       }
-      name.textContent = item.item_name;
+      name.textContent = item2.item_name;
       name.classList.add("rowBox", "align_center");
-      quantity.value = item.qty;
-      rate.value = item.rate;
-      discountedRate.value = item.rate - item.discount_amount;
-      discount_amount.value = (_a = item.discount_amount) != null ? _a : 0;
-      discount_percentage.value = (_b = item.discount_percentage) != null ? _b : 0;
-      available.value = this.getQtyInWarehouse(item.name, this.warehouse);
-      uom.value = item.stock_uom;
+      quantity.value = item2.qty;
+      rate.value = item2.rate;
+      discountedRate.value = item2.rate - item2.discount_amount;
+      discount_amount.value = (_a = item2.discount_amount) != null ? _a : 0;
+      discount_percentage.value = (_b = item2.discount_percentage) != null ? _b : 0;
+      available.value = this.getQtyInWarehouse(item2.name, this.warehouse);
+      uom.value = item2.stock_uom;
       priceList.value = this.price_lists[0].price_list_name;
       warehouse.textContent = "Warehouse : " + this.warehouse;
-      itemGroup.textContent = "Item Group : " + item.item_group;
-      priceListRate.value = this.getItemPrice(item.name) + "DA";
+      itemGroup.textContent = "Item Group : " + item2.item_group;
+      priceListRate.value = this.getItemPrice(item2.name) + "DA";
       console.log("end ref");
       this.makeSelectedFieldHighlighted();
     }
@@ -2107,7 +2108,7 @@
       });
     }
     getItemPrice(itemId) {
-      const price = this.item_prices.find((itemPrice) => itemPrice.item_code == itemId);
+      const price = this.item_prices.find((itemPrice2) => itemPrice2.item_code == itemId);
       return price ? price.price_list_rate : 0;
     }
     getQtyInWarehouse(itemId, warehouseId) {
@@ -2516,13 +2517,13 @@
         this.actionButtonsContainer.css("display", "flex");
       }
       this.itemList.html("");
-      this.selected_pos.items.forEach((item) => {
-        this.itemList.append(`<div class="rowBox align_item">    <div class="itemName rowBox align_center">${item.item_name}</div>   <div class="itemQuantity rowBox align_center">${item.qty}</div>   <div class="itemCost rowBox align_center">${item.qty * item.rate} DA</div>  </div>`);
+      this.selected_pos.items.forEach((item2) => {
+        this.itemList.append(`<div class="rowBox align_item">    <div class="itemName rowBox align_center">${item2.item_name}</div>   <div class="itemQuantity rowBox align_center">${item2.qty}</div>   <div class="itemCost rowBox align_center">${item2.qty * item2.rate} DA</div>  </div>`);
       });
       this.totalList.html("");
       let netTotal = 0;
-      this.selected_pos.items.forEach((item) => {
-        netTotal += item.rate * item.qty;
+      this.selected_pos.items.forEach((item2) => {
+        netTotal += item2.rate * item2.qty;
       });
       this.totalList.append(`<div class="rowBox align_item"> <div class="name rowBox align_center">Net Total</div> <div class="price rowBox align_center">${netTotal} DA</div> </div>`);
       let allTax = 0;
@@ -2637,9 +2638,9 @@
       let taxes = 0;
       let grandTotal = 0;
       let invoiceHTML = `<style>#company_container {width: 100% ; height: 40px ; display:flex; align-items:center; font-size : 12px;}table{border: 1px solid #505050; border-spacing:0px;width: 100%; margin-top:16px;}tr{width:100%; height:20px;}tr:nth-child(1){background:#eeeeee;}th{border-right:1px solid #505050;border-bottom:1px solid #505050;border-top:1px solid #505050;font-weight : 500;}td{border-right:1px solid #505050;}#logContainer{width: 100%;height:80px;display : flex;justify-content:center;}#logContainer img{width:70%; height:100%;}td>div{height:20px; width:100%;font-size:12px;display:flex; justify-content:center; align-items:center;}</style><div style="display:flex; flex-direction:column;"><div id="logContainer"  ><div style="width:15%;"></div><img src="${this.company.company_logo}"><div style="width:15%;"></div></div><div id="company_container"><div style="flex-grow:1; border-bottom:1px dashed #505050; border-top:1px dashed #505050; "></div><p style="margin:0px 25px;">${this.company.company_name}</p><div style="flex-grow:1; border-bottom:1px dashed #505050; border-top:1px dashed #505050;"></div></div><div>Clien: ${this.selected_pos.customer}</div><div>Date : 24-10-2024</div><div>temp : 13:09</div><table><tr><th>Nom</th><th>Qt\xE9</th><th>P.unit\xE9</th><th>Prix</th>`;
-      this.selected_pos.items.forEach((item) => {
-        netTotal += item.rate * item.qty;
-        invoiceHTML += `<tr> <td><div>${item.item_name}</div></td>  <td><div>${item.qty}</div></td>  <td><div>${item.rate}</div></td>  <td><div>${item.rate * item.qty}</div></td></tr>`;
+      this.selected_pos.items.forEach((item2) => {
+        netTotal += item2.rate * item2.qty;
+        invoiceHTML += `<tr> <td><div>${item2.item_name}</div></td>  <td><div>${item2.qty}</div></td>  <td><div>${item2.rate}</div></td>  <td><div>${item2.rate * item2.qty}</div></td></tr>`;
       });
       invoiceHTML += "</table>";
       invoiceHTML += `<div style="height:26px;"> <p style="font-size:18px;font-weight:500;" ><span style="font-size:18px;font-weight:700;">Net Total : </span> ${netTotal} DA </p> </div>`;
@@ -2668,14 +2669,14 @@
     }
     static async openDatabase() {
       return new Promise((resolve, reject) => {
-        const request = window.indexedDB.open("POSDB_test29", 1);
-        request.onerror = (event2) => {
-          reject(request.error);
+        const request2 = window.indexedDB.open("POSDB_test29", 1);
+        request2.onerror = (event2) => {
+          reject(request2.error);
         };
-        request.onsuccess = (event2) => {
+        request2.onsuccess = (event2) => {
           resolve(new pos_ar.PointOfSale.pos_db(event2.target.result));
         };
-        request.onupgradeneeded = (event2) => {
+        request2.onupgradeneeded = (event2) => {
           const db = event2.target.result;
           if (!db.objectStoreNames.contains("Customer")) {
             db.createObjectStore("Customer", { keyPath: "name" });
@@ -2720,25 +2721,225 @@
         console.error(`Database error: ${(_a = event2.target.error) == null ? void 0 : _a.message}`);
       };
     }
+    saveItemList(itemList, onSuccess, onFailure) {
+      const transaction = this.db.transaction(["Item"], "readwrite");
+      const store = transaction.objectStore("Item");
+      itemList.forEach((posProfile) => {
+        const request2 = store.put(item);
+        request2.onerror = (err) => {
+          console.error("db => error saving Item : ", item, "err : ", err);
+        };
+      });
+      transaction.oncomplete = () => {
+        onSuccess();
+      };
+      request.onerror = (event2) => {
+        console.error("db => error saving Item.");
+        onFailure(event2);
+      };
+    }
+    getAllPriceList(onSuccess, onFailure) {
+      const transaction = this.db.transaction(["Item"], "readwrite");
+      const store = transaction.objectStore("Item");
+      const result = store.getAll().onsuccess = (event2) => {
+        const value = event2.target.result;
+        onSuccess(value);
+      };
+    }
+    savePosProfileList(posProfileList, onSuccess, onFailure) {
+      const transaction = this.db.transaction(["POS Profile"], "readwrite");
+      const store = transaction.objectStore("POS Profile");
+      posProfileList.forEach((posProfile) => {
+        const request2 = store.put(posProfile);
+        request2.onerror = (err) => {
+          console.error("db => error saving POS Profile : ", posProfile, "err : ", err);
+        };
+      });
+      transaction.oncomplete = () => {
+        onSuccess();
+      };
+      request.onerror = (event2) => {
+        console.error("db => error saving POS Profile.");
+        onFailure(event2);
+      };
+    }
+    getAllPriceList(onSuccess, onFailure) {
+      const transaction = this.db.transaction(["POS Profile"], "readwrite");
+      const store = transaction.objectStore("POS Profile");
+      const result = store.getAll().onsuccess = (event2) => {
+        const value = event2.target.result;
+        onSuccess(value);
+      };
+    }
+    saveBinList(binList, onSuccess, onFailure) {
+      const transaction = this.db.transaction(["Bin"], "readwrite");
+      const store = transaction.objectStore("Bin");
+      binList.forEach((bin) => {
+        const request2 = store.put(bin);
+        request2.onerror = (err) => {
+          console.error("db => error saving Bin : ", bin, "err : ", err);
+        };
+      });
+      transaction.oncomplete = () => {
+        onSuccess();
+      };
+      request.onerror = (event2) => {
+        console.error("db => error saving Bin.");
+        onFailure(event2);
+      };
+    }
+    getAllPriceList(onSuccess, onFailure) {
+      const transaction = this.db.transaction(["Bin"], "readwrite");
+      const store = transaction.objectStore("Bin");
+      const result = store.getAll().onsuccess = (event2) => {
+        const value = event2.target.result;
+        onSuccess(value);
+      };
+    }
+    saveWarehouseList(warehouseList, onSuccess, onFailure) {
+      const transaction = this.db.transaction(["Warehouse"], "readwrite");
+      const store = transaction.objectStore("Warehouse");
+      warehousesList.forEach((warehouse) => {
+        const request2 = store.put(warehouse);
+        request2.onerror = (err) => {
+          console.error("db => error saving Warehouse : ", warehouse, "err : ", err);
+        };
+      });
+      transaction.oncomplete = () => {
+        onSuccess();
+      };
+      request.onerror = (event2) => {
+        console.error("db => error saving Warehouse List.");
+        onFailure(event2);
+      };
+    }
+    getAllPriceList(onSuccess, onFailure) {
+      const transaction = this.db.transaction(["Warehouse"], "readwrite");
+      const store = transaction.objectStore("Warehouse");
+      const result = store.getAll().onsuccess = (event2) => {
+        const value = event2.target.result;
+        onSuccess(value);
+      };
+    }
+    savePriceLists(priceLists, onSuccess, onFailure) {
+      const transaction = this.db.transaction(["Price List"], "readwrite");
+      const store = transaction.objectStore("Price List");
+      priceLists.forEach((priceList) => {
+        const request2 = store.put(priceList);
+        request2.onerror = (err) => {
+          console.error("db => error saving Price List : ", itemPrice, "err : ", err);
+        };
+      });
+      transaction.oncomplete = () => {
+        onSuccess();
+      };
+      request.onerror = (event2) => {
+        console.error("db => error saving Price Lists.");
+        onFailure(event2);
+      };
+    }
+    getAllPriceList(onSuccess, onFailure) {
+      const transaction = this.db.transaction(["Price List"], "readwrite");
+      const store = transaction.objectStore("Price List");
+      const result = store.getAll().onsuccess = (event2) => {
+        const value = event2.target.result;
+        onSuccess(value);
+      };
+    }
+    saveItemPriceList(itemPriceList, onSuccess, onFailure) {
+      const transaction = this.db.transaction(["Item Price"], "readwrite");
+      const store = transaction.objectStore("Item Price");
+      itemPriceList.forEach((itemPrice2) => {
+        const request2 = store.put(itemPrice2);
+        request2.onerror = (err) => {
+          console.error("db => error saving Item Price : ", itemPrice2, "err : ", err);
+        };
+      });
+      transaction.oncomplete = () => {
+        onSuccess();
+      };
+      request.onerror = (event2) => {
+        console.error("db => error saving Item Price.");
+        onFailure(event2);
+      };
+    }
+    getAllItemPrice(onSuccess, onFailure) {
+      const transaction = this.db.transaction(["Item Price"], "readwrite");
+      const store = transaction.objectStore("Item Price");
+      const result = store.getAll().onsuccess = (event2) => {
+        const value = event2.target.result;
+        onSuccess(value);
+      };
+    }
+    saveItemGroupList(itemGroupList, onSuccess, onFailure) {
+      const transaction = this.db.transaction(["Item Group"], "readwrite");
+      const store = transaction.objectStore("Item Group");
+      itemGroupList.forEach((itemGroup) => {
+        const request2 = store.put(itemGroup);
+        request2.onerror = (err) => {
+          console.error("db => error saving Item Group : ", itemGroup, "err : ", err);
+        };
+      });
+      transaction.oncomplete = () => {
+        onSuccess();
+      };
+      request.onerror = (event2) => {
+        console.error("db => error saving Item Group.");
+        onFailure(event2);
+      };
+    }
+    getAllItemGroup(onSuccess, onFailure) {
+      const transaction = this.db.transaction(["Item Group"], "readwrite");
+      const store = transaction.objectStore("Item Group");
+      const result = store.getAll().onsuccess = (event2) => {
+        const value = event2.target.result;
+        onSuccess(value);
+      };
+    }
+    saveCustomerList(customerList, onSuccess, onFailure) {
+      const transaction = this.db.transaction(["Customer"], "readwrite");
+      const store = transaction.objectStore("Customer");
+      customerList.forEach((customer) => {
+        const request2 = store.put(customer);
+        request2.onerror = (err) => {
+          console.error("db => error saving customer : ", customer, "err : ", err);
+        };
+      });
+      transaction.oncomplete = () => {
+        onSuccess();
+      };
+      request.onerror = (event2) => {
+        console.error("db => error saving customer.");
+        onFailure(event2);
+      };
+    }
+    getAllCustomers(onSuccess, onFailure) {
+      const transaction = this.db.transaction(["Customer"], "readwrite");
+      const store = transaction.objectStore("Customer");
+      const result = store.getAll().onsuccess = (event2) => {
+        const value = event2.target.result;
+        onSuccess(value);
+      };
+    }
     savePosInvoice(posInvoice, onSuccess, onFailure) {
       const transaction = this.db.transaction(["POS Invoice"], "readwrite");
       const store = transaction.objectStore("POS Invoice");
-      const request = store.put(posInvoice);
-      request.onsuccess = (event2) => {
+      const request2 = store.put(posInvoice);
+      request2.onsuccess = (event2) => {
         onSuccess(event2);
       };
-      request.onerror = (event2) => {
+      request2.onerror = (event2) => {
         onFailure(event2);
       };
     }
     updatePosInvoice(posInvoice, onSuccess, onFailure) {
       const transaction = this.db.transaction(["POS Invoice"], "readwrite");
       const store = transaction.objectStore("POS Invoice");
-      const request = store.put(posInvoice);
-      request.onsuccess = (event2) => {
+      const request2 = store.put(posInvoice);
+      request2.onsuccess = (event2) => {
         onSuccess(event2);
       };
-      request.onerror = (event2) => {
+      request2.onerror = (event2) => {
         onFailure(event2);
       };
     }
@@ -2754,11 +2955,11 @@
       const transaction_posInvoice = this.db.transaction(["POS Invoice"], "readwrite");
       const store_posInvoice = transaction_posInvoice.objectStore("POS Invoice");
       const index_docstatus_posInvoice = store_posInvoice.index("docstatus");
-      const request = index_docstatus_posInvoice.getAll(0);
-      request.onsuccess = (event2) => {
+      const request2 = index_docstatus_posInvoice.getAll(0);
+      request2.onsuccess = (event2) => {
         onSuccess(event2.target.result);
       };
-      request.onerror = (event2) => {
+      request2.onerror = (event2) => {
         onFailure(event2);
       };
     }
@@ -2766,12 +2967,12 @@
       const transaction_posInvoice = this.db.transaction(["POS Invoice"], "readwrite");
       const store_posInvoice = transaction_posInvoice.objectStore("POS Invoice");
       const index_docstatus_posInvoice = store_posInvoice.index("docstatus");
-      const request = index_docstatus_posInvoice.getAll(1);
-      request.onsuccess = (result) => {
+      const request2 = index_docstatus_posInvoice.getAll(1);
+      request2.onsuccess = (result) => {
         const filtredResult = result.target.result.filter((invoice) => invoice.synced == false);
         onSuccess(filtredResult.length);
       };
-      request.onerror = (err) => {
+      request2.onerror = (err) => {
         onFailure(err);
       };
     }
@@ -2779,45 +2980,45 @@
       const transaction_posInvoice = this.db.transaction(["POS Invoice"], "readwrite");
       const store_posInvoice = transaction_posInvoice.objectStore("POS Invoice");
       const index_docstatus_posInvoice = store_posInvoice.index("docstatus");
-      const request = index_docstatus_posInvoice.getAll(1);
-      request.onsuccess = (result) => {
+      const request2 = index_docstatus_posInvoice.getAll(1);
+      request2.onsuccess = (result) => {
         const filtredResult = result.target.result.filter((invoice) => invoice.synced == false);
         onSuccess(filtredResult);
       };
-      request.onerror = (err) => {
+      request2.onerror = (err) => {
         onFailure(err);
       };
     }
     deletePosInvoice(invoiceName, onSuccess, onFailure) {
       const transaction = this.db.transaction(["POS Invoice"], "readwrite");
       const store = transaction.objectStore("POS Invoice");
-      const request = store.delete(invoiceName);
-      request.onsuccess = (event2) => {
+      const request2 = store.delete(invoiceName);
+      request2.onsuccess = (event2) => {
         onSuccess(event2);
       };
-      request.onerror = (event2) => {
+      request2.onerror = (event2) => {
         onFailure(event2);
       };
     }
     deleteAllSettings(onSuccess, onFailure) {
       const transaction = this.db.transaction(["POS Invoice"], "readwrite");
       const store = transaction.objectStore("POS Invoice");
-      const request = store.clear();
-      request.onsuccess = (event2) => {
+      const request2 = store.clear();
+      request2.onsuccess = (event2) => {
         onSuccess(event2);
       };
-      request.onerror = (event2) => {
+      request2.onerror = (event2) => {
         onFailure(event2);
       };
     }
     saveCheckInOut(checkInOut, onSuccess, onFailure) {
       const transaction = this.db.transaction(["check_in_out"], "readwrite");
       const store = transaction.objectStore("check_in_out");
-      const request = store.put(checkInOut);
-      request.onsuccess = (event2) => {
+      const request2 = store.put(checkInOut);
+      request2.onsuccess = (event2) => {
         onSuccess(event2);
       };
-      request.onerror = (event2) => {
+      request2.onerror = (event2) => {
         onFailure(event2);
       };
     }
@@ -2832,44 +3033,44 @@
     deleteAllCheckInOut(onSuccess, onFailure) {
       const transaction = this.db.transaction(["check_in_out"], "readwrite");
       const store = transaction.objectStore("check_in_out");
-      const request = store.clear();
-      request.onsuccess = (event2) => {
+      const request2 = store.clear();
+      request2.onsuccess = (event2) => {
         onSuccess(event2);
       };
-      request.onerror = (event2) => {
+      request2.onerror = (event2) => {
         onFailure(event2);
       };
     }
     updateSettings(settings, onSuccess, onFailure) {
       const transaction = this.db.transaction(["POS Settings"], "readwrite");
       const store = transaction.objectStore("POS Settings");
-      const request = store.put(__spreadValues({ id: 1 }, settings));
-      request.onsuccess = (event2) => {
+      const request2 = store.put(__spreadValues({ id: 1 }, settings));
+      request2.onsuccess = (event2) => {
         onSuccess(event2);
       };
-      request.onerror = (event2) => {
+      request2.onerror = (event2) => {
         onFailure(event2);
       };
     }
     getSettings(onSuccess, onFailure) {
       const transaction = this.db.transaction(["POS Settings"], "readwrite");
       const store = transaction.objectStore("POS Settings");
-      const request = store.get(1);
-      request.onsuccess = (event2) => {
+      const request2 = store.get(1);
+      request2.onsuccess = (event2) => {
         onSuccess(event2.target.result);
       };
-      request.onerror = (event2) => {
+      request2.onerror = (event2) => {
         onFailure(event2);
       };
     }
     deleteAllSettings(onSuccess, onFailure) {
       const transaction = this.db.transaction(["POS Settings"], "readwrite");
       const store = transaction.objectStore("POS Settings");
-      const request = store.clear();
-      request.onsuccess = (event2) => {
+      const request2 = store.clear();
+      request2.onsuccess = (event2) => {
         onSuccess(event2);
       };
-      request.onerror = (event2) => {
+      request2.onerror = (event2) => {
         onFailure(event2);
       };
     }
@@ -3060,7 +3261,7 @@
     }
     refreshCheckInOutList() {
       this.check_in_out_list.empty();
-      const filteredList = this.checkList.filter((item) => item.check_type == this.filter || this.filter == "All");
+      const filteredList = this.checkList.filter((item2) => item2.check_type == this.filter || this.filter == "All");
       filteredList.forEach((checkInOut) => {
         const checkInOutObject = document.createElement("div");
         checkInOutObject.classList.add("checkInOutItem", "rowBox");
@@ -3098,12 +3299,12 @@
       let inAmount = 0;
       let outAmount = 0;
       let allAmount = 0;
-      this.checkList.forEach((item) => {
-        allAmount += parseFloat(item.amount) || 0;
-        if (item.check_type == "In")
-          inAmount += parseFloat(item.amount) || 0;
-        else if (item.check_type == "Out")
-          outAmount += parseFloat(item.amount) || 0;
+      this.checkList.forEach((item2) => {
+        allAmount += parseFloat(item2.amount) || 0;
+        if (item2.check_type == "In")
+          inAmount += parseFloat(item2.amount) || 0;
+        else if (item2.check_type == "Out")
+          outAmount += parseFloat(item2.amount) || 0;
       });
       this.check_in_amount.append(`${inAmount.toFixed(2)} DA`);
       this.check_out_amount.append(`${outAmount.toFixed(2)} DA`);
@@ -3220,6 +3421,21 @@
       } else {
         console.error("invalide base : ", base, "there are just : ", this.price_bases);
       }
+    }
+  };
+
+  // ../pos_ar/pos_ar/pos_ar/page/pos/data/posAppData.js
+  pos_ar.PointOfSale.posAppData = class {
+    constructor(db) {
+      this.db = db;
+      this.db.getAllCustomers(
+        (res) => {
+          console.log("local customer", res);
+        },
+        (err) => {
+          console.log("error geting local customer list");
+        }
+      );
     }
   };
 
@@ -3354,4 +3570,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.KDSAMFOB.js.map
+//# sourceMappingURL=pos.bundle.7XDYMD55.js.map

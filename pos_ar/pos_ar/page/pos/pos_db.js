@@ -79,7 +79,340 @@ pos_ar.PointOfSale.pos_db  = class POSDatabase {
 
 
 
+	/************************************   Item  ***************************************/
+	/************************************************************************************/
+	/************************************************************************************/
+
+	saveItemList( itemList , onSuccess , onFailure){
+
+		const transaction = this.db.transaction(['Item'] , "readwrite");
+		const store       = transaction.objectStore('Item')
+
+		// Loop through the list of customers and add each one to the store
+		itemList.forEach(posProfile => {
+			const request = store.put(item)
+			request.onerror = (err)=>{
+				console.error("db => error saving Item : " , item ,  "err : " , err)
+			}
+		})
+
+		// Transaction's oncomplete event will be triggered
+		//once all requests in this transaction complete successfully
+		transaction.oncomplete = () => {
+			onSuccess();
+		};
+
+		request.onerror = (event) => {
+			console.error("db => error saving Item.")
+			onFailure(event);
+		};
+
+	}
+
+	getAllPriceList(onSuccess , onFailure){
+		const transaction = this.db.transaction(['Item'] , "readwrite");
+		const store       = transaction.objectStore('Item');
+		const result      = store.getAll().onsuccess = (event) => {
+			const value = event.target.result
+			onSuccess(value);
+		}
+	}
+
+
+	/*********************************   POS Profile  ***********************************/
+	/************************************************************************************/
+	/************************************************************************************/
+
+	savePosProfileList( posProfileList , onSuccess , onFailure){
+
+		const transaction = this.db.transaction(['POS Profile'] , "readwrite");
+		const store       = transaction.objectStore('POS Profile')
+
+		// Loop through the list of customers and add each one to the store
+		posProfileList.forEach(posProfile => {
+			const request = store.put(posProfile)
+			request.onerror = (err)=>{
+				console.error("db => error saving POS Profile : " ,posProfile ,  "err : " , err)
+			}
+		})
+
+		// Transaction's oncomplete event will be triggered
+		//once all requests in this transaction complete successfully
+		transaction.oncomplete = () => {
+			onSuccess();
+		};
+
+		request.onerror = (event) => {
+			console.error("db => error saving POS Profile.")
+			onFailure(event);
+		};
+
+	}
+
+	getAllPriceList(onSuccess , onFailure){
+		const transaction = this.db.transaction(['POS Profile'] , "readwrite");
+		const store       = transaction.objectStore('POS Profile');
+		const result      = store.getAll().onsuccess = (event) => {
+			const value = event.target.result
+			onSuccess(value);
+		}
+	}
+
+
+
+	/*********************************       Bin      ***********************************/
+	/************************************************************************************/
+	/************************************************************************************/
+
+	saveBinList( binList , onSuccess , onFailure){
+
+		const transaction = this.db.transaction(['Bin'] , "readwrite");
+		const store       = transaction.objectStore('Bin')
+
+		// Loop through the list of customers and add each one to the store
+		binList.forEach(bin => {
+			const request = store.put(bin)
+			request.onerror = (err)=>{
+				console.error("db => error saving Bin : " , bin ,  "err : " , err)
+			}
+		})
+
+		// Transaction's oncomplete event will be triggered
+		//once all requests in this transaction complete successfully
+		transaction.oncomplete = () => {
+			onSuccess();
+		};
+
+		request.onerror = (event) => {
+			console.error("db => error saving Bin.")
+			onFailure(event);
+		};
+
+	}
+
+	getAllPriceList(onSuccess , onFailure){
+		const transaction = this.db.transaction(['Bin'] , "readwrite");
+		const store       = transaction.objectStore('Bin');
+		const result      = store.getAll().onsuccess = (event) => {
+			const value = event.target.result
+			onSuccess(value);
+		}
+	}
+
+
+
+
+	/*********************************   Warehouse    ***********************************/
+	/************************************************************************************/
+	/************************************************************************************/
+
+	saveWarehouseList(warehouseList , onSuccess , onFailure){
+
+		const transaction = this.db.transaction(['Warehouse'] , "readwrite");
+		const store       = transaction.objectStore('Warehouse')
+
+		// Loop through the list of customers and add each one to the store
+		warehousesList.forEach(warehouse => {
+			const request = store.put(warehouse)
+			request.onerror = (err)=>{
+				console.error("db => error saving Warehouse : " ,warehouse ,  "err : " , err)
+			}
+		})
+
+		// Transaction's oncomplete event will be triggered
+		//once all requests in this transaction complete successfully
+		transaction.oncomplete = () => {
+			onSuccess();
+		};
+
+		request.onerror = (event) => {
+			console.error("db => error saving Warehouse List.")
+			onFailure(event);
+		};
+
+	}
+
+	getAllPriceList(onSuccess , onFailure){
+		const transaction = this.db.transaction(['Warehouse'] , "readwrite");
+		const store       = transaction.objectStore('Warehouse');
+		const result      = store.getAll().onsuccess = (event) => {
+			const value = event.target.result
+			onSuccess(value);
+		}
+	}
+
+
+
+	/*********************************   Price List   ***********************************/
+	/************************************************************************************/
+	/************************************************************************************/
+
+	savePriceLists(priceLists , onSuccess , onFailure){
+
+		const transaction = this.db.transaction(['Price List'] , "readwrite");
+		const store       = transaction.objectStore('Price List')
+
+		// Loop through the list of customers and add each one to the store
+		priceLists.forEach(priceList => {
+			const request = store.put(priceList)
+			request.onerror = (err)=>{
+				console.error("db => error saving Price List : " ,itemPrice ,  "err : " , err)
+			}
+		})
+
+		// Transaction's oncomplete event will be triggered
+		//once all requests in this transaction complete successfully
+		transaction.oncomplete = () => {
+			onSuccess();
+		};
+
+		request.onerror = (event) => {
+			console.error("db => error saving Price Lists.")
+			onFailure(event);
+		};
+
+	}
+
+	getAllPriceList(onSuccess , onFailure){
+		const transaction = this.db.transaction(['Price List'] , "readwrite");
+		const store       = transaction.objectStore('Price List');
+		const result      = store.getAll().onsuccess = (event) => {
+			const value = event.target.result
+			onSuccess(value);
+		}
+	}
+
+
+
+
+	/*********************************   Item Price   ***********************************/
+	/************************************************************************************/
+	/************************************************************************************/
+
+	saveItemPriceList(itemPriceList , onSuccess , onFailure){
+
+		const transaction = this.db.transaction(['Item Price'] , "readwrite");
+		const store       = transaction.objectStore('Item Price')
+
+		// Loop through the list of customers and add each one to the store
+		itemPriceList.forEach(itemPrice => {
+			const request = store.put(itemPrice)
+			request.onerror = (err)=>{
+				console.error("db => error saving Item Price : " ,itemPrice ,  "err : " , err)
+			}
+		})
+
+		// Transaction's oncomplete event will be triggered
+		//once all requests in this transaction complete successfully
+		transaction.oncomplete = () => {
+			onSuccess();
+		};
+
+		request.onerror = (event) => {
+			console.error("db => error saving Item Price.")
+			onFailure(event);
+		};
+
+	}
+
+	getAllItemPrice(onSuccess , onFailure){
+		const transaction = this.db.transaction(['Item Price'] , "readwrite");
+		const store       = transaction.objectStore('Item Price');
+		const result      = store.getAll().onsuccess = (event) => {
+			const value = event.target.result
+			onSuccess(value);
+		}
+	}
+
+
+	/*********************************   Item Group   ***********************************/
+	/************************************************************************************/
+	/************************************************************************************/
+
+	saveItemGroupList(itemGroupList , onSuccess , onFailure){
+
+		const transaction = this.db.transaction(['Item Group'] , "readwrite");
+		const store       = transaction.objectStore('Item Group')
+
+		// Loop through the list of customers and add each one to the store
+		itemGroupList.forEach(itemGroup => {
+			const request = store.put(itemGroup)
+			request.onerror = (err)=>{
+				console.error("db => error saving Item Group : " ,itemGroup ,  "err : " , err)
+			}
+		})
+
+		// Transaction's oncomplete event will be triggered
+		//once all requests in this transaction complete successfully
+		transaction.oncomplete = () => {
+			onSuccess();
+		};
+
+		request.onerror = (event) => {
+			console.error("db => error saving Item Group.")
+			onFailure(event);
+		};
+
+	}
+
+	getAllItemGroup(onSuccess , onFailure){
+		const transaction = this.db.transaction(['Item Group'] , "readwrite");
+		const store       = transaction.objectStore('Item Group');
+		const result      = store.getAll().onsuccess = (event) => {
+			const value = event.target.result
+			onSuccess(value);
+		}
+	}
+
+
+
+	/*********************************   cutomers   *************************************/
+	/************************************************************************************/
+	/************************************************************************************/
+
+	saveCustomerList(customerList , onSuccess , onFailure){
+
+		const transaction = this.db.transaction(['Customer'] , "readwrite");
+		const store       = transaction.objectStore('Customer')
+
+		// Loop through the list of customers and add each one to the store
+		customerList.forEach(customer => {
+			const request = store.put(customer)
+			request.onerror = (err)=>{
+				console.error("db => error saving customer : " ,customer ,  "err : " , err)
+			}
+		})
+
+		// Transaction's oncomplete event will be triggered
+		//once all requests in this transaction complete successfully
+		transaction.oncomplete = () => {
+			onSuccess();
+		};
+
+		request.onerror = (event) => {
+			console.error("db => error saving customer.")
+			onFailure(event);
+		};
+
+	}
+
+	getAllCustomers(onSuccess , onFailure){
+		const transaction = this.db.transaction(['Customer'] , "readwrite");
+		const store       = transaction.objectStore('Customer');
+		const result      = store.getAll().onsuccess = (event) => {
+			const value = event.target.result
+			onSuccess(value);
+		}
+	}
+
+
+
+
+
 	/****************************** pos invoice *********************************/
+	/****************************************************************************/
+	/****************************************************************************/
+
 	savePosInvoice(posInvoice , onSuccess , onFailure){
 
 		const transaction = this.db.transaction(['POS Invoice'] , "readwrite");

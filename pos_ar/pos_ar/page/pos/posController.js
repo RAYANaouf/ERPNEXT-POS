@@ -41,11 +41,13 @@ pos_ar.PointOfSale.Controller = class {
 	 async start_app(){
 		try{
 			//init db
-			this.db = await pos_ar.PointOfSale.pos_db.openDatabase();
+			this.db            = await pos_ar.PointOfSale.pos_db.openDatabase();
 			//data classes
 			this.settings_data = new pos_ar.PointOfSale.posSettingsData(this.db)
 			//api fetch handler
 			this.dataHandler   = new pos_ar.PointOfSale.FetchHandler(this.db)
+			//local app data
+			this.appData       = new pos_ar.PointOfSale.posAppData(this.db)
 
 			this.prepare_container();
 			//prepare app data
