@@ -2926,7 +2926,7 @@
         };
       });
     }
-    saveItemGroupList(itemGroupList, onSuccess, onFailure) {
+    saveItemGroupList(itemGroupList, onSuccess2, onFailure2) {
       return new Promise((resolve, reject) => {
         const transaction = this.db.transaction(["Item Group"], "readwrite");
         const store = transaction.objectStore("Item Group");
@@ -2937,20 +2937,20 @@
           };
         });
         transaction.oncomplete = () => {
-          onSuccess();
+          onSuccess2();
         };
         request.onerror = (event2) => {
           console.error("db => error saving Item Group.");
-          onFailure(event2);
+          onFailure2(event2);
         };
       });
     }
-    getAllItemGroup(onSuccess, onFailure) {
+    getAllItemGroup(onSuccess2, onFailure2) {
       const transaction = this.db.transaction(["Item Group"], "readwrite");
       const store = transaction.objectStore("Item Group");
       const result = store.getAll().onsuccess = (event2) => {
         const value = event2.target.result;
-        onSuccess(value);
+        onSuccess2(value);
       };
     }
     saveCustomerList(customerList) {
@@ -3085,79 +3085,97 @@
         };
       });
     }
-    deleteAllSettings(onSuccess, onFailure) {
-      const transaction = this.db.transaction(["POS Invoice"], "readwrite");
-      const store = transaction.objectStore("POS Invoice");
-      const request2 = store.clear();
-      request2.onsuccess = (event2) => {
-        onSuccess(event2);
-      };
-      request2.onerror = (event2) => {
-        onFailure(event2);
-      };
+    deleteAllSettings() {
+      return new Promise((resolve, reject) => {
+        const transaction = this.db.transaction(["POS Invoice"], "readwrite");
+        const store = transaction.objectStore("POS Invoice");
+        const request2 = store.clear();
+        request2.onsuccess = () => {
+          resolve();
+        };
+        request2.onerror = (err) => {
+          onFailure(err);
+        };
+      });
     }
-    saveCheckInOut(checkInOut, onSuccess, onFailure) {
-      const transaction = this.db.transaction(["check_in_out"], "readwrite");
-      const store = transaction.objectStore("check_in_out");
-      const request2 = store.put(checkInOut);
-      request2.onsuccess = (event2) => {
-        onSuccess(event2);
-      };
-      request2.onerror = (event2) => {
-        onFailure(event2);
-      };
+    saveCheckInOut(checkInOut) {
+      return new Promise((resolve, reject) => {
+        const transaction = this.db.transaction(["check_in_out"], "readwrite");
+        const store = transaction.objectStore("check_in_out");
+        const request2 = store.put(checkInOut);
+        request2.onsuccess = (event2) => {
+          onSuccess(event2.target.result);
+        };
+        request2.onerror = (err) => {
+          onFailure(err);
+        };
+      });
     }
-    getAllCheckInOut(onSuccess, onFailure) {
-      const transaction = this.db.transaction(["check_in_out"], "readwrite");
-      const store = transaction.objectStore("check_in_out");
-      const result = store.getAll().onsuccess = (event2) => {
-        const value = event2.target.result;
-        onSuccess(value);
-      };
+    getAllCheckInOut() {
+      return new Promise((resolve, reject) => {
+        const transaction = this.db.transaction(["check_in_out"], "readwrite");
+        const store = transaction.objectStore("check_in_out");
+        const result = store.getAll();
+        result.onsuccess = (event2) => {
+          const value = event2.target.result;
+          resolve(value);
+        };
+        result.onerror = (err) => {
+          reject(err);
+        };
+      });
     }
-    deleteAllCheckInOut(onSuccess, onFailure) {
-      const transaction = this.db.transaction(["check_in_out"], "readwrite");
-      const store = transaction.objectStore("check_in_out");
-      const request2 = store.clear();
-      request2.onsuccess = (event2) => {
-        onSuccess(event2);
-      };
-      request2.onerror = (event2) => {
-        onFailure(event2);
-      };
+    deleteAllCheckInOut() {
+      return new Promise((resolve, reject) => {
+        const transaction = this.db.transaction(["check_in_out"], "readwrite");
+        const store = transaction.objectStore("check_in_out");
+        const request2 = store.clear();
+        request2.onsuccess = () => {
+          resolve();
+        };
+        request2.onerror = (err) => {
+          reject(err);
+        };
+      });
     }
-    updateSettings(settings, onSuccess, onFailure) {
-      const transaction = this.db.transaction(["POS Settings"], "readwrite");
-      const store = transaction.objectStore("POS Settings");
-      const request2 = store.put(__spreadValues({ id: 1 }, settings));
-      request2.onsuccess = (event2) => {
-        onSuccess(event2);
-      };
-      request2.onerror = (event2) => {
-        onFailure(event2);
-      };
+    updateSettings(settings) {
+      return new Promise((resolve, reject) => {
+        const transaction = this.db.transaction(["POS Settings"], "readwrite");
+        const store = transaction.objectStore("POS Settings");
+        const request2 = store.put(__spreadValues({ id: 1 }, settings));
+        request2.onsuccess = (event2) => {
+          resolve(event2.target.result);
+        };
+        request2.onerror = (err) => {
+          reject(err);
+        };
+      });
     }
-    getSettings(onSuccess, onFailure) {
-      const transaction = this.db.transaction(["POS Settings"], "readwrite");
-      const store = transaction.objectStore("POS Settings");
-      const request2 = store.get(1);
-      request2.onsuccess = (event2) => {
-        onSuccess(event2.target.result);
-      };
-      request2.onerror = (event2) => {
-        onFailure(event2);
-      };
+    getSettings() {
+      return new Promise((resolve, reject) => {
+        const transaction = this.db.transaction(["POS Settings"], "readwrite");
+        const store = transaction.objectStore("POS Settings");
+        const request2 = store.get(1);
+        request2.onsuccess = (event2) => {
+          resolve(event2.target.result);
+        };
+        request2.onerror = (err) => {
+          reject(err);
+        };
+      });
     }
-    deleteAllSettings(onSuccess, onFailure) {
-      const transaction = this.db.transaction(["POS Settings"], "readwrite");
-      const store = transaction.objectStore("POS Settings");
-      const request2 = store.clear();
-      request2.onsuccess = (event2) => {
-        onSuccess(event2);
-      };
-      request2.onerror = (event2) => {
-        onFailure(event2);
-      };
+    deleteAllSettings() {
+      return new Promise((resolve, reject) => {
+        const transaction = this.db.transaction(["POS Settings"], "readwrite");
+        const store = transaction.objectStore("POS Settings");
+        const request2 = store.clear();
+        request2.onsuccess = () => {
+          resolve();
+        };
+        request2.onerror = (err) => {
+          reject(err);
+        };
+      });
     }
   };
 
@@ -3490,13 +3508,13 @@
     getAllPriceBases() {
       return this.price_bases;
     }
-    setPriceItemBasedOn(base, onSuccess, onFailure) {
+    setPriceItemBasedOn(base, onSuccess2, onFailure2) {
       if (this.price_bases.includes(base)) {
         this.settings.itemPriceBasedOn = base;
         this.db.updateSettings(
           this.settings,
           () => {
-            onSuccess();
+            onSuccess2();
             console.log("settings update is save successfuly");
           },
           () => {
@@ -3668,4 +3686,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.T5XTSL6C.js.map
+//# sourceMappingURL=pos.bundle.NEV3NLVI.js.map

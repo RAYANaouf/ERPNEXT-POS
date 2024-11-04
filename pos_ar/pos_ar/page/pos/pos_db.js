@@ -558,112 +558,112 @@ pos_ar.PointOfSale.pos_db  = class POSDatabase {
 		})
 	}
 
-	deleteAllSettings(onSuccess, onFailure) {
-		const transaction = this.db.transaction(['POS Invoice'], 'readwrite');
-		const store = transaction.objectStore('POS Invoice');
-
-		const request = store.clear(); // Clear all entries in the store
-
-		request.onsuccess = (event) => {
-			onSuccess(event);
-		};
-
-		request.onerror = (event) => {
-			onFailure(event);
-		};
+	deleteAllSettings() {
+		return new Promise((resolve,reject)=>{
+			const transaction = this.db.transaction(['POS Invoice'], 'readwrite');
+			const store = transaction.objectStore('POS Invoice');
+			const request = store.clear(); // Clear all entries in the store
+			request.onsuccess = () => {
+				resolve();
+			};
+			request.onerror = (err) => {
+				onFailure(err);
+			};
+		})
 	}
 
 
 
 	/********************************* check_in_out ***********************************************/
-	saveCheckInOut(checkInOut , onSuccess , onFailure){
-
-		const transaction = this.db.transaction(['check_in_out'] , "readwrite");
-		const store       = transaction.objectStore('check_in_out')
-		const request     = store.put(checkInOut)
-
-		request.onsuccess = (event) => {
-			onSuccess(event);
-		};
-
-		request.onerror = (event) => {
-			onFailure(event);
-		};
+	saveCheckInOut(checkInOut){
+		return new Promise((resolve,reject)=>{
+			const transaction = this.db.transaction(['check_in_out'] , "readwrite");
+			const store       = transaction.objectStore('check_in_out')
+			const request     = store.put(checkInOut)
+			request.onsuccess = (event) => {
+				onSuccess(event.target.result);
+			};
+			request.onerror = (err) => {
+				onFailure(err);
+			};
+		})
 
 	}
 
-	getAllCheckInOut(onSuccess , onFailure){
-		const transaction = this.db.transaction(['check_in_out'] , "readwrite");
-		const store       = transaction.objectStore('check_in_out');
-		const result      = store.getAll().onsuccess = (event) => {
-			const value = event.target.result
-			onSuccess(value);
-		}
+	getAllCheckInOut(){
+		return new Promise((resolve,reject)=>{
+			const transaction = this.db.transaction(['check_in_out'] , "readwrite");
+			const store       = transaction.objectStore('check_in_out');
+			const result      = store.getAll()
+			result.onsuccess = (event) => {
+				const value = event.target.result
+				resolve(value);
+			}
+			result.onerror = (err)=>{
+				reject(err)
+			}
+		})
 	}
 
-	deleteAllCheckInOut(onSuccess, onFailure) {
-		const transaction = this.db.transaction(['check_in_out'], 'readwrite');
-		const store = transaction.objectStore('check_in_out');
-
-		const request = store.clear(); // Clear all entries in the store
-
-		request.onsuccess = (event) => {
-			onSuccess(event);
-		};
-
-		request.onerror = (event) => {
-			onFailure(event);
-		};
+	deleteAllCheckInOut() {
+		return new Promise((resolve,reject)=>{
+			const transaction = this.db.transaction(['check_in_out'], 'readwrite');
+			const store = transaction.objectStore('check_in_out');
+			const request = store.clear(); // Clear all entries in the store
+			request.onsuccess = () => {
+				resolve();
+			};
+			request.onerror = (err) => {
+				reject(err);
+			};
+		})
 	}
 
 	/****************************** pos settings *********************************/
 	/*****************************************************************************/
 	/*****************************************************************************/
 
-	updateSettings(settings , onSuccess , onFailure){
-		const transaction = this.db.transaction(['POS Settings'] , "readwrite");
-		const store       = transaction.objectStore('POS Settings')
-		const request     = store.put({id : 1 , ...settings});
-
-		request.onsuccess = (event) => {
-			onSuccess(event);
-		};
-
-		request.onerror = (event) => {
-			onFailure(event);
-		};
+	updateSettings(settings){
+		return new Promise((resolve,reject)=>{
+			const transaction = this.db.transaction(['POS Settings'] , "readwrite");
+			const store       = transaction.objectStore('POS Settings')
+			const request     = store.put({id : 1 , ...settings});
+			request.onsuccess = (event) => {
+				resolve(event.target.result);
+			};
+			request.onerror = (err) => {
+				reject(err);
+			};
+		})
 	}
 
 
-	getSettings(onSuccess, onFailure) {
-
-		const transaction = this.db.transaction(['POS Settings'], 'readwrite');
-		const store = transaction.objectStore('POS Settings');
-
-		const request = store.get(1); // Get the settings using the unique ID
-
-		request.onsuccess = (event) => {
-			onSuccess(event.target.result);
-		};
-
-		request.onerror = (event) => {
-			onFailure(event);
-		};
+	getSettings() {
+		return new Promise((resolve,reject)=>{
+			const transaction = this.db.transaction(['POS Settings'], 'readwrite');
+			const store = transaction.objectStore('POS Settings');
+			const request = store.get(1); // Get the settings using the unique ID
+			request.onsuccess = (event) => {
+				resolve(event.target.result);
+			};
+			request.onerror = (err) => {
+				reject(err);
+			};
+		})
 	}
 
-	deleteAllSettings(onSuccess, onFailure) {
-		const transaction = this.db.transaction(['POS Settings'], 'readwrite');
-		const store = transaction.objectStore('POS Settings');
-
-		const request = store.clear(); // Clear all entries in the store
-
-		request.onsuccess = (event) => {
-			onSuccess(event);
-		};
-
-		request.onerror = (event) => {
-			onFailure(event);
-		};
+	deleteAllSettings() {
+		return new Promise((resolve,reject)=>{
+			const transaction = this.db.transaction(['POS Settings'], 'readwrite');
+			const store = transaction.objectStore('POS Settings');
+			const request = store.clear(); // Clear all entries in the store
+			request.onsuccess = () => {
+				resolve();
+			};
+			request.onerror = (err) => {
+				reject(err);
+			};
+		})
 	}
 
 }
