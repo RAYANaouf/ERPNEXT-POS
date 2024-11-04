@@ -6,10 +6,11 @@ pos_ar.PointOfSale.posSettingsData = class{
 		this.db = db;
 		//Array of valid price bases
 		this.price_bases = ['brand' , 'priceList']
+		console.log("hello from setting class")
 		//Default setting (it could be more)
 		this.db.getSettings(
 			(res)=>{
-
+				console.log("debuging : we are here1")
 				if(res && res.itemPriceBasedOn){
 					this.settings = res
 				}else{

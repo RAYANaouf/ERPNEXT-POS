@@ -3120,18 +3120,16 @@
         };
       });
     }
-    getSettings() {
-      return new Promise((resolve, reject) => {
-        const transaction = this.db.transaction(["POS Settings"], "readwrite");
-        const store = transaction.objectStore("POS Settings");
-        const request2 = store.get(1);
-        request2.onsuccess = (event2) => {
-          resolve(event2.target.result);
-        };
-        request2.onerror = (err) => {
-          reject(err);
-        };
-      });
+    getSettings(onSuccess, onFailure) {
+      const transaction = this.db.transaction(["POS Settings"], "readwrite");
+      const store = transaction.objectStore("POS Settings");
+      const request2 = store.get(1);
+      request2.onsuccess = (event2) => {
+        onSuccess(event2.target.result);
+      };
+      request2.onerror = (err) => {
+        onFailure(err);
+      };
     }
     deleteAllSettings() {
       return new Promise((resolve, reject) => {
@@ -3451,8 +3449,10 @@
     constructor(db) {
       this.db = db;
       this.price_bases = ["brand", "priceList"];
+      console.log("hello from setting class");
       this.db.getSettings(
         (res) => {
+          console.log("debuging : we are here1");
           if (res && res.itemPriceBasedOn) {
             this.settings = res;
           } else {
@@ -3712,4 +3712,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.DMXFXZET.js.map
+//# sourceMappingURL=pos.bundle.XHOQDH7Y.js.map

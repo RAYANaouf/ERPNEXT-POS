@@ -635,18 +635,16 @@ pos_ar.PointOfSale.pos_db  = class POSDatabase {
 	}
 
 
-	getSettings() {
-		return new Promise((resolve,reject)=>{
-			const transaction = this.db.transaction(['POS Settings'], 'readwrite');
-			const store = transaction.objectStore('POS Settings');
-			const request = store.get(1); // Get the settings using the unique ID
-			request.onsuccess = (event) => {
-				resolve(event.target.result);
-			};
-			request.onerror = (err) => {
-				reject(err);
-			};
-		})
+	getSettings(onSuccess,onFailure) {
+		const transaction = this.db.transaction(['POS Settings'], 'readwrite');
+		const store = transaction.objectStore('POS Settings');
+		const request = store.get(1); // Get the settings using the unique ID
+		request.onsuccess = (event) => {
+			onSuccess(event.target.result);
+		};
+		request.onerror = (err) => {
+			onFailure(err);
+		};
 	}
 
 	deleteAllSettings() {
