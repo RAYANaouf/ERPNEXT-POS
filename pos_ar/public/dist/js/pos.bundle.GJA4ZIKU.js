@@ -2896,30 +2896,40 @@
         onSuccess(value);
       };
     }
-    saveCustomerList(customerList, onSuccess, onFailure) {
-      const transaction = this.db.transaction(["Customer"], "readwrite");
-      const store = transaction.objectStore("Customer");
-      customerList.forEach((customer) => {
-        const request2 = store.put(customer);
-        request2.onerror = (err) => {
-          console.error("db => error saving customer : ", customer, "err : ", err);
+    saveCustomerList(customerList) {
+      return new Promise((resolve, reject) => {
+        const transaction = this.db.transaction(["Customer"], "readonly");
+        const store = transaction.objectStore("Customer");
+        customerList.forEach((customer) => {
+          const request2 = store.put(customer);
+          request2.onerror = (err) => {
+            console.error("db => error saving customer : ", customer, "err : ", err);
+            reject(err);
+          };
+        });
+        transaction.oncomplete = () => {
+          resolve();
+        };
+        request.onerror = (event2) => {
+          console.error("db => error saving customer.");
+          reject(event2);
         };
       });
-      transaction.oncomplete = () => {
-        onSuccess();
-      };
-      request.onerror = (event2) => {
-        console.error("db => error saving customer.");
-        onFailure(event2);
-      };
     }
-    getAllCustomers(onSuccess, onFailure) {
-      const transaction = this.db.transaction(["Customer"], "readwrite");
-      const store = transaction.objectStore("Customer");
-      const result = store.getAll().onsuccess = (event2) => {
-        const value = event2.target.result;
-        onSuccess(value);
-      };
+    getAllCustomers() {
+      return new Promise((resolve, reject) => {
+        const transaction = this.db.transaction(["Customer"], "readonly");
+        const store = transaction.objectStore("Customer");
+        const result = store.getAll();
+        result.onsuccess = (event2) => {
+          const value = event2.target.result;
+          resolve(value);
+        };
+        result.onerror = (value) => {
+          console.error("error when getting customer from db");
+          reject(event);
+        };
+      });
     }
     savePosInvoice(posInvoice, onSuccess, onFailure) {
       const transaction = this.db.transaction(["POS Invoice"], "readwrite");
@@ -3428,14 +3438,12 @@
   pos_ar.PointOfSale.posAppData = class {
     constructor(db) {
       this.db = db;
-      this.db.getAllCustomers(
-        (res) => {
-          console.log("local customer", res);
-        },
-        (err) => {
-          console.log("error geting local customer list");
-        }
-      );
+      this.appData = {};
+      this.getCustomers();
+    }
+    async getCustomers() {
+      this.appData.customers = await this.db.getAllCustomers();
+      console.log("local > ", this.appData.customers);
     }
   };
 
@@ -3570,4 +3578,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.7XDYMD55.js.map
+//# sourceMappingURL=pos.bundle.GJA4ZIKU.js.map

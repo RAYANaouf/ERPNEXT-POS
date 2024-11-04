@@ -4,15 +4,16 @@ pos_ar.PointOfSale.posAppData = class {
 		db
 	){
 		this.db = db;
-		//get local customer
-		this.db.getAllCustomers(
-			(res)=>{
-				console.log("local customer" , res)
-			},(err)=>{
-				console.log("error geting local customer list")
-			}
-		)
+		this.appData = {} ;
+		this.getCustomers()
 	}
+
+	async getCustomers(){
+		//get local customer
+		this.appData.customers = await this.db.getAllCustomers();
+		console.log("local > " , this.appData.customers)
+	}
+
 
 
 }

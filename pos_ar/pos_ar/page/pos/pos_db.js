@@ -370,39 +370,49 @@ pos_ar.PointOfSale.pos_db  = class POSDatabase {
 	/************************************************************************************/
 	/************************************************************************************/
 
-	saveCustomerList(customerList , onSuccess , onFailure){
+	saveCustomerList(customerList ){
 
-		const transaction = this.db.transaction(['Customer'] , "readwrite");
-		const store       = transaction.objectStore('Customer')
+		return new Promise((resolve,reject) => {
+			const transaction = this.db.transaction(['Customer'] , "readonly");
+			const store       = transaction.objectStore('Customer')
 
-		// Loop through the list of customers and add each one to the store
-		customerList.forEach(customer => {
-			const request = store.put(customer)
-			request.onerror = (err)=>{
-				console.error("db => error saving customer : " ,customer ,  "err : " , err)
-			}
+			// Loop through the list of customers and add each one to the store
+			customerList.forEach(customer => {
+				const request = store.put(customer)
+				request.onerror = (err)=>{
+					console.error("db => error saving customer : " ,customer ,  "err : " , err)
+					reject(err)
+				}
+			})
+
+			// Transaction's oncomplete event will be triggered
+			//once all requests in this transaction complete successfully
+			transaction.oncomplete = () => {
+				resolve();
+			};
+
+			request.onerror = (event) => {
+				console.error("db => error saving customer.")
+				reject(event)
+			};
+
 		})
-
-		// Transaction's oncomplete event will be triggered
-		//once all requests in this transaction complete successfully
-		transaction.oncomplete = () => {
-			onSuccess();
-		};
-
-		request.onerror = (event) => {
-			console.error("db => error saving customer.")
-			onFailure(event);
-		};
-
 	}
 
-	getAllCustomers(onSuccess , onFailure){
-		const transaction = this.db.transaction(['Customer'] , "readwrite");
-		const store       = transaction.objectStore('Customer');
-		const result      = store.getAll().onsuccess = (event) => {
-			const value = event.target.result
-			onSuccess(value);
-		}
+	getAllCustomers(){
+		return new Promise((resolve,reject)=>{
+			const transaction = this.db.transaction(['Customer'] , "readonly");
+			const store       = transaction.objectStore('Customer');
+			const result      = store.getAll()
+			result.onsuccess = (event) => {
+				const value = event.target.result
+				resolve(value)
+			}
+			result.onerror = (value)=>{
+				console.error("error when getting customer from db")
+				reject(event)
+			}
+		})
 	}
 
 
