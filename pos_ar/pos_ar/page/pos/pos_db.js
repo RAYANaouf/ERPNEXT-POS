@@ -359,39 +359,43 @@ pos_ar.PointOfSale.pos_db  = class POSDatabase {
 	/************************************************************************************/
 	/************************************************************************************/
 
-	saveItemGroupList(itemGroupList , onSuccess , onFailure){
+	saveItemGroupList(itemGroupList){
 		return new Promise((resolve,reject)=>{
 			const transaction = this.db.transaction(['Item Group'] , "readwrite");
 			const store       = transaction.objectStore('Item Group')
-
 			// Loop through the list of customers and add each one to the store
 			itemGroupList.forEach(itemGroup => {
 				const request = store.put(itemGroup)
 				request.onerror = (err)=>{
+					reject(err);
 					console.error("db => error saving Item Group : " ,itemGroup ,  "err : " , err)
 				}
 			})
-
 			// Transaction's oncomplete event will be triggered
 			//once all requests in this transaction complete successfully
 			transaction.oncomplete = () => {
-				onSuccess();
+				resolve();
 			};
-
-			request.onerror = (event) => {
+			request.onerror = (err) => {
 				console.error("db => error saving Item Group.")
-				onFailure(event);
+				reject(err);
 			};
 		})
 	}
 
-	getAllItemGroup(onSuccess , onFailure){
-		const transaction = this.db.transaction(['Item Group'] , "readwrite");
-		const store       = transaction.objectStore('Item Group');
-		const result      = store.getAll().onsuccess = (event) => {
-			const value = event.target.result
-			onSuccess(value);
-		}
+	getAllItemGroup(){
+		return new Promise((resolve,reject)=>{
+			const transaction = this.db.transaction(['Item Group'] , "readwrite");
+			const store       = transaction.objectStore('Item Group');
+			const result      = store.getAll()
+			result.onsuccess = (event) => {
+				const value = event.target.result
+				resolve(value);
+			}
+			result.onerror = (err)=>{
+				reject(err);
+			}
+		})
 	}
 
 
@@ -510,37 +514,33 @@ pos_ar.PointOfSale.pos_db  = class POSDatabase {
 
 	}
 
-	getNotSyncedPosNumber(){
-		return new Promise((resolve,reject)=>{
+	getNotSyncedPosNumber(onSuccess,onFailure){
 			const transaction_posInvoice     = this.db.transaction(['POS Invoice'] , "readwrite");
 			const store_posInvoice           = transaction_posInvoice.objectStore('POS Invoice');
 			const index_docstatus_posInvoice = store_posInvoice.index('docstatus');
 			const request = index_docstatus_posInvoice.getAll(1);
 			request.onsuccess = (result) => {
 				const filtredResult = result.target.result.filter(invoice => invoice.synced == false )
-				resolve(filtredResult.length);
+				onSuccess(filtredResult.length);
 			}
 			request.onerror = (err) => {
-				reject(err);
+				onFailure(err);
 			}
-		})
 	}
 
 
-	getNotSyncedPos(){
-		return new Promise((resolve,reject)=>{
-			const transaction_posInvoice     = this.db.transaction(['POS Invoice'] , "readwrite");
-			const store_posInvoice           = transaction_posInvoice.objectStore('POS Invoice');
-			const index_docstatus_posInvoice = store_posInvoice.index('docstatus');
-			const request = index_docstatus_posInvoice.getAll(1);
-			request.onsuccess = (result) => {
-				const filtredResult = result.target.result.filter(invoice => invoice.synced == false )
-				resolve(filtredResult);
-			}
-			request.onerror = (err) => {
-				reject(err);
-			}
-		})
+	getNotSyncedPos(onSuccess,onFailure){
+		const transaction_posInvoice     = this.db.transaction(['POS Invoice'] , "readwrite");
+		const store_posInvoice           = transaction_posInvoice.objectStore('POS Invoice');
+		const index_docstatus_posInvoice = store_posInvoice.index('docstatus');
+		const request = index_docstatus_posInvoice.getAll(1);
+		request.onsuccess = (result) => {
+			const filtredResult = result.target.result.filter(invoice => invoice.synced == false )
+			onSuccess(filtredResult);
+		}
+		request.onerror = (err) => {
+			onFailure(err);
+		}
 	}
 
 	// New delete function to remove a POS Invoice
@@ -567,7 +567,7 @@ pos_ar.PointOfSale.pos_db  = class POSDatabase {
 				resolve();
 			};
 			request.onerror = (err) => {
-				onFailure(err);
+				reject(err);
 			};
 		})
 	}
@@ -575,19 +575,16 @@ pos_ar.PointOfSale.pos_db  = class POSDatabase {
 
 
 	/********************************* check_in_out ***********************************************/
-	saveCheckInOut(checkInOut){
-		return new Promise((resolve,reject)=>{
-			const transaction = this.db.transaction(['check_in_out'] , "readwrite");
-			const store       = transaction.objectStore('check_in_out')
-			const request     = store.put(checkInOut)
-			request.onsuccess = (event) => {
-				onSuccess(event.target.result);
-			};
-			request.onerror = (err) => {
-				onFailure(err);
-			};
-		})
-
+	saveCheckInOut(checkInOut,onSuccess,onFailure){
+		const transaction = this.db.transaction(['check_in_out'] , "readwrite");
+		const store       = transaction.objectStore('check_in_out')
+		const request     = store.put(checkInOut)
+		request.onsuccess = (event) => {
+			onSuccess(event.target.result);
+		};
+		request.onerror = (err) => {
+			onFailure(err);
+		};
 	}
 
 	getAllCheckInOut(){

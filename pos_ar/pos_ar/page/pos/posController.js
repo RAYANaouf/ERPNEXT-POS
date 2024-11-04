@@ -45,9 +45,9 @@ pos_ar.PointOfSale.Controller = class {
 			//data classes
 			this.settings_data = new pos_ar.PointOfSale.posSettingsData(this.db)
 			//api fetch handler
-			this.dataHandler   = new pos_ar.PointOfSale.FetchHandler(this.db)
+			this.dataHandler   = new pos_ar.PointOfSale.FetchHandler()
 			//local app data
-			this.appData       = new pos_ar.PointOfSale.posAppData(this.db)
+			this.appData       = new pos_ar.PointOfSale.posAppData(this.db , this.dataHandler)
 
 			this.prepare_container();
 			//prepare app data
@@ -475,7 +475,7 @@ pos_ar.PointOfSale.Controller = class {
 	}
 
 	saveCheckInOut(checkInOut){
-		this.db.saveCheckInOut(
+		this.appData.saveCheckInOut(
 			checkInOut,
 			(res)=>{
 				console.log('res : ' , res)
@@ -501,15 +501,7 @@ pos_ar.PointOfSale.Controller = class {
 			return ;
 		}
 		this.selectedItemMaps.get(this.selectedTab.tabName).synced = false ;
-		this.db.savePosInvoice(
-					this.selectedItemMaps.get(this.selectedTab.tabName),
-					(event) => {
-						console.log("sucess => " , event )
-					},
-					(event) => {
-						console.log("failure => " , event )
-					}
-				)
+		this.appData.savePosInvoice(this.selectedItemMaps.get(this.selectedTab.tabName))
 		//show
 		this.payment_cart.showCart();
 		//hide
@@ -923,30 +915,14 @@ pos_ar.PointOfSale.Controller = class {
 			frappe.db.insert(
 				pos
 			).then(r =>{
-				this.db.updatePosInvoice(
-							pos,
-							(event) => {
-								console.log("db sucess => "  , event )
-							},
-							(event) => {
-								console.log("failure => " , event )
-							}
-						)
+				this.appData.updatePosInvoice(pos)
 			}).catch(err=>{
 				console.log("cant push pos invoice : " , err);
 			})
 		}
 		else{
 			pos.synced = false ;
-			this.db.updatePosInvoice(
-						pos ,
-						(event) => {
-							console.log("sucess => " , event )
-						},
-						(event) => {
-							console.log("failure => " , event )
-						}
-					)
+			this.appData.updatePosInvoice(pos)
 			this.unsyncedPos += 1 ;
 			this.customer_box.setNotSynced(this.unsyncedPos);
 		}
@@ -990,7 +966,7 @@ pos_ar.PointOfSale.Controller = class {
 		let failure     = 0  ;
 		let seccess     = 0  ;
 
-		this.db.getNotSyncedPos(
+		this.appData.getNotSyncedPos(
 			(allUnsyncedPos) =>{
 
 				//create progress bar
@@ -1004,15 +980,7 @@ pos_ar.PointOfSale.Controller = class {
 					).then(r =>{
 						const updatedPos = structuredClone(pos)
 						updatedPos.synced = true;
-						this.db.updatePosInvoice(
-								updatedPos,
-								(event) => {
-									console.log("sucess => " , event )
-								},
-								(event) => {
-									console.log("failure => " , event )
-								}
-							)
+						this.appData.updatePosInvoice(updatedPos)
 						counter += 1 ;
 						frappe.show_progress('Syncing Invoices...' , counter , allUnsyncedPos.length , 'syncing')
 						//if the last pos save seccessfully then hide the progress bar
@@ -1166,7 +1134,7 @@ pos_ar.PointOfSale.Controller = class {
 	}
 
 	checkUnSyncedPos(){
-		this.db.getNotSyncedPosNumber(
+		this.appData.getNotSyncedPosNumber(
 			(result)=>{
 				console.log(`there are ${result} POS to sync`)
 				this.unsyncedPos = result

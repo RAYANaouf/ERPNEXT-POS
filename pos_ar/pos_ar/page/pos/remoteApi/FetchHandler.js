@@ -1,9 +1,7 @@
 pos_ar.PointOfSale.FetchHandler = class FetchHandler{
 
-	constructor(
-		db
-	){
-		this.db = db;
+	constructor(){
+
 	}
 
 

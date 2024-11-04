@@ -48,8 +48,8 @@
       try {
         this.db = await pos_ar.PointOfSale.pos_db.openDatabase();
         this.settings_data = new pos_ar.PointOfSale.posSettingsData(this.db);
-        this.dataHandler = new pos_ar.PointOfSale.FetchHandler(this.db);
-        this.appData = new pos_ar.PointOfSale.posAppData(this.db);
+        this.dataHandler = new pos_ar.PointOfSale.FetchHandler();
+        this.appData = new pos_ar.PointOfSale.posAppData(this.db, this.dataHandler);
         this.prepare_container();
         await this.prepare_app_data();
         await this.checkForPOSEntry();
@@ -416,7 +416,7 @@
       this.item_details.refreshDate(item);
     }
     saveCheckInOut(checkInOut) {
-      this.db.saveCheckInOut(
+      this.appData.saveCheckInOut(
         checkInOut,
         (res) => {
           console.log("res : ", res);
@@ -438,15 +438,7 @@
         return;
       }
       this.selectedItemMaps.get(this.selectedTab.tabName).synced = false;
-      this.db.savePosInvoice(
-        this.selectedItemMaps.get(this.selectedTab.tabName),
-        (event2) => {
-          console.log("sucess => ", event2);
-        },
-        (event2) => {
-          console.log("failure => ", event2);
-        }
-      );
+      this.appData.savePosInvoice(this.selectedItemMaps.get(this.selectedTab.tabName));
       this.payment_cart.showCart();
       this.item_selector.hideCart();
       this.item_details.hide_cart();
@@ -723,29 +715,13 @@
         frappe.db.insert(
           pos
         ).then((r) => {
-          this.db.updatePosInvoice(
-            pos,
-            (event2) => {
-              console.log("db sucess => ", event2);
-            },
-            (event2) => {
-              console.log("failure => ", event2);
-            }
-          );
+          this.appData.updatePosInvoice(pos);
         }).catch((err) => {
           console.log("cant push pos invoice : ", err);
         });
       } else {
         pos.synced = false;
-        this.db.updatePosInvoice(
-          pos,
-          (event2) => {
-            console.log("sucess => ", event2);
-          },
-          (event2) => {
-            console.log("failure => ", event2);
-          }
-        );
+        this.appData.updatePosInvoice(pos);
         this.unsyncedPos += 1;
         this.customer_box.setNotSynced(this.unsyncedPos);
       }
@@ -776,7 +752,7 @@
       let counter = 0;
       let failure = 0;
       let seccess = 0;
-      this.db.getNotSyncedPos(
+      this.appData.getNotSyncedPos(
         (allUnsyncedPos) => {
           frappe.show_progress("Syncing Invoices...", 0, allUnsyncedPos.length, "syncing");
           allUnsyncedPos.forEach((pos) => {
@@ -785,15 +761,7 @@
             ).then((r) => {
               const updatedPos = structuredClone(pos);
               updatedPos.synced = true;
-              this.db.updatePosInvoice(
-                updatedPos,
-                (event2) => {
-                  console.log("sucess => ", event2);
-                },
-                (event2) => {
-                  console.log("failure => ", event2);
-                }
-              );
+              this.appData.updatePosInvoice(updatedPos);
               counter += 1;
               frappe.show_progress("Syncing Invoices...", counter, allUnsyncedPos.length, "syncing");
               if (counter == allUnsyncedPos.length) {
@@ -891,7 +859,7 @@
       }
     }
     checkUnSyncedPos() {
-      this.db.getNotSyncedPosNumber(
+      this.appData.getNotSyncedPosNumber(
         (result) => {
           console.log(`there are ${result} POS to sync`);
           this.unsyncedPos = result;
@@ -2926,32 +2894,39 @@
         };
       });
     }
-    saveItemGroupList(itemGroupList, onSuccess2, onFailure2) {
+    saveItemGroupList(itemGroupList) {
       return new Promise((resolve, reject) => {
         const transaction = this.db.transaction(["Item Group"], "readwrite");
         const store = transaction.objectStore("Item Group");
         itemGroupList.forEach((itemGroup) => {
           const request2 = store.put(itemGroup);
           request2.onerror = (err) => {
+            reject(err);
             console.error("db => error saving Item Group : ", itemGroup, "err : ", err);
           };
         });
         transaction.oncomplete = () => {
-          onSuccess2();
+          resolve();
         };
-        request.onerror = (event2) => {
+        request.onerror = (err) => {
           console.error("db => error saving Item Group.");
-          onFailure2(event2);
+          reject(err);
         };
       });
     }
-    getAllItemGroup(onSuccess2, onFailure2) {
-      const transaction = this.db.transaction(["Item Group"], "readwrite");
-      const store = transaction.objectStore("Item Group");
-      const result = store.getAll().onsuccess = (event2) => {
-        const value = event2.target.result;
-        onSuccess2(value);
-      };
+    getAllItemGroup() {
+      return new Promise((resolve, reject) => {
+        const transaction = this.db.transaction(["Item Group"], "readwrite");
+        const store = transaction.objectStore("Item Group");
+        const result = store.getAll();
+        result.onsuccess = (event2) => {
+          const value = event2.target.result;
+          resolve(value);
+        };
+        result.onerror = (err) => {
+          reject(err);
+        };
+      });
     }
     saveCustomerList(customerList) {
       return new Promise((resolve, reject) => {
@@ -3042,35 +3017,31 @@
         };
       });
     }
-    getNotSyncedPosNumber() {
-      return new Promise((resolve, reject) => {
-        const transaction_posInvoice = this.db.transaction(["POS Invoice"], "readwrite");
-        const store_posInvoice = transaction_posInvoice.objectStore("POS Invoice");
-        const index_docstatus_posInvoice = store_posInvoice.index("docstatus");
-        const request2 = index_docstatus_posInvoice.getAll(1);
-        request2.onsuccess = (result) => {
-          const filtredResult = result.target.result.filter((invoice) => invoice.synced == false);
-          resolve(filtredResult.length);
-        };
-        request2.onerror = (err) => {
-          reject(err);
-        };
-      });
+    getNotSyncedPosNumber(onSuccess, onFailure) {
+      const transaction_posInvoice = this.db.transaction(["POS Invoice"], "readwrite");
+      const store_posInvoice = transaction_posInvoice.objectStore("POS Invoice");
+      const index_docstatus_posInvoice = store_posInvoice.index("docstatus");
+      const request2 = index_docstatus_posInvoice.getAll(1);
+      request2.onsuccess = (result) => {
+        const filtredResult = result.target.result.filter((invoice) => invoice.synced == false);
+        onSuccess(filtredResult.length);
+      };
+      request2.onerror = (err) => {
+        onFailure(err);
+      };
     }
-    getNotSyncedPos() {
-      return new Promise((resolve, reject) => {
-        const transaction_posInvoice = this.db.transaction(["POS Invoice"], "readwrite");
-        const store_posInvoice = transaction_posInvoice.objectStore("POS Invoice");
-        const index_docstatus_posInvoice = store_posInvoice.index("docstatus");
-        const request2 = index_docstatus_posInvoice.getAll(1);
-        request2.onsuccess = (result) => {
-          const filtredResult = result.target.result.filter((invoice) => invoice.synced == false);
-          resolve(filtredResult);
-        };
-        request2.onerror = (err) => {
-          reject(err);
-        };
-      });
+    getNotSyncedPos(onSuccess, onFailure) {
+      const transaction_posInvoice = this.db.transaction(["POS Invoice"], "readwrite");
+      const store_posInvoice = transaction_posInvoice.objectStore("POS Invoice");
+      const index_docstatus_posInvoice = store_posInvoice.index("docstatus");
+      const request2 = index_docstatus_posInvoice.getAll(1);
+      request2.onsuccess = (result) => {
+        const filtredResult = result.target.result.filter((invoice) => invoice.synced == false);
+        onSuccess(filtredResult);
+      };
+      request2.onerror = (err) => {
+        onFailure(err);
+      };
     }
     deletePosInvoice(invoiceName) {
       return new Promise((resolve, reject) => {
@@ -3094,22 +3065,20 @@
           resolve();
         };
         request2.onerror = (err) => {
-          onFailure(err);
+          reject(err);
         };
       });
     }
-    saveCheckInOut(checkInOut) {
-      return new Promise((resolve, reject) => {
-        const transaction = this.db.transaction(["check_in_out"], "readwrite");
-        const store = transaction.objectStore("check_in_out");
-        const request2 = store.put(checkInOut);
-        request2.onsuccess = (event2) => {
-          onSuccess(event2.target.result);
-        };
-        request2.onerror = (err) => {
-          onFailure(err);
-        };
-      });
+    saveCheckInOut(checkInOut, onSuccess, onFailure) {
+      const transaction = this.db.transaction(["check_in_out"], "readwrite");
+      const store = transaction.objectStore("check_in_out");
+      const request2 = store.put(checkInOut);
+      request2.onsuccess = (event2) => {
+        onSuccess(event2.target.result);
+      };
+      request2.onerror = (err) => {
+        onFailure(err);
+      };
     }
     getAllCheckInOut() {
       return new Promise((resolve, reject) => {
@@ -3508,13 +3477,13 @@
     getAllPriceBases() {
       return this.price_bases;
     }
-    setPriceItemBasedOn(base, onSuccess2, onFailure2) {
+    setPriceItemBasedOn(base, onSuccess, onFailure) {
       if (this.price_bases.includes(base)) {
         this.settings.itemPriceBasedOn = base;
         this.db.updateSettings(
           this.settings,
           () => {
-            onSuccess2();
+            onSuccess();
             console.log("settings update is save successfuly");
           },
           () => {
@@ -3529,8 +3498,9 @@
 
   // ../pos_ar/pos_ar/pos_ar/page/pos/data/posAppData.js
   pos_ar.PointOfSale.posAppData = class {
-    constructor(db) {
+    constructor(db, apiHandler) {
       this.db = db;
+      this.api_handler = apiHandler;
       this.appData = {};
       this.getAllData();
     }
@@ -3539,6 +3509,13 @@
         this.getCustomers();
         this.getItems();
         this.getPosProfiles();
+        this.getBins();
+        this.getWarehouses();
+        this.getPriceLists();
+        this.getItemPrices();
+        this.getItemGroups();
+        this.getPosInvoices();
+        this.getCheckInOuts();
         console.log("app data : ", this.appData);
       } catch (err) {
         console.error("appData Class Error  : ", err);
@@ -3551,14 +3528,63 @@
       this.appData.items = await this.db.getAllItems();
     }
     async getPosProfiles() {
-      this.appData.posProfiles = await this.db.getAllPosProfile();
+      this.appData.pos_profiles = await this.db.getAllPosProfile();
+    }
+    async getBins() {
+      this.appData.bins = await this.db.getAllBin();
+    }
+    async getWarehouses() {
+      this.appData.warehouses = await this.db.getAllWarehouse();
+    }
+    async getPriceLists() {
+      this.appData.price_lists = await this.db.getAllPriceList();
+    }
+    async getItemPrices() {
+      this.appData.item_prices = await this.db.getAllItemPrice();
+    }
+    async getItemGroups() {
+      this.appData.item_groups = await this.db.getAllItemGroup();
+    }
+    async getPosInvoices() {
+      this.appData.pos_invoices = await this.db.getAllPosInvoice();
+    }
+    async getCheckInOuts() {
+      this.appData.check_in_outs = await this.db.getAllCheckInOut();
+    }
+    saveCheckInOut(checkInOut, onSuccess, onFailure) {
+      this.db.saveCheckInOut(checkInOut, onSuccess, onFailure);
+    }
+    savePosInvoice(posInvoice) {
+      this.db.savePosInvoice(posInvoice);
+    }
+    updatePosInvoice(posInvoice) {
+      this.db.updatePosInvoice(posInvoice);
+    }
+    getNotSyncedPos(onSuccess, onFailure) {
+      this.db.getNotSyncedPos(
+        (res) => {
+          onSuccess(res);
+        },
+        (err) => {
+          onFailure(err);
+        }
+      );
+    }
+    getNotSyncedPosNumber(onSuccess, onFailure) {
+      this.db.genotSyncedPosNumber(
+        (res) => {
+          onSuccess(res);
+        },
+        (err) => {
+          onFailure(err);
+        }
+      );
     }
   };
 
   // ../pos_ar/pos_ar/pos_ar/page/pos/remoteApi/FetchHandler.js
   pos_ar.PointOfSale.FetchHandler = class FetchHandler {
-    constructor(db) {
-      this.db = db;
+    constructor() {
     }
     async fetchCustomers() {
       try {
@@ -3686,4 +3712,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.NEV3NLVI.js.map
+//# sourceMappingURL=pos.bundle.DMXFXZET.js.map
