@@ -90,7 +90,7 @@ pos_ar.PointOfSale.posAppData = class {
 		)
 	}
 	getNotSyncedPosNumber(onSuccess,onFailure){
-		this.db.genotSyncedPosNumber(
+		this.db.getNotSyncedPosNumber(
 			(res)=>{
 				onSuccess(res)
 			},(err)=>{

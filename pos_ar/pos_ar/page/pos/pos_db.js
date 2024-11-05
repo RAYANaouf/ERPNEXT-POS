@@ -483,6 +483,7 @@ pos_ar.PointOfSale.pos_db  = class POSDatabase {
 		})
 	}
 
+	//async
 	getAllPosInvoice(){
 		return new Promise((resolve,reject)=>{
 			const transaction = this.db.transaction(['POS Invoice'] , "readwrite");
@@ -496,6 +497,19 @@ pos_ar.PointOfSale.pos_db  = class POSDatabase {
 				reject(err)
 			}
 		})
+	}
+	//callBack version
+	getAllPosInvoice_callback(onSuccess,onFailure){
+		const transaction = this.db.transaction(['POS Invoice'] , "readwrite");
+		const store       = transaction.objectStore('POS Invoice');
+		const result      = store.getAll()
+		result.onsuccess = (event) => {
+			const value = event.target.result
+			onSuccess(value);
+		}
+		result.onerror = (err)=>{
+			onFailure(err)
+		}
 	}
 
 	getDraftPosInvoice(){
@@ -558,7 +572,20 @@ pos_ar.PointOfSale.pos_db  = class POSDatabase {
 		})
 	}
 
-	deleteAllSettings() {
+	// New delete function to remove a POS Invoice
+	deletePosInvoice_callback(invoiceName,onSuccess,onFailure) {
+		const transaction = this.db.transaction(['POS Invoice'], "readwrite");
+		const store = transaction.objectStore('POS Invoice');
+		const request = store.delete(invoiceName);  // Deletes the record with the key 'invoiceName', (i set the name as keypath , in erpnext name is the id.)
+		request.onsuccess = () => {
+			onSuccess();  // Call success callback if the deletion is successful
+		};
+		request.onerror = (err) => {
+			onFailure(err);  // Call failure callback if there is an error
+		};
+	}
+
+	deleteAllPosInvoice() {
 		return new Promise((resolve,reject)=>{
 			const transaction = this.db.transaction(['POS Invoice'], 'readwrite');
 			const store = transaction.objectStore('POS Invoice');

@@ -4,9 +4,6 @@ pos_ar.PointOfSale.Controller = class {
                 this.wrapper = $(wrapper).find(".layout-main-section");
                 this.page    = wrapper.page ;
 
-
-
-
 		//logic variable
                 this.customersList     = []
                 this.itemGroupList     = []
@@ -968,10 +965,8 @@ pos_ar.PointOfSale.Controller = class {
 
 		this.appData.getNotSyncedPos(
 			(allUnsyncedPos) =>{
-
 				//create progress bar
 				frappe.show_progress('Syncing Invoices...' , 0 , allUnsyncedPos.length , 'syncing')
-
 				allUnsyncedPos.forEach(pos=>{
 					// we still didnt implement the  base_paid_amount and amount_eligible_for_commissionseen
 					// value in deafault pos ==>  ["Administrator"]. i think it is an array.

@@ -2337,42 +2337,33 @@
       this.company = company;
       this.sales_taxes = salesTaxes;
       this.on_click = onClick;
-      console.log("company : ", this.company);
-      console.log("company logo : ", this.company.company_logo);
       this.localPosInvoice = { lastTime: null, pos_invoices: [] };
       this.filter = "";
       this.filtered_pos_list = [];
       this.selected_pos = null;
       this.start_work();
     }
-    start_work() {
+    async start_work() {
       this.prepare_history_cart();
-      this.db.getAllPosInvoice(
-        (result) => {
-          console.log("the db data ", result);
-          this.localPosInvoice.pos_invoices = result;
-          this.filtered_pos_list = this.localPosInvoice.pos_invoices.filter((pos) => {
-            console.log("pos : ", pos, "its status ", pos.status);
-            if (pos.status == "Draft") {
-              return true;
-            } else {
-              return false;
-            }
-          });
-          console.log("log init data : ", this.filtered_pos_list);
-          if (this.filtered_pos_list.length == 0) {
-            this.selected_pos = null;
-            console.log("first condition");
-          } else {
-            this.selected_pos = structuredClone(this.filtered_pos_list[0]);
-            console.log("second condition");
-          }
-          this.refreshData();
-        },
-        (error) => {
-          console.log(error);
+      const result = await this.db.getAllPosInvoice();
+      console.log("the db data ", result);
+      this.localPosInvoice.pos_invoices = result;
+      this.filtered_pos_list = this.localPosInvoice.pos_invoices.filter((pos) => {
+        if (pos.status == "Draft") {
+          return true;
+        } else {
+          return false;
         }
-      );
+      });
+      console.log("log init data : ", this.filtered_pos_list);
+      if (this.filtered_pos_list.length == 0) {
+        this.selected_pos = null;
+        console.log("first condition");
+      } else {
+        this.selected_pos = structuredClone(this.filtered_pos_list[0]);
+        console.log("second condition");
+      }
+      this.refreshData();
       this.setListener();
     }
     prepare_history_cart() {
@@ -2515,7 +2506,7 @@
       this.right_container.css("display", "flex");
       const filter = this.filter_input.val();
       console.log("filter : ", filter);
-      this.db.getAllPosInvoice(
+      this.db.getAllPosInvoice_callback(
         (result) => {
           console.log("look at the result : ", result);
           this.localPosInvoice.pos_invoices = result;
@@ -2573,7 +2564,7 @@
         this.refreshData();
       });
       this.deleteBtn.on("click", (event2) => {
-        this.db.deletePosInvoice(
+        this.db.deletePosInvoice_callback(
           this.selected_pos.name,
           (event3) => {
             this.filtered_pos_list = this.filtered_pos_list.filter((pos) => pos.name != this.selected_pos.name);
@@ -3003,6 +2994,18 @@
         };
       });
     }
+    getAllPosInvoice_callback(onSuccess, onFailure) {
+      const transaction = this.db.transaction(["POS Invoice"], "readwrite");
+      const store = transaction.objectStore("POS Invoice");
+      const result = store.getAll();
+      result.onsuccess = (event2) => {
+        const value = event2.target.result;
+        onSuccess(value);
+      };
+      result.onerror = (err) => {
+        onFailure(err);
+      };
+    }
     getDraftPosInvoice() {
       return new Promise((resolve, reject) => {
         const transaction_posInvoice = this.db.transaction(["POS Invoice"], "readwrite");
@@ -3056,7 +3059,18 @@
         };
       });
     }
-    deleteAllSettings() {
+    deletePosInvoice_callback(invoiceName, onSuccess, onFailure) {
+      const transaction = this.db.transaction(["POS Invoice"], "readwrite");
+      const store = transaction.objectStore("POS Invoice");
+      const request2 = store.delete(invoiceName);
+      request2.onsuccess = () => {
+        onSuccess();
+      };
+      request2.onerror = (err) => {
+        onFailure(err);
+      };
+    }
+    deleteAllPosInvoice() {
       return new Promise((resolve, reject) => {
         const transaction = this.db.transaction(["POS Invoice"], "readwrite");
         const store = transaction.objectStore("POS Invoice");
@@ -3571,7 +3585,7 @@
       );
     }
     getNotSyncedPosNumber(onSuccess, onFailure) {
-      this.db.genotSyncedPosNumber(
+      this.db.getNotSyncedPosNumber(
         (res) => {
           onSuccess(res);
         },
@@ -3712,4 +3726,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.XHOQDH7Y.js.map
+//# sourceMappingURL=pos.bundle.PXTIROEA.js.map
