@@ -15,7 +15,3 @@ import "../../pos_ar/page/pos/data/posAppData.js"
 
 //remote api
 import "../../pos_ar/page/pos/remoteApi/FetchHandler.js"
-
-
-//service worker
-import "../../pos_ar/page/pos/sw.js"

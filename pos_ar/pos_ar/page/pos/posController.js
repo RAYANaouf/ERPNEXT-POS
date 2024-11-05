@@ -34,8 +34,6 @@ pos_ar.PointOfSale.Controller = class {
 
 
 
-		//test
-		this.sw = new pos_ar.PointOfSale.Sw()
 
                 this.start_app();
         }
@@ -77,8 +75,6 @@ pos_ar.PointOfSale.Controller = class {
 			this.PosProfileList   = await this.dataHandler.fetchPosProfileList()
 			this.binList          = await this.dataHandler.fetchBinList()
 			await this.handleAppData();
-
-			console.log("the app data : ",this.itemList)
 
 			let new_pos_invoice = frappe.model.get_new_doc('POS Invoice');
 			new_pos_invoice.customer          = this.defaultCustomer.name
@@ -482,7 +478,6 @@ pos_ar.PointOfSale.Controller = class {
 		this.appData.saveCheckInOut(
 			checkInOut,
 			(res)=>{
-				console.log('res : ' , res)
 				this.check_in_out_cart.getAllCheckInOut();
 			},(err)=>{
 				console.log('err to save checkInOut : ' , err)
@@ -911,7 +906,6 @@ pos_ar.PointOfSale.Controller = class {
 		//copy the pos is important otherwise it will deleted and the selectedTab change and then it will save the
 		//wrong one. because insert take a while after the callback will called.
 		const pos = structuredClone(this.selectedItemMaps.get(this.selectedTab.tabName))
-		console.log("sync : " , pos)
 
 
 		if(status == 'Unpaid'){
@@ -1092,12 +1086,12 @@ pos_ar.PointOfSale.Controller = class {
 
 	/*****************************  tools  **********************************/
 	getItemPrice(item , priceList){
-		console.log("debug getItemPrice function : " , item , priceList)
 		//check the mode
 		const mode = this.settings_data.settings.itemPriceBasedOn
 		if(mode == 'brand'){
 			if(item.brand == null)
 				return 0 ;
+
 			const price = this.itemPrices.find(itemPrice => itemPrice.brand == item.brand && itemPrice.price_list == priceList)
 			return price ? price.price_list_rate  : 0
 		}else if(mode == 'priceList'){
@@ -1139,7 +1133,6 @@ pos_ar.PointOfSale.Controller = class {
 	checkUnSyncedPos(){
 		this.appData.getNotSyncedPosNumber(
 			(result)=>{
-				console.log(`there are ${result} POS to sync`)
 				this.unsyncedPos = result
 				if(this.unsyncedPos == 0){
 					this.customer_box.setSynced(result);
