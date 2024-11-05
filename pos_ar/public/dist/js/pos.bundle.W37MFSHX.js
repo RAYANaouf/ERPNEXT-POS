@@ -3108,6 +3108,18 @@
         };
       });
     }
+    getAllCheckInOut_callback(onSuccess, onFailure) {
+      const transaction = this.db.transaction(["check_in_out"], "readwrite");
+      const store = transaction.objectStore("check_in_out");
+      const result = store.getAll();
+      result.onsuccess = (event2) => {
+        const value = event2.target.result;
+        onSuccess(value);
+      };
+      result.onerror = (err) => {
+        onFailure(err);
+      };
+    }
     deleteAllCheckInOut() {
       return new Promise((resolve, reject) => {
         const transaction = this.db.transaction(["check_in_out"], "readwrite");
@@ -3402,7 +3414,6 @@
       this.checkReason.html("");
       this.checkOwner.html("");
       this.checkAmount.html("");
-      console.log("check ==> ", this.selectedCheckInOut);
       this.checkType.append(this.selectedCheckInOut.check_type);
       this.checkCreationTime.append(this.selectedCheckInOut.creation_time);
       this.checkAmount.append(this.selectedCheckInOut.amount + " DA");
@@ -3443,12 +3454,16 @@
         this.refreshCheckInOutList();
       });
     }
-    getAllCheckInOut() {
-      this.db.getAllCheckInOut(
+    async getAllCheckInOut() {
+      this.db.getAllCheckInOut_callback(
         (res) => {
+          if (res.length > 0) {
+            this.selectedCheckInOut = res[0];
+          }
           this.checkList = res;
           this.refreshCheckInOutList();
           this.refreshCheckInOutAmount();
+          this.refreshCheckInOutDetails();
           console.log("res : ", res);
         },
         (err) => {
@@ -3726,4 +3741,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.PXTIROEA.js.map
+//# sourceMappingURL=pos.bundle.W37MFSHX.js.map

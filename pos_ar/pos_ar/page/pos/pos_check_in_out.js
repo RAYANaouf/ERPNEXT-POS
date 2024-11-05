@@ -177,8 +177,6 @@ pos_ar.PointOfSale.pos_check_in_out = class {
 		this.checkOwner.html('')
 		this.checkAmount.html('')
 
-		console.log("check ==> " , this.selectedCheckInOut)
-
 		this.checkType.append(this.selectedCheckInOut.check_type)
 		this.checkCreationTime.append(this.selectedCheckInOut.creation_time)
 		this.checkAmount.append(this.selectedCheckInOut.amount + ' DA')
@@ -232,12 +230,16 @@ pos_ar.PointOfSale.pos_check_in_out = class {
 	/*****************************************  functions  **************************************************/
 	/********************************************************************************************************/
 
-	getAllCheckInOut(){
-		this.db.getAllCheckInOut(
+	async getAllCheckInOut(){
+		this.db.getAllCheckInOut_callback(
 			(res)=>{
+				if(res.length > 0){
+					this.selectedCheckInOut = res[0]
+				}
 				this.checkList = res ;
 				this.refreshCheckInOutList();
 				this.refreshCheckInOutAmount();
+				this.refreshCheckInOutDetails();
 				console.log("res : " , res)
 			},(err)=>{
 				console.log("err : " , err)

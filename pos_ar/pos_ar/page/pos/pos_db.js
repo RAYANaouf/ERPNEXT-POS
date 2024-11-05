@@ -629,6 +629,19 @@ pos_ar.PointOfSale.pos_db  = class POSDatabase {
 		})
 	}
 
+	getAllCheckInOut_callback(onSuccess,onFailure){
+		const transaction = this.db.transaction(['check_in_out'] , "readwrite");
+		const store       = transaction.objectStore('check_in_out');
+		const result      = store.getAll()
+		result.onsuccess = (event) => {
+			const value = event.target.result
+			onSuccess(value);
+		}
+		result.onerror = (err)=>{
+			onFailure(err)
+		}
+	}
+
 	deleteAllCheckInOut() {
 		return new Promise((resolve,reject)=>{
 			const transaction = this.db.transaction(['check_in_out'], 'readwrite');
