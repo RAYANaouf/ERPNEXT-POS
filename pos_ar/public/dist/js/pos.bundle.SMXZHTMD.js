@@ -839,7 +839,7 @@
       if (mode == "brand") {
         if (item.brand == null)
           return 0;
-        const price = this.itemPrices.find((itemPrice2) => itemPrice2.brand == item.brand);
+        const price = this.itemPrices.find((itemPrice2) => itemPrice2.brand == item.brand && itemPrice2.price_list == priceList);
         return price ? price.price_list_rate : 0;
       } else if (mode == "priceList") {
         const price = this.itemPrices.find((itemPrice2) => itemPrice2.item_code == item.item_name && itemPrice2.price_list == priceList);
@@ -3741,4 +3741,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.W37MFSHX.js.map
+//# sourceMappingURL=pos.bundle.SMXZHTMD.js.map

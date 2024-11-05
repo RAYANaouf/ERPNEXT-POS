@@ -1090,7 +1090,7 @@ pos_ar.PointOfSale.Controller = class {
 		if(mode == 'brand'){
 			if(item.brand == null)
 				return 0 ;
-			const price = this.itemPrices.find(itemPrice => itemPrice.brand == item.brand)
+			const price = this.itemPrices.find(itemPrice => itemPrice.brand == item.brand && itemPrice.price_list == priceList)
 			return price ? price.price_list_rate  : 0
 		}else if(mode == 'priceList'){
 			const price = this.itemPrices.find(itemPrice => itemPrice.item_code == item.item_name && itemPrice.price_list == priceList)
