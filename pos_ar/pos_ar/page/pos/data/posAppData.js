@@ -13,16 +13,16 @@ pos_ar.PointOfSale.posAppData = class {
 
 	async getAllData(){
 		try{
-			this.getCustomers();
-			this.getItems();
-			this.getPosProfiles();
-			this.getBins();
-			this.getWarehouses();
-			this.getPriceLists();
-			this.getItemPrices();
-			this.getItemGroups();
-			this.getPosInvoices();
-			this.getCheckInOuts();
+			await this.getCustomers();
+			await this.getItems();
+			await this.getPosProfiles();
+			await this.getBins();
+			await this.getWarehouses();
+			await this.getPriceLists();
+			await this.getItemPrices();
+			await this.getItemGroups();
+			await this.getPosInvoices();
+			await this.getCheckInOuts();
 			console.log("app data : " , this.appData)
 		}catch(err){
 			console.error("appData Class Error  : " , err)

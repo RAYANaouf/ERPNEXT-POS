@@ -32,6 +32,11 @@ pos_ar.PointOfSale.Controller = class {
 		this.invoiceData = { netTotal : 0 , grandTotal : 0 , paidAmount : 0 , toChange : 0 , discount : 0}
 		this.db          = null;
 
+
+
+		//test
+		this.sw = new pos_ar.PointOfSale.Sw()
+
                 this.start_app();
         }
 
@@ -72,6 +77,8 @@ pos_ar.PointOfSale.Controller = class {
 			this.PosProfileList   = await this.dataHandler.fetchPosProfileList()
 			this.binList          = await this.dataHandler.fetchBinList()
 			await this.handleAppData();
+
+			console.log("the app data : ",this.itemList)
 
 			let new_pos_invoice = frappe.model.get_new_doc('POS Invoice');
 			new_pos_invoice.customer          = this.defaultCustomer.name
@@ -1085,6 +1092,7 @@ pos_ar.PointOfSale.Controller = class {
 
 	/*****************************  tools  **********************************/
 	getItemPrice(item , priceList){
+		console.log("debug getItemPrice function : " , item , priceList)
 		//check the mode
 		const mode = this.settings_data.settings.itemPriceBasedOn
 		if(mode == 'brand'){
