@@ -74,6 +74,7 @@ pos_ar.PointOfSale.Controller = class {
 			this.warehouseList    = await this.dataHandler.fetchWarehouseList()
 			this.PosProfileList   = await this.dataHandler.fetchPosProfileList()
 			this.binList          = await this.dataHandler.fetchBinList()
+
 			await this.handleAppData();
 
 			let new_pos_invoice = frappe.model.get_new_doc('POS Invoice');
