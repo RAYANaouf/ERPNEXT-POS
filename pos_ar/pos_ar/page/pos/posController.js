@@ -92,6 +92,7 @@ pos_ar.PointOfSale.Controller = class {
 			new_pos_invoice.docstatus         = 0
 			new_pos_invoice.status            = 'Draft'
 			new_pos_invoice.priceList         = this.defaultPriceList.name
+			new_pos_invoice.refNum            = this.selectedPosProfile.name+"-0"
 
 			this.selectedItemMaps.set("C1" , new_pos_invoice)
 			this.selectedTab.tabName = `C1`
