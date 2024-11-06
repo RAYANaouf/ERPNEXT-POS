@@ -13,27 +13,27 @@ pos_ar.PointOfSale.posAppData = class {
 
 	async getAllData(){
 		try{
-			frappe.show_progress('Loading..', 1, 11, 'Please wait');
+			frappe.show_progress('Please Wait', 1, 11, 'loading customers...');
 			await this.getCustomers();
-			frappe.show_progress('Loading..', 2, 11, 'Please wait');
+			frappe.show_progress('Please Wait', 2, 11, 'loading items...');
 			await this.getItems();
-			frappe.show_progress('Loading..', 3, 11, 'Please wait');
+			frappe.show_progress('Please Wait', 3, 11, 'loading pos profiles');
 			await this.getPosProfiles();
-			frappe.show_progress('Loading..', 4, 11, 'Please wait');
+			frappe.show_progress('Please Wait', 4, 11, 'Please wait');
 			await this.getBins();
-			frappe.show_progress('Loading..', 5, 11, 'Please wait');
+			frappe.show_progress('Please Wait', 5, 11, 'loading warehouses');
 			await this.getWarehouses();
-			frappe.show_progress('Loading..', 6, 11, 'Please wait');
+			frappe.show_progress('Please Wait', 6, 11, 'loading price lists');
 			await this.getPriceLists();
-			frappe.show_progress('Loading..', 7, 11, 'Please wait');
+			frappe.show_progress('Please Wait', 7, 11, 'loading item prices');
 			await this.getItemPrices();
-			frappe.show_progress('Loading..', 8, 11, 'Please wait');
+			frappe.show_progress('Please Wait', 8, 11, 'loading item groups');
 			await this.getItemGroups();
-			frappe.show_progress('Loading..', 9, 11, 'Please wait');
+			frappe.show_progress('Please Wait', 9, 11, 'loading invoices');
 			await this.getPosInvoices();
-			frappe.show_progress('Loading..', 10, 11, 'Please wait');
+			frappe.show_progress('Please Wait', 10, 11, 'Please check in out');
 			await this.getCheckInOuts();
-			frappe.show_progress('Loading..', 11, 11, 'Please wait');
+			frappe.show_progress('Please Wait', 11, 11, 'Please wait');
 			frappe.hide_progress();
 			frappe.hide_progress();
 			console.log("app data : " , this.appData)
