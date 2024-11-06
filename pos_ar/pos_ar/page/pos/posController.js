@@ -4,15 +4,6 @@ pos_ar.PointOfSale.Controller = class {
                 this.wrapper = $(wrapper).find(".layout-main-section");
                 this.page    = wrapper.page ;
 
-		//logic variable
-                this.customersList     = []
-                this.itemGroupList     = []
-                this.itemList          = []
-                this.itemPrices        = []
-                this.priceLists        = []
-                this.warehouseList     = []
-                this.PosProfileList    = []
-                this.binList           = []
 
                 this.selectedItemMaps  = new Map()
 
@@ -48,6 +39,7 @@ pos_ar.PointOfSale.Controller = class {
 			this.dataHandler   = new pos_ar.PointOfSale.FetchHandler()
 			//local app data
 			this.appData       = new pos_ar.PointOfSale.posAppData(this.db , this.dataHandler)
+			await this.appData.getAllData()
 
 			this.prepare_container();
 			//prepare app data
@@ -65,15 +57,6 @@ pos_ar.PointOfSale.Controller = class {
 
 	async prepare_app_data(){
 		try{
-			this.customersList    = await this.dataHandler.fetchCustomers()
-			this.brandsList       = await this.dataHandler.fetchBrands()
-			this.itemGroupList    = await this.dataHandler.fetchItemGroups()
-        	        this.itemList         = await this.dataHandler.fetchItems()
-        	        this.itemPrices       = await this.dataHandler.fetchItemPrice()
-			this.priceLists       = await this.dataHandler.fetchPriceList()
-			this.warehouseList    = await this.dataHandler.fetchWarehouseList()
-			this.PosProfileList   = await this.dataHandler.fetchPosProfileList()
-			this.binList          = await this.dataHandler.fetchBinList()
 
 			await this.handleAppData();
 
@@ -112,12 +95,12 @@ pos_ar.PointOfSale.Controller = class {
 
 	async handleAppData(){
 		//check pos profile
-		if(this.PosProfileList.length == 0){
+		if(this.appData.appData.pos_profiles.length == 0){
 			frappe.set_route("Form", "POS Profile");
 			throw new Error("there is no pos profile")
 		}
 		//set default val
-		Object.assign(this.selectedPosProfile , this.PosProfileList[0])
+		Object.assign(this.selectedPosProfile , this.appData.appData.pos_profiles[0])
 		//check takes and get it if it exist on pos profile
 		if(this.selectedPosProfile.taxes_and_charges != null){
 			this.taxes_and_charges_template = await this.dataHandler.fetchSalesTaxesAndChargesTemplate(this.selectedPosProfile.taxes_and_charges)
@@ -129,8 +112,8 @@ pos_ar.PointOfSale.Controller = class {
 		}
 
 		//check customer
-		if(this.customersList.length > 0){
-			this.defaultCustomer = structuredClone(this.customersList[0])
+		if(this.appData.appData.customers.length > 0){
+			this.defaultCustomer = structuredClone(this.appData.appData.customers[0])
 		}else{
 			frappe.warn(
 					'You dont have a customer',
@@ -144,7 +127,7 @@ pos_ar.PointOfSale.Controller = class {
 			throw new Error("there is no customer")
 		}
 		//check price list
-		if(this.priceLists.length > 0){
+		if(this.appData.appData.price_lists.length > 0){
 			this.defaultPriceList.name = this.selectedPosProfile.selling_price_list
 		}else{
 			frappe.warn(
@@ -340,12 +323,12 @@ pos_ar.PointOfSale.Controller = class {
         init_item_selector(){
 
                 this.item_selector = new pos_ar.PointOfSale.pos_item_selector(
-						this.$leftSection      ,
-						this.itemList          ,
-						this.itemGroupList     ,
-						this.itemPrices        ,
-						this.defaultPriceList  ,
-						this.getItemPrice.bind(this),
+						this.$leftSection                ,
+						this.appData.appData.items       ,
+						this.appData.appData.item_groups ,
+						this.appData.appData.item_prices ,
+						this.defaultPriceList            ,
+						this.getItemPrice.bind(this)     ,
 						item => { this.itemClick_selector(item)  }
 					)
 	}
@@ -353,7 +336,7 @@ pos_ar.PointOfSale.Controller = class {
 	init_customer_box(){
 		this.customer_box  = new pos_ar.PointOfSale.pos_customer_box(
 									this.$rightSection ,
-									this.customersList    ,
+									this.appData.appData.customers,
 									this.defaultCustomer ,
 									this.backHome.bind(this),
 									this.onSync.bind(this),
@@ -366,9 +349,9 @@ pos_ar.PointOfSale.Controller = class {
 									this.$rightSection    ,
 									this.settings_data    ,
 									this.selectedItemMaps ,
-									this.priceLists       ,
-									this.customersList    ,
-									this.brandsList       ,
+									this.appData.appData.price_lists ,
+									this.appData.appData.customers   ,
+									this.appData.brands   ,
 									this.taxes_and_charges,
 									this.invoiceData      ,
 									this.selectedTab      ,
@@ -393,9 +376,9 @@ pos_ar.PointOfSale.Controller = class {
 		this.item_details = new pos_ar.PointOfSale.pos_item_details(
 									this.$leftSection,
 									this.selectedPosProfile.warehouse,
-									this.priceLists,
-									this.itemPrices,
-									this.binList,
+									this.appData.appData.price_lists ,
+									this.appData.appData.item_prices ,
+									this.appData.appData.bins        ,
 									this.selectedItem,
 									this.selectedField,
 									(event , field , value) =>{
@@ -444,7 +427,7 @@ pos_ar.PointOfSale.Controller = class {
 		this.settings_cart = new pos_ar.PointOfSale.pos_settings(
 									this.wrapper,
 									this.settings_data,
-									this.PosProfileList,
+									this.appData.appData.pos_profiles,
 									this.selectedPosProfile,
 									this.onSettingsChange.bind(this)
 								)
@@ -629,7 +612,13 @@ pos_ar.PointOfSale.Controller = class {
 		new_pos_invoice.docstatus         = 0
 		new_pos_invoice.status            = 'Draft'
 		new_pos_invoice.priceList         = this.defaultPriceList.name
-
+		//build refNm   posProfile-date-time
+		const date = new Date()
+		const [year,month,day] = date.toISOString().split('T')[0].split('-')
+		const hour    = date.getHours()
+		const minutes = date.getMinutes()
+		const seconds = date.getMilliseconds()
+		new_pos_invoice.refNum            = this.selectedPosProfile.name+"-"+year+'-'+month+'-'+day+'-'+hour+minutes+seconds
 
 		this.selectedItemMaps.set(`C${counter}` , new_pos_invoice)
 		this.selectedTab.tabName = `C${counter}`
@@ -1101,10 +1090,10 @@ pos_ar.PointOfSale.Controller = class {
 			if(item.brand == null)
 				return 0 ;
 
-			const price = this.itemPrices.find(itemPrice => itemPrice.brand == item.brand && itemPrice.price_list == priceList)
+			const price = this.appData.appData.item_prices.find(itemPrice => itemPrice.brand == item.brand && itemPrice.price_list == priceList)
 			return price ? price.price_list_rate  : 0
 		}else if(mode == 'priceList'){
-			const price = this.itemPrices.find(itemPrice => itemPrice.item_code == item.item_name && itemPrice.price_list == priceList)
+			const price = this.appData.appData.item_prices.find(itemPrice => itemPrice.item_code == item.item_name && itemPrice.price_list == priceList)
 			return price ? price.price_list_rate  : 0
 		}
         }

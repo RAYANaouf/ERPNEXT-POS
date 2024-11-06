@@ -21,14 +21,6 @@
     constructor(wrapper) {
       this.wrapper = $(wrapper).find(".layout-main-section");
       this.page = wrapper.page;
-      this.customersList = [];
-      this.itemGroupList = [];
-      this.itemList = [];
-      this.itemPrices = [];
-      this.priceLists = [];
-      this.warehouseList = [];
-      this.PosProfileList = [];
-      this.binList = [];
       this.selectedItemMaps = /* @__PURE__ */ new Map();
       this.selectedItem = { "name": "" };
       this.selectedField = { "field_name": "" };
@@ -50,6 +42,7 @@
         this.settings_data = new pos_ar.PointOfSale.posSettingsData(this.db);
         this.dataHandler = new pos_ar.PointOfSale.FetchHandler();
         this.appData = new pos_ar.PointOfSale.posAppData(this.db, this.dataHandler);
+        await this.appData.getAllData();
         this.prepare_container();
         await this.prepare_app_data();
         await this.checkForPOSEntry();
@@ -62,15 +55,6 @@
     }
     async prepare_app_data() {
       try {
-        this.customersList = await this.dataHandler.fetchCustomers();
-        this.brandsList = await this.dataHandler.fetchBrands();
-        this.itemGroupList = await this.dataHandler.fetchItemGroups();
-        this.itemList = await this.dataHandler.fetchItems();
-        this.itemPrices = await this.dataHandler.fetchItemPrice();
-        this.priceLists = await this.dataHandler.fetchPriceList();
-        this.warehouseList = await this.dataHandler.fetchWarehouseList();
-        this.PosProfileList = await this.dataHandler.fetchPosProfileList();
-        this.binList = await this.dataHandler.fetchBinList();
         await this.handleAppData();
         let new_pos_invoice = frappe.model.get_new_doc("POS Invoice");
         new_pos_invoice.customer = this.defaultCustomer.name;
@@ -102,11 +86,11 @@
       }
     }
     async handleAppData() {
-      if (this.PosProfileList.length == 0) {
+      if (this.appData.appData.pos_profiles.length == 0) {
         frappe.set_route("Form", "POS Profile");
         throw new Error("there is no pos profile");
       }
-      Object.assign(this.selectedPosProfile, this.PosProfileList[0]);
+      Object.assign(this.selectedPosProfile, this.appData.appData.pos_profiles[0]);
       if (this.selectedPosProfile.taxes_and_charges != null) {
         this.taxes_and_charges_template = await this.dataHandler.fetchSalesTaxesAndChargesTemplate(this.selectedPosProfile.taxes_and_charges);
         this.taxes_and_charges = this.taxes_and_charges_template.taxes;
@@ -114,8 +98,8 @@
       if (this.selectedPosProfile.company != null && this.selectedPosProfile.company != "") {
         this.company = await this.dataHandler.fetchCompany(this.selectedPosProfile.company);
       }
-      if (this.customersList.length > 0) {
-        this.defaultCustomer = structuredClone(this.customersList[0]);
+      if (this.appData.appData.customers.length > 0) {
+        this.defaultCustomer = structuredClone(this.appData.appData.customers[0]);
       } else {
         frappe.warn(
           "You dont have a customer",
@@ -128,7 +112,7 @@
         );
         throw new Error("there is no customer");
       }
-      if (this.priceLists.length > 0) {
+      if (this.appData.appData.price_lists.length > 0) {
         this.defaultPriceList.name = this.selectedPosProfile.selling_price_list;
       } else {
         frappe.warn(
@@ -299,9 +283,9 @@
     init_item_selector() {
       this.item_selector = new pos_ar.PointOfSale.pos_item_selector(
         this.$leftSection,
-        this.itemList,
-        this.itemGroupList,
-        this.itemPrices,
+        this.appData.appData.items,
+        this.appData.appData.item_groups,
+        this.appData.appData.item_prices,
         this.defaultPriceList,
         this.getItemPrice.bind(this),
         (item) => {
@@ -312,7 +296,7 @@
     init_customer_box() {
       this.customer_box = new pos_ar.PointOfSale.pos_customer_box(
         this.$rightSection,
-        this.customersList,
+        this.appData.appData.customers,
         this.defaultCustomer,
         this.backHome.bind(this),
         this.onSync.bind(this),
@@ -325,9 +309,9 @@
         this.$rightSection,
         this.settings_data,
         this.selectedItemMaps,
-        this.priceLists,
-        this.customersList,
-        this.brandsList,
+        this.appData.appData.price_lists,
+        this.appData.appData.customers,
+        this.appData.brands,
         this.taxes_and_charges,
         this.invoiceData,
         this.selectedTab,
@@ -351,9 +335,9 @@
       this.item_details = new pos_ar.PointOfSale.pos_item_details(
         this.$leftSection,
         this.selectedPosProfile.warehouse,
-        this.priceLists,
-        this.itemPrices,
-        this.binList,
+        this.appData.appData.price_lists,
+        this.appData.appData.item_prices,
+        this.appData.appData.bins,
         this.selectedItem,
         this.selectedField,
         (event2, field, value) => {
@@ -396,7 +380,7 @@
       this.settings_cart = new pos_ar.PointOfSale.pos_settings(
         this.wrapper,
         this.settings_data,
-        this.PosProfileList,
+        this.appData.appData.pos_profiles,
         this.selectedPosProfile,
         this.onSettingsChange.bind(this)
       );
@@ -534,6 +518,12 @@
       new_pos_invoice.docstatus = 0;
       new_pos_invoice.status = "Draft";
       new_pos_invoice.priceList = this.defaultPriceList.name;
+      const date = new Date();
+      const [year, month, day] = date.toISOString().split("T")[0].split("-");
+      const hour = date.getHours();
+      const minutes = date.getMinutes();
+      const seconds = date.getMilliseconds();
+      new_pos_invoice.refNum = this.selectedPosProfile.name + "-" + year + "-" + month + "-" + day + "-" + hour + minutes + seconds;
       this.selectedItemMaps.set(`C${counter}`, new_pos_invoice);
       this.selectedTab.tabName = `C${counter}`;
     }
@@ -844,10 +834,10 @@
       if (mode == "brand") {
         if (item.brand == null)
           return 0;
-        const price = this.itemPrices.find((itemPrice2) => itemPrice2.brand == item.brand && itemPrice2.price_list == priceList);
+        const price = this.appData.appData.item_prices.find((itemPrice2) => itemPrice2.brand == item.brand && itemPrice2.price_list == priceList);
         return price ? price.price_list_rate : 0;
       } else if (mode == "priceList") {
-        const price = this.itemPrices.find((itemPrice2) => itemPrice2.item_code == item.item_name && itemPrice2.price_list == priceList);
+        const price = this.appData.appData.item_prices.find((itemPrice2) => itemPrice2.item_code == item.item_name && itemPrice2.price_list == priceList);
         return price ? price.price_list_rate : 0;
       }
     }
@@ -3543,7 +3533,6 @@
       this.db = db;
       this.api_handler = apiHandler;
       this.appData = {};
-      this.getAllData();
     }
     async getAllData() {
       try {
@@ -3564,27 +3553,38 @@
     }
     async getCustomers() {
       this.appData.customers = await this.db.getAllCustomers();
+      this.appData.customers = await this.api_handler.fetchCustomers();
+    }
+    async getBrands() {
+      this.appData.brands = await this.api_handler.fetchBrands();
     }
     async getItems() {
       this.appData.items = await this.db.getAllItems();
+      this.appData.items = await this.api_handler.fetchItems();
     }
     async getPosProfiles() {
       this.appData.pos_profiles = await this.db.getAllPosProfile();
+      this.appData.pos_profiles = await this.api_handler.fetchPosProfileList();
     }
     async getBins() {
       this.appData.bins = await this.db.getAllBin();
+      this.appData.bins = await this.api_handler.fetchBinList();
     }
     async getWarehouses() {
       this.appData.warehouses = await this.db.getAllWarehouse();
+      this.appData.warehouses = await this.api_handler.fetchWarehouseList();
     }
     async getPriceLists() {
       this.appData.price_lists = await this.db.getAllPriceList();
+      this.appData.price_lists = await this.api_handler.fetchPriceList();
     }
     async getItemPrices() {
       this.appData.item_prices = await this.db.getAllItemPrice();
+      this.appData.item_prices = await this.api_handler.fetchItemPrice();
     }
     async getItemGroups() {
       this.appData.item_groups = await this.db.getAllItemGroup();
+      this.appData.item_groups = await this.api_handler.fetchItemGroups();
     }
     async getPosInvoices() {
       this.appData.pos_invoices = await this.db.getAllPosInvoice();
@@ -3753,4 +3753,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.T7QD2WOC.js.map
+//# sourceMappingURL=pos.bundle.IALPWNIH.js.map
