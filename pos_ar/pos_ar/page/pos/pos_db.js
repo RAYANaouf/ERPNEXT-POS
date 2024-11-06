@@ -83,6 +83,23 @@ pos_ar.PointOfSale.pos_db  = class POSDatabase {
 	/************************************************************************************/
 	/************************************************************************************/
 
+
+
+	getPosCounter(){
+		return new Promise((resolve , reject) => {
+			const transaction = this.db.transaction(['Counter'] , "readwrite");
+			const store       = transaction.objectStore('Counter')
+
+		})
+	}
+
+
+
+
+	/************************************   Item  ***************************************/
+	/************************************************************************************/
+	/************************************************************************************/
+
 	saveItemList( itemList ){
 		return new Promise((resolve , reject) => {
 			const transaction = this.db.transaction(['Item'] , "readwrite");

@@ -92,7 +92,14 @@ pos_ar.PointOfSale.Controller = class {
 			new_pos_invoice.docstatus         = 0
 			new_pos_invoice.status            = 'Draft'
 			new_pos_invoice.priceList         = this.defaultPriceList.name
-			new_pos_invoice.refNum            = this.selectedPosProfile.name+"-0"
+			//build refNm   posProfile-date-time
+			const date = new Date()
+			const [year,month,day] = date.toISOString().split('T')[0].split('-')
+			const hour    = date.getHours()
+			const minutes = date.getMinutes()
+			const seconds = date.getMilliseconds()
+			console.log("debuging : " , year+'-'+month+'-'+day+'-'+hour+minutes+seconds )
+			new_pos_invoice.refNum            = this.selectedPosProfile.name+"-"+year+'-'+month+'-'+day+'-'+hour+minutes+seconds
 
 			this.selectedItemMaps.set("C1" , new_pos_invoice)
 			this.selectedTab.tabName = `C1`

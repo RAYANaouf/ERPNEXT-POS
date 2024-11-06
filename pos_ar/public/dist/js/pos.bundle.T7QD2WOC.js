@@ -87,7 +87,13 @@
         new_pos_invoice.docstatus = 0;
         new_pos_invoice.status = "Draft";
         new_pos_invoice.priceList = this.defaultPriceList.name;
-        new_pos_invoice.refNum = this.selectedPosProfile.name + "-0";
+        const date = new Date();
+        const [year, month, day] = date.toISOString().split("T")[0].split("-");
+        const hour = date.getHours();
+        const minutes = date.getMinutes();
+        const seconds = date.getMilliseconds();
+        console.log("debuging : ", year + "-" + month + "-" + day + "-" + hour + minutes + seconds);
+        new_pos_invoice.refNum = this.selectedPosProfile.name + "-" + year + "-" + month + "-" + day + "-" + hour + minutes + seconds;
         this.selectedItemMaps.set("C1", new_pos_invoice);
         this.selectedTab.tabName = `C1`;
       } catch (err) {
@@ -2596,19 +2602,19 @@
       let grandTotal = 0;
       const creation_time = this.selected_pos.creation_time;
       const [date, time] = creation_time.split(" ");
-      let invoiceHTML = `<style>#company_container {width: 100% ; height: 40px ; display:flex; align-items:center; font-size : 12px;}table{border: 1px solid #505050; border-spacing:0px;width: 100%; margin-top:16px;}tr{width:100%; height:16px;}tr:nth-child(1){background:#eeeeee;}th{border-right:1px solid #505050;border-bottom:1px solid #505050;border-top:1px solid #505050;font-weight : 500;}td{border-right:1px solid #505050;}#logContainer{width: 100%;height:80px;display : flex;justify-content:center;}#logContainer img{width:50%; height:100%;}#top_data_container{width:100%;display:flex;}#top_data_container>div{width:50%;}#top_data_container>div.c2{display:flex;flex-direction:column;align-items:end;}td>div{height:18px; width:100%;font-size:12px;display:flex; justify-content:center; align-items:center;}#footer_message{height:20px;}</style><div style="display:flex; flex-direction:column;"><div id="logContainer"  ><div style="width:20%;"></div><img src="${this.company.company_logo}"><div style="width:20%;"></div></div><div id="company_container"><div style="flex-grow:1; border-bottom:1px dashed #505050; border-top:1px dashed #505050; "></div><p style="margin:0px 25px;">${this.company.company_name}</p><div style="flex-grow:1; border-bottom:1px dashed #505050; border-top:1px dashed #505050;"></div></div><div id="top_data_container"><div class="c1"><div class="customer"> Customer : ${this.selected_pos.customer} </div><div class="refrence"> Commande : ${this.selected_pos.refNum} </div></div><div class="c2"><div class="date"> ${date} </div><div class="time"> ${time} </div></div></div><table><tr><th>Nom</th><th>Qt\xE9</th><th>P.unit\xE9</th><th>Prix</th>`;
+      let invoiceHTML = `<style>#company_container {width: 100% ; height: 40px ; display:flex; align-items:center; font-size : 12px;}table{border: 1px solid #505050; border-spacing:0px;width: 100%; margin-top:16px;}tr{width:100%; height:16px;}tr:nth-child(1){background:#eeeeee;}th{border-right:1px solid #505050;border-bottom:1px solid #505050;border-top:1px solid #505050;font-weight : 500;}td{border-right:1px solid #505050;}#logContainer{width: 100%;height:80px;display : flex;justify-content:center;}#logContainer img{width:50%; height:100%;}#top_data_container{width:100%;display:flex;}#top_data_container>div.c1{font-size:12px;flex-grow:1;}#top_data_container>div.c2{font-size:12px;flex-grow:1;display:flex;flex-direction:column;align-items:end;}td>div{height:18px; width:100%;font-size:12px;display:flex; justify-content:center; align-items:center;}#footer_message{height:20px;}</style><div style="display:flex; flex-direction:column;"><div id="logContainer"  ><div style="width:20%;"></div><img src="${this.company.company_logo}"><div style="width:20%;"></div></div><div id="company_container"><div style="flex-grow:1; border-bottom:1px dashed #505050; border-top:1px dashed #505050; "></div><p style="margin:0px 25px;">${this.company.company_name}</p><div style="flex-grow:1; border-bottom:1px dashed #505050; border-top:1px dashed #505050;"></div></div><div id="top_data_container"><div class="c1"><div class="customer"> Customer : ${this.selected_pos.customer} </div><div class="refrence"> Commande : ${this.selected_pos.refNum} </div></div><div class="c2"><div class="date"> ${date}/${time} </div></div></div><table><tr><th>Nom</th><th>Qt\xE9</th><th>P.unit\xE9</th><th>Prix</th>`;
       this.selected_pos.items.forEach((item) => {
         netTotal += item.rate * item.qty;
         invoiceHTML += `<tr> <td><div>${item.item_name}</div></td>  <td><div>${item.qty}</div></td>  <td><div>${item.rate}</div></td>  <td><div>${item.rate * item.qty}</div></td></tr>`;
       });
       invoiceHTML += "</table>";
-      invoiceHTML += `<div style="height:23px;"> <p style="font-size:16px;font-weight:500;" ><span style="font-size:16px;font-weight:600;">Sous-total : </span> ${netTotal} DA </p> </div>`;
-      invoiceHTML += `<div style="height:23px;"> <p style="font-size:16px;font-weight:500;" ><span style="font-size:16px;font-weight:600;">Reduction : </span> ${this.selected_pos.additional_discount_percentage * netTotal} DA </p> </div>`;
+      invoiceHTML += `<div style="height:23px;"> <p style="font-size:12px;font-weight:500;" ><span style="font-size:16px;font-weight:600;">Sous-total : </span> ${netTotal} DA </p> </div>`;
+      invoiceHTML += `<div style="height:23px;"> <p style="font-size:12px;font-weight:500;" ><span style="font-size:16px;font-weight:600;">Reduction : </span> ${this.selected_pos.additional_discount_percentage * netTotal} DA </p> </div>`;
       this.sales_taxes.forEach((tax) => {
         taxes += tax.rate;
-        invoiceHTML += `<div style="height:23px;"> <p style="font-size:16px;font-weight:500;" ><span style="font-size:16px;font-weight:600;">${tax.description} : </span> ${tax.rate} % </p> </div>`;
+        invoiceHTML += `<div style="height:23px;"> <p style="font-size:12px;font-weight:500;" ><span style="font-size:16px;font-weight:600;">${tax.description} : </span> ${tax.rate} % </p> </div>`;
       });
-      invoiceHTML += `<div style="height:23px;"> <p style="font-size:16px;font-weight:500;" ><span style="font-size:16px;font-weight:700;">Total : </span> ${netTotal + netTotal * (taxes / 100) - this.selected_pos.additional_discount_percentage * netTotal} DA </p> </div>`;
+      invoiceHTML += `<div style="height:23px;"> <p style="font-size:12px;font-weight:500;" ><span style="font-size:16px;font-weight:700;">Total : </span> ${netTotal + netTotal * (taxes / 100) - this.selected_pos.additional_discount_percentage * netTotal} DA </p> </div>`;
       invoiceHTML += '<div id="footer_message" style="width:100%; display:flex; align-items:center; margin-top:30px;"><div style="flex-grow:1; border-bottom:2px dashed #505050;"></div><div style="margin:30px 25px;"> Thank You, Come Again</div><div style="flex-grow:1;border-bottom:2px dashed #505050;"></div></div>';
       invoiceHTML += "</div>";
       const printWindow = window.open("", "_blank");
@@ -2679,6 +2685,12 @@
         var _a;
         console.error(`Database error: ${(_a = event2.target.error) == null ? void 0 : _a.message}`);
       };
+    }
+    getPosCounter() {
+      return new Promise((resolve, reject) => {
+        const transaction = this.db.transaction(["Counter"], "readwrite");
+        const store = transaction.objectStore("Counter");
+      });
     }
     saveItemList(itemList) {
       return new Promise((resolve, reject) => {
@@ -3741,4 +3753,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.MIUN5Z5Y.js.map
+//# sourceMappingURL=pos.bundle.T7QD2WOC.js.map

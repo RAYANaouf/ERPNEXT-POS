@@ -449,10 +449,11 @@ pos_ar.PointOfSale.pos_history = class {
 				'#top_data_container{'+
 					'width:100%;display:flex;'+
 				'}'+
-				'#top_data_container>div{'+
-					'width:50%;'+
+				'#top_data_container>div.c1{'+
+					'font-size:12px;flex-grow:1;'+
 				'}'+
 				'#top_data_container>div.c2{'+
+					'font-size:12px;flex-grow:1;'+
 					'display:flex;flex-direction:column;align-items:end;'+
 				'}'+
 				'td>div{'+
@@ -481,8 +482,7 @@ pos_ar.PointOfSale.pos_history = class {
 							`<div class="refrence"> Commande : ${this.selected_pos.refNum} </div>`+
 						'</div>'+
 						'<div class="c2">'+
-							`<div class="date"> ${date} </div>`+
-							`<div class="time"> ${time} </div>`+
+							`<div class="date"> ${date}/${time} </div>`+
 						'</div>'+
 					'</div>'+
 					'<table>'+
@@ -497,15 +497,15 @@ pos_ar.PointOfSale.pos_history = class {
 
 
 
-		invoiceHTML += `<div style="height:23px;"> <p style="font-size:16px;font-weight:500;" ><span style="font-size:16px;font-weight:600;">Sous-total : </span> ${netTotal} DA </p> </div>`
-		invoiceHTML += `<div style="height:23px;"> <p style="font-size:16px;font-weight:500;" ><span style="font-size:16px;font-weight:600;">Reduction : </span> ${this.selected_pos.additional_discount_percentage * netTotal} DA </p> </div>`
+		invoiceHTML += `<div style="height:23px;"> <p style="font-size:12px;font-weight:500;" ><span style="font-size:16px;font-weight:600;">Sous-total : </span> ${netTotal} DA </p> </div>`
+		invoiceHTML += `<div style="height:23px;"> <p style="font-size:12px;font-weight:500;" ><span style="font-size:16px;font-weight:600;">Reduction : </span> ${this.selected_pos.additional_discount_percentage * netTotal} DA </p> </div>`
 
 		this.sales_taxes.forEach(tax => {
 			taxes += tax.rate
-			invoiceHTML += `<div style="height:23px;"> <p style="font-size:16px;font-weight:500;" ><span style="font-size:16px;font-weight:600;">${tax.description} : </span> ${tax.rate} % </p> </div>`
+			invoiceHTML += `<div style="height:23px;"> <p style="font-size:12px;font-weight:500;" ><span style="font-size:16px;font-weight:600;">${tax.description} : </span> ${tax.rate} % </p> </div>`
 		})
 
-		invoiceHTML += `<div style="height:23px;"> <p style="font-size:16px;font-weight:500;" ><span style="font-size:16px;font-weight:700;">Total : </span> ${netTotal+(netTotal*(taxes/100)) - this.selected_pos.additional_discount_percentage * netTotal} DA </p> </div>`
+		invoiceHTML += `<div style="height:23px;"> <p style="font-size:12px;font-weight:500;" ><span style="font-size:16px;font-weight:700;">Total : </span> ${netTotal+(netTotal*(taxes/100)) - this.selected_pos.additional_discount_percentage * netTotal} DA </p> </div>`
 
 
 		invoiceHTML +=
