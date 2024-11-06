@@ -3536,20 +3536,35 @@
     }
     async getAllData() {
       try {
+        frappe.show_progress("Loading..", 1, 11, "Please wait");
         await this.getCustomers();
+        frappe.show_progress("Loading..", 2, 11, "Please wait");
         await this.getItems();
+        frappe.show_progress("Loading..", 3, 11, "Please wait");
         await this.getPosProfiles();
+        frappe.show_progress("Loading..", 4, 11, "Please wait");
         await this.getBins();
+        frappe.show_progress("Loading..", 5, 11, "Please wait");
         await this.getWarehouses();
+        frappe.show_progress("Loading..", 6, 11, "Please wait");
         await this.getPriceLists();
+        frappe.show_progress("Loading..", 7, 11, "Please wait");
         await this.getItemPrices();
+        frappe.show_progress("Loading..", 8, 11, "Please wait");
         await this.getItemGroups();
+        frappe.show_progress("Loading..", 9, 11, "Please wait");
         await this.getPosInvoices();
+        frappe.show_progress("Loading..", 10, 11, "Please wait");
         await this.getCheckInOuts();
+        frappe.show_progress("Loading..", 11, 11, "Please wait");
+        frappe.hide_progress();
+        frappe.hide_progress();
         console.log("app data : ", this.appData);
       } catch (err) {
         console.error("appData Class Error  : ", err);
+        frappe.hide_progress();
       }
+      frappe.hide_progress();
     }
     async getCustomers() {
       this.appData.customers = await this.db.getAllCustomers();
@@ -3753,4 +3768,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.TG2BXL25.js.map
+//# sourceMappingURL=pos.bundle.DKSGRM4J.js.map
