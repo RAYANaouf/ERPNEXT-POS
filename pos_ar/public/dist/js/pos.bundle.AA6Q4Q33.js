@@ -2334,6 +2334,7 @@
       this.company = company;
       this.sales_taxes = salesTaxes;
       this.on_click = onClick;
+      console.log("here we are debuging : ", company);
       this.localPosInvoice = { lastTime: null, pos_invoices: [] };
       this.filter = "";
       this.filtered_pos_list = [];
@@ -2390,7 +2391,7 @@
       this.draftActionButtonsContainer = this.left_container.find("#posDraftActionsContainer");
       this.deleteBtn = this.draftActionButtonsContainer.find("#posDeleteBtn");
       this.editBtn = this.draftActionButtonsContainer.find("#posEditBtn");
-      this.right_container.append('<div id="historyRightContainerHeader" class="rowBox align_center" ><h4 class="CartTitle">Recent Orders</h4><img src="/files/1661795110-optilance.png" style="width:30px;height:30px;"></div>');
+      this.right_container.append(`<div id="historyRightContainerHeader" class="rowBox align_center" ><h4 class="CartTitle">Recent Orders</h4><img src="${this.company.company_logo}" style="width:30px;height:30px;"></div>`);
       this.right_container.append('<div id="historyRightSearchContainer" class="rowBox align_center" ></div>');
       this.search_container = this.right_container.find("#historyRightSearchContainer");
       this.search_container.append('<select  id="PosInvoiceTypeInput" placeholder="POS Invoice Type">');
@@ -2588,12 +2589,12 @@
       });
     }
     print_receipt() {
-      console.log("pos invoice : ", this.selected_pos);
-      console.log("taxes : ", this.sales_taxes);
       let netTotal = 0;
       let taxes = 0;
       let grandTotal = 0;
-      let invoiceHTML = `<style>#company_container {width: 100% ; height: 40px ; display:flex; align-items:center; font-size : 12px;}table{border: 1px solid #505050; border-spacing:0px;width: 100%; margin-top:16px;}tr{width:100%; height:20px;}tr:nth-child(1){background:#eeeeee;}th{border-right:1px solid #505050;border-bottom:1px solid #505050;border-top:1px solid #505050;font-weight : 500;}td{border-right:1px solid #505050;}#logContainer{width: 100%;height:80px;display : flex;justify-content:center;}#logContainer img{width:70%; height:100%;}td>div{height:20px; width:100%;font-size:12px;display:flex; justify-content:center; align-items:center;}</style><div style="display:flex; flex-direction:column;"><div id="logContainer"  ><div style="width:15%;"></div><img src="${this.company.company_logo}"><div style="width:15%;"></div></div><div id="company_container"><div style="flex-grow:1; border-bottom:1px dashed #505050; border-top:1px dashed #505050; "></div><p style="margin:0px 25px;">${this.company.company_name}</p><div style="flex-grow:1; border-bottom:1px dashed #505050; border-top:1px dashed #505050;"></div></div><div>Clien: ${this.selected_pos.customer}</div><div>Date : 24-10-2024</div><div>temp : 13:09</div><table><tr><th>Nom</th><th>Qt\xE9</th><th>P.unit\xE9</th><th>Prix</th>`;
+      const creation_time = this.selected_pos.creation_time;
+      const [date, time] = creation_time.split(" ");
+      let invoiceHTML = `<style>#company_container {width: 100% ; height: 40px ; display:flex; align-items:center; font-size : 12px;}table{border: 1px solid #505050; border-spacing:0px;width: 100%; margin-top:16px;}tr{width:100%; height:20px;}tr:nth-child(1){background:#eeeeee;}th{border-right:1px solid #505050;border-bottom:1px solid #505050;border-top:1px solid #505050;font-weight : 500;}td{border-right:1px solid #505050;}#logContainer{width: 100%;height:80px;display : flex;justify-content:center;}#logContainer img{width:50%; height:100%;}td>div{height:20px; width:100%;font-size:12px;display:flex; justify-content:center; align-items:center;}</style><div style="display:flex; flex-direction:column;"><div id="logContainer"  ><div style="width:20%;"></div><img src="${this.company.company_logo}"><div style="width:20%;"></div></div><div id="company_container"><div style="flex-grow:1; border-bottom:1px dashed #505050; border-top:1px dashed #505050; "></div><p style="margin:0px 25px;">${this.company.company_name}</p><div style="flex-grow:1; border-bottom:1px dashed #505050; border-top:1px dashed #505050;"></div></div><div id="top_data_container"><div class="c1"></div><div class="c2"><div class="date"> ${date} </div><div class="time"> ${time} </div></div></div><table><tr><th>Nom</th><th>Qt\xE9</th><th>P.unit\xE9</th><th>Prix</th>`;
       this.selected_pos.items.forEach((item) => {
         netTotal += item.rate * item.qty;
         invoiceHTML += `<tr> <td><div>${item.item_name}</div></td>  <td><div>${item.qty}</div></td>  <td><div>${item.rate}</div></td>  <td><div>${item.rate * item.qty}</div></td></tr>`;
@@ -3738,4 +3739,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.7IF6S3SL.js.map
+//# sourceMappingURL=pos.bundle.AA6Q4Q33.js.map

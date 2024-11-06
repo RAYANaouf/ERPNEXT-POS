@@ -15,6 +15,8 @@ pos_ar.PointOfSale.pos_history = class {
 		this.sales_taxes           = salesTaxes;
 		this.on_click              = onClick;
 
+		console.log("here we are debuging : " , company)
+
 		//local data
 		this.localPosInvoice   = { lastTime : null , pos_invoices : [] }
 		this.filter            = "" ;
@@ -100,7 +102,7 @@ pos_ar.PointOfSale.pos_history = class {
 		this.editBtn    = this.draftActionButtonsContainer.find('#posEditBtn')
 
 
-		this.right_container.append('<div id="historyRightContainerHeader" class="rowBox align_center" ><h4 class="CartTitle">Recent Orders</h4><img src="/files/1661795110-optilance.png" style="width:30px;height:30px;"></div>')
+		this.right_container.append(`<div id="historyRightContainerHeader" class="rowBox align_center" ><h4 class="CartTitle">Recent Orders</h4><img src="${this.company.company_logo}" style="width:30px;height:30px;"></div>`)
 		this.right_container.append('<div id="historyRightSearchContainer" class="rowBox align_center" ></div>');
 
 		this.search_container = this.right_container.find('#historyRightSearchContainer');
@@ -401,13 +403,15 @@ pos_ar.PointOfSale.pos_history = class {
 	/******************************************** functions  ********************************************************/
 	print_receipt() {
 
-		console.log("pos invoice : " , this.selected_pos)
-		console.log("taxes : " , this.sales_taxes)
 		let netTotal   = 0
 		let taxes      = 0
 		let grandTotal = 0
 
-		let invoiceHTML ='<style>'+
+		const creation_time = this.selected_pos.creation_time
+		const [date, time]  = creation_time.split(' ')
+
+		let invoiceHTML =
+			'<style>'+
 				'#company_container {'+
 					'width: 100% ; height: 40px ; '+
 					'display:flex; align-items:center; '+
@@ -438,7 +442,7 @@ pos_ar.PointOfSale.pos_history = class {
 					'justify-content:center;'+
 				'}'+
 				'#logContainer img{'+
-					'width:70%; height:100%;'+
+					'width:50%; height:100%;'+
 				'}'+
 				'td>div{'+
 					'height:20px; width:100%;'+
@@ -448,23 +452,22 @@ pos_ar.PointOfSale.pos_history = class {
 				'</style>'+
 				'<div style="display:flex; flex-direction:column;">'+
 					'<div id="logContainer"  >'+
-						'<div style="width:15%;"></div>'+
+						'<div style="width:20%;"></div>'+
 						`<img src="${this.company.company_logo}">`+
-						'<div style="width:15%;"></div>'+
+						'<div style="width:20%;"></div>'+
 					'</div>'+
 					'<div id="company_container">' +
 						'<div style="flex-grow:1; border-bottom:1px dashed #505050; border-top:1px dashed #505050; "></div>'+
 						`<p style="margin:0px 25px;">${this.company.company_name}</p>`+
 						'<div style="flex-grow:1; border-bottom:1px dashed #505050; border-top:1px dashed #505050;"></div>'+
 					'</div>'+
-					'<div>'+
-						`Clien: ${this.selected_pos.customer}`+
-					'</div>'+
-					'<div>'+
-						`Date : 24-10-2024`+
-					'</div>'+
-					'<div>'+
-						`temp : 13:09`+
+					'<div id="top_data_container">'+
+						'<div class="c1">'+
+						'</div>'+
+						'<div class="c2">'+
+							`<div class="date"> ${date} </div>`+
+							`<div class="time"> ${time} </div>`+
+						'</div>'+
 					'</div>'+
 					'<table>'+
 						'<tr><th>Nom</th><th>Qté</th><th>P.unité</th><th>Prix</th>'
