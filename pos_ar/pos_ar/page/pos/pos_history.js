@@ -420,24 +420,31 @@ pos_ar.PointOfSale.pos_history = class {
 					'font-size : 12px;'+
 				'}'+
 				'table{'+
-					'border: 1px solid #505050; border-spacing:0px;'+
+					//'border: 1px solid #505050; border-spacing:0px;'+
 					'width: 100%; margin-top:16px;'+
 				'}'+
 				'tr{'+
 					'width:100%; height:16px;'+
 				'}'+
 				'tr:nth-child(1){'+
-					'background:#eeeeee;'+
+					'background:#eeeeee;border:2px solid #000000;'+
 				'}'+
-				'th{'+
-					'border-right:1px solid #505050;'+
+				/*'th{'+
+					//'border-right:1px solid #505050;'+
 					'border-bottom:1px solid #505050;'+
 					'border-top:1px solid #505050;'+
+					//'border-top:1px solid #505050;'+
 					'font-weight : 500;'+
 				'}'+
-				'td{'+
-					'border-right:1px solid #505050;'+
+				'th:nth-child(1){'+
+					'border-left:1px solid #505050;'+
 				'}'+
+				'th:nth-child(4){'+
+					'border-right:1px solid #505050;'+
+				'}'+*/
+				//'td{'+
+					//'border-right:1px solid #505050;'+
+				//'}'+
 				'#logContainer{'+
 					'width: 100%;height:80px;'+
 					'display : flex;'+
@@ -486,7 +493,7 @@ pos_ar.PointOfSale.pos_history = class {
 						'</div>'+
 					'</div>'+
 					'<table>'+
-						'<tr><th>Nom</th><th>Qté</th><th>P.unité</th><th>Prix</th>'
+						'<tr style="border:3px solid #000000;"><th>Nom</th><th>Qté</th><th>P.unité</th><th>Prix</th>'
 
 		this.selected_pos.items.forEach(item => {
 			netTotal    += item.rate * item.qty
