@@ -43,7 +43,7 @@ pos_ar.PointOfSale.posSettingsData = class{
 	setPriceItemBasedOn(base , onSuccess , onFailure){
 		if(this.price_bases.includes(base)){
 			this.settings.itemPriceBasedOn = base
-			this.db.updateSettings(
+			this.db.updateSettings_callback(
 				this.settings,
 				()=>{
 					//saved

@@ -690,6 +690,18 @@ pos_ar.PointOfSale.pos_db  = class POSDatabase {
 			};
 		})
 	}
+	//callback version
+	updateSettings_callback(settings,onSuccess,onFailure){
+		const transaction = this.db.transaction(['POS Settings'] , "readwrite");
+		const store       = transaction.objectStore('POS Settings')
+		const request     = store.put({id : 1 , ...settings});
+		request.onsuccess = (event) => {
+			onSuccess(event.target.result);
+		};
+		request.onerror = (err) => {
+			onFailure(err);
+		};
+	}
 
 
 	getSettings(onSuccess,onFailure) {

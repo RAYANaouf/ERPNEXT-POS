@@ -126,10 +126,13 @@ pos_ar.PointOfSale.pos_settings = class{
 		})
 
 		//set listeners
+		console.log("got you man")
 		this.item_price_based_on_select.on('input' , (event)=>{
+			console.log("im inside man")
 			this.settings_data.setPriceItemBasedOn(
 				event.target.value,
 				()=>{
+					console.log("debuging : we are here man ")
 					this.on_settings_change("itemPriceBasedOn")
 				},()=>{
 					console.error("error to affect the ui by the settings changes (settings.js)")

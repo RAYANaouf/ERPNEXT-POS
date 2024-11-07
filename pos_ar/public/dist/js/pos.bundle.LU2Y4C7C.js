@@ -418,6 +418,7 @@
       );
     }
     onSettingsChange(settingName) {
+      console.log("debuging : ", settingName);
       if (settingName == "itemPriceBasedOn") {
         this.item_selector.refreshItemSelector();
       }
@@ -3148,6 +3149,17 @@
         };
       });
     }
+    updateSettings_callback(settings, onSuccess, onFailure) {
+      const transaction = this.db.transaction(["POS Settings"], "readwrite");
+      const store = transaction.objectStore("POS Settings");
+      const request2 = store.put(__spreadValues({ id: 1 }, settings));
+      request2.onsuccess = (event2) => {
+        onSuccess(event2.target.result);
+      };
+      request2.onerror = (err) => {
+        onFailure(err);
+      };
+    }
     getSettings(onSuccess, onFailure) {
       const transaction = this.db.transaction(["POS Settings"], "readwrite");
       const store = transaction.objectStore("POS Settings");
@@ -3262,10 +3274,13 @@
           this.item_price_based_on_select.append(`<option value="${base}"> ${base} </option>`);
         }
       });
+      console.log("got you man");
       this.item_price_based_on_select.on("input", (event2) => {
+        console.log("im inside man");
         this.settings_data.setPriceItemBasedOn(
           event2.target.value,
           () => {
+            console.log("debuging : we are here man ");
             this.on_settings_change("itemPriceBasedOn");
           },
           () => {
@@ -3511,7 +3526,7 @@
     setPriceItemBasedOn(base, onSuccess, onFailure) {
       if (this.price_bases.includes(base)) {
         this.settings.itemPriceBasedOn = base;
-        this.db.updateSettings(
+        this.db.updateSettings_callback(
           this.settings,
           () => {
             onSuccess();
@@ -3768,4 +3783,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.VLPDIMT5.js.map
+//# sourceMappingURL=pos.bundle.LU2Y4C7C.js.map
