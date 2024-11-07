@@ -418,9 +418,10 @@
       );
     }
     onSettingsChange(settingName) {
-      console.log("debuging : ", settingName);
       if (settingName == "itemPriceBasedOn") {
         this.item_selector.refreshItemSelector();
+        this.selected_item_cart.resetItemRateBaseOnPriceList();
+        this.selected_item_cart.refreshSelectedItem();
       }
     }
     onCheckout() {
@@ -1678,8 +1679,9 @@
     resetItemRateBaseOnPriceList() {
       this.selected_item_maps.get(this.selected_tab.tabName).items.forEach((item) => {
         item.rate = this.get_item_price(item, this.selected_item_maps.get(this.selected_tab.tabName).priceList);
+        item.discount_percentage = 0;
+        item.discount_amount = 0;
       });
-      console.log("resting ==> ", this.selected_item_maps.get(this.selected_tab.tabName));
     }
     makeItemHighlight(itemElement) {
       const selectedItemsContainer = document.getElementById("selectedItemsContainer");
@@ -3783,4 +3785,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.LU2Y4C7C.js.map
+//# sourceMappingURL=pos.bundle.PRKODBMY.js.map
