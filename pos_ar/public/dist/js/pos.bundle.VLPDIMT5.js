@@ -720,6 +720,7 @@
         this.unsyncedPos += 1;
         this.customer_box.setNotSynced(this.unsyncedPos);
       }
+      this.history_cart.print_receipt(pos);
       this.selectedItemMaps.delete(this.selectedTab.tabName);
       let tabs = Array.from(this.selectedItemMaps.keys());
       if (tabs.length > 0) {
@@ -2582,29 +2583,28 @@
         this.on_click("return", null);
       });
       this.printBtn.on("click", (event2) => {
-        this.print_receipt();
+        this.print_receipt(this.selected_pos);
       });
     }
-    print_receipt() {
-      console.log("debuging : ", this.selected_pos);
+    print_receipt(pos) {
       let netTotal = 0;
       let taxes = 0;
       let grandTotal = 0;
-      const creation_time = this.selected_pos.creation_time;
+      const creation_time = pos.creation_time;
       const [date, time] = creation_time.split(" ");
-      let invoiceHTML = `<style>#company_container {width: 100% ; height: 40px ; display:flex; align-items:center; font-size : 12px;}table{width: 100%; margin-top:16px;}tr{width:100%; height:16px;}tr:nth-child(1){background:#eeeeee;border:2px solid #000000;}#logContainer{width: 100%;height:80px;display : flex;justify-content:center;}#logContainer img{width:50%; height:100%;}#top_data_container{width:100%;display:flex;}#top_data_container>div.c1{font-size:12px;flex-grow:1;}#top_data_container>div.c2{font-size:12px;flex-grow:1;display:flex;flex-direction:column;align-items:end;}td>div{height:18px; width:100%;font-size:12px;display:flex; justify-content:center; align-items:center;}#footer_message{height:20px;}</style><div style="display:flex; flex-direction:column;"><div id="logContainer"  ><div style="width:20%;"></div><img src="${this.company.company_logo}"><div style="width:20%;"></div></div><div id="company_container"><div style="flex-grow:1; border-bottom:1px dashed #505050; border-top:1px dashed #505050; "></div><p style="margin:0px 25px;">${this.company.company_name}</p><div style="flex-grow:1; border-bottom:1px dashed #505050; border-top:1px dashed #505050;"></div></div><div id="top_data_container"><div class="c1"><div class="customer"> Customer : ${this.selected_pos.customer} </div><div class="refrence"> Commande : ${this.selected_pos.refNum} </div></div><div class="c2"><div class="date"> ${date}/${time} </div></div></div><table><tr style="border:3px solid #000000;"><th>Nom</th><th>Qt\xE9</th><th>P.unit\xE9</th><th>Prix</th>`;
-      this.selected_pos.items.forEach((item) => {
+      let invoiceHTML = `<style>#company_container {width: 100% ; height: 40px ; display:flex; align-items:center; font-size : 12px;}table{width: 100%; margin-top:16px;}tr{width:100%; height:16px;}tr:nth-child(1){background:#eeeeee;border:2px solid #000000;}#logContainer{width: 100%;height:80px;display : flex;justify-content:center;}#logContainer img{width:50%; height:100%;}#top_data_container{width:100%;display:flex;}#top_data_container>div.c1{font-size:12px;flex-grow:1;}#top_data_container>div.c2{font-size:12px;flex-grow:1;display:flex;flex-direction:column;align-items:end;}td>div{height:18px; width:100%;font-size:12px;display:flex; justify-content:center; align-items:center;}#footer_message{height:20px;}</style><div style="display:flex; flex-direction:column;"><div id="logContainer"  ><div style="width:20%;"></div><img src="${this.company.company_logo}"><div style="width:20%;"></div></div><div id="company_container"><div style="flex-grow:1; border-bottom:1px dashed #505050; border-top:1px dashed #505050; "></div><p style="margin:0px 25px;">${this.company.company_name}</p><div style="flex-grow:1; border-bottom:1px dashed #505050; border-top:1px dashed #505050;"></div></div><div id="top_data_container"><div class="c1"><div class="customer"> Customer : ${pos.customer} </div><div class="refrence"> Commande : ${pos.refNum} </div></div><div class="c2"><div class="date"> ${date}/${time} </div></div></div><table><tr style="border:3px solid #000000;"><th>Nom</th><th>Qt\xE9</th><th>P.unit\xE9</th><th>Prix</th>`;
+      pos.items.forEach((item) => {
         netTotal += item.rate * item.qty;
         invoiceHTML += `<tr> <td><div>${item.item_name}</div></td>  <td><div>${item.qty}</div></td>  <td><div>${item.rate}</div></td>  <td><div>${item.rate * item.qty}</div></td></tr>`;
       });
       invoiceHTML += "</table>";
       invoiceHTML += `<div style="height:23px;"> <p style="font-size:12px;font-weight:500;" ><span style="font-size:16px;font-weight:600;">Sous-total : </span> ${netTotal} DA </p> </div>`;
-      invoiceHTML += `<div style="height:23px;"> <p style="font-size:12px;font-weight:500;" ><span style="font-size:16px;font-weight:600;">Reduction : </span> ${this.selected_pos.additional_discount_percentage * netTotal} DA </p> </div>`;
+      invoiceHTML += `<div style="height:23px;"> <p style="font-size:12px;font-weight:500;" ><span style="font-size:16px;font-weight:600;">Reduction : </span> ${pos.additional_discount_percentage * netTotal} DA </p> </div>`;
       this.sales_taxes.forEach((tax) => {
         taxes += tax.rate;
         invoiceHTML += `<div style="height:23px;"> <p style="font-size:12px;font-weight:500;" ><span style="font-size:16px;font-weight:600;">${tax.description} : </span> ${tax.rate} % </p> </div>`;
       });
-      invoiceHTML += `<div style="height:23px;"> <p style="font-size:12px;font-weight:500;" ><span style="font-size:16px;font-weight:700;">Total : </span> ${netTotal + netTotal * (taxes / 100) - this.selected_pos.additional_discount_percentage * netTotal} DA </p> </div>`;
+      invoiceHTML += `<div style="height:23px;"> <p style="font-size:12px;font-weight:500;" ><span style="font-size:16px;font-weight:700;">Total : </span> ${netTotal + netTotal * (taxes / 100) - pos.additional_discount_percentage * netTotal} DA </p> </div>`;
       invoiceHTML += '<div id="footer_message" style="width:100%; display:flex; align-items:center; margin-top:30px;"><div style="flex-grow:1; border-bottom:2px dashed #505050;"></div><div style="margin:30px 25px;"> Thank You, Come Again</div><div style="flex-grow:1;border-bottom:2px dashed #505050;"></div></div>';
       invoiceHTML += "</div>";
       const printWindow = window.open("", "_blank");
@@ -3768,4 +3768,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.AI37C72S.js.map
+//# sourceMappingURL=pos.bundle.VLPDIMT5.js.map

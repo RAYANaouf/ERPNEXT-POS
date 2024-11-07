@@ -922,6 +922,9 @@ pos_ar.PointOfSale.Controller = class {
 			this.unsyncedPos += 1 ;
 			this.customer_box.setNotSynced(this.unsyncedPos);
 		}
+		//print the pos
+		this.history_cart.print_receipt(pos)
+
 		this.selectedItemMaps.delete(this.selectedTab.tabName)
 
 		//tabs

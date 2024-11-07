@@ -395,21 +395,19 @@ pos_ar.PointOfSale.pos_history = class {
 		})
 
 		this.printBtn.on('click' , (event)=>{
-			this.print_receipt()
+			this.print_receipt(this.selected_pos)
 		})
 
 	}
 
 	/******************************************** functions  ********************************************************/
-	print_receipt() {
-
-		console.log("debuging : ", this.selected_pos);
+	print_receipt(pos) {
 
 		let netTotal   = 0
 		let taxes      = 0
 		let grandTotal = 0
 
-		const creation_time = this.selected_pos.creation_time
+		const creation_time = pos.creation_time
 		const [date, time]  = creation_time.split(' ')
 
 		let invoiceHTML =
@@ -429,22 +427,6 @@ pos_ar.PointOfSale.pos_history = class {
 				'tr:nth-child(1){'+
 					'background:#eeeeee;border:2px solid #000000;'+
 				'}'+
-				/*'th{'+
-					//'border-right:1px solid #505050;'+
-					'border-bottom:1px solid #505050;'+
-					'border-top:1px solid #505050;'+
-					//'border-top:1px solid #505050;'+
-					'font-weight : 500;'+
-				'}'+
-				'th:nth-child(1){'+
-					'border-left:1px solid #505050;'+
-				'}'+
-				'th:nth-child(4){'+
-					'border-right:1px solid #505050;'+
-				'}'+*/
-				//'td{'+
-					//'border-right:1px solid #505050;'+
-				//'}'+
 				'#logContainer{'+
 					'width: 100%;height:80px;'+
 					'display : flex;'+
@@ -485,8 +467,8 @@ pos_ar.PointOfSale.pos_history = class {
 					'</div>'+
 					'<div id="top_data_container">'+
 						'<div class="c1">'+
-							`<div class="customer"> Customer : ${this.selected_pos.customer} </div>`+
-							`<div class="refrence"> Commande : ${this.selected_pos.refNum} </div>`+
+							`<div class="customer"> Customer : ${pos.customer} </div>`+
+							`<div class="refrence"> Commande : ${pos.refNum} </div>`+
 						'</div>'+
 						'<div class="c2">'+
 							`<div class="date"> ${date}/${time} </div>`+
@@ -495,7 +477,7 @@ pos_ar.PointOfSale.pos_history = class {
 					'<table>'+
 						'<tr style="border:3px solid #000000;"><th>Nom</th><th>Qté</th><th>P.unité</th><th>Prix</th>'
 
-		this.selected_pos.items.forEach(item => {
+		pos.items.forEach(item => {
 			netTotal    += item.rate * item.qty
 			invoiceHTML += `<tr> <td><div>${item.item_name}</div></td>  <td><div>${item.qty}</div></td>  <td><div>${item.rate}</div></td>  <td><div>${item.rate * item.qty}</div></td></tr>`
 		})
@@ -505,14 +487,14 @@ pos_ar.PointOfSale.pos_history = class {
 
 
 		invoiceHTML += `<div style="height:23px;"> <p style="font-size:12px;font-weight:500;" ><span style="font-size:16px;font-weight:600;">Sous-total : </span> ${netTotal} DA </p> </div>`
-		invoiceHTML += `<div style="height:23px;"> <p style="font-size:12px;font-weight:500;" ><span style="font-size:16px;font-weight:600;">Reduction : </span> ${this.selected_pos.additional_discount_percentage * netTotal} DA </p> </div>`
+		invoiceHTML += `<div style="height:23px;"> <p style="font-size:12px;font-weight:500;" ><span style="font-size:16px;font-weight:600;">Reduction : </span> ${pos.additional_discount_percentage * netTotal} DA </p> </div>`
 
 		this.sales_taxes.forEach(tax => {
 			taxes += tax.rate
 			invoiceHTML += `<div style="height:23px;"> <p style="font-size:12px;font-weight:500;" ><span style="font-size:16px;font-weight:600;">${tax.description} : </span> ${tax.rate} % </p> </div>`
 		})
 
-		invoiceHTML += `<div style="height:23px;"> <p style="font-size:12px;font-weight:500;" ><span style="font-size:16px;font-weight:700;">Total : </span> ${netTotal+(netTotal*(taxes/100)) - this.selected_pos.additional_discount_percentage * netTotal} DA </p> </div>`
+		invoiceHTML += `<div style="height:23px;"> <p style="font-size:12px;font-weight:500;" ><span style="font-size:16px;font-weight:700;">Total : </span> ${netTotal+(netTotal*(taxes/100)) - pos.additional_discount_percentage * netTotal} DA </p> </div>`
 
 
 		invoiceHTML +=
