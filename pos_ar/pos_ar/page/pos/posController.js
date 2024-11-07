@@ -81,7 +81,6 @@ pos_ar.PointOfSale.Controller = class {
 			const hour    = date.getHours()
 			const minutes = date.getMinutes()
 			const seconds = date.getMilliseconds()
-			console.log("debuging : " , year+'-'+month+'-'+day+'-'+hour+minutes+seconds )
 			new_pos_invoice.refNum            = this.selectedPosProfile.name+"-"+year+'-'+month+'-'+day+'-'+hour+minutes+seconds
 
 			this.selectedItemMaps.set("C1" , new_pos_invoice)
@@ -102,7 +101,9 @@ pos_ar.PointOfSale.Controller = class {
 		//set default val
 		Object.assign(this.selectedPosProfile , this.appData.appData.pos_profiles[0])
 		//check takes and get it if it exist on pos profile
-		if(this.selectedPosProfile.taxes_and_charges != null){
+		console.log("debuging : " , this.selectedPosProfile)
+		if(this.selectedPosProfile.taxes_and_charges != null && this.selectedPosProfile.taxes_and_charges != ""){
+			console.log("debuging inside : " , this.selectedPosProfile)
 			this.taxes_and_charges_template = await this.dataHandler.fetchSalesTaxesAndChargesTemplate(this.selectedPosProfile.taxes_and_charges)
 			this.taxes_and_charges = this.taxes_and_charges_template.taxes
 		}
@@ -909,11 +910,14 @@ pos_ar.PointOfSale.Controller = class {
 		const pos = structuredClone(this.selectedItemMaps.get(this.selectedTab.tabName))
 
 
+
 		if(status == 'Unpaid'){
 			pos.synced = true
 			frappe.db.insert(
 				pos
 			).then(r =>{
+				console.log("debuging the pos : " , r)
+
 				this.appData.updatePosInvoice(pos)
 			}).catch(err=>{
 				console.log("cant push pos invoice : " , err);

@@ -76,7 +76,6 @@
         const hour = date.getHours();
         const minutes = date.getMinutes();
         const seconds = date.getMilliseconds();
-        console.log("debuging : ", year + "-" + month + "-" + day + "-" + hour + minutes + seconds);
         new_pos_invoice.refNum = this.selectedPosProfile.name + "-" + year + "-" + month + "-" + day + "-" + hour + minutes + seconds;
         this.selectedItemMaps.set("C1", new_pos_invoice);
         this.selectedTab.tabName = `C1`;
@@ -91,7 +90,9 @@
         throw new Error("there is no pos profile");
       }
       Object.assign(this.selectedPosProfile, this.appData.appData.pos_profiles[0]);
-      if (this.selectedPosProfile.taxes_and_charges != null) {
+      console.log("debuging : ", this.selectedPosProfile);
+      if (this.selectedPosProfile.taxes_and_charges != null && this.selectedPosProfile.taxes_and_charges != "") {
+        console.log("debuging inside : ", this.selectedPosProfile);
         this.taxes_and_charges_template = await this.dataHandler.fetchSalesTaxesAndChargesTemplate(this.selectedPosProfile.taxes_and_charges);
         this.taxes_and_charges = this.taxes_and_charges_template.taxes;
       }
@@ -712,6 +713,7 @@
         frappe.db.insert(
           pos
         ).then((r) => {
+          console.log("debuging the pos : ", r);
           this.appData.updatePosInvoice(pos);
         }).catch((err) => {
           console.log("cant push pos invoice : ", err);
@@ -3785,4 +3787,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.PRKODBMY.js.map
+//# sourceMappingURL=pos.bundle.W7NJFFEN.js.map
