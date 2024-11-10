@@ -1432,7 +1432,7 @@
           itemImageHolder.appendChild(itemImageLatter);
           leftGroup.appendChild(itemImageHolder);
         }
-        itemName.textContent = item.name;
+        itemName.textContent = item.item_name;
         itemName.classList.add("selectedItemName");
         leftGroup.appendChild(itemName);
         itemQuantity.textContent = item.qty;
@@ -3788,4 +3788,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.V7X6EAZI.js.map
+//# sourceMappingURL=pos.bundle.PPX4ODD2.js.map

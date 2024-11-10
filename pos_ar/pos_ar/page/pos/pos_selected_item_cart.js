@@ -282,7 +282,7 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 
 
 			//name
-			itemName.textContent = item.name;
+			itemName.textContent = item.item_name;
 			itemName.classList.add("selectedItemName");
 			leftGroup.appendChild(itemName);
 
