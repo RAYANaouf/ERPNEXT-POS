@@ -242,7 +242,7 @@ pos_ar.PointOfSale.pos_db  = class POSDatabase {
 			const transaction = this.db.transaction(['Warehouse'] , "readwrite");
 			const store       = transaction.objectStore('Warehouse')
 			// Loop through the list of warehouse and add each one to the store
-			warehousesList.forEach(warehouse => {
+			warehouseList.forEach(warehouse => {
 				const request = store.put(warehouse)
 				request.onerror = (err)=>{
 					console.error("db => error saving Warehouse : " ,warehouse ,  "err : " , err)

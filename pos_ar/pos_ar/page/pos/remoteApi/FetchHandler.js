@@ -154,7 +154,7 @@ pos_ar.PointOfSale.FetchHandler = class FetchHandler{
 		try{
 			const filter = {}
 			return await frappe.db.get_list('Bin' , {
-				fields  : ['actual_qty' , 'item_code' , 'warehouse'],
+				fields  : ['name' , 'actual_qty' , 'item_code' , 'warehouse'],
 				filters : filter,
 				limit   : 1
 			})

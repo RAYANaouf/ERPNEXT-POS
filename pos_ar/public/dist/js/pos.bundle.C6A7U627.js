@@ -2795,7 +2795,7 @@
       return new Promise((resolve, reject) => {
         const transaction = this.db.transaction(["Warehouse"], "readwrite");
         const store = transaction.objectStore("Warehouse");
-        warehousesList.forEach((warehouse) => {
+        warehouseList.forEach((warehouse) => {
           const request = store.put(warehouse);
           request.onerror = (err) => {
             console.error("db => error saving Warehouse : ", warehouse, "err : ", err);
@@ -3816,7 +3816,7 @@
       try {
         const filter = {};
         return await frappe.db.get_list("Bin", {
-          fields: ["actual_qty", "item_code", "warehouse"],
+          fields: ["name", "actual_qty", "item_code", "warehouse"],
           filters: filter,
           limit: 1
         });
@@ -3827,4 +3827,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.MWBCZIX3.js.map
+//# sourceMappingURL=pos.bundle.C6A7U627.js.map

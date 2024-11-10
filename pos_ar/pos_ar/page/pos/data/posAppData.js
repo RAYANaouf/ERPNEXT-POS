@@ -110,7 +110,6 @@ pos_ar.PointOfSale.posAppData = class {
 		const updatedWarehouses = await this.api_handler.fetchWarehouseList(this.since)
 		//save new warehouse
 		await this.db.saveWarehouseList(updatedWarehouses);
-
 		this.appData.warehouses = this.combineLocalAndUpdated(localWarehouses,updatedWarehouses)
 	}
 	async getPriceLists(){
