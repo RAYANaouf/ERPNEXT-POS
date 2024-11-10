@@ -7,6 +7,9 @@ pos_ar.PointOfSale.posAppData = class {
 		this.db          = db;
 		this.api_handler = apiHandler;
 
+		this.since = localStorage.getItem('lastTime');
+
+
 		this.appData = {} ;
 	}
 
@@ -33,9 +36,14 @@ pos_ar.PointOfSale.posAppData = class {
 			await this.getPosInvoices();
 			frappe.show_progress('Please Wait', 10, 11, 'Please check in out');
 			await this.getCheckInOuts();
-			frappe.show_progress('Please Wait', 11, 11, 'Please wait');
 			frappe.hide_progress();
 			frappe.hide_progress();
+			frappe.hide_progress();
+
+			this.since = frappe.datetime.now_datetime()
+			localStorage.setItem('lastTime', frappe.datetime.now_datetime());
+
+
 			console.log("app data : " , this.appData)
 		}catch(err){
 			console.error("appData Class Error  : " , err)
@@ -50,56 +58,88 @@ pos_ar.PointOfSale.posAppData = class {
 	async getCustomers(){
 		/*the function should combine the two the logic didnt complite yet we still working on it*/
 		//get local
-		this.appData.customers = await this.db.getAllCustomers();
+		//this.appData.customers = await this.db.getAllCustomers();
+		const localCustomers = await this.db.getAllCustomers();
 		//get remote
-		this.appData.customers = await this.api_handler.fetchCustomers()
+		const updatedCustomers = await this.api_handler.fetchCustomers(this.since)
+		//save new customers
+		await this.db.saveCustomerList(updatedCustomers)
+
+		this.appData.customers = this.combineLocalAndUpdated(localCustomers,updatedCustomers)
+
 	}
 	async getBrands(){
 		//get local
 		//get remote
-		this.appData.brands = await this.api_handler.fetchBrands()
+		this.appData.brands = await this.api_handler.fetchBrands(this.since)
 	}
 	async getItems(){
 		//get local
-		this.appData.items = await this.db.getAllItems();
+		const localItems   = await this.db.getAllItems();
 		//get remote
-		this.appData.items = await this.api_handler.fetchItems()
+		const updatedItems = await this.api_handler.fetchItems(this.since)
+		//save new items
+		await this.db.saveItemList(updatedItems)
+
+		this.appData.items = this.combineLocalAndUpdated(localItems,updatedItems)
 	}
 	async getPosProfiles(){
 		//get local
-		this.appData.pos_profiles = await this.db.getAllPosProfile();
+		const localPosProfiles    = await this.db.getAllPosProfile();
 		//get remote
-		this.appData.pos_profiles = await this.api_handler.fetchPosProfileList()
+		const updatedPosProfiles  = await this.api_handler.fetchPosProfileList(this.since)
+		//save new pos profiles
+		await this.db.savePosProfileList()
+
+		this.appData.pos_profiles = this.combineLocalAndUpdated(localPosProfiles,updatedPosProfiles)
 	}
 	async getBins(){
 		//get local
-		this.appData.bins = await this.db.getAllBin();
+		const localBins   = await this.db.getAllBin();
 		//get remote
-		this.appData.bins = await this.api_handler.fetchBinList()
+		const updatedBins = await this.api_handler.fetchBinList(this.since)
+		//save new bins
+		await this.db.saveBinList()
+
+		this.appData.bins = this.combineLocalAndUpdated(localBins,updatedBins)
 	}
 	async getWarehouses(){
 		//get local
-		this.appData.warehouses = await this.db.getAllWarehouse();
+		const localWarehouses   = await this.db.getAllWarehouse();
 		//warehouse
-		this.appData.warehouses = await this.api_handler.fetchWarehouseList()
+		const updatedWarehouses = await this.api_handler.fetchWarehouseList(this.since)
+		//save new warehouse
+		await this.db.saveWarehouseList(updatedWarehouses);
+
+		this.appData.warehouses = this.combineLocalAndUpdated(localWarehouses,updatedWarehouses)
 	}
 	async getPriceLists(){
 		//get local
-		this.appData.price_lists = await this.db.getAllPriceList();
+		const localPriceLists  = await this.db.getAllPriceList();
 		//get remote
-		this.appData.price_lists = await this.api_handler.fetchPriceList()
+		const updatedPriceList = await this.api_handler.fetchPriceList(this.since)
+		//save new price list
+		await this.db.savePriceLists(updatedPriceList)
+
+		this.appData.price_lists = this.combineLocalAndUpdated(localPriceLists,updatedPriceList)
 	}
 	async getItemPrices(){
 		//get local
-		this.appData.item_prices = await this.db.getAllItemPrice();
+		const localItemPrices = await this.db.getAllItemPrice();
 		//get remote
-		this.appData.item_prices = await this.api_handler.fetchItemPrice()
+		const updateItemPrices = await this.api_handler.fetchItemPrice(this.since)
+		await this.db.saveItemPriceList(updateItemPrices);
+
+		this.appData.item_prices = this.combineLocalAndUpdated(localItemPrices,updateItemPrices)
 	}
 	async getItemGroups(){
 		//get local
-		this.appData.item_groups = await this.db.getAllItemGroup();
+		const localItemGroups = await this.db.getAllItemGroup();
 		//get remote
-		this.appData.item_groups = await this.api_handler.fetchItemGroups()
+		const localItemGroups = await this.api_handler.fetchItemGroups(this.since)
+		await this.db.saveItemGroupList(localItemGroups)
+
+		this.appData.item_groups = this.combineLocalAndUpdated(localItemGroups,localItemGroups)
 	}
 	async getPosInvoices(){
 		//get local
@@ -140,4 +180,16 @@ pos_ar.PointOfSale.posAppData = class {
 		)
 	}
 
+
+	/******************  function ***************************/
+	combineLocalAndUpdated(local,updated){
+		console.log("we are on combineLocalAndUpdated : local ==> " , local , " updated ==> " , updated )
+		// Create a map from the local data array using a unique identifier (name)
+		const combinedMap = new Map(local.map(item => [item.name, item]));
+		// Loop through each item in the updated data
+		updated.forEach(updatedItem=>{
+			combinedMap.set(updatedItem.name , updatedItem)
+		})
+		return Array.from(combinedMap.values())
+	}
 }

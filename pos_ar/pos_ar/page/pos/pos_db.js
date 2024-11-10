@@ -10,7 +10,7 @@ pos_ar.PointOfSale.pos_db  = class POSDatabase {
 		return new Promise((resolve , reject) => {
 
 			// Let us open our database
-			const request = window.indexedDB.open( 'POSDB_test29' , 1);
+			const request = window.indexedDB.open( 'POSDB_test31' , 1);
 
 			request.onerror = (event) => {
 				// Do something with request.error!
@@ -104,7 +104,7 @@ pos_ar.PointOfSale.pos_db  = class POSDatabase {
 		return new Promise((resolve , reject) => {
 			const transaction = this.db.transaction(['Item'] , "readwrite");
 			const store       = transaction.objectStore('Item')
-			// Loop through the list of customers and add each one to the store
+			// Loop through the list of items  and add each one to the store
 			itemList.forEach(item => {
 				const request = store.put(item)
 				request.onerror = (err)=>{
@@ -148,7 +148,7 @@ pos_ar.PointOfSale.pos_db  = class POSDatabase {
 		return new Promise((resolve,reject)=>{
 			const transaction = this.db.transaction(['POS Profile'] , "readwrite");
 			const store       = transaction.objectStore('POS Profile')
-			// Loop through the list of customers and add each one to the store
+			// Loop through the list of pos profile and add each one to the store
 			posProfileList.forEach(posProfile => {
 				const request = store.put(posProfile)
 				request.onerror = (err)=>{
@@ -195,7 +195,7 @@ pos_ar.PointOfSale.pos_db  = class POSDatabase {
 		return new Promise((resolve,reject)=>{
 			const transaction = this.db.transaction(['Bin'] , "readwrite");
 			const store       = transaction.objectStore('Bin')
-			// Loop through the list of customers and add each one to the store
+			// Loop through the list of bin  and add each one to the store
 			binList.forEach(bin => {
 				const request = store.put(bin)
 				request.onerror = (err)=>{
@@ -241,7 +241,7 @@ pos_ar.PointOfSale.pos_db  = class POSDatabase {
 		return new Promise((resolve,reject)=>{
 			const transaction = this.db.transaction(['Warehouse'] , "readwrite");
 			const store       = transaction.objectStore('Warehouse')
-			// Loop through the list of customers and add each one to the store
+			// Loop through the list of warehouse and add each one to the store
 			warehousesList.forEach(warehouse => {
 				const request = store.put(warehouse)
 				request.onerror = (err)=>{
@@ -287,7 +287,7 @@ pos_ar.PointOfSale.pos_db  = class POSDatabase {
 			const transaction = this.db.transaction(['Price List'] , "readwrite");
 			const store       = transaction.objectStore('Price List')
 
-			// Loop through the list of customers and add each one to the store
+			// Loop through the list of price lists and add each one to the store
 			priceLists.forEach(priceList => {
 				const request = store.put(priceList)
 				request.onerror = (err)=>{
@@ -336,7 +336,7 @@ pos_ar.PointOfSale.pos_db  = class POSDatabase {
 		return new Promise((resolve,reject)=>{
 			const transaction = this.db.transaction(['Item Price'] , "readwrite");
 			const store       = transaction.objectStore('Item Price')
-			// Loop through the list of customers and add each one to the store
+			// Loop through the list of item price and add each one to the store
 			itemPriceList.forEach(itemPrice => {
 				const request = store.put(itemPrice)
 				request.onerror = (err)=>{
@@ -380,7 +380,7 @@ pos_ar.PointOfSale.pos_db  = class POSDatabase {
 		return new Promise((resolve,reject)=>{
 			const transaction = this.db.transaction(['Item Group'] , "readwrite");
 			const store       = transaction.objectStore('Item Group')
-			// Loop through the list of customers and add each one to the store
+			// Loop through the list of item group and add each one to the store
 			itemGroupList.forEach(itemGroup => {
 				const request = store.put(itemGroup)
 				request.onerror = (err)=>{
@@ -423,7 +423,7 @@ pos_ar.PointOfSale.pos_db  = class POSDatabase {
 
 	saveCustomerList(customerList ){
 		return new Promise((resolve,reject) => {
-			const transaction = this.db.transaction(['Customer'] , "readonly");
+			const transaction = this.db.transaction(['Customer'] , "readwrite");
 			const store       = transaction.objectStore('Customer')
 			// Loop through the list of customers and add each one to the store
 			customerList.forEach(customer => {
@@ -438,7 +438,7 @@ pos_ar.PointOfSale.pos_db  = class POSDatabase {
 			transaction.oncomplete = () => {
 				resolve();
 			};
-			request.onerror = (event) => {
+			transaction.onerror = (event) => {
 				console.error("db => error saving customer.")
 				reject(event)
 			};

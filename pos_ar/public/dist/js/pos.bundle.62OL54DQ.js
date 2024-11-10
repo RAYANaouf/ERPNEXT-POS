@@ -2630,7 +2630,7 @@
     }
     static async openDatabase() {
       return new Promise((resolve, reject) => {
-        const request2 = window.indexedDB.open("POSDB_test29", 1);
+        const request2 = window.indexedDB.open("POSDB_test31", 1);
         request2.onerror = (event2) => {
           reject(request2.error);
         };
@@ -2929,7 +2929,7 @@
     }
     saveCustomerList(customerList) {
       return new Promise((resolve, reject) => {
-        const transaction = this.db.transaction(["Customer"], "readonly");
+        const transaction = this.db.transaction(["Customer"], "readwrite");
         const store = transaction.objectStore("Customer");
         customerList.forEach((customer) => {
           const request2 = store.put(customer);
@@ -2941,7 +2941,7 @@
         transaction.oncomplete = () => {
           resolve();
         };
-        request.onerror = (event2) => {
+        transaction.onerror = (event2) => {
           console.error("db => error saving customer.");
           reject(event2);
         };
@@ -3552,6 +3552,8 @@
     constructor(db, apiHandler) {
       this.db = db;
       this.api_handler = apiHandler;
+      localStorage.removeItem("lastTime");
+      this.since = localStorage.getItem("lastTime");
       this.appData = {};
     }
     async getAllData() {
@@ -3576,9 +3578,11 @@
         await this.getPosInvoices();
         frappe.show_progress("Please Wait", 10, 11, "Please check in out");
         await this.getCheckInOuts();
-        frappe.show_progress("Please Wait", 11, 11, "Please wait");
         frappe.hide_progress();
         frappe.hide_progress();
+        frappe.hide_progress();
+        this.since = frappe.datetime.now_datetime();
+        localStorage.setItem("lastTime", frappe.datetime.now_datetime());
         console.log("app data : ", this.appData);
       } catch (err) {
         console.error("appData Class Error  : ", err);
@@ -3587,39 +3591,43 @@
       frappe.hide_progress();
     }
     async getCustomers() {
-      this.appData.customers = await this.db.getAllCustomers();
-      this.appData.customers = await this.api_handler.fetchCustomers();
+      const localCustomers = await this.db.getAllCustomers();
+      const updatedCustomers = await this.api_handler.fetchCustomers(this.since);
+      await this.db.saveCustomerList(updatedCustomers);
+      this.appData.customers = this.combineLocalAndUpdated(localCustomers, updatedCustomers);
     }
     async getBrands() {
-      this.appData.brands = await this.api_handler.fetchBrands();
+      this.appData.brands = await this.api_handler.fetchBrands(this.since);
     }
     async getItems() {
-      this.appData.items = await this.db.getAllItems();
-      this.appData.items = await this.api_handler.fetchItems();
+      const localItems = await this.db.getAllItems();
+      const updatedItems = await this.api_handler.fetchItems(this.since);
+      this.appData.items = this.combineLocalAndUpdated(localItems, updatedItems);
     }
     async getPosProfiles() {
-      this.appData.pos_profiles = await this.db.getAllPosProfile();
-      this.appData.pos_profiles = await this.api_handler.fetchPosProfileList();
+      const localPosProfiles = await this.db.getAllPosProfile();
+      const updatedPosProfiles = await this.api_handler.fetchPosProfileList(this.since);
+      this.appData.pos_profiles = this.combineLocalAndUpdated(localPosProfiles, updatedPosProfiles);
     }
     async getBins() {
       this.appData.bins = await this.db.getAllBin();
-      this.appData.bins = await this.api_handler.fetchBinList();
+      this.appData.bins = await this.api_handler.fetchBinList(this.since);
     }
     async getWarehouses() {
       this.appData.warehouses = await this.db.getAllWarehouse();
-      this.appData.warehouses = await this.api_handler.fetchWarehouseList();
+      this.appData.warehouses = await this.api_handler.fetchWarehouseList(this.since);
     }
     async getPriceLists() {
       this.appData.price_lists = await this.db.getAllPriceList();
-      this.appData.price_lists = await this.api_handler.fetchPriceList();
+      this.appData.price_lists = await this.api_handler.fetchPriceList(this.since);
     }
     async getItemPrices() {
       this.appData.item_prices = await this.db.getAllItemPrice();
-      this.appData.item_prices = await this.api_handler.fetchItemPrice();
+      this.appData.item_prices = await this.api_handler.fetchItemPrice(this.since);
     }
     async getItemGroups() {
       this.appData.item_groups = await this.db.getAllItemGroup();
-      this.appData.item_groups = await this.api_handler.fetchItemGroups();
+      this.appData.item_groups = await this.api_handler.fetchItemGroups(this.since);
     }
     async getPosInvoices() {
       this.appData.pos_invoices = await this.db.getAllPosInvoice();
@@ -3656,17 +3664,29 @@
         }
       );
     }
+    combineLocalAndUpdated(local, updated) {
+      console.log("we are on combineLocalAndUpdated : local ==> ", local, " updated ==> ", updated);
+      const combinedMap = new Map(local.map((item) => [item.name, item]));
+      updated.forEach((updatedItem) => {
+        combinedMap.set(updatedItem.name, updatedItem);
+      });
+      return Array.from(combinedMap.values());
+    }
   };
 
   // ../pos_ar/pos_ar/pos_ar/page/pos/remoteApi/FetchHandler.js
   pos_ar.PointOfSale.FetchHandler = class FetchHandler {
     constructor() {
     }
-    async fetchCustomers() {
+    async fetchCustomers(since) {
       try {
+        const filter = { disabled: 0 };
+        if (since) {
+          filter.modified = [">", since];
+        }
         return await frappe.db.get_list("Customer", {
           fields: ["name", "customer_name"],
-          filters: { disabled: 0 },
+          filters: filter,
           limit: 1e5
         });
       } catch (error) {
@@ -3674,11 +3694,12 @@
         return [];
       }
     }
-    async fetchBrands() {
+    async fetchBrands(since) {
       try {
+        const filter = {};
         return await frappe.db.get_list("Brand", {
           fields: ["brand"],
-          filters: {},
+          filters: filter,
           limit: 1e5
         });
       } catch (error) {
@@ -3686,11 +3707,12 @@
         return [];
       }
     }
-    async fetchItemGroups() {
+    async fetchItemGroups(since) {
       try {
+        const filter = {};
         return await frappe.db.get_list("Item Group", {
           fields: ["name", "item_group_name", "parent_item_group", "is_group"],
-          filters: {},
+          filters: filter,
           limit: 1e5
         });
       } catch (error) {
@@ -3698,11 +3720,12 @@
         return [];
       }
     }
-    async fetchItems() {
+    async fetchItems(since) {
       try {
+        const filter = { disabled: 0 };
         return await frappe.db.get_list("Item", {
           fields: ["name", "item_name", "image", "brand", "item_group", "description", "stock_uom"],
-          filters: { disabled: 0 },
+          filters: filter,
           limit: 1e5
         });
       } catch (error) {
@@ -3710,11 +3733,12 @@
         return [];
       }
     }
-    async fetchItemPrice() {
+    async fetchItemPrice(since) {
       try {
+        const filter = {};
         return await frappe.db.get_list("Item Price", {
           fields: ["name", "item_code", "item_name", "price_list", "price_list_rate", "brand"],
-          filters: {},
+          filters: filter,
           limit: 1e5
         });
       } catch (error) {
@@ -3722,11 +3746,12 @@
         return [];
       }
     }
-    async fetchPriceList() {
+    async fetchPriceList(since) {
       try {
+        const filter = { selling: 1 };
         return await frappe.db.get_list("Price List", {
           fields: ["name", "price_list_name", "currency"],
-          filters: { selling: 1 },
+          filters: filter,
           limit: 1e5
         });
       } catch (error) {
@@ -3734,11 +3759,12 @@
         return [];
       }
     }
-    async fetchWarehouseList() {
+    async fetchWarehouseList(since) {
       try {
+        const filter = {};
         return await frappe.db.get_list("Warehouse", {
           fields: ["name", "warehouse_name"],
-          filters: {},
+          filters: filter,
           limit: 1e5
         });
       } catch (error) {
@@ -3746,11 +3772,12 @@
         return [];
       }
     }
-    async fetchPosProfileList() {
+    async fetchPosProfileList(since) {
       try {
+        const filter = { disabled: 0 };
         return await frappe.db.get_list("POS Profile", {
           fields: ["name", "warehouse", "company", "selling_price_list", "warehouse", "income_account", "cost_center", "write_off_account", "write_off_cost_center", "taxes_and_charges", "tax_category"],
-          filters: { disabled: 0 },
+          filters: filter,
           limit: 100
         });
       } catch (error) {
@@ -3774,11 +3801,12 @@
         return [];
       }
     }
-    async fetchBinList() {
+    async fetchBinList(since) {
       try {
+        const filter = {};
         return await frappe.db.get_list("Bin", {
           fields: ["actual_qty", "item_code", "warehouse"],
-          filters: {},
+          filters: filter,
           limit: 1
         });
       } catch (error) {
@@ -3788,4 +3816,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.PPX4ODD2.js.map
+//# sourceMappingURL=pos.bundle.62OL54DQ.js.map

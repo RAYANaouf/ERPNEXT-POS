@@ -5,11 +5,15 @@ pos_ar.PointOfSale.FetchHandler = class FetchHandler{
 	}
 
 
-	async fetchCustomers() {
+	async fetchCustomers(since) {
 		try {
+			const filter = { disabled : 0}
+			if(since){
+				filter.modified = ['>',since]
+			}
 			return await frappe.db.get_list('Customer', {
                                 fields: ['name', 'customer_name' ],
-				filters: { disabled : 0},
+				filters: filter,
 				limit : 100000
 			})
 		} catch (error) {
@@ -19,11 +23,12 @@ pos_ar.PointOfSale.FetchHandler = class FetchHandler{
 	}
 
 
-	async fetchBrands() {
+	async fetchBrands(since) {
 		try {
+			const filter = {}
 			return await frappe.db.get_list('Brand', {
 				fields: ['brand' ],
-				filters: {},
+				filters: filter,
 				limit : 100000
 			})
 		} catch (error) {
@@ -32,11 +37,12 @@ pos_ar.PointOfSale.FetchHandler = class FetchHandler{
 		}
 	}
 
-	async fetchItemGroups() {
+	async fetchItemGroups(since) {
 		try {
+			const filter = {}
 			return await frappe.db.get_list('Item Group', {
 				fields: ['name', 'item_group_name' , 'parent_item_group' , 'is_group' ],
-				filters: {},
+				filters: filter,
 				limit : 100000
 			})
 		} catch (error) {
@@ -46,11 +52,12 @@ pos_ar.PointOfSale.FetchHandler = class FetchHandler{
 	}
 
 
-	async fetchItems() {
+	async fetchItems(since) {
 		try {
+			const filter = {disabled : 0}
 			return await frappe.db.get_list('Item', {
 				fields: ['name', 'item_name' , 'image' , 'brand' ,'item_group' , 'description' , 'stock_uom' ],
-				filters: { disabled : 0 },
+				filters: filter,
 				limit : 100000
 			})
 		} catch (error) {
@@ -61,11 +68,12 @@ pos_ar.PointOfSale.FetchHandler = class FetchHandler{
 
 
 
-	async fetchItemPrice() {
+	async fetchItemPrice(since) {
 		try {
+			const filter = {}
 			return await frappe.db.get_list('Item Price', {
 				fields: ['name', 'item_code' , 'item_name' , 'price_list', 'price_list_rate' , 'brand'],
-				filters: {},
+				filters: filter,
 				limit : 100000
 			})
 		} catch (error) {
@@ -75,11 +83,12 @@ pos_ar.PointOfSale.FetchHandler = class FetchHandler{
 	}
 
 
-	async fetchPriceList() {
+	async fetchPriceList(since) {
 		try {
+			const filter = {selling : 1}
 			return await frappe.db.get_list('Price List', {
 				fields: ['name', 'price_list_name' , 'currency' ],
-				filters: {selling : 1 },
+				filters: filter,
 				limit : 100000
 			})
 		} catch (error) {
@@ -89,11 +98,12 @@ pos_ar.PointOfSale.FetchHandler = class FetchHandler{
 	}
 
 
-	async fetchWarehouseList(){
+	async fetchWarehouseList(since){
 		try{
+			const filter = {}
 			return await frappe.db.get_list('Warehouse' , {
 				fields  : ['name' , 'warehouse_name'],
-				filters : {},
+				filters : filter,
 				limit : 100000
 			})
 		}
@@ -104,11 +114,12 @@ pos_ar.PointOfSale.FetchHandler = class FetchHandler{
 	}
 
 
-	async fetchPosProfileList(){
+	async fetchPosProfileList(since){
 		try{
+			const filter = {disabled : 0}
 			return await frappe.db.get_list('POS Profile' , {
 				fields  : ['name' , 'warehouse' , 'company' , 'selling_price_list' , 'warehouse' , 'income_account' , 'cost_center' , 'write_off_account' , 'write_off_cost_center' , 'taxes_and_charges' , 'tax_category'],
-				filters : { disabled : 0},
+				filters : filter,
 				limit : 100
 			})
 		}
@@ -139,11 +150,12 @@ pos_ar.PointOfSale.FetchHandler = class FetchHandler{
 		}
 	}
 
-	async fetchBinList(){
+	async fetchBinList(since){
 		try{
+			const filter = {}
 			return await frappe.db.get_list('Bin' , {
 				fields  : ['actual_qty' , 'item_code' , 'warehouse'],
-				filters : {},
+				filters : filter,
 				limit   : 1
 			})
 		}
