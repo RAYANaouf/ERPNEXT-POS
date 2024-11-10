@@ -136,7 +136,7 @@ pos_ar.PointOfSale.posAppData = class {
 		//get local
 		const localItemGroups = await this.db.getAllItemGroup();
 		//get remote
-		const localItemGroups = await this.api_handler.fetchItemGroups(this.since)
+		const updatedItemGroups = await this.api_handler.fetchItemGroups(this.since)
 		await this.db.saveItemGroupList(localItemGroups)
 
 		this.appData.item_groups = this.combineLocalAndUpdated(localItemGroups,localItemGroups)
