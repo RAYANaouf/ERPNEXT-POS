@@ -2394,7 +2394,7 @@
       this.draftActionButtonsContainer = this.left_container.find("#posDraftActionsContainer");
       this.deleteBtn = this.draftActionButtonsContainer.find("#posDeleteBtn");
       this.editBtn = this.draftActionButtonsContainer.find("#posEditBtn");
-      this.right_container.append(`<div id="historyRightContainerHeader" class="rowBox align_center" ><h4 class="CartTitle">Recent Orders</h4><img src="${this.company.company_logo}" style="width:30px;height:30px;"></div>`);
+      this.right_container.append(`<div id="historyRightContainerHeader" class="rowBox align_center" ><h4 class="CartTitle">Recent Orders</h4></div>`);
       this.right_container.append('<div id="historyRightSearchContainer" class="rowBox align_center" ></div>');
       this.search_container = this.right_container.find("#historyRightSearchContainer");
       this.search_container.append('<select  id="PosInvoiceTypeInput" placeholder="POS Invoice Type">');
@@ -2597,6 +2597,7 @@
       let grandTotal = 0;
       const creation_time = pos.creation_time;
       const [date, time] = creation_time.split(" ");
+      console.log("here we are debuging : ", pos);
       let invoiceHTML = `<style>#company_container {width: 100% ; height: 40px ; display:flex; align-items:center; font-size : 12px;}table{width: 100%; margin-top:16px;}tr{width:100%; height:16px;}tr:nth-child(1){background:#eeeeee;border:2px solid #000000;}#logContainer{width: 100%;height:80px;display : flex;justify-content:center;}#logContainer img{width:50%; height:100%;}#top_data_container{width:100%;display:flex;}#top_data_container>div.c1{font-size:12px;flex-grow:1;}#top_data_container>div.c2{font-size:12px;flex-grow:1;display:flex;flex-direction:column;align-items:end;}td>div{height:18px; width:100%;font-size:12px;display:flex; justify-content:center; align-items:center;}#footer_message{height:20px;}</style><div style="display:flex; flex-direction:column;"><div id="logContainer"  ><div style="width:20%;"></div><img src="${this.company.company_logo}"><div style="width:20%;"></div></div><div id="company_container"><div style="flex-grow:1; border-bottom:1px dashed #505050; border-top:1px dashed #505050; "></div><p style="margin:0px 25px;">${this.company.company_name}</p><div style="flex-grow:1; border-bottom:1px dashed #505050; border-top:1px dashed #505050;"></div></div><div id="top_data_container"><div class="c1"><div class="customer"> Customer : ${pos.customer} </div><div class="refrence"> Commande : ${pos.refNum} </div></div><div class="c2"><div class="date"> ${date}/${time} </div></div></div><table><tr style="border:3px solid #000000;"><th>Nom</th><th>Qt\xE9</th><th>P.unit\xE9</th><th>Prix</th>`;
       pos.items.forEach((item) => {
         netTotal += item.rate * item.qty;
@@ -3787,4 +3788,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.W7NJFFEN.js.map
+//# sourceMappingURL=pos.bundle.HBA2LZ4N.js.map

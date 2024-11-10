@@ -102,7 +102,7 @@ pos_ar.PointOfSale.pos_history = class {
 		this.editBtn    = this.draftActionButtonsContainer.find('#posEditBtn')
 
 
-		this.right_container.append(`<div id="historyRightContainerHeader" class="rowBox align_center" ><h4 class="CartTitle">Recent Orders</h4><img src="${this.company.company_logo}" style="width:30px;height:30px;"></div>`)
+		this.right_container.append(`<div id="historyRightContainerHeader" class="rowBox align_center" ><h4 class="CartTitle">Recent Orders</h4></div>`)
 		this.right_container.append('<div id="historyRightSearchContainer" class="rowBox align_center" ></div>');
 
 		this.search_container = this.right_container.find('#historyRightSearchContainer');
@@ -409,6 +409,8 @@ pos_ar.PointOfSale.pos_history = class {
 
 		const creation_time = pos.creation_time
 		const [date, time]  = creation_time.split(' ')
+
+		console.log("here we are debuging : " , pos)
 
 		let invoiceHTML =
 			'<style>'+
