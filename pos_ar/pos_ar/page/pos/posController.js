@@ -323,6 +323,7 @@ pos_ar.PointOfSale.Controller = class {
 
         init_item_selector(){
 
+		console.log("im looking for the problem : items==> " ,  this.appData.appData.items)
                 this.item_selector = new pos_ar.PointOfSale.pos_item_selector(
 						this.$leftSection                ,
 						this.appData.appData.items       ,

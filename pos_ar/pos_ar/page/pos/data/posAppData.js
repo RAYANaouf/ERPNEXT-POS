@@ -130,6 +130,7 @@ pos_ar.PointOfSale.posAppData = class {
 		await this.db.saveItemPriceList(updateItemPrices);
 
 		this.appData.item_prices = this.combineLocalAndUpdated(localItemPrices,updateItemPrices)
+		console.log()
 	}
 	async getItemGroups(){
 		//get local
@@ -138,7 +139,7 @@ pos_ar.PointOfSale.posAppData = class {
 		const updatedItemGroups = await this.api_handler.fetchItemGroups(this.since)
 		await this.db.saveItemGroupList(updatedItemGroups)
 
-		this.appData.item_groups = this.combineLocalAndUpdated(localItemGroups,localItemGroups)
+		this.appData.item_groups = this.combineLocalAndUpdated(localItemGroups,updatedItemGroups)
 	}
 	async getPosInvoices(){
 		//get local
@@ -182,13 +183,13 @@ pos_ar.PointOfSale.posAppData = class {
 
 	/******************  function ***************************/
 	combineLocalAndUpdated(local,updated){
-		console.log("we are on combineLocalAndUpdated : local ==> " , local , " updated ==> " , updated )
 		// Create a map from the local data array using a unique identifier (name)
 		const combinedMap = new Map(local.map(item => [item.name, item]));
 		// Loop through each item in the updated data
 		updated.forEach(updatedItem=>{
 			combinedMap.set(updatedItem.name , updatedItem)
 		})
+
 		return Array.from(combinedMap.values())
 	}
 }

@@ -282,6 +282,7 @@
       this.$leftSection = this.$components_wrapper.find("#LeftSection");
     }
     init_item_selector() {
+      console.log("im looking for the problem : items==> ", this.appData.appData.items);
       this.item_selector = new pos_ar.PointOfSale.pos_item_selector(
         this.$leftSection,
         this.appData.appData.items,
@@ -3633,12 +3634,13 @@
       const updateItemPrices = await this.api_handler.fetchItemPrice(this.since);
       await this.db.saveItemPriceList(updateItemPrices);
       this.appData.item_prices = this.combineLocalAndUpdated(localItemPrices, updateItemPrices);
+      console.log();
     }
     async getItemGroups() {
       const localItemGroups = await this.db.getAllItemGroup();
       const updatedItemGroups = await this.api_handler.fetchItemGroups(this.since);
       await this.db.saveItemGroupList(updatedItemGroups);
-      this.appData.item_groups = this.combineLocalAndUpdated(localItemGroups, localItemGroups);
+      this.appData.item_groups = this.combineLocalAndUpdated(localItemGroups, updatedItemGroups);
     }
     async getPosInvoices() {
       this.appData.pos_invoices = await this.db.getAllPosInvoice();
@@ -3676,7 +3678,6 @@
       );
     }
     combineLocalAndUpdated(local, updated) {
-      console.log("we are on combineLocalAndUpdated : local ==> ", local, " updated ==> ", updated);
       const combinedMap = new Map(local.map((item) => [item.name, item]));
       updated.forEach((updatedItem) => {
         combinedMap.set(updatedItem.name, updatedItem);
@@ -3827,4 +3828,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.C6A7U627.js.map
+//# sourceMappingURL=pos.bundle.XCQGPTFQ.js.map
