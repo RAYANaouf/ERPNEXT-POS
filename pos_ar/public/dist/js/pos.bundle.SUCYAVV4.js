@@ -3607,7 +3607,7 @@
     async getPosProfiles() {
       const localPosProfiles = await this.db.getAllPosProfile();
       const updatedPosProfiles = await this.api_handler.fetchPosProfileList(this.since);
-      await this.db.savePosProfileList();
+      await this.db.savePosProfileList(updatedPosProfiles);
       this.appData.pos_profiles = this.combineLocalAndUpdated(localPosProfiles, updatedPosProfiles);
     }
     async getBins() {
@@ -3827,4 +3827,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.5IDIRY34.js.map
+//# sourceMappingURL=pos.bundle.SUCYAVV4.js.map
