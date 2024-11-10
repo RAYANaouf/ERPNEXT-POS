@@ -79,7 +79,7 @@ pos_ar.PointOfSale.pos_db  = class POSDatabase {
 
 
 
-	/************************************   Item  ***************************************/
+	/************************************  counte ***************************************/
 	/************************************************************************************/
 	/************************************************************************************/
 
@@ -117,7 +117,7 @@ pos_ar.PointOfSale.pos_db  = class POSDatabase {
 			transaction.oncomplete = () => {
 				resolve()
 			};
-			request.onerror = (err) => {
+			transaction.onerror = (err) => {
 				console.error("db => error saving Item.")
 				reject(err)
 			};
@@ -161,7 +161,7 @@ pos_ar.PointOfSale.pos_db  = class POSDatabase {
 			transaction.oncomplete = () => {
 				resolve()
 			};
-			request.onerror = (err) => {
+			transaction.onerror = (err) => {
 				console.error("db => error saving POS Profile.")
 				reject(err)
 			};
@@ -208,7 +208,7 @@ pos_ar.PointOfSale.pos_db  = class POSDatabase {
 			transaction.oncomplete = () => {
 				resolve()
 			};
-			request.onerror = (err) => {
+			transaction.onerror = (err) => {
 				console.error("db => error saving Bin.")
 				reject(err)
 			};
@@ -254,7 +254,7 @@ pos_ar.PointOfSale.pos_db  = class POSDatabase {
 			transaction.oncomplete = () => {
 				resolve();
 			};
-			request.onerror = (event) => {
+			transaction.onerror = (event) => {
 				console.error("db => error saving Warehouse List.")
 				reject(event);
 			};
@@ -302,7 +302,7 @@ pos_ar.PointOfSale.pos_db  = class POSDatabase {
 				resolve();
 			};
 
-			request.onerror = (err) => {
+			transaction.onerror = (err) => {
 				console.error("db => error saving Price Lists.")
 				reject(err);
 			};
@@ -349,7 +349,7 @@ pos_ar.PointOfSale.pos_db  = class POSDatabase {
 			transaction.oncomplete = () => {
 				resolve();
 			};
-			request.onerror = (err) => {
+			transaction.onerror = (err) => {
 				console.error("db => error saving Item Price.")
 				reject(err);
 			};
@@ -393,7 +393,7 @@ pos_ar.PointOfSale.pos_db  = class POSDatabase {
 			transaction.oncomplete = () => {
 				resolve();
 			};
-			request.onerror = (err) => {
+			transaction.onerror = (err) => {
 				console.error("db => error saving Item Group.")
 				reject(err);
 			};
