@@ -99,7 +99,7 @@ pos_ar.PointOfSale.posAppData = class {
 		//get remote
 		const updatedBins = await this.api_handler.fetchBinList(this.since)
 		//save new bins
-		await this.db.saveBinList()
+		await this.db.saveBinList(updatedBins)
 
 		this.appData.bins = this.combineLocalAndUpdated(localBins,updatedBins)
 	}
@@ -137,7 +137,7 @@ pos_ar.PointOfSale.posAppData = class {
 		const localItemGroups = await this.db.getAllItemGroup();
 		//get remote
 		const updatedItemGroups = await this.api_handler.fetchItemGroups(this.since)
-		await this.db.saveItemGroupList(localItemGroups)
+		await this.db.saveItemGroupList(updatedItemGroups)
 
 		this.appData.item_groups = this.combineLocalAndUpdated(localItemGroups,localItemGroups)
 	}

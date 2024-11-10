@@ -3613,7 +3613,7 @@
     async getBins() {
       const localBins = await this.db.getAllBin();
       const updatedBins = await this.api_handler.fetchBinList(this.since);
-      await this.db.saveBinList();
+      await this.db.saveBinList(updatedBins);
       this.appData.bins = this.combineLocalAndUpdated(localBins, updatedBins);
     }
     async getWarehouses() {
@@ -3637,7 +3637,7 @@
     async getItemGroups() {
       const localItemGroups = await this.db.getAllItemGroup();
       const updatedItemGroups = await this.api_handler.fetchItemGroups(this.since);
-      await this.db.saveItemGroupList(localItemGroups);
+      await this.db.saveItemGroupList(updatedItemGroups);
       this.appData.item_groups = this.combineLocalAndUpdated(localItemGroups, localItemGroups);
     }
     async getPosInvoices() {
@@ -3827,4 +3827,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.SUCYAVV4.js.map
+//# sourceMappingURL=pos.bundle.MWBCZIX3.js.map
