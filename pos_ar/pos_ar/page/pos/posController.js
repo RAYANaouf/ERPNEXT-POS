@@ -877,7 +877,7 @@ pos_ar.PointOfSale.Controller = class {
 			// we still didnt implement the price_list_rate and base_price_list_rate
 			// same thing with actual_qty refering to the stock quantity
 			let newItem = {
-				'item_name'               : item.name,
+				'item_name'               : item.item_name,
 				'item_code'               : item.name,
 				'rate'                    : item.rate,
 				'qty'                     : item.qty,

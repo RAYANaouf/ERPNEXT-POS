@@ -683,7 +683,7 @@
       let items = [];
       this.selectedItemMaps.get(this.selectedTab.tabName).items.forEach((item) => {
         let newItem = {
-          "item_name": item.name,
+          "item_name": item.item_name,
           "item_code": item.name,
           "rate": item.rate,
           "qty": item.qty,
@@ -3788,4 +3788,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.HBA2LZ4N.js.map
+//# sourceMappingURL=pos.bundle.V7X6EAZI.js.map
