@@ -23,9 +23,6 @@ pos_ar.PointOfSale.Controller = class {
 		this.invoiceData = { netTotal : 0 , grandTotal : 0 , paidAmount : 0 , toChange : 0 , discount : 0}
 		this.db          = null;
 
-
-
-
                 this.start_app();
         }
 
@@ -40,6 +37,8 @@ pos_ar.PointOfSale.Controller = class {
 			//local app data
 			this.appData       = new pos_ar.PointOfSale.posAppData(this.db , this.dataHandler)
 			await this.appData.getAllData()
+
+			console.log("debugiiiiin : " , this.appData.appData)
 
 			this.prepare_container();
 			//prepare app data

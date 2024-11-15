@@ -43,6 +43,7 @@
         this.dataHandler = new pos_ar.PointOfSale.FetchHandler();
         this.appData = new pos_ar.PointOfSale.posAppData(this.db, this.dataHandler);
         await this.appData.getAllData();
+        console.log("debugiiiiin : ", this.appData.appData);
         this.prepare_container();
         await this.prepare_app_data();
         await this.checkForPOSEntry();
@@ -3828,4 +3829,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.XCQGPTFQ.js.map
+//# sourceMappingURL=pos.bundle.6JJHSUCD.js.map
