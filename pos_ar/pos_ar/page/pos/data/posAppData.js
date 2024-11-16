@@ -60,8 +60,8 @@ pos_ar.PointOfSale.posAppData = class {
 	async getCustomers(){
 		/*the function should combine the two the logic didnt complite yet we still working on it*/
 		//get local
-		//this.appData.customers = await this.db.getAllCustomers();
-		const localCustomers = await this.db.getAllCustomers();
+		//const localCustomers = await this.db.getAllCustomers();
+		const localCustomers = [];
 		//get remote
 		const updatedCustomers = await this.api_handler.fetchCustomers(this.since)
 		//save new customers
@@ -77,7 +77,8 @@ pos_ar.PointOfSale.posAppData = class {
 	}
 	async getItems(){
 		//get local
-		const localItems   = await this.db.getAllItems();
+		//const localItems   = await this.db.getAllItems();
+		const localItems   = [];
 		//get remote
 		const updatedItems = await this.api_handler.fetchItems(this.since)
 		//save new items
@@ -87,7 +88,8 @@ pos_ar.PointOfSale.posAppData = class {
 	}
 	async getPosProfiles(){
 		//get local
-		const localPosProfiles    = await this.db.getAllPosProfile();
+		//const localPosProfiles    = await this.db.getAllPosProfile();
+		const localPosProfiles    = [];
 		//get remote
 		const updatedPosProfiles  = await this.api_handler.fetchPosProfileList(this.since)
 		//save new pos profiles
@@ -97,7 +99,8 @@ pos_ar.PointOfSale.posAppData = class {
 	}
 	async getBins(){
 		//get local
-		const localBins   = await this.db.getAllBin();
+		//const localBins   = await this.db.getAllBin();
+		const localBins   = [];
 		//get remote
 		const updatedBins = await this.api_handler.fetchBinList(this.since)
 		//save new bins
@@ -107,7 +110,8 @@ pos_ar.PointOfSale.posAppData = class {
 	}
 	async getWarehouses(){
 		//get local
-		const localWarehouses   = await this.db.getAllWarehouse();
+		//const localWarehouses   = await this.db.getAllWarehouse();
+		const localWarehouses   = [];
 		//warehouse
 		const updatedWarehouses = await this.api_handler.fetchWarehouseList(this.since)
 		//save new warehouse
@@ -116,7 +120,8 @@ pos_ar.PointOfSale.posAppData = class {
 	}
 	async getPriceLists(){
 		//get local
-		const localPriceLists  = await this.db.getAllPriceList();
+		//const localPriceLists  = await this.db.getAllPriceList();
+		const localPriceLists  = [];
 		//get remote
 		const updatedPriceList = await this.api_handler.fetchPriceList(this.since)
 		//save new price list
@@ -126,7 +131,8 @@ pos_ar.PointOfSale.posAppData = class {
 	}
 	async getItemPrices(){
 		//get local
-		const localItemPrices = await this.db.getAllItemPrice();
+		//const localItemPrices = await this.db.getAllItemPrice();
+		const localItemPrices = [];
 		//get remote
 		const updateItemPrices = await this.api_handler.fetchItemPrice(this.since)
 		await this.db.saveItemPriceList(updateItemPrices);
@@ -136,7 +142,8 @@ pos_ar.PointOfSale.posAppData = class {
 	}
 	async getItemGroups(){
 		//get local
-		const localItemGroups = await this.db.getAllItemGroup();
+		//const localItemGroups = await this.db.getAllItemGroup();
+		const localItemGroups = [];
 		//get remote
 		const updatedItemGroups = await this.api_handler.fetchItemGroups(this.since)
 		await this.db.saveItemGroupList(updatedItemGroups)

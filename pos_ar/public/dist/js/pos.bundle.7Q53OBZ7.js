@@ -3601,7 +3601,7 @@
       frappe.hide_progress();
     }
     async getCustomers() {
-      const localCustomers = await this.db.getAllCustomers();
+      const localCustomers = [];
       const updatedCustomers = await this.api_handler.fetchCustomers(this.since);
       await this.db.saveCustomerList(updatedCustomers);
       this.appData.customers = this.combineLocalAndUpdated(localCustomers, updatedCustomers);
@@ -3610,44 +3610,44 @@
       this.appData.brands = await this.api_handler.fetchBrands(this.since);
     }
     async getItems() {
-      const localItems = await this.db.getAllItems();
+      const localItems = [];
       const updatedItems = await this.api_handler.fetchItems(this.since);
       await this.db.saveItemList(updatedItems);
       this.appData.items = this.combineLocalAndUpdated(localItems, updatedItems);
     }
     async getPosProfiles() {
-      const localPosProfiles = await this.db.getAllPosProfile();
+      const localPosProfiles = [];
       const updatedPosProfiles = await this.api_handler.fetchPosProfileList(this.since);
       await this.db.savePosProfileList(updatedPosProfiles);
       this.appData.pos_profiles = this.combineLocalAndUpdated(localPosProfiles, updatedPosProfiles);
     }
     async getBins() {
-      const localBins = await this.db.getAllBin();
+      const localBins = [];
       const updatedBins = await this.api_handler.fetchBinList(this.since);
       await this.db.saveBinList(updatedBins);
       this.appData.bins = this.combineLocalAndUpdated(localBins, updatedBins);
     }
     async getWarehouses() {
-      const localWarehouses = await this.db.getAllWarehouse();
+      const localWarehouses = [];
       const updatedWarehouses = await this.api_handler.fetchWarehouseList(this.since);
       await this.db.saveWarehouseList(updatedWarehouses);
       this.appData.warehouses = this.combineLocalAndUpdated(localWarehouses, updatedWarehouses);
     }
     async getPriceLists() {
-      const localPriceLists = await this.db.getAllPriceList();
+      const localPriceLists = [];
       const updatedPriceList = await this.api_handler.fetchPriceList(this.since);
       await this.db.savePriceLists(updatedPriceList);
       this.appData.price_lists = this.combineLocalAndUpdated(localPriceLists, updatedPriceList);
     }
     async getItemPrices() {
-      const localItemPrices = await this.db.getAllItemPrice();
+      const localItemPrices = [];
       const updateItemPrices = await this.api_handler.fetchItemPrice(this.since);
       await this.db.saveItemPriceList(updateItemPrices);
       this.appData.item_prices = this.combineLocalAndUpdated(localItemPrices, updateItemPrices);
       console.log();
     }
     async getItemGroups() {
-      const localItemGroups = await this.db.getAllItemGroup();
+      const localItemGroups = [];
       const updatedItemGroups = await this.api_handler.fetchItemGroups(this.since);
       await this.db.saveItemGroupList(updatedItemGroups);
       this.appData.item_groups = this.combineLocalAndUpdated(localItemGroups, updatedItemGroups);
@@ -3841,4 +3841,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.MQCZYZGW.js.map
+//# sourceMappingURL=pos.bundle.7Q53OBZ7.js.map
