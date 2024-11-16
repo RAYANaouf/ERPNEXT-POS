@@ -76,11 +76,11 @@ pos_ar.PointOfSale.FetchHandler = class FetchHandler{
 	}
 
 	async fetchItemBarCodes(since) {
-		try {
+		/*try {
 			const filter = {parenttype:"Item"}
-			/*if(since){
+			if(since){
 				filter.modified = ['>',since]
-			}*/
+			}
 			return await frappe.db.get_list('Item Barcode', {
 				fields: ['name', 'barcode_type'  ,'parent' , 'uom' , 'barcode' ],
 				filters: filter,
@@ -89,7 +89,8 @@ pos_ar.PointOfSale.FetchHandler = class FetchHandler{
 		} catch (error) {
 			console.error('Error fetching Item Group :', error);
 			return []
-		}
+		}*/
+		return []
 	}
 
 

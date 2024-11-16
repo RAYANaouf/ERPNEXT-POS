@@ -3766,17 +3766,7 @@
       }
     }
     async fetchItemBarCodes(since) {
-      try {
-        const filter = { parenttype: "Item" };
-        return await frappe.db.get_list("Item Barcode", {
-          fields: ["name", "barcode_type", "parent", "uom", "barcode"],
-          filters: filter,
-          limit: 1e5
-        });
-      } catch (error) {
-        console.error("Error fetching Item Group :", error);
-        return [];
-      }
+      return [];
     }
     async fetchItemPrice(since) {
       try {
@@ -3876,4 +3866,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.63QBUQEN.js.map
+//# sourceMappingURL=pos.bundle.X5S66ZL5.js.map
