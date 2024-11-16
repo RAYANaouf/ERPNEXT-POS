@@ -36,6 +36,8 @@ pos_ar.PointOfSale.posAppData = class {
 			await this.getPosInvoices();
 			frappe.show_progress('Please Wait', 10, 11, 'Please check in out');
 			await this.getCheckInOuts();
+			frappe.show_progress('Please Wait', 11, 11, 'Please check in out');
+			await this.getItemBarcodes()
 			frappe.hide_progress();
 			frappe.hide_progress();
 			frappe.hide_progress();
@@ -140,6 +142,9 @@ pos_ar.PointOfSale.posAppData = class {
 		await this.db.saveItemGroupList(updatedItemGroups)
 
 		this.appData.item_groups = this.combineLocalAndUpdated(localItemGroups,updatedItemGroups)
+	}
+	async getItemBarcodes(){
+		this.appData.item_barcodes = await this.api_handler.fetchItemBarCodes(this.since)
 	}
 	async getPosInvoices(){
 		//get local

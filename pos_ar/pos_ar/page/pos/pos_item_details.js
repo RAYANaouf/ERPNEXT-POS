@@ -1,4 +1,3 @@
-
 pos_ar.PointOfSale.pos_item_details = class{
 
 	constructor(

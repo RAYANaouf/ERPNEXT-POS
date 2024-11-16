@@ -287,6 +287,7 @@
       this.item_selector = new pos_ar.PointOfSale.pos_item_selector(
         this.$leftSection,
         this.appData.appData.items,
+        this.appData.appData.item_barcodes,
         this.appData.appData.item_groups,
         this.appData.appData.item_prices,
         this.defaultPriceList,
@@ -937,9 +938,10 @@
 
   // ../pos_ar/pos_ar/pos_ar/page/pos/pos_item_selector.js
   pos_ar.PointOfSale.pos_item_selector = class {
-    constructor(wrapper, item_list, item_group_list, item_prices, selectedPriceList, getItemPrice, onItemClick) {
+    constructor(wrapper, item_list, itemBarcodes, item_group_list, item_prices, selectedPriceList, getItemPrice, onItemClick) {
       this.wrapper = wrapper;
       this.item_list = item_list;
+      this.item_barcodes = itemBarcodes;
       this.item_group_list = item_group_list;
       this.item_prices = item_prices;
       this.selected_price_list = selectedPriceList;
@@ -1041,7 +1043,10 @@
       });
     }
     filterListByItemData(value) {
-      return this.item_list.filter((item) => item.name.toLowerCase().includes(value.toLowerCase()) || item.scan_barcode == value || item.item_name.toLowerCase().includes(value.toLowerCase()));
+      const filteredBarcodes = this.item_barcodes.filter((BarCode) => BarCode.barcode == value);
+      const barcodeItemIds = filteredBarcodes.map((cod) => cod.parent);
+      console.log("just debuging ==> ", barcodeItemIds);
+      return this.item_list.filter((item) => item.name.toLowerCase().includes(value.toLowerCase()) || barcodeItemIds.includes(item.name) || item.scan_barcode == value || item.item_name.toLowerCase().includes(value.toLowerCase()));
     }
     getItemByItemGroup(item_group) {
       let groups = [];
@@ -3579,6 +3584,8 @@
         await this.getPosInvoices();
         frappe.show_progress("Please Wait", 10, 11, "Please check in out");
         await this.getCheckInOuts();
+        frappe.show_progress("Please Wait", 11, 11, "Please check in out");
+        await this.getItemBarcodes();
         frappe.hide_progress();
         frappe.hide_progress();
         frappe.hide_progress();
@@ -3642,6 +3649,9 @@
       const updatedItemGroups = await this.api_handler.fetchItemGroups(this.since);
       await this.db.saveItemGroupList(updatedItemGroups);
       this.appData.item_groups = this.combineLocalAndUpdated(localItemGroups, updatedItemGroups);
+    }
+    async getItemBarcodes() {
+      this.appData.item_barcodes = await this.api_handler.fetchItemBarCodes(this.since);
     }
     async getPosInvoices() {
       this.appData.pos_invoices = await this.db.getAllPosInvoice();
@@ -3710,6 +3720,9 @@
     async fetchBrands(since) {
       try {
         const filter = {};
+        if (since) {
+          filter.modified = [">", since];
+        }
         return await frappe.db.get_list("Brand", {
           fields: ["brand"],
           filters: filter,
@@ -3723,6 +3736,9 @@
     async fetchItemGroups(since) {
       try {
         const filter = {};
+        if (since) {
+          filter.modified = [">", since];
+        }
         return await frappe.db.get_list("Item Group", {
           fields: ["name", "item_group_name", "parent_item_group", "is_group"],
           filters: filter,
@@ -3736,8 +3752,24 @@
     async fetchItems(since) {
       try {
         const filter = { disabled: 0 };
+        if (since) {
+          filter.modified = [">", since];
+        }
         return await frappe.db.get_list("Item", {
-          fields: ["name", "item_name", "image", "brand", "item_group", "description", "stock_uom"],
+          fields: ["name", "item_name", "image", "brand", "item_group", "description", "stock_uom", "barcodes"],
+          filters: filter,
+          limit: 1e5
+        });
+      } catch (error) {
+        console.error("Error fetching Item Group :", error);
+        return [];
+      }
+    }
+    async fetchItemBarCodes(since) {
+      try {
+        const filter = { parenttype: "Item" };
+        return await frappe.db.get_list("Item Barcode", {
+          fields: ["name", "barcode_type", "parent", "uom", "barcode"],
           filters: filter,
           limit: 1e5
         });
@@ -3749,6 +3781,9 @@
     async fetchItemPrice(since) {
       try {
         const filter = {};
+        if (since) {
+          filter.modified = [">", since];
+        }
         return await frappe.db.get_list("Item Price", {
           fields: ["name", "item_code", "item_name", "price_list", "price_list_rate", "brand"],
           filters: filter,
@@ -3762,6 +3797,9 @@
     async fetchPriceList(since) {
       try {
         const filter = { selling: 1 };
+        if (since) {
+          filter.modified = [">", since];
+        }
         return await frappe.db.get_list("Price List", {
           fields: ["name", "price_list_name", "currency"],
           filters: filter,
@@ -3775,6 +3813,9 @@
     async fetchWarehouseList(since) {
       try {
         const filter = {};
+        if (since) {
+          filter.modified = [">", since];
+        }
         return await frappe.db.get_list("Warehouse", {
           fields: ["name", "warehouse_name"],
           filters: filter,
@@ -3788,6 +3829,9 @@
     async fetchPosProfileList(since) {
       try {
         const filter = { disabled: 0 };
+        if (since) {
+          filter.modified = [">", since];
+        }
         return await frappe.db.get_list("POS Profile", {
           fields: ["name", "warehouse", "company", "selling_price_list", "warehouse", "income_account", "cost_center", "write_off_account", "write_off_cost_center", "taxes_and_charges", "tax_category"],
           filters: filter,
@@ -3817,6 +3861,9 @@
     async fetchBinList(since) {
       try {
         const filter = {};
+        if (since) {
+          filter.modified = [">", since];
+        }
         return await frappe.db.get_list("Bin", {
           fields: ["name", "actual_qty", "item_code", "warehouse"],
           filters: filter,
@@ -3829,4 +3876,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.6JJHSUCD.js.map
+//# sourceMappingURL=pos.bundle.63QBUQEN.js.map

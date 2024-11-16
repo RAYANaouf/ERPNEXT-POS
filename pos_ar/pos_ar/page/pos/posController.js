@@ -324,12 +324,13 @@ pos_ar.PointOfSale.Controller = class {
 
 		console.log("im looking for the problem : items==> " ,  this.appData.appData.items)
                 this.item_selector = new pos_ar.PointOfSale.pos_item_selector(
-						this.$leftSection                ,
-						this.appData.appData.items       ,
-						this.appData.appData.item_groups ,
-						this.appData.appData.item_prices ,
-						this.defaultPriceList            ,
-						this.getItemPrice.bind(this)     ,
+						this.$leftSection                  ,
+						this.appData.appData.items         ,
+						this.appData.appData.item_barcodes ,
+						this.appData.appData.item_groups   ,
+						this.appData.appData.item_prices   ,
+						this.defaultPriceList              ,
+						this.getItemPrice.bind(this)       ,
 						item => { this.itemClick_selector(item)  }
 					)
 	}
