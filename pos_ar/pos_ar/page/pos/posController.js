@@ -1098,13 +1098,15 @@ pos_ar.PointOfSale.Controller = class {
 		//check the mode
 		const mode = this.settings_data.settings.itemPriceBasedOn
 
-		console.log("debagiiiiiiiinoo : " , item , " ==> " , priceList )
-
 		if(mode == 'brand'){
 			if(item.brand == null)
 				return 0 ;
 
 			const price = this.appData.appData.item_prices.find(itemPrice => itemPrice.brand == item.brand && itemPrice.price_list == priceList)
+
+			console.log("debagiiiiiiiiiiiiiiiiiiiiiiiiiiiing : " , this.appData.appData.item_prices.find(itemPrice => itemPrice.brand == item.brand && itemPrice.price_list == priceList))
+
+
 			console.log("and price  ===> " , price)
 
 			return price ? price.price_list_rate  : 0

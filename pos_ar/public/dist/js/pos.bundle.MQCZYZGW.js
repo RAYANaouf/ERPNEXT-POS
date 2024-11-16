@@ -839,11 +839,11 @@
     }
     getItemPrice(item, priceList) {
       const mode = this.settings_data.settings.itemPriceBasedOn;
-      console.log("debagiiiiiiiinoo : ", item, " ==> ", priceList);
       if (mode == "brand") {
         if (item.brand == null)
           return 0;
         const price = this.appData.appData.item_prices.find((itemPrice2) => itemPrice2.brand == item.brand && itemPrice2.price_list == priceList);
+        console.log("debagiiiiiiiiiiiiiiiiiiiiiiiiiiiing : ", this.appData.appData.item_prices.find((itemPrice2) => itemPrice2.brand == item.brand && itemPrice2.price_list == priceList));
         console.log("and price  ===> ", price);
         return price ? price.price_list_rate : 0;
       } else if (mode == "priceList") {
@@ -3706,9 +3706,6 @@
     async fetchCustomers(since) {
       try {
         const filter = { disabled: 0 };
-        if (since) {
-          filter.modified = [">", since];
-        }
         return await frappe.db.get_list("Customer", {
           fields: ["name", "customer_name"],
           filters: filter,
@@ -3722,9 +3719,6 @@
     async fetchBrands(since) {
       try {
         const filter = {};
-        if (since) {
-          filter.modified = [">", since];
-        }
         return await frappe.db.get_list("Brand", {
           fields: ["brand"],
           filters: filter,
@@ -3738,9 +3732,6 @@
     async fetchItemGroups(since) {
       try {
         const filter = {};
-        if (since) {
-          filter.modified = [">", since];
-        }
         return await frappe.db.get_list("Item Group", {
           fields: ["name", "item_group_name", "parent_item_group", "is_group"],
           filters: filter,
@@ -3754,9 +3745,6 @@
     async fetchItems(since) {
       try {
         const filter = { disabled: 0 };
-        if (since) {
-          filter.modified = [">", since];
-        }
         return await frappe.db.get_list("Item", {
           fields: ["name", "item_name", "image", "brand", "item_group", "description", "stock_uom", "barcodes"],
           filters: filter,
@@ -3773,9 +3761,6 @@
     async fetchItemPrice(since) {
       try {
         const filter = {};
-        if (since) {
-          filter.modified = [">", since];
-        }
         return await frappe.db.get_list("Item Price", {
           fields: ["name", "item_code", "item_name", "price_list", "price_list_rate", "brand"],
           filters: filter,
@@ -3789,9 +3774,6 @@
     async fetchPriceList(since) {
       try {
         const filter = { selling: 1 };
-        if (since) {
-          filter.modified = [">", since];
-        }
         return await frappe.db.get_list("Price List", {
           fields: ["name", "price_list_name", "currency"],
           filters: filter,
@@ -3805,9 +3787,6 @@
     async fetchWarehouseList(since) {
       try {
         const filter = {};
-        if (since) {
-          filter.modified = [">", since];
-        }
         return await frappe.db.get_list("Warehouse", {
           fields: ["name", "warehouse_name"],
           filters: filter,
@@ -3821,9 +3800,6 @@
     async fetchPosProfileList(since) {
       try {
         const filter = { disabled: 0 };
-        if (since) {
-          filter.modified = [">", since];
-        }
         return await frappe.db.get_list("POS Profile", {
           fields: ["name", "warehouse", "company", "selling_price_list", "warehouse", "income_account", "cost_center", "write_off_account", "write_off_cost_center", "taxes_and_charges", "tax_category"],
           filters: filter,
@@ -3853,9 +3829,6 @@
     async fetchBinList(since) {
       try {
         const filter = {};
-        if (since) {
-          filter.modified = [">", since];
-        }
         return await frappe.db.get_list("Bin", {
           fields: ["name", "actual_qty", "item_code", "warehouse"],
           filters: filter,
@@ -3868,4 +3841,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.RCUPKRUY.js.map
+//# sourceMappingURL=pos.bundle.MQCZYZGW.js.map
