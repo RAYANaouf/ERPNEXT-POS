@@ -839,10 +839,12 @@
     }
     getItemPrice(item, priceList) {
       const mode = this.settings_data.settings.itemPriceBasedOn;
+      console.log("debagiiiiiiiinoo : ", item, " ==> ", priceList);
       if (mode == "brand") {
         if (item.brand == null)
           return 0;
         const price = this.appData.appData.item_prices.find((itemPrice2) => itemPrice2.brand == item.brand && itemPrice2.price_list == priceList);
+        console.log("and price  ===> ", price);
         return price ? price.price_list_rate : 0;
       } else if (mode == "priceList") {
         const price = this.appData.appData.item_prices.find((itemPrice2) => itemPrice2.item_code == item.item_name && itemPrice2.price_list == priceList);
@@ -3866,4 +3868,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.X5S66ZL5.js.map
+//# sourceMappingURL=pos.bundle.RCUPKRUY.js.map
