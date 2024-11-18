@@ -100,9 +100,7 @@ pos_ar.PointOfSale.Controller = class {
 		//set default val
 		Object.assign(this.selectedPosProfile , this.appData.appData.pos_profiles[0])
 		//check takes and get it if it exist on pos profile
-		console.log("debuging : " , this.selectedPosProfile)
 		if(this.selectedPosProfile.taxes_and_charges != null && this.selectedPosProfile.taxes_and_charges != ""){
-			console.log("debuging inside : " , this.selectedPosProfile)
 			this.taxes_and_charges_template = await this.dataHandler.fetchSalesTaxesAndChargesTemplate(this.selectedPosProfile.taxes_and_charges)
 			this.taxes_and_charges = this.taxes_and_charges_template.taxes
 		}
@@ -917,8 +915,6 @@ pos_ar.PointOfSale.Controller = class {
 			frappe.db.insert(
 				pos
 			).then(r =>{
-				console.log("debuging the pos : " , r)
-
 				this.appData.updatePosInvoice(pos)
 			}).catch(err=>{
 				console.log("cant push pos invoice : " , err);
@@ -1103,11 +1099,6 @@ pos_ar.PointOfSale.Controller = class {
 				return 0 ;
 
 			const price = this.appData.appData.item_prices.find(itemPrice => itemPrice.brand == item.brand && itemPrice.price_list == priceList)
-
-			console.log("debagiiiiiiiiiiiiiiiiiiiiiiiiiiiing : " , this.appData.appData.item_prices.find(itemPrice => itemPrice.brand == item.brand && itemPrice.price_list == priceList))
-
-
-			console.log("and price  ===> " , price)
 
 			return price ? price.price_list_rate  : 0
 		}else if(mode == 'priceList'){
