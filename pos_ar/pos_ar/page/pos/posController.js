@@ -1100,6 +1100,8 @@ pos_ar.PointOfSale.Controller = class {
 
 			const price = this.appData.appData.item_prices.find(itemPrice => itemPrice.brand == item.brand && itemPrice.price_list == priceList)
 
+			console.log("item : " , item , " priceList " , priceList , " item price : " , this.appData.appData.item_prices)
+
 			return price ? price.price_list_rate  : 0
 		}else if(mode == 'priceList'){
 			const price = this.appData.appData.item_prices.find(itemPrice => itemPrice.item_code == item.item_name && itemPrice.price_list == priceList)

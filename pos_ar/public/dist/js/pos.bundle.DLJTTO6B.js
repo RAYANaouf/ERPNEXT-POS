@@ -840,6 +840,7 @@
         if (item.brand == null)
           return 0;
         const price = this.appData.appData.item_prices.find((itemPrice2) => itemPrice2.brand == item.brand && itemPrice2.price_list == priceList);
+        console.log("item : ", item, " priceList ", priceList, " item price : ", this.appData.appData.item_prices);
         return price ? price.price_list_rate : 0;
       } else if (mode == "priceList") {
         const price = this.appData.appData.item_prices.find((itemPrice2) => itemPrice2.item_code == item.item_name && itemPrice2.price_list == priceList);
@@ -3871,4 +3872,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.UZDIANM4.js.map
+//# sourceMappingURL=pos.bundle.DLJTTO6B.js.map
