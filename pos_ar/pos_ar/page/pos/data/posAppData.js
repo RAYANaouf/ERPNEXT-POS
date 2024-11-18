@@ -155,7 +155,7 @@ pos_ar.PointOfSale.posAppData = class {
 		this.appData.item_groups = this.combineLocalAndUpdated(localItemGroups,updatedItemGroups)
 	}
 	async getItemBarcodes(){
-		this.appData.item_barcodes = await this.api_handler.fetchItemBarCodes(this.since)
+		this.appData.item_barcodes = await this.api_handler.fetchItemBarCodes()
 	}
 	async getPosInvoices(){
 		//get local

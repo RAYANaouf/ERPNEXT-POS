@@ -3650,7 +3650,7 @@
       this.appData.item_groups = this.combineLocalAndUpdated(localItemGroups, updatedItemGroups);
     }
     async getItemBarcodes() {
-      this.appData.item_barcodes = await this.api_handler.fetchItemBarCodes(this.since);
+      this.appData.item_barcodes = await this.api_handler.fetchItemBarCodes();
     }
     async getPosInvoices() {
       this.appData.pos_invoices = await this.db.getAllPosInvoice();
@@ -3707,7 +3707,7 @@
   pos_ar.PointOfSale.FetchHandler = class FetchHandler {
     constructor() {
     }
-    async fetchCustomers(since) {
+    async fetchCustomers(since2) {
       try {
         const filter = { disabled: 0 };
         return await frappe.db.get_list("Customer", {
@@ -3720,7 +3720,7 @@
         return [];
       }
     }
-    async fetchBrands(since) {
+    async fetchBrands(since2) {
       try {
         const filter = {};
         return await frappe.db.get_list("Brand", {
@@ -3733,7 +3733,7 @@
         return [];
       }
     }
-    async fetchItemGroups(since) {
+    async fetchItemGroups(since2) {
       try {
         const filter = {};
         return await frappe.db.get_list("Item Group", {
@@ -3746,7 +3746,7 @@
         return [];
       }
     }
-    async fetchItems(since) {
+    async fetchItems(since2) {
       try {
         const filter = { disabled: 0 };
         return await frappe.db.get_list("Item", {
@@ -3759,7 +3759,7 @@
         return [];
       }
     }
-    async fetchItemBarCodes(since) {
+    async fetchItemBarCodes() {
       try {
         const response = await frappe.call({
           method: "pos_ar.pos_ar.doctype.pos_info.pos_info.get_item_barcodes",
@@ -3771,7 +3771,7 @@
         return [];
       }
     }
-    async fetchItemPrice(since) {
+    async fetchItemPrice(since2) {
       try {
         const filter = {};
         return await frappe.db.get_list("Item Price", {
@@ -3784,7 +3784,7 @@
         return [];
       }
     }
-    async fetchPriceList(since) {
+    async fetchPriceList(since2) {
       try {
         const filter = { selling: 1 };
         return await frappe.db.get_list("Price List", {
@@ -3797,7 +3797,7 @@
         return [];
       }
     }
-    async fetchWarehouseList(since) {
+    async fetchWarehouseList(since2) {
       try {
         const filter = {};
         return await frappe.db.get_list("Warehouse", {
@@ -3810,7 +3810,7 @@
         return [];
       }
     }
-    async fetchPosProfileList(since) {
+    async fetchPosProfileList(since2) {
       try {
         const filter = { disabled: 0 };
         return await frappe.db.get_list("POS Profile", {
@@ -3839,7 +3839,7 @@
         return [];
       }
     }
-    async fetchBinList(since) {
+    async fetchBinList(since2) {
       try {
         const filter = {};
         return await frappe.db.get_list("Bin", {
@@ -3852,11 +3852,11 @@
         return [];
       }
     }
-    async fetchDeletedDocs(since) {
+    async fetchDeletedDocs(since2) {
       try {
         const filter = {};
-        if (since) {
-          filter.modified = [">", since];
+        if (since2) {
+          filter.modified = [">", since2];
         }
         return await frappe.db.get_list("Deleted Document", {
           fields: ["name", "deleted_name", "deleted_doctype", "restored"],
@@ -3871,4 +3871,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.L6LUX5M5.js.map
+//# sourceMappingURL=pos.bundle.UZDIANM4.js.map

@@ -93,7 +93,7 @@ pos_ar.PointOfSale.FetchHandler = class FetchHandler{
 		return []
 	}
 */
-	async fetchItemBarCodes(since) {
+	async fetchItemBarCodes() {
 		try {
 			const response = await frappe.call({
 				method: 'pos_ar.pos_ar.doctype.pos_info.pos_info.get_item_barcodes',
