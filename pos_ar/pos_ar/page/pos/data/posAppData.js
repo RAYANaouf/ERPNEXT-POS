@@ -16,28 +16,32 @@ pos_ar.PointOfSale.posAppData = class {
 
 	async getAllData(){
 		try{
-			frappe.show_progress('Please Wait', 1, 11, 'loading customers...');
+			frappe.show_progress('Please Wait', 0, 12, 'loading deleted documents');
+			await this.getDeletedDocs()
+			frappe.show_progress('Please Wait', 1, 12, 'loading customers...');
 			await this.getCustomers();
-			frappe.show_progress('Please Wait', 2, 11, 'loading items...');
+			frappe.show_progress('Please Wait', 2, 12, 'loading items...');
 			await this.getItems();
-			frappe.show_progress('Please Wait', 3, 11, 'loading pos profiles');
+			frappe.show_progress('Please Wait', 3, 12, 'loading pos profiles');
 			await this.getPosProfiles();
-			frappe.show_progress('Please Wait', 4, 11, 'Please wait');
+			frappe.show_progress('Please Wait', 4, 12, 'Please wait');
 			await this.getBins();
-			frappe.show_progress('Please Wait', 5, 11, 'loading warehouses');
+			frappe.show_progress('Please Wait', 5, 12, 'loading warehouses');
 			await this.getWarehouses();
-			frappe.show_progress('Please Wait', 6, 11, 'loading price lists');
+			frappe.show_progress('Please Wait', 6, 12, 'loading price lists');
 			await this.getPriceLists();
-			frappe.show_progress('Please Wait', 7, 11, 'loading item prices');
+			frappe.show_progress('Please Wait', 7, 12, 'loading item prices');
 			await this.getItemPrices();
-			frappe.show_progress('Please Wait', 8, 11, 'loading item groups');
+			frappe.show_progress('Please Wait', 8, 12, 'loading item groups');
 			await this.getItemGroups();
-			frappe.show_progress('Please Wait', 9, 11, 'loading invoices');
+			frappe.show_progress('Please Wait', 9, 12, 'loading invoices');
 			await this.getPosInvoices();
-			frappe.show_progress('Please Wait', 10, 11, 'Please check in out');
+			frappe.show_progress('Please Wait', 10, 12, 'loading check in out');
 			await this.getCheckInOuts();
-			frappe.show_progress('Please Wait', 11, 11, 'Please check in out');
+			frappe.show_progress('Please Wait', 11, 12, 'loading barcodes');
 			await this.getItemBarcodes()
+			frappe.show_progress('Please Wait', 12, 12, 'Completed');
+			frappe.hide_progress();
 			frappe.hide_progress();
 			frappe.hide_progress();
 			frappe.hide_progress();
@@ -162,6 +166,12 @@ pos_ar.PointOfSale.posAppData = class {
 		this.appData.check_in_outs = await this.db.getAllCheckInOut();
 	}
 
+	async getDeletedDocs(){
+		//get local
+		this.appData.deleted_documents = await this.api_handler.fetchDeletedDocs(this.since);
+		console.log("debuuuuuuuuuuuging : " , this.appData.deleted_documents)
+	}
+
 
 
 	saveCheckInOut(checkInOut,onSuccess,onFailure){
@@ -198,10 +208,14 @@ pos_ar.PointOfSale.posAppData = class {
 		// Create a map from the local data array using a unique identifier (name)
 		const combinedMap = new Map(local.map(item => [item.name, item]));
 		// Loop through each item in the updated data
+		this.appData.deleted_documents.forEach(deleted=>{
+			combinedMap.delete( deleted.name )
+		})
 		updated.forEach(updatedItem=>{
 			combinedMap.set(updatedItem.name , updatedItem)
 		})
 
 		return Array.from(combinedMap.values())
 	}
+
 }

@@ -75,8 +75,8 @@ pos_ar.PointOfSale.FetchHandler = class FetchHandler{
 		}
 	}
 
-	async fetchItemBarCodes(since) {
-		/*try {
+/*	async fetchItemBarCodes(since) {
+		try {
 			const filter = {parenttype:"Item"}
 			if(since){
 				filter.modified = ['>',since]
@@ -89,8 +89,21 @@ pos_ar.PointOfSale.FetchHandler = class FetchHandler{
 		} catch (error) {
 			console.error('Error fetching Item Group :', error);
 			return []
-		}*/
+		}
 		return []
+	}
+*/
+	async fetchItemBarCodes(since) {
+		try {
+			const response = await frappe.call({
+				method: 'pos_ar.pos_ar.doctype.pos_info.pos_info.get_item_barcodes',
+				args: { since }
+			});
+			return response.message;  // The fetched item barcodes
+		} catch (error) {
+			console.error('Error fetching Item Barcodes:', error);
+			return [];
+		}
 	}
 
 
@@ -207,6 +220,23 @@ pos_ar.PointOfSale.FetchHandler = class FetchHandler{
 		}
 	}
 
+	async fetchDeletedDocs(since) {
+		try {
+			const filter = {}
+			if(since){
+				filter.modified = ['>',since]
+			}
+			return await frappe.db.get_list('Deleted Document', {
+				fields: ['name', 'deleted_name'  ,'deleted_doctype' , 'restored' ],
+				filters: filter,
+				limit : 100000
+			})
+		} catch (error) {
+			console.error('Error fetching deleted documents :', error);
+			return []
+		}
+		return []
+	}
 
 
 }

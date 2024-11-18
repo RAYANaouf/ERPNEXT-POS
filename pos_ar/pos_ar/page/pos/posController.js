@@ -38,7 +38,7 @@ pos_ar.PointOfSale.Controller = class {
 			this.appData       = new pos_ar.PointOfSale.posAppData(this.db , this.dataHandler)
 			await this.appData.getAllData()
 
-			console.log("debugiiiiin : " , this.appData.appData)
+			console.log("see app data : " , this.appData.appData)
 
 			this.prepare_container();
 			//prepare app data

@@ -15,8 +15,6 @@ pos_ar.PointOfSale.pos_history = class {
 		this.sales_taxes           = salesTaxes;
 		this.on_click              = onClick;
 
-		console.log("here we are debuging : " , company)
-
 		//local data
 		this.localPosInvoice   = { lastTime : null , pos_invoices : [] }
 		this.filter            = "" ;
@@ -410,7 +408,6 @@ pos_ar.PointOfSale.pos_history = class {
 		const creation_time = pos.creation_time
 		const [date, time]  = creation_time.split(' ')
 
-		console.log("here we are debuging : " , pos)
 
 		let invoiceHTML =
 			'<style>'+
@@ -427,7 +424,10 @@ pos_ar.PointOfSale.pos_history = class {
 					'width:100%; height:16px;'+
 				'}'+
 				'tr:nth-child(1){'+
-					'background:#eeeeee;border:2px solid #000000;'+
+					''+
+				'}'+
+				'#first_row{'+
+					'border: 5px solid black;'+
 				'}'+
 				'#logContainer{'+
 					'width: 100%;height:80px;'+
@@ -463,9 +463,9 @@ pos_ar.PointOfSale.pos_history = class {
 						'<div style="width:20%;"></div>'+
 					'</div>'+
 					'<div id="company_container">' +
-						'<div style="flex-grow:1; border-bottom:1px dashed #505050; border-top:1px dashed #505050; "></div>'+
+						'<div style="flex-grow:1;"></div>'+
 						`<p style="margin:0px 25px;">${this.company.company_name}</p>`+
-						'<div style="flex-grow:1; border-bottom:1px dashed #505050; border-top:1px dashed #505050;"></div>'+
+						'<div style="flex-grow:1;"></div>'+
 					'</div>'+
 					'<div id="top_data_container">'+
 						'<div class="c1">'+
@@ -477,36 +477,40 @@ pos_ar.PointOfSale.pos_history = class {
 						'</div>'+
 					'</div>'+
 					'<table>'+
-						'<tr style="border:3px solid #000000;"><th>Nom</th><th>Qté</th><th>P.unité</th><th>Prix</th>'
+						'<tr id="first_row" ><th style="boder:1px solid black;">Nom</th><th>Qté</th><th>Prix</th><th>Value</th>'
 
 		pos.items.forEach(item => {
 			netTotal    += item.rate * item.qty
-			invoiceHTML += `<tr> <td><div>${item.item_name}</div></td>  <td><div>${item.qty}</div></td>  <td><div>${item.rate}</div></td>  <td><div>${item.rate * item.qty}</div></td></tr>`
+			invoiceHTML += `<tr > <td ><div >${item.item_name}</div></td>  <td><div>${item.qty}</div></td>  <td><div>${item.rate}</div></td>  <td><div>${item.rate * item.qty}</div></td></tr>`
 		})
 
 		invoiceHTML += '</table>'
 
 
 
-		invoiceHTML += `<div style="height:23px;"> <p style="font-size:12px;font-weight:500;" ><span style="font-size:16px;font-weight:600;">Sous-total : </span> ${netTotal} DA </p> </div>`
-		invoiceHTML += `<div style="height:23px;"> <p style="font-size:12px;font-weight:500;" ><span style="font-size:16px;font-weight:600;">Reduction : </span> ${pos.additional_discount_percentage * netTotal} DA </p> </div>`
+		invoiceHTML += `<div style="height:23px;"> <p style="font-size:12px;font-weight:500;" ><span style="font-size:12px;font-weight:600;">Sous-total : </span> ${netTotal} DA </p> </div>`
+		invoiceHTML += `<div style="height:23px;"> <p style="font-size:12px;font-weight:500;" ><span style="font-size:12px;font-weight:600;">Reduction : </span> ${pos.additional_discount_percentage * netTotal} DA </p> </div>`
 
 		this.sales_taxes.forEach(tax => {
 			taxes += tax.rate
-			invoiceHTML += `<div style="height:23px;"> <p style="font-size:12px;font-weight:500;" ><span style="font-size:16px;font-weight:600;">${tax.description} : </span> ${tax.rate} % </p> </div>`
+			invoiceHTML += `<div style="height:23px;"> <p style="font-size:12px;font-weight:500;" ><span style="font-size:12px;font-weight:600;">${tax.description} : </span> ${tax.rate} % </p> </div>`
 		})
 
-		invoiceHTML += `<div style="height:23px;"> <p style="font-size:12px;font-weight:500;" ><span style="font-size:16px;font-weight:700;">Total : </span> ${netTotal+(netTotal*(taxes/100)) - pos.additional_discount_percentage * netTotal} DA </p> </div>`
+		invoiceHTML += `<div style="height:23px;"> <p style="font-size:12px;font-weight:500;" ><span style="font-size:12px;font-weight:600;">Total : </span> ${netTotal+(netTotal*(taxes/100)) - pos.additional_discount_percentage * netTotal} DA </p> </div>`
 
 
 		invoiceHTML +=
 		'<div id="footer_message" style="width:100%; display:flex; align-items:center; margin-top:30px;">'+
-			'<div style="flex-grow:1; border-bottom:2px dashed #505050;"></div>'+
+			'<div style="flex-grow:1;"></div>'+
 			'<div style="margin:30px 25px;"> Thank You, Come Again</div>'+
-			'<div style="flex-grow:1;border-bottom:2px dashed #505050;"></div>'+
+			'<div style="flex-grow:1;"></div>'+
 		'</div>'
 
 		invoiceHTML += '</div>'
+
+
+
+
 		// Open a new window and print the HTML content
 		const printWindow = window.open('', '_blank');
 		printWindow.document.write(invoiceHTML);
