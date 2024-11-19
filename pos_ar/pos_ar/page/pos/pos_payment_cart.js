@@ -35,9 +35,6 @@ pos_ar.PointOfSale.pos_payment_cart = class{
 		this.prepare_payment_cart();
 		this.calculateGrandTotal()
 		this.setListeners()
-
-		console.log("helloooooooooooooooooooooooooooo ")
-
 	}
 
 	prepare_payment_cart(){
@@ -164,8 +161,6 @@ pos_ar.PointOfSale.pos_payment_cart = class{
 
 		//inputs
 		this.cashBox.find('#cachInput').on('input' , (event)=>{
-
-			console.log("we are here 1:)");
 
 			const value = event.target.value;
 			if(value.length == 0){

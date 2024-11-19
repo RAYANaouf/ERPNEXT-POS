@@ -705,16 +705,19 @@
       this.selectedItemMaps.get(this.selectedTab.tabName).paid_amount = this.invoiceData.paidAmount;
       this.selectedItemMaps.get(this.selectedTab.tabName).base_paid_amount = this.invoiceData.paidAmount;
       this.selectedItemMaps.get(this.selectedTab.tabName).payments = [{ "mode_of_payment": "Cash", "amount": this.invoiceData.paidAmount }];
+      this.selectedItemMaps.get(this.selectedTab.tabName).outstanding_amount = this.invoiceData.grandTotal - this.invoiceData.paidAmount;
       this.selectedItemMaps.get(this.selectedTab.tabName).docstatus = 1;
       const status = this.checkIfPaid(this.selectedItemMaps.get(this.selectedTab.tabName));
       this.selectedItemMaps.get(this.selectedTab.tabName).status = status;
       const pos = structuredClone(this.selectedItemMaps.get(this.selectedTab.tabName));
       if (status == "Unpaid") {
         pos.synced = true;
+        console.log("debuging here == ===> ", pos);
         frappe.db.insert(
           pos
         ).then((r) => {
           this.appData.updatePosInvoice(pos);
+          console.log("debuging here => ", r);
         }).catch((err) => {
           console.log("cant push pos invoice : ", err);
         });
@@ -2108,7 +2111,6 @@
       this.prepare_payment_cart();
       this.calculateGrandTotal();
       this.setListeners();
-      console.log("helloooooooooooooooooooooooooooo ");
     }
     prepare_payment_cart() {
       this.wrapper.append('<div id="paymentMethodCart" class="columnBox align_center"></div>');
@@ -2192,7 +2194,6 @@
         this.refreshPaidAmount();
       });
       this.cashBox.find("#cachInput").on("input", (event2) => {
-        console.log("we are here 1:)");
         const value = event2.target.value;
         if (value.length == 0) {
           event2.target.value = 0;
@@ -3708,7 +3709,7 @@
   pos_ar.PointOfSale.FetchHandler = class FetchHandler {
     constructor() {
     }
-    async fetchCustomers(since2) {
+    async fetchCustomers(since) {
       try {
         const filter = { disabled: 0 };
         return await frappe.db.get_list("Customer", {
@@ -3721,7 +3722,7 @@
         return [];
       }
     }
-    async fetchBrands(since2) {
+    async fetchBrands(since) {
       try {
         const filter = {};
         return await frappe.db.get_list("Brand", {
@@ -3734,7 +3735,7 @@
         return [];
       }
     }
-    async fetchItemGroups(since2) {
+    async fetchItemGroups(since) {
       try {
         const filter = {};
         return await frappe.db.get_list("Item Group", {
@@ -3747,7 +3748,7 @@
         return [];
       }
     }
-    async fetchItems(since2) {
+    async fetchItems(since) {
       try {
         const filter = { disabled: 0 };
         return await frappe.db.get_list("Item", {
@@ -3764,7 +3765,7 @@
       try {
         const response = await frappe.call({
           method: "pos_ar.pos_ar.doctype.pos_info.pos_info.get_item_barcodes",
-          args: { since }
+          args: {}
         });
         return response.message;
       } catch (error) {
@@ -3772,7 +3773,7 @@
         return [];
       }
     }
-    async fetchItemPrice(since2) {
+    async fetchItemPrice(since) {
       try {
         const filter = {};
         return await frappe.db.get_list("Item Price", {
@@ -3785,7 +3786,7 @@
         return [];
       }
     }
-    async fetchPriceList(since2) {
+    async fetchPriceList(since) {
       try {
         const filter = { selling: 1 };
         return await frappe.db.get_list("Price List", {
@@ -3798,7 +3799,7 @@
         return [];
       }
     }
-    async fetchWarehouseList(since2) {
+    async fetchWarehouseList(since) {
       try {
         const filter = {};
         return await frappe.db.get_list("Warehouse", {
@@ -3811,7 +3812,7 @@
         return [];
       }
     }
-    async fetchPosProfileList(since2) {
+    async fetchPosProfileList(since) {
       try {
         const filter = { disabled: 0 };
         return await frappe.db.get_list("POS Profile", {
@@ -3840,7 +3841,7 @@
         return [];
       }
     }
-    async fetchBinList(since2) {
+    async fetchBinList(since) {
       try {
         const filter = {};
         return await frappe.db.get_list("Bin", {
@@ -3853,11 +3854,11 @@
         return [];
       }
     }
-    async fetchDeletedDocs(since2) {
+    async fetchDeletedDocs(since) {
       try {
         const filter = {};
-        if (since2) {
-          filter.modified = [">", since2];
+        if (since) {
+          filter.modified = [">", since];
         }
         return await frappe.db.get_list("Deleted Document", {
           fields: ["name", "deleted_name", "deleted_doctype", "restored"],
@@ -3872,4 +3873,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.DLJTTO6B.js.map
+//# sourceMappingURL=pos.bundle.U34RPE5P.js.map

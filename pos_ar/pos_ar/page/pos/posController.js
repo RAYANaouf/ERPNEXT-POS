@@ -891,14 +891,16 @@ pos_ar.PointOfSale.Controller = class {
 			}
 			items.push(newItem)
 		})
+
 		this.selectedItemMaps.get(this.selectedTab.tabName).items = items
 		if(items.length ==0)
 			return
 
-		this.selectedItemMaps.get(this.selectedTab.tabName).paid_amount       = this.invoiceData.paidAmount
-		this.selectedItemMaps.get(this.selectedTab.tabName).base_paid_amount  = this.invoiceData.paidAmount
-		this.selectedItemMaps.get(this.selectedTab.tabName).payments          = [{'mode_of_payment' : 'Cash' , 'amount' : this.invoiceData.paidAmount}]
-		this.selectedItemMaps.get(this.selectedTab.tabName).docstatus         = 1
+		this.selectedItemMaps.get(this.selectedTab.tabName).paid_amount        = this.invoiceData.paidAmount
+		this.selectedItemMaps.get(this.selectedTab.tabName).base_paid_amount   = this.invoiceData.paidAmount
+		this.selectedItemMaps.get(this.selectedTab.tabName).payments           = [{'mode_of_payment' : 'Cash' , 'amount' : this.invoiceData.paidAmount}]
+		this.selectedItemMaps.get(this.selectedTab.tabName).outstanding_amount = this.invoiceData.grandTotal - this.invoiceData.paidAmount
+		this.selectedItemMaps.get(this.selectedTab.tabName).docstatus          = 1
 
 		//set status
 		const status = this.checkIfPaid(this.selectedItemMaps.get(this.selectedTab.tabName))
@@ -912,10 +914,12 @@ pos_ar.PointOfSale.Controller = class {
 
 		if(status == 'Unpaid'){
 			pos.synced = true
+			console.log("debuging here == ===> " , pos)
 			frappe.db.insert(
 				pos
 			).then(r =>{
 				this.appData.updatePosInvoice(pos)
+				console.log("debuging here => " , r)
 			}).catch(err=>{
 				console.log("cant push pos invoice : " , err);
 			})
@@ -944,7 +948,6 @@ pos_ar.PointOfSale.Controller = class {
 			this.selected_item_cart.createNewTab();
 		}
 		this.onClose_payment_cart()
-
 	}
 
 
