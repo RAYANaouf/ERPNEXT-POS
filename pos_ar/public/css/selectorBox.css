@@ -71,8 +71,6 @@
 }
 #LeftSection #SelectorBox #itemsContainer .itemBox .itemTitle{
         padding : 0px 0px 0px 5px ;
-        text-overflow: ellipsis;
-        white-space  : nowrap  ;
         overflow     : hidden  ;
 
 }
