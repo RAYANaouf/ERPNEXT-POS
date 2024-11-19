@@ -156,9 +156,7 @@ pos_ar.PointOfSale.pos_item_selector = class {
 		// Extract the parent item IDs from the filtered barcodes
 		const barcodeItemIds   = filteredBarcodes.map(cod => cod.parent)
 
-		console.log("just debuging ==> " , barcodeItemIds)
-
-		return this.item_list.filter(item => item.name.toLowerCase().includes(value.toLowerCase()) || barcodeItemIds.includes(item.name) || item.scan_barcode == value || item.item_name.toLowerCase().includes(value.toLowerCase()))
+		return this.item_list.filter(item =>  barcodeItemIds.includes(item.name)  || item.item_name.toLowerCase().includes(value.toLowerCase()))
 	}
 
 

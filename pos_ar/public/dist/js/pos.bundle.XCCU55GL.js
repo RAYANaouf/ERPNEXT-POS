@@ -281,7 +281,6 @@
       this.$leftSection = this.$components_wrapper.find("#LeftSection");
     }
     init_item_selector() {
-      console.log("im looking for the problem : items==> ", this.appData.appData.items);
       this.item_selector = new pos_ar.PointOfSale.pos_item_selector(
         this.$leftSection,
         this.appData.appData.items,
@@ -712,12 +711,10 @@
       const pos = structuredClone(this.selectedItemMaps.get(this.selectedTab.tabName));
       if (status == "Unpaid") {
         pos.synced = true;
-        console.log("debuging here == ===> ", pos);
         frappe.db.insert(
           pos
         ).then((r) => {
           this.appData.updatePosInvoice(pos);
-          console.log("debuging here => ", r);
         }).catch((err) => {
           console.log("cant push pos invoice : ", err);
         });
@@ -843,7 +840,6 @@
         if (item.brand == null)
           return 0;
         const price = this.appData.appData.item_prices.find((itemPrice2) => itemPrice2.brand == item.brand && itemPrice2.price_list == priceList);
-        console.log("item : ", item, " priceList ", priceList, " item price : ", this.appData.appData.item_prices);
         return price ? price.price_list_rate : 0;
       } else if (mode == "priceList") {
         const price = this.appData.appData.item_prices.find((itemPrice2) => itemPrice2.item_code == item.item_name && itemPrice2.price_list == priceList);
@@ -1046,8 +1042,7 @@
     filterListByItemData(value) {
       const filteredBarcodes = this.item_barcodes.filter((BarCode) => BarCode.barcode == value);
       const barcodeItemIds = filteredBarcodes.map((cod) => cod.parent);
-      console.log("just debuging ==> ", barcodeItemIds);
-      return this.item_list.filter((item) => item.name.toLowerCase().includes(value.toLowerCase()) || barcodeItemIds.includes(item.name) || item.scan_barcode == value || item.item_name.toLowerCase().includes(value.toLowerCase()));
+      return this.item_list.filter((item) => barcodeItemIds.includes(item.name) || item.item_name.toLowerCase().includes(value.toLowerCase()));
     }
     getItemByItemGroup(item_group) {
       let groups = [];
@@ -3873,4 +3868,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.U34RPE5P.js.map
+//# sourceMappingURL=pos.bundle.XCCU55GL.js.map

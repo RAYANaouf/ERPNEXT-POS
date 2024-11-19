@@ -320,7 +320,6 @@ pos_ar.PointOfSale.Controller = class {
 
         init_item_selector(){
 
-		console.log("im looking for the problem : items==> " ,  this.appData.appData.items)
                 this.item_selector = new pos_ar.PointOfSale.pos_item_selector(
 						this.$leftSection                  ,
 						this.appData.appData.items         ,
@@ -914,12 +913,10 @@ pos_ar.PointOfSale.Controller = class {
 
 		if(status == 'Unpaid'){
 			pos.synced = true
-			console.log("debuging here == ===> " , pos)
 			frappe.db.insert(
 				pos
 			).then(r =>{
 				this.appData.updatePosInvoice(pos)
-				console.log("debuging here => " , r)
 			}).catch(err=>{
 				console.log("cant push pos invoice : " , err);
 			})
@@ -1100,11 +1097,7 @@ pos_ar.PointOfSale.Controller = class {
 		if(mode == 'brand'){
 			if(item.brand == null)
 				return 0 ;
-
 			const price = this.appData.appData.item_prices.find(itemPrice => itemPrice.brand == item.brand && itemPrice.price_list == priceList)
-
-			console.log("item : " , item , " priceList " , priceList , " item price : " , this.appData.appData.item_prices)
-
 			return price ? price.price_list_rate  : 0
 		}else if(mode == 'priceList'){
 			const price = this.appData.appData.item_prices.find(itemPrice => itemPrice.item_code == item.item_name && itemPrice.price_list == priceList)
