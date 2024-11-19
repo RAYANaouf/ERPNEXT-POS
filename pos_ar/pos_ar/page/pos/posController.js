@@ -328,6 +328,7 @@ pos_ar.PointOfSale.Controller = class {
 						this.appData.appData.item_prices   ,
 						this.defaultPriceList              ,
 						this.getItemPrice.bind(this)       ,
+						this.auto_select.bind(this)        ,
 						item => { this.itemClick_selector(item)  }
 					)
 	}
@@ -520,6 +521,10 @@ pos_ar.PointOfSale.Controller = class {
 		//change display
 		this.selected_item_cart.setKeyboardOrientation("portrait");
 		this.selected_item_cart.cleanHeighlight();
+	}
+
+	auto_select(item){
+		itemClick_selector(item)
 	}
 
 	onClose_payment_cart(){

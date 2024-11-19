@@ -289,6 +289,7 @@
         this.appData.appData.item_prices,
         this.defaultPriceList,
         this.getItemPrice.bind(this),
+        this.auto_select.bind(this),
         (item) => {
           this.itemClick_selector(item);
         }
@@ -449,6 +450,9 @@
       this.settings_cart.hideCart();
       this.selected_item_cart.setKeyboardOrientation("portrait");
       this.selected_item_cart.cleanHeighlight();
+    }
+    auto_select(item) {
+      itemClick_selector(item);
     }
     onClose_payment_cart() {
       this.item_selector.showCart();
@@ -935,7 +939,7 @@
 
   // ../pos_ar/pos_ar/pos_ar/page/pos/pos_item_selector.js
   pos_ar.PointOfSale.pos_item_selector = class {
-    constructor(wrapper, item_list, itemBarcodes, item_group_list, item_prices, selectedPriceList, getItemPrice, onItemClick) {
+    constructor(wrapper, item_list, itemBarcodes, item_group_list, item_prices, selectedPriceList, getItemPrice, autoSelect, onItemClick) {
       this.wrapper = wrapper;
       this.item_list = item_list;
       this.item_barcodes = itemBarcodes;
@@ -943,6 +947,7 @@
       this.item_prices = item_prices;
       this.selected_price_list = selectedPriceList;
       this.get_item_price = getItemPrice;
+      this.auto_select = autoSelect;
       this.on_item_click = onItemClick;
       this.start_item_selector();
     }
@@ -987,6 +992,9 @@
     setItemInFlow(filtered_item_list) {
       const itemsContainer_html = document.getElementById("itemsContainer");
       itemsContainer_html.innerHTML = "";
+      if (filtered_item_list.length == 1) {
+        this.auto_select(filtered_item_list[0]);
+      }
       for (let i = 0; i < filtered_item_list.length && i < 800; i++) {
         let item = filtered_item_list[i];
         const itemBox = document.createElement("div");
@@ -3868,4 +3876,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.XCCU55GL.js.map
+//# sourceMappingURL=pos.bundle.Y3CLISWV.js.map

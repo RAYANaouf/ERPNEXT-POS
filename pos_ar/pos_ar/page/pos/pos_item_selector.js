@@ -8,6 +8,7 @@ pos_ar.PointOfSale.pos_item_selector = class {
 		item_prices       ,
 		selectedPriceList ,
 		getItemPrice      ,
+		autoSelect        ,
 		onItemClick
 	){
 		this.wrapper             = wrapper           ;
@@ -17,6 +18,7 @@ pos_ar.PointOfSale.pos_item_selector = class {
 		this.item_prices         = item_prices       ;
 		this.selected_price_list = selectedPriceList ;
 		this.get_item_price      = getItemPrice      ;
+		this.auto_select         = autoSelect        ;
 		this.on_item_click       = onItemClick       ;
 
 		//class functions invocation
@@ -76,6 +78,10 @@ pos_ar.PointOfSale.pos_item_selector = class {
 	setItemInFlow(filtered_item_list){
         	const itemsContainer_html = document.getElementById("itemsContainer");
         	itemsContainer_html.innerHTML = "";
+
+		if(filtered_item_list.length == 1){
+			this.auto_select(filtered_item_list[0])
+		}
 
 		for(let i=0 ; i<filtered_item_list.length && i<800 ; i++){
 			let item = filtered_item_list[i];
@@ -148,7 +154,6 @@ pos_ar.PointOfSale.pos_item_selector = class {
 
 	//filter list by item code or barcode
 	filterListByItemData( value ){
-
 
 		// Filter barcodes that match the value
 		const filteredBarcodes = this.item_barcodes.filter(BarCode=> BarCode.barcode == value)
