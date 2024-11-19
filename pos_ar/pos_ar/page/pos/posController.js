@@ -524,7 +524,8 @@ pos_ar.PointOfSale.Controller = class {
 	}
 
 	auto_select(item){
-		itemClick_selector(item)
+		this.itemClick_selector(item)
+		this.item_selector.refresh()
 	}
 
 	onClose_payment_cart(){

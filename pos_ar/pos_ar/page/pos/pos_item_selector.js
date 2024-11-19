@@ -25,11 +25,16 @@ pos_ar.PointOfSale.pos_item_selector = class {
 		this.start_item_selector();
         }
 
+
 	start_item_selector(){
 		this.prepare_select_box();
 		this.setItemGroupsInList();
 		this.setItemInFlow(this.getItemByItemGroup(""))
 		this.setListeners();
+	}
+
+	refresh(){
+		this.setItemInFlow(this.getItemByItemGroup(""))
 	}
 
 	/***********************  ui  functions  ***************************************/
