@@ -172,7 +172,7 @@ pos_ar.PointOfSale.FetchHandler = class FetchHandler{
 			return await frappe.db.get_list('POS Profile' , {
 				fields  : ['name' , 'warehouse' , 'company' , 'selling_price_list' , 'warehouse' , 'income_account' , 'cost_center' , 'write_off_account' , 'write_off_cost_center' , 'taxes_and_charges' , 'tax_category'],
 				filters : filter,
-				limit : 100
+				limit : 1
 			})
 		}
 		catch(error){

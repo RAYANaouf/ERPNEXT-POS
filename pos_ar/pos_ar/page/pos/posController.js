@@ -16,6 +16,7 @@ pos_ar.PointOfSale.Controller = class {
 		this.defaultPriceList           = {"name"       : ""   }
 		this.taxes_and_charges_template = null;
 		this.taxes_and_charges          = [];
+		this.payment_methods            = []
 
 		//sell invoice
 		this.POSOpeningEntry = {}
@@ -229,9 +230,12 @@ pos_ar.PointOfSale.Controller = class {
 
 		const fetch_pos_payment_methods = () => {
 			const pos_profile = dialog.fields_dict.pos_profile.get_value();
+			console.log("pos debuging ===> " , pos_profile)
+
 			if (!pos_profile) return;
 			frappe.db.get_doc("POS Profile", pos_profile).then(({ payments }) => {
 				dialog.fields_dict.balance_details.df.data = [];
+				this.payment_methods = payments
 				payments.forEach((pay) => {
 					const { mode_of_payment } = pay;
 					dialog.fields_dict.balance_details.df.data.push({ mode_of_payment, opening_amount: "0" });
@@ -604,7 +608,21 @@ pos_ar.PointOfSale.Controller = class {
 		this.check_in_out_cart.hideCart();
 	}
 
+	getDefaultPaymentMethods(){
+		let result = '';
+		console.log("pos debug : " , this.payment_methods)
+		this.payment_methods.forEach(method =>{
+			if(method.default){
+				result = method.mode_of_payment
+			}
+		})
+		return result
+	}
+
 	createNewTab(counter){
+
+		console.log("pos : " , this.getDefaultPaymentMethods())
+
 		let new_pos_invoice = frappe.model.get_new_doc('POS Invoice');
 		new_pos_invoice.customer          = this.defaultCustomer.name
 		new_pos_invoice.pos_profile       = this.selectedPosProfile.name
@@ -614,7 +632,7 @@ pos_ar.PointOfSale.Controller = class {
 		new_pos_invoice.paid_amount       = 0
 		new_pos_invoice.base_paid_amount  = 0
 		new_pos_invoice.creation_time     = frappe.datetime.now_datetime()
-		new_pos_invoice.payments          = [{'mode_of_payment' : 'Cash' , 'amount' : 0}]
+		new_pos_invoice.payments          = [{'mode_of_payment' : this.getDefaultPaymentMethods() , 'amount' : 0}]
 		new_pos_invoice.is_pos            = 1
 		new_pos_invoice.update_stock      = 1
 		new_pos_invoice.docstatus         = 0
