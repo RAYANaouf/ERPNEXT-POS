@@ -994,6 +994,8 @@
       itemsContainer_html.innerHTML = "";
       if (filtered_item_list.length == 1) {
         this.auto_select(filtered_item_list[0]);
+        const itemInput = document.getElementById("ItemInput");
+        itemInput.value = "";
       }
       for (let i = 0; i < filtered_item_list.length && i < 800; i++) {
         let item = filtered_item_list[i];
@@ -3876,4 +3878,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.Y3CLISWV.js.map
+//# sourceMappingURL=pos.bundle.A6EXDGU6.js.map

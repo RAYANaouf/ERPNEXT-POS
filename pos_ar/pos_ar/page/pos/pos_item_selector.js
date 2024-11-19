@@ -81,6 +81,8 @@ pos_ar.PointOfSale.pos_item_selector = class {
 
 		if(filtered_item_list.length == 1){
 			this.auto_select(filtered_item_list[0])
+			const itemInput = document.getElementById("ItemInput");
+			itemInput.value = ''
 		}
 
 		for(let i=0 ; i<filtered_item_list.length && i<800 ; i++){
