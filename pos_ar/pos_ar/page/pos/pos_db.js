@@ -10,7 +10,7 @@ pos_ar.PointOfSale.pos_db  = class POSDatabase {
 		return new Promise((resolve , reject) => {
 
 			// Let us open our database
-			const request = window.indexedDB.open( 'POSDB_test31' , 1);
+			const request = window.indexedDB.open( 'POSDB_test32' , 1);
 
 			request.onerror = (event) => {
 				// Do something with request.error!

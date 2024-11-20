@@ -17,7 +17,8 @@ pos_ar.PointOfSale.posSettingsData = class{
 						itemPriceBasedOn  : 'brand',
 						showItemDetails   : false  ,
 						showItemImage     : false  ,
-						showDiscountField : false
+						showDiscountField : false  ,
+						search_by_group   : false
 					}
 				}
 
@@ -28,7 +29,8 @@ pos_ar.PointOfSale.posSettingsData = class{
 					itemPriceBasedOn  : 'brand',
 					showItemDetails   : false  ,
 					showItemImage     : false  ,
-					showDiscountField : false
+					showDiscountField : false  ,
+					search_by_group   : false
 				}
 
 			}

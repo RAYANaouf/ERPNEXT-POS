@@ -6,6 +6,7 @@ pos_ar.PointOfSale.pos_item_selector = class {
 		itemBarcodes      ,
 		item_group_list   ,
 		item_prices       ,
+		settingsData      ,
 		selectedPriceList ,
 		getItemPrice      ,
 		autoSelect        ,
@@ -16,6 +17,7 @@ pos_ar.PointOfSale.pos_item_selector = class {
 		this.item_barcodes       = itemBarcodes      ;
 		this.item_group_list     = item_group_list   ;
 		this.item_prices         = item_prices       ;
+		this.settings_data       = settingsData      ;
 		this.selected_price_list = selectedPriceList ;
 		this.get_item_price      = getItemPrice      ;
 		this.auto_select         = autoSelect        ;
@@ -55,6 +57,11 @@ pos_ar.PointOfSale.pos_item_selector = class {
 
 		this.itemGroupList = this.inputBox.find("#ItemGroupList");
 		this.itemGroupList.append('<option>fetching Item Groups ...</option>')
+
+		if(!this.settings_data.search_by_group){
+			console.log(" see settings " , this.settings_data)
+			this.inputBox.find("#ItemGroupInput").hide();
+		}
 
 		this.selectorBox.append('<div id="itemsContainer" class="rowBox row_wrap"></div>')
 		this.itemsContainer = this.selectorBox.find('#itemsContainer')
@@ -131,8 +138,6 @@ pos_ar.PointOfSale.pos_item_selector = class {
 
 		}
 	}
-
-
 
 
 	//show and hide

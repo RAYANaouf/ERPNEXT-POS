@@ -287,6 +287,7 @@
         this.appData.appData.item_barcodes,
         this.appData.appData.item_groups,
         this.appData.appData.item_prices,
+        this.settings_data.settings,
         this.defaultPriceList,
         this.getItemPrice.bind(this),
         this.auto_select.bind(this),
@@ -963,12 +964,13 @@
 
   // ../pos_ar/pos_ar/pos_ar/page/pos/pos_item_selector.js
   pos_ar.PointOfSale.pos_item_selector = class {
-    constructor(wrapper, item_list, itemBarcodes, item_group_list, item_prices, selectedPriceList, getItemPrice, autoSelect, onItemClick) {
+    constructor(wrapper, item_list, itemBarcodes, item_group_list, item_prices, settingsData, selectedPriceList, getItemPrice, autoSelect, onItemClick) {
       this.wrapper = wrapper;
       this.item_list = item_list;
       this.item_barcodes = itemBarcodes;
       this.item_group_list = item_group_list;
       this.item_prices = item_prices;
+      this.settings_data = settingsData;
       this.selected_price_list = selectedPriceList;
       this.get_item_price = getItemPrice;
       this.auto_select = autoSelect;
@@ -997,6 +999,10 @@
       this.inputBox.append('<datalist id="ItemGroupList"></datalist>');
       this.itemGroupList = this.inputBox.find("#ItemGroupList");
       this.itemGroupList.append("<option>fetching Item Groups ...</option>");
+      if (!this.settings_data.search_by_group) {
+        console.log(" see settings ", this.settings_data);
+        this.inputBox.find("#ItemGroupInput").hide();
+      }
       this.selectorBox.append('<div id="itemsContainer" class="rowBox row_wrap"></div>');
       this.itemsContainer = this.selectorBox.find("#itemsContainer");
     }
@@ -2671,7 +2677,7 @@
     }
     static async openDatabase() {
       return new Promise((resolve, reject) => {
-        const request = window.indexedDB.open("POSDB_test31", 1);
+        const request = window.indexedDB.open("POSDB_test32", 1);
         request.onerror = (event2) => {
           reject(request.error);
         };
@@ -3543,7 +3549,8 @@
               itemPriceBasedOn: "brand",
               showItemDetails: false,
               showItemImage: false,
-              showDiscountField: false
+              showDiscountField: false,
+              search_by_group: false
             };
           }
         },
@@ -3553,7 +3560,8 @@
             itemPriceBasedOn: "brand",
             showItemDetails: false,
             showItemImage: false,
-            showDiscountField: false
+            showDiscountField: false,
+            search_by_group: false
           };
         }
       );
@@ -3928,4 +3936,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.5VLUPRSB.js.map
+//# sourceMappingURL=pos.bundle.3XLTPR4M.js.map

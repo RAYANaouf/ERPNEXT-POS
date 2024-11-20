@@ -327,6 +327,7 @@ pos_ar.PointOfSale.Controller = class {
 						this.appData.appData.item_barcodes ,
 						this.appData.appData.item_groups   ,
 						this.appData.appData.item_prices   ,
+						this.settings_data.settings        ,
 						this.defaultPriceList              ,
 						this.getItemPrice.bind(this)       ,
 						this.auto_select.bind(this)        ,
