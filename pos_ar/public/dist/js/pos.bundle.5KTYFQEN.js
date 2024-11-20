@@ -388,18 +388,19 @@
     }
     itemClick_selector(item) {
       const itemCloned = structuredClone(item);
+      this.selectedItem.name = itemCloned.name;
       itemCloned.discount_amount = 0;
       itemCloned.discount_percentage = 0;
-      this.selectedItem = structuredClone(item);
       this.addItemToPosInvoice(itemCloned);
       this.selected_item_cart.calculateNetTotal();
       this.selected_item_cart.calculateVAT();
       this.selected_item_cart.calculateQnatity();
       this.selected_item_cart.calculateGrandTotal();
       this.selected_item_cart.refreshSelectedItem();
+      console.log(" selected intem =+=+=> ", this.selectedItem, " its name : ", this.selectedItem.name, " inside the class :::: ", this.selected_item_cart.selected_item);
     }
     onSelectedItemClick(item) {
-      this.selectedItem = structuredClone(item);
+      this.selectedItem.name = item.name;
       if (this.settings_data.settings.showItemDetails) {
         this.item_details.show_cart();
         this.item_selector.hideCart();
@@ -3898,4 +3899,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.EYIITIOI.js.map
+//# sourceMappingURL=pos.bundle.5KTYFQEN.js.map

@@ -440,10 +440,10 @@ pos_ar.PointOfSale.Controller = class {
 
 	itemClick_selector(item){
 		const  itemCloned = structuredClone(item);
+		this.selectedItem.name = itemCloned.name;
 
 		itemCloned.discount_amount     = 0;
 		itemCloned.discount_percentage = 0;
-		this.selectedItem = structuredClone(item);
 		this.addItemToPosInvoice( itemCloned )
 
 		this.selected_item_cart.calculateNetTotal();
@@ -452,14 +452,12 @@ pos_ar.PointOfSale.Controller = class {
 		this.selected_item_cart.calculateGrandTotal();
 		this.selected_item_cart.refreshSelectedItem();
 
-		//console.log(" selected intem =+=+=> " , this.selectedItem , " its name : " , this.selectedItem.name)
-
-
+		console.log( " selected intem =+=+=> " , this.selectedItem , " its name : " , this.selectedItem.name , " inside the class :::: " , this.selected_item_cart.selected_item)
 	}
 
 
 	onSelectedItemClick(item){
-		this.selectedItem = structuredClone(item)
+		this.selectedItem.name = item.name
 		//show details depend on settings
 		if(this.settings_data.settings.showItemDetails){
 			this.item_details.show_cart();
