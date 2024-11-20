@@ -388,19 +388,20 @@
     }
     itemClick_selector(item) {
       const itemCloned = structuredClone(item);
-      this.selectedItem.name = itemCloned.name;
       itemCloned.discount_amount = 0;
       itemCloned.discount_percentage = 0;
+      Object.assign(this.selectedItem, itemCloned);
       this.addItemToPosInvoice(itemCloned);
       this.selected_item_cart.calculateNetTotal();
       this.selected_item_cart.calculateVAT();
       this.selected_item_cart.calculateQnatity();
       this.selected_item_cart.calculateGrandTotal();
       this.selected_item_cart.refreshSelectedItem();
-      console.log(" selected intem =+=+=> ", this.selectedItem, " its name : ", this.selectedItem.name, " inside the class :::: ", this.selected_item_cart.selected_item);
     }
     onSelectedItemClick(item) {
-      this.selectedItem.name = item.name;
+      const clonedItem = structuredClone(item);
+      Object.assign(this.selectedItem, clonedItem);
+      console.log("selected item ==> ", this.selectedItem);
       if (this.settings_data.settings.showItemDetails) {
         this.item_details.show_cart();
         this.item_selector.hideCart();
@@ -625,6 +626,7 @@
     }
     onKeyPressed(action, key) {
       var _a;
+      console.log("on key pressed ==> action : ", action, " key : ", key);
       if (action == "quantity") {
         this.item_details.requestFocus("quantity");
       } else if (action == "rate") {
@@ -897,8 +899,7 @@
       );
     }
     addItemToPosInvoice(clickedItem) {
-      let clonedItem = {};
-      Object.assign(clonedItem, clickedItem);
+      let clonedItem = structuredClone(clickedItem);
       const posInvoice = this.selectedItemMaps.get(this.selectedTab.tabName);
       const posItems = posInvoice.items;
       let exist = false;
@@ -906,6 +907,8 @@
         if (item.name == clickedItem.name) {
           exist = true;
           item.qty += 1;
+          const clone = structuredClone(item);
+          Object.assign(this.selectedItem, clone);
         }
       });
       if (!exist) {
@@ -914,6 +917,8 @@
         clonedItem.qty = 1;
         clonedItem.rate = this.getItemPrice(clickedItem, this.selectedItemMaps.get(this.selectedTab.tabName).priceList);
         posItems.push(clonedItem);
+        const clone = structuredClone(clonedItem);
+        Object.assign(this.selectedItem, clone);
       }
     }
     deleteItemFromPOsInvoice(itemId) {
@@ -1448,7 +1453,6 @@
       });
     }
     refreshSelectedItem() {
-      console.log("selected item ==> ", this.selected_item, " its name : ", this.selected_item.name);
       this.priceListInput.val(this.selected_item_maps.get(this.selected_tab.tabName).priceList);
       this.customerInput.val(this.selected_item_maps.get(this.selected_tab.tabName).customer);
       const selectedItemsContainer = document.getElementById("selectedItemsContainer");
@@ -1460,7 +1464,7 @@
         const itemName = document.createElement("h5");
         const itemQuantity = document.createElement("div");
         const itemPrice2 = document.createElement("div");
-        if (!this.settings_data.settings.showItemDetails) {
+        if (!this.settings_data.settings.showItemImage) {
         } else if (item.image) {
           const itemImage = document.createElement("img");
           itemImage.src = item.image;
@@ -1606,7 +1610,7 @@
             this.on_key_pressed("quantity", null);
           } else if (keyContent == "Rate") {
             this.on_key_pressed("rate", null);
-          } else if (keyContent == "Discount") {
+          } else if (keyContent == "Discount" && this.settings_data.settings.showDiscountField) {
             this.on_key_pressed("discount", null);
           } else if (keyContent == "Remove") {
             this.on_key_pressed("remove", null);
@@ -1671,7 +1675,6 @@
       });
     }
     calculateNetTotal() {
-      console.log("selected item :::+=> ", this.selected_item, " and its name :::+=> ", this.selected_item.name);
       let netTotal = 0;
       this.selected_item_maps.get(this.selected_tab.tabName).items.forEach((item) => {
         netTotal += item.rate * item.qty;
@@ -1800,7 +1803,6 @@
     }
     refreshDate(item) {
       var _a, _b;
-      console.log("item : ", item);
       const imageContainer = document.getElementById("detailsItemImage");
       const name = document.getElementById("detailsItemName");
       const warehouse = document.getElementById("detailsItemWarehouse");
@@ -3926,4 +3928,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.55JCCW5D.js.map
+//# sourceMappingURL=pos.bundle.5VLUPRSB.js.map

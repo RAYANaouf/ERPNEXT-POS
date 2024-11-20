@@ -440,10 +440,12 @@ pos_ar.PointOfSale.Controller = class {
 
 	itemClick_selector(item){
 		const  itemCloned = structuredClone(item);
-		this.selectedItem.name = itemCloned.name;
 
 		itemCloned.discount_amount     = 0;
 		itemCloned.discount_percentage = 0;
+
+		Object.assign(this.selectedItem , itemCloned)
+
 		this.addItemToPosInvoice( itemCloned )
 
 		this.selected_item_cart.calculateNetTotal();
@@ -452,12 +454,15 @@ pos_ar.PointOfSale.Controller = class {
 		this.selected_item_cart.calculateGrandTotal();
 		this.selected_item_cart.refreshSelectedItem();
 
-		console.log( " selected intem =+=+=> " , this.selectedItem , " its name : " , this.selectedItem.name , " inside the class :::: " , this.selected_item_cart.selected_item)
 	}
 
 
 	onSelectedItemClick(item){
-		this.selectedItem.name = item.name
+		const clonedItem = structuredClone(item)
+		Object.assign(this.selectedItem , clonedItem)
+
+		console.log("selected item ==> " , this.selectedItem)
+
 		//show details depend on settings
 		if(this.settings_data.settings.showItemDetails){
 			this.item_details.show_cart();
@@ -775,6 +780,8 @@ pos_ar.PointOfSale.Controller = class {
 
 	onKeyPressed( action  , key){
 
+		console.log("on key pressed ==> action : " , action , " key : " , key )
+
 		if(action == "quantity"){
 			this.item_details.requestFocus("quantity")
 		}
@@ -874,6 +881,7 @@ pos_ar.PointOfSale.Controller = class {
 
 
 		}
+
 
 		//update the posInvoice
 		this.editPosItemDiscountAmount(this.selectedItem.name , this.selectedItem.discount_amount);
@@ -1184,8 +1192,7 @@ pos_ar.PointOfSale.Controller = class {
 	}
 
 	addItemToPosInvoice( clickedItem ){
-		let clonedItem = {} ;
-		Object.assign(clonedItem , clickedItem)
+		let clonedItem = structuredClone(clickedItem) ;
 
 		const posInvoice = this.selectedItemMaps.get(this.selectedTab.tabName);
 		const posItems   = posInvoice.items;
@@ -1196,6 +1203,8 @@ pos_ar.PointOfSale.Controller = class {
 			if(item.name == clickedItem.name){
 				exist = true;
 				item.qty += 1 ;
+				const clone = structuredClone(item)
+				Object.assign(this.selectedItem , clone)
 			}
 		})
 
@@ -1205,6 +1214,10 @@ pos_ar.PointOfSale.Controller = class {
 			clonedItem.qty                 = 1 ;
 			clonedItem.rate                = this.getItemPrice(clickedItem , this.selectedItemMaps.get(this.selectedTab.tabName).priceList);
 			posItems.push(clonedItem)
+
+			const clone = structuredClone(clonedItem)
+			Object.assign(this.selectedItem , clone)
+
 		}
 
 
