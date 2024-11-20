@@ -91,15 +91,7 @@ pos_ar.PointOfSale.posAppData = class {
 		this.appData.items = this.combineLocalAndUpdated(localItems,updatedItems)
 	}
 	async getPosProfiles(){
-		//get local
-		//const localPosProfiles    = await this.db.getAllPosProfile();
-		const localPosProfiles    = [];
-		//get remote
-		const updatedPosProfiles  = await this.api_handler.fetchPosProfileList(this.since)
-		//save new pos profiles
-		await this.db.savePosProfileList(updatedPosProfiles)
-
-		this.appData.pos_profiles = this.combineLocalAndUpdated(localPosProfiles,updatedPosProfiles)
+		this.appData.pos_profile  =  await this.api_handler.fetchPosProfile(this.since)
 	}
 	async getBins(){
 		//get local

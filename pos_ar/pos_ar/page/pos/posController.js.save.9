@@ -12,6 +12,7 @@ pos_ar.PointOfSale.Controller = class {
                 this.selectedTab                = {"tabName"    : ""   }
 		this.selectedPaymentMethod      = {"methodName" : ""   }
 		this.defaultCustomer            = {"name"       : "" , "customer_name" : ""}
+		this.selectedPosProfile         = {"name"       : ""   }
 		this.defaultPriceList           = {"name"       : ""   }
 		this.taxes_and_charges_template = null;
 		this.taxes_and_charges          = [];
@@ -61,9 +62,9 @@ pos_ar.PointOfSale.Controller = class {
 
 			let new_pos_invoice = frappe.model.get_new_doc('POS Invoice');
 			new_pos_invoice.customer          = this.defaultCustomer.name
-			new_pos_invoice.pos_profile       = this.appData.appData.pos_profile.name
+			new_pos_invoice.pos_profile       = this.selectedPosProfile.name
 			new_pos_invoice.items             = [];
-			new_pos_invoice.taxes_and_charges = this.appData.appData.pos_profile.taxes_and_charges
+			new_pos_invoice.taxes_and_charges = this.selectedPosProfile.taxes_and_charges
 			new_pos_invoice.additional_discount_percentage = this.invoiceData.discount
 			new_pos_invoice.paid_amount       = 0
 			new_pos_invoice.base_paid_amount  = 0
@@ -80,7 +81,7 @@ pos_ar.PointOfSale.Controller = class {
 			const hour    = date.getHours()
 			const minutes = date.getMinutes()
 			const seconds = date.getMilliseconds()
-			new_pos_invoice.refNum            = this.appData.appData.pos_profile.name+"-"+year+'-'+month+'-'+day+'-'+hour+minutes+seconds
+			new_pos_invoice.refNum            = this.selectedPosProfile.name+"-"+year+'-'+month+'-'+day+'-'+hour+minutes+seconds
 
 			this.selectedItemMaps.set("C1" , new_pos_invoice)
 			this.selectedTab.tabName = `C1`
@@ -93,19 +94,20 @@ pos_ar.PointOfSale.Controller = class {
 
 	async handleAppData(){
 		//check pos profile
-		if(this.appData.appData.pos_profile  == null ){
+		if(this.appData.appData.pos_profiles.length == 0){
 			frappe.set_route("Form", "POS Profile");
 			throw new Error("there is no pos profile")
 		}
-
+		//set default val
+		Object.assign(this.selectedPosProfile , this.appData.appData.pos_profiles[0])
 		//check takes and get it if it exist on pos profile
-		if(this.appData.appData.pos_profile.taxes_and_charges != null && this.appData.appData.pos_profile.taxes_and_charges != ""){
-			this.taxes_and_charges_template = await this.dataHandler.fetchSalesTaxesAndChargesTemplate(this.appData.appData.pos_profile.taxes_and_charges)
+		if(this.selectedPosProfile.taxes_and_charges != null && this.selectedPosProfile.taxes_and_charges != ""){
+			this.taxes_and_charges_template = await this.dataHandler.fetchSalesTaxesAndChargesTemplate(this.selectedPosProfile.taxes_and_charges)
 			this.taxes_and_charges = this.taxes_and_charges_template.taxes
 		}
 		//check company and get it if it exist on pos profile
-		if(this.appData.appData.pos_profile.company != null && this.appData.appData.pos_profile.company != ''){
-			this.company = await this.dataHandler.fetchCompany(this.appData.appData.pos_profile.company)
+		if(this.selectedPosProfile.company != null && this.selectedPosProfile.company != ''){
+			this.company = await this.dataHandler.fetchCompany(this.selectedPosProfile.company)
 		}
 
 		//check customer
@@ -125,7 +127,7 @@ pos_ar.PointOfSale.Controller = class {
 		}
 		//check price list
 		if(this.appData.appData.price_lists.length > 0){
-			this.defaultPriceList.name = this.appData.appData.pos_profile.selling_price_list
+			this.defaultPriceList.name = this.selectedPosProfile.selling_price_list
 		}else{
 			frappe.warn(
 					'You dont have a single price list',
@@ -169,29 +171,30 @@ pos_ar.PointOfSale.Controller = class {
 	}
 
 	async checkForPOSEntry(){
-		const user       = frappe.session.user
-		const posProfile = this.appData.appData.pos_profile.name
-		try {
-			const response = await frappe.call({
-				method: 'pos_ar.pos_ar.doctype.pos_info.pos_info.check_opening_entry',
-				args: { user , posProfile}
-			});
-			const r = response.message;
-			console.log("debuging is here")
-			if(r.length === 0 ){
-				this.create_opening_voucher()
+		try{
+			const r = await frappe.db.get_list('POS Opening Entry' , {
+					filters :{
+						'pos_profile' : this.selectedPosProfile.name,
+						'status'      : 'Open',
+						'user'        : frappe.session.user
+					},
+					fields  : ['name' , 'pos_profile' ,'period_start_date' , 'company'],
+					limit   : 1 // we only need the most recent one
+				});
+			if(r.length === 0){
+				this.create_opening_voucher();
 				return false;
 			}
 			//copy data
 			Object.assign(this.POSOpeningEntry ,  r[0])
-			return true
-		} catch (error) {
+
+			return true;
+
+		}catch(error){
 			console.error('error occured : ' , error);
 			frappe.throw('Error checking for POS Opening Entry.')
 			return false;
 		}
-
-
 	}
 
 
@@ -227,7 +230,6 @@ pos_ar.PointOfSale.Controller = class {
 
 		const fetch_pos_payment_methods = () => {
 			const pos_profile = dialog.fields_dict.pos_profile.get_value();
-			console.log("pos debuging ===> " , pos_profile)
 
 			if (!pos_profile) return;
 			frappe.db.get_doc("POS Profile", pos_profile).then(({ payments }) => {
@@ -376,7 +378,7 @@ pos_ar.PointOfSale.Controller = class {
 	init_item_details(){
 		this.item_details = new pos_ar.PointOfSale.pos_item_details(
 									this.$leftSection,
-									this.appData.appData.pos_profile.warehouse,
+									this.selectedPosProfile.warehouse,
 									this.appData.appData.price_lists ,
 									this.appData.appData.item_prices ,
 									this.appData.appData.bins        ,
@@ -409,7 +411,7 @@ pos_ar.PointOfSale.Controller = class {
 		this.history_cart = new pos_ar.PointOfSale.pos_history(
 									this.wrapper,
 									this.db,
-									this.appData.appData.pos_profile,
+									this.selectedPosProfile,
 									this.company,
 									this.taxes_and_charges,
 									this.historyCartClick.bind(this)
@@ -428,7 +430,8 @@ pos_ar.PointOfSale.Controller = class {
 		this.settings_cart = new pos_ar.PointOfSale.pos_settings(
 									this.wrapper,
 									this.settings_data,
-									this.appData.appData.pos_profile,
+									this.appData.appData.pos_profiles,
+									this.selectedPosProfile,
 									this.onSettingsChange.bind(this)
 								)
         }
@@ -440,33 +443,24 @@ pos_ar.PointOfSale.Controller = class {
 
 	itemClick_selector(item){
 		const  itemCloned = structuredClone(item);
-
 		itemCloned.discount_amount     = 0;
 		itemCloned.discount_percentage = 0;
-		this.selectedItem = structuredClone(item);
-		this.addItemToPosInvoice( itemCloned )
+		this.addItemToPosInvoice( item )
 
 		this.selected_item_cart.calculateNetTotal();
 		this.selected_item_cart.calculateVAT();
 		this.selected_item_cart.calculateQnatity();
 		this.selected_item_cart.calculateGrandTotal();
 		this.selected_item_cart.refreshSelectedItem();
-
-		//console.log(" selected intem =+=+=> " , this.selectedItem , " its name : " , this.selectedItem.name)
-
-
 	}
-
 
 	onSelectedItemClick(item){
 		this.selectedItem = structuredClone(item)
-		//show details depend on settings
-		if(this.settings_data.settings.showItemDetails){
-			this.item_details.show_cart();
-			this.item_selector.hideCart();
-		}
+		//show
+		this.item_details.show_cart();
 		this.selected_item_cart.showKeyboard();
 		//close
+		this.item_selector.hideCart();
 		this.payment_cart.hideCart();
 		this.settings_cart.hideCart();
 		//change display
@@ -630,9 +624,9 @@ pos_ar.PointOfSale.Controller = class {
 
 		let new_pos_invoice = frappe.model.get_new_doc('POS Invoice');
 		new_pos_invoice.customer          = this.defaultCustomer.name
-		new_pos_invoice.pos_profile       = this.appData.appData.pos_profile.name
+		new_pos_invoice.pos_profile       = this.selectedPosProfile.name
 		new_pos_invoice.items             = [];
-		new_pos_invoice.taxes_and_charges = this.appData.appData.pos_profile.taxes_and_charges
+		new_pos_invoice.taxes_and_charges = this.selectedPosProfile.taxes_and_charges
 		new_pos_invoice.additional_discount_percentage = this.invoiceData.discount
 		new_pos_invoice.paid_amount       = 0
 		new_pos_invoice.base_paid_amount  = 0
@@ -649,7 +643,7 @@ pos_ar.PointOfSale.Controller = class {
 		const hour    = date.getHours()
 		const minutes = date.getMinutes()
 		const seconds = date.getMilliseconds()
-		new_pos_invoice.refNum            = this.appData.appData.pos_profile.name+"-"+year+'-'+month+'-'+day+'-'+hour+minutes+seconds
+		new_pos_invoice.refNum            = this.selectedPosProfile.name+"-"+year+'-'+month+'-'+day+'-'+hour+minutes+seconds
 
 		this.selectedItemMaps.set(`C${counter}` , new_pos_invoice)
 		this.selectedTab.tabName = `C${counter}`
@@ -911,11 +905,11 @@ pos_ar.PointOfSale.Controller = class {
 				'description'             : item.name,
 				'image'                   : item.image,
 				'use_serial_batch_fields' : 1,
-				'cost_center'             : this.appData.appData.pos_profile.cost_center,
+				'cost_center'             : this.selectedPosProfile.cost_center,
 				'discount_percentage'     : item.discount_percentage,
 				'discount_amount'         : item.discount_amount,
-				'warehouse'               : this.appData.appData.pos_profile.warehouse,
-				'income_account'          : this.appData.appData.pos_profile.income_account,
+				'warehouse'               : this.selectedPosProfile.warehouse,
+				'income_account'          : this.selectedPosProfile.income_account,
 			}
 			items.push(newItem)
 		})

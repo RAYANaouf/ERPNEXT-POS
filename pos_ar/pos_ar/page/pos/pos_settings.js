@@ -3,13 +3,11 @@ pos_ar.PointOfSale.pos_settings = class{
 	constructor(
 		wrapper,
 		settingsData,
-		posProfileList,
 		selectedPosProfile,
 		onSettingsChange,
 	){
 		this.wrapper              = wrapper            ;
 		this.settings_data        = settingsData       ;
-		this.pos_profile_list     = posProfileList     ;
 		this.selected_pos_profile = selectedPosProfile ;
 		this.on_settings_change   = onSettingsChange   ;
 		//scene
@@ -71,14 +69,7 @@ pos_ar.PointOfSale.pos_settings = class{
 		this.c1.append('<select  name="pos_profile" id="posProfileSelect" disabled ></select>')
 
 		this.pos_profile_select = this.c1.find('#posProfileSelect')
-		this.pos_profile_list.forEach( posProfile =>{
-			if(posProfile.name == this.selected_pos_profile.name){
-				this.pos_profile_select.append(`<option value="${posProfile.name}">${posProfile.name}</option>`)
-			}
-			else{
-				this.pos_profile_select.append(`<option value="${posProfile.name}" selected >${posProfile.name}</option>`)
-			}
-		})
+		this.pos_profile_select.append(`<option value="${this.selected_pos_profile.name} selected ">${this.selected_pos_profile.name}</option>`)
 
 		this.c1.append(`<label for="warehouse">POS Warehouse</label>`)
 		this.c1.append(`<input name="warehouse" value="${this.selected_pos_profile.warehouse}" disabled>`)

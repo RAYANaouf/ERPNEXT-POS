@@ -89,6 +89,8 @@ pos_ar.PointOfSale.pos_item_details = class{
 
 	refreshDate(item){
 
+		console.log("item : " , item)
+
 		const imageContainer    = document.getElementById("detailsItemImage") ;
 		const name              = document.getElementById("detailsItemName");
 		const warehouse         = document.getElementById("detailsItemWarehouse");

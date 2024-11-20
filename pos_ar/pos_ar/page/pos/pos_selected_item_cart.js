@@ -242,7 +242,7 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 
 	refreshSelectedItem(){
 
-
+		console.log("selected item ==> " , this.selected_item , " its name : " ,  this.selected_item.name)
 		//refresh price list:
 		this.priceListInput.val(this.selected_item_maps.get(this.selected_tab.tabName).priceList)
 		//refresh customer list:
@@ -252,8 +252,6 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 		selectedItemsContainer.innerHTML = "";
 
 		this.selected_item_maps.get(this.selected_tab.tabName).items.forEach( item  =>{
-
-			//console.log("item >==>>>> " , item)
 
 			const itemElement   = document.createElement("div");
 			const leftGroup     = document.createElement("div");
@@ -309,7 +307,6 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 			if(item.name == this.selected_item.name)
 				itemElement.classList.add("selected")
 			itemElement.addEventListener("click" , event =>{
-				console.log("we are click")
 				this.makeItemHighlight(itemElement)
 				this.on_selected_item_click(item);
 			})
@@ -561,6 +558,8 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 
 
 	calculateNetTotal(){
+
+		console.log("selected item :::+=> " , this.selected_item , " and its name :::+=> "  ,  this.selected_item.name )
 		let netTotal = 0;
 		this.selected_item_maps.get(this.selected_tab.tabName).items.forEach( item => {
 			netTotal += item.rate * item.qty

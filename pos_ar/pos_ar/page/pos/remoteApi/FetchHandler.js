@@ -163,21 +163,18 @@ pos_ar.PointOfSale.FetchHandler = class FetchHandler{
 	}
 
 
-	async fetchPosProfileList(since){
+	async fetchPosProfile(){
 		try{
 			const filter = {disabled : 0}
 			/*if(since){
 				filter.modified = ['>',since]
 			}*/
-			return await frappe.db.get_list('POS Profile' , {
-				fields  : ['name' , 'warehouse' , 'company' , 'selling_price_list' , 'warehouse' , 'income_account' , 'cost_center' , 'write_off_account' , 'write_off_cost_center' , 'taxes_and_charges' , 'tax_category'],
-				filters : filter,
-				limit : 1
-			})
+			const r = await frappe.db.get_doc('POS Profile', null , { disabled:0 } )
+			return r
 		}
 		catch(error){
 			console.error('Error fetching pos profile list : ' , error)
-			return [];
+			return null;
 		}
 	}
 
