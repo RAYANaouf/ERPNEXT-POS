@@ -111,6 +111,7 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 		this.cartFooter.append('<button type="button" id="checkoutBtn"> Checkout </button>')
 
 		this.cartDetails = this.cartFooter.find('#cartDetails')
+
 		this.cartDetails.append('<div id="discount" class="rowBox align_center row_sbtw"></div>')
 		this.cartDetails.append('<div id="totalQuantity" class="rowBox align_center row_sbtw"></div>')
 		this.cartDetails.append('<div id="netTotal" class="rowBox align_center row_sbtw"></div>')
@@ -122,6 +123,7 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 		this.discount.append('<input type="number" id="addGlobalDiscountInput" value="0" step="1" min="0" max="100" >')
 		this.discountInput = this.discount.find('#addGlobalDiscountInput')
 		this.discountTitle = this.discount.find('#addDiscountTitle')
+
 
 		this.totalQuantity = this.cartDetails.find('#totalQuantity')
 		this.totalQuantity.append('<div id="totalQuantityTitle">Total Quantity</div>')
@@ -143,7 +145,15 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 		this.grandTotal.append('<div id="grandTotalTitle">Grand Total</div>')
 		this.grandTotal.append('<div id="grandTotalValue">0.00</div>')
 
+
+		if(!this.settings_data.settings.showDiscountField){
+			this.setKeyboardOrientation('landscape')
+			this.discount.css('display' , 'none')
+		}
+
+
 		this.editSelectedItem = this.cartFooter.find('#editSelectedItemCart')
+		this.editSelectedItem.css('display','flex');
 		this.editSelectedItem.append('<div class="grid-container">')
 
 		this.buttonsContainer = this.editSelectedItem.find('.grid-container')
@@ -260,9 +270,12 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 			const itemQuantity  = document.createElement("div") ;
 			const itemPrice     = document.createElement("div") ;
 
+
 			//image
 			//check if there is an image or not
-			if(item.image){
+			if(!this.settings_data.settings.showItemDetails){
+				//dont create image
+			}else if(item.image){
 				const itemImage   = document.createElement("img");
 	                        itemImage.src = item.image ;
         	                itemImage.classList.add("selectedItemImage");

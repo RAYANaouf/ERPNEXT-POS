@@ -523,7 +523,9 @@ pos_ar.PointOfSale.Controller = class {
 		//hide
 		this.payment_cart.hideCart() ;
 		this.item_details.hide_cart();
-		this.selected_item_cart.hideKeyboard();
+		if(this.settings_data.settings.showItemDetails){
+			this.selected_item_cart.hideKeyboard();
+		}
 		this.settings_cart.hideCart();
 		//change display
 		this.selected_item_cart.setKeyboardOrientation("portrait");
@@ -541,7 +543,9 @@ pos_ar.PointOfSale.Controller = class {
 		//hide
 		this.item_details.hide_cart();
 		this.payment_cart.hideCart();
-		this.selected_item_cart.hideKeyboard();
+		if(this.settings_data.settings.showItemDetails){
+			this.selected_item_cart.hideKeyboard();
+		}
 		this.settings_cart.hideCart();
 		//update ui
 		this.selected_item_cart.setKeyboardOrientation("portrait");

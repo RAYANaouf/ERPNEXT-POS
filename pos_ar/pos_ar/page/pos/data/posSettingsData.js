@@ -14,8 +14,10 @@ pos_ar.PointOfSale.posSettingsData = class{
 				}else{
 					//default
 					this.settings = {
-						itemPriceBasedOn : 'brand',
-						showItemDetails  : false
+						itemPriceBasedOn  : 'brand',
+						showItemDetails   : false  ,
+						showItemImage     : false  ,
+						showDiscountField : false
 					}
 				}
 
@@ -23,9 +25,10 @@ pos_ar.PointOfSale.posSettingsData = class{
 			(err)=>{
 				console.log("error when trying to get the setting from local, so we use the default.")
 				this.settings = {
-					itemPriceBasedOn : 'brand',
-					showItemDetails  : false
-
+					itemPriceBasedOn  : 'brand',
+					showItemDetails   : false  ,
+					showItemImage     : false  ,
+					showDiscountField : false
 				}
 
 			}
@@ -76,4 +79,22 @@ pos_ar.PointOfSale.posSettingsData = class{
 		)
 
 	}
+
+
+	setSettings( settings , onSuccess , onFailure){
+		this.settings  = settings
+		this.db.updateSettings_callback(
+			this.settings,
+			()=>{
+				//saved
+				onSuccess();
+				console.log("settings update is save successfuly")
+			},()=>{
+				console.error("error occured when trying to save settings")
+			}
+		)
+
+	}
+
+
 }

@@ -449,7 +449,9 @@
       this.item_selector.showCart();
       this.payment_cart.hideCart();
       this.item_details.hide_cart();
-      this.selected_item_cart.hideKeyboard();
+      if (this.settings_data.settings.showItemDetails) {
+        this.selected_item_cart.hideKeyboard();
+      }
       this.settings_cart.hideCart();
       this.selected_item_cart.setKeyboardOrientation("portrait");
       this.selected_item_cart.cleanHeighlight();
@@ -462,7 +464,9 @@
       this.item_selector.showCart();
       this.item_details.hide_cart();
       this.payment_cart.hideCart();
-      this.selected_item_cart.hideKeyboard();
+      if (this.settings_data.settings.showItemDetails) {
+        this.selected_item_cart.hideKeyboard();
+      }
       this.settings_cart.hideCart();
       this.selected_item_cart.setKeyboardOrientation("portrait");
       this.selected_item_cart.cleanHeighlight();
@@ -1375,7 +1379,12 @@
       this.grandTotal = this.cartDetails.find("#grandTotal");
       this.grandTotal.append('<div id="grandTotalTitle">Grand Total</div>');
       this.grandTotal.append('<div id="grandTotalValue">0.00</div>');
+      if (!this.settings_data.settings.showDiscountField) {
+        this.setKeyboardOrientation("landscape");
+        this.discount.css("display", "none");
+      }
       this.editSelectedItem = this.cartFooter.find("#editSelectedItemCart");
+      this.editSelectedItem.css("display", "flex");
       this.editSelectedItem.append('<div class="grid-container">');
       this.buttonsContainer = this.editSelectedItem.find(".grid-container");
       this.buttonsContainer.append('<button id="key_1"        class="grid-item">1</button>');
@@ -1451,7 +1460,8 @@
         const itemName = document.createElement("h5");
         const itemQuantity = document.createElement("div");
         const itemPrice2 = document.createElement("div");
-        if (item.image) {
+        if (!this.settings_data.settings.showItemDetails) {
+        } else if (item.image) {
           const itemImage = document.createElement("img");
           itemImage.src = item.image;
           itemImage.classList.add("selectedItemImage");
@@ -3529,7 +3539,9 @@
           } else {
             this.settings = {
               itemPriceBasedOn: "brand",
-              showItemDetails: false
+              showItemDetails: false,
+              showItemImage: false,
+              showDiscountField: false
             };
           }
         },
@@ -3537,7 +3549,9 @@
           console.log("error when trying to get the setting from local, so we use the default.");
           this.settings = {
             itemPriceBasedOn: "brand",
-            showItemDetails: false
+            showItemDetails: false,
+            showItemImage: false,
+            showDiscountField: false
           };
         }
       );
@@ -3570,6 +3584,19 @@
     }
     setShowItemDetails(show, onSuccess, onFailure) {
       this.settings.showItemDetails = show;
+      this.db.updateSettings_callback(
+        this.settings,
+        () => {
+          onSuccess();
+          console.log("settings update is save successfuly");
+        },
+        () => {
+          console.error("error occured when trying to save settings");
+        }
+      );
+    }
+    setSettings(settings, onSuccess, onFailure) {
+      this.settings = settings;
       this.db.updateSettings_callback(
         this.settings,
         () => {
@@ -3899,4 +3926,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.5KTYFQEN.js.map
+//# sourceMappingURL=pos.bundle.55JCCW5D.js.map
