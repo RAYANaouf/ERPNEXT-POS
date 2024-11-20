@@ -64,7 +64,7 @@ pos_ar.PointOfSale.pos_payment_cart = class{
 
 		console.log("see methods " , this.payment_methods)
 		this.payment_methods.forEach(method =>{
-			this.cart_content_top_section.append('<div id="cashBox" class="paymentMethodBox"><div id="cashBoxTitle" class="title">Cash</div><input type="float" id="cachInput" value="0"  ></div>')
+			this.cart_content_top_section.append(`<div id="cashBox" class="paymentMethodBox"><div id="cashBoxTitle" class="title">${method.mode_of_payment}</div><input type="float" id="cachInput" value="0"  ></div>`)
 		})
 
 		//this.cart_content_top_section.append('<div id="cashBox" class="paymentMethodBox"><div id="cashBoxTitle" class="title">Cash</div><input type="float" id="cachInput" value="0"  ></div>')
