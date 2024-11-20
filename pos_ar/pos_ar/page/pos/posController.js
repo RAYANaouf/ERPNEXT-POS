@@ -396,6 +396,7 @@ pos_ar.PointOfSale.Controller = class {
 									this.$leftSection,
 									this.selectedItemMaps,
 									this.selectedTab,
+									this.appData.appData.pos_profile.payments,
 									this.selectedPaymentMethod,
 									this.invoiceData,
 									this.onClose_payment_cart.bind(this),
@@ -634,8 +635,6 @@ pos_ar.PointOfSale.Controller = class {
 
 	createNewTab(counter){
 
-		console.log("pos : " , this.getDefaultPaymentMethods())
-
 		let new_pos_invoice = frappe.model.get_new_doc('POS Invoice');
 		new_pos_invoice.customer          = this.defaultCustomer.name
 		new_pos_invoice.pos_profile       = this.appData.appData.pos_profile.name
@@ -662,6 +661,8 @@ pos_ar.PointOfSale.Controller = class {
 		this.selectedItemMaps.set(`C${counter}` , new_pos_invoice)
 		this.selectedTab.tabName = `C${counter}`
 
+		//hide item details
+		this.item_details.hide_cart() ;
 	}
 
 

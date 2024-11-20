@@ -6,6 +6,7 @@ pos_ar.PointOfSale.pos_payment_cart = class{
 		wrapper,
 		selectedItemMap,
 		selectedTab,
+		paymentMethods,
 		selectedPaymentMythod,
 		invoiceData,
 		onClose,
@@ -14,16 +15,15 @@ pos_ar.PointOfSale.pos_payment_cart = class{
 	){
 
 
-		this.wrapper                 = wrapper     ;
-		this.selected_item_map       = selectedItemMap;
-		this.selected_tab            = selectedTab ;
-		this.selected_payment_method = selectedPaymentMythod;
-		this.invoice_data            = invoiceData ;
-		this.on_close_cart           = onClose     ;
-		this.on_complete             = onComplete  ;
-		this.on_input                = onInput     ;
-
-		console.log("starting with  ==> " , this.invoice_data.grandTotal)
+		this.wrapper                 = wrapper               ;
+		this.selected_item_map       = selectedItemMap       ;
+		this.selected_tab            = selectedTab           ;
+		this.payment_methods         = paymentMethods        ;
+		this.selected_payment_method = selectedPaymentMythod ;
+		this.invoice_data            = invoiceData           ;
+		this.on_close_cart           = onClose               ;
+		this.on_complete             = onComplete            ;
+		this.on_input                = onInput               ;
 
 		this.start_work();
 	}
@@ -62,7 +62,12 @@ pos_ar.PointOfSale.pos_payment_cart = class{
 		this.cart_content_top_section    = this.cart_content.find('#paymentContentTopSection')
 		this.cart_content_bottom_section = this.cart_content.find('#paymentContentBottomSection')
 
-		this.cart_content_top_section.append('<div id="cashBox" class="paymentMethodBox"><div id="cashBoxTitle" class="title">Cash</div><input type="float" id="cachInput" value="0"  ></div>')
+		console.log("see methods " , this.payment_methods)
+		this.payment_methods.forEach(method =>{
+			this.cart_content_top_section.append('<div id="cashBox" class="paymentMethodBox"><div id="cashBoxTitle" class="title">Cash</div><input type="float" id="cachInput" value="0"  ></div>')
+		})
+
+		//this.cart_content_top_section.append('<div id="cashBox" class="paymentMethodBox"><div id="cashBoxTitle" class="title">Cash</div><input type="float" id="cachInput" value="0"  ></div>')
 		this.cart_content_top_section.append('<div id="paymentOnTimeBox" class="paymentMethodBox"  style="display:none;" ><div id="paymentOnTimeBoxTitle" class="title">On Time</div><input type="float" id="paymentOnTimeInput" value="0" ></div>')
 		this.cart_content_top_section.append('<div id="redeemLoyaltyPoints" class="paymentMethodBox" style="display:none;" ><div id="redeemLoyaltyPointsTitle" class="title"">Redeem Loyalty Points</div><input type="float" id="RedeemLayoutPointsInput" value="0" disabled></div>')
 

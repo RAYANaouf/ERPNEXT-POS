@@ -354,6 +354,7 @@
         this.$leftSection,
         this.selectedItemMaps,
         this.selectedTab,
+        this.appData.appData.pos_profile.payments,
         this.selectedPaymentMethod,
         this.invoiceData,
         this.onClose_payment_cart.bind(this),
@@ -530,7 +531,6 @@
       return result;
     }
     createNewTab(counter) {
-      console.log("pos : ", this.getDefaultPaymentMethods());
       let new_pos_invoice = frappe.model.get_new_doc("POS Invoice");
       new_pos_invoice.customer = this.defaultCustomer.name;
       new_pos_invoice.pos_profile = this.appData.appData.pos_profile.name;
@@ -554,6 +554,7 @@
       new_pos_invoice.refNum = this.appData.appData.pos_profile.name + "-" + year + "-" + month + "-" + day + "-" + hour + minutes + seconds;
       this.selectedItemMaps.set(`C${counter}`, new_pos_invoice);
       this.selectedTab.tabName = `C${counter}`;
+      this.item_details.hide_cart();
     }
     historyCartClick(event2, message) {
       if (event2 == "edit") {
@@ -1362,7 +1363,7 @@
       this.cartFooter = this.cartBox.find("#cartFooter");
       this.cartFooter.append('<div id="cartDetails" class="columnBox"></div>');
       this.cartFooter.append('<div id="editSelectedItemCart"></div>');
-      this.cartFooter.append('<button type="button" id="checkoutBtn"> Checkout </button>');
+      this.cartFooter.append('<button type="button" id="checkoutBtn"> Payment </button>');
       this.cartDetails = this.cartFooter.find("#cartDetails");
       this.cartDetails.append('<div id="discount" class="rowBox align_center row_sbtw"></div>');
       this.cartDetails.append('<div id="totalQuantity" class="rowBox align_center row_sbtw"></div>');
@@ -2138,16 +2139,16 @@
 
   // ../pos_ar/pos_ar/pos_ar/page/pos/pos_payment_cart.js
   pos_ar.PointOfSale.pos_payment_cart = class {
-    constructor(wrapper, selectedItemMap, selectedTab, selectedPaymentMythod, invoiceData, onClose, onComplete, onInput) {
+    constructor(wrapper, selectedItemMap, selectedTab, paymentMethods, selectedPaymentMythod, invoiceData, onClose, onComplete, onInput) {
       this.wrapper = wrapper;
       this.selected_item_map = selectedItemMap;
       this.selected_tab = selectedTab;
+      this.payment_methods = paymentMethods;
       this.selected_payment_method = selectedPaymentMythod;
       this.invoice_data = invoiceData;
       this.on_close_cart = onClose;
       this.on_complete = onComplete;
       this.on_input = onInput;
-      console.log("starting with  ==> ", this.invoice_data.grandTotal);
       this.start_work();
     }
     start_work() {
@@ -2173,7 +2174,10 @@
       this.cart_content.append('<div id="paymentContentBottomSection" class="columnBox"></div>');
       this.cart_content_top_section = this.cart_content.find("#paymentContentTopSection");
       this.cart_content_bottom_section = this.cart_content.find("#paymentContentBottomSection");
-      this.cart_content_top_section.append('<div id="cashBox" class="paymentMethodBox"><div id="cashBoxTitle" class="title">Cash</div><input type="float" id="cachInput" value="0"  ></div>');
+      console.log("see methods ", this.payment_methods);
+      this.payment_methods.forEach((method) => {
+        this.cart_content_top_section.append('<div id="cashBox" class="paymentMethodBox"><div id="cashBoxTitle" class="title">Cash</div><input type="float" id="cachInput" value="0"  ></div>');
+      });
       this.cart_content_top_section.append('<div id="paymentOnTimeBox" class="paymentMethodBox"  style="display:none;" ><div id="paymentOnTimeBoxTitle" class="title">On Time</div><input type="float" id="paymentOnTimeInput" value="0" ></div>');
       this.cart_content_top_section.append('<div id="redeemLoyaltyPoints" class="paymentMethodBox" style="display:none;" ><div id="redeemLoyaltyPointsTitle" class="title"">Redeem Loyalty Points</div><input type="float" id="RedeemLayoutPointsInput" value="0" disabled></div>');
       this.cashBox = this.cart_content_top_section.find("#cashBox");
@@ -3936,4 +3940,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.3XLTPR4M.js.map
+//# sourceMappingURL=pos.bundle.D2WPT6LS.js.map

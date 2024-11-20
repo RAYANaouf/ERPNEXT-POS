@@ -108,7 +108,7 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 		this.cartFooter = this.cartBox.find('#cartFooter')
 		this.cartFooter.append('<div id="cartDetails" class="columnBox"></div>')
 		this.cartFooter.append('<div id="editSelectedItemCart"></div>')
-		this.cartFooter.append('<button type="button" id="checkoutBtn"> Checkout </button>')
+		this.cartFooter.append('<button type="button" id="checkoutBtn"> Payment </button>')
 
 		this.cartDetails = this.cartFooter.find('#cartDetails')
 
