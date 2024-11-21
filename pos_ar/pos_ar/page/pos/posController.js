@@ -68,7 +68,7 @@ pos_ar.PointOfSale.Controller = class {
 			new_pos_invoice.paid_amount       = 0
 			new_pos_invoice.base_paid_amount  = 0
 			new_pos_invoice.creation_time     = frappe.datetime.now_datetime()
-			new_pos_invoice.payments          = [{'mode_of_payment' : this.getDefaultPaymentMethod().mode_of_payment , 'amount' : 0}]
+			new_pos_invoice.payments          = this.getPaymentMethods()
 			new_pos_invoice.is_pos            = 1
 			new_pos_invoice.update_stock      = 1
 			new_pos_invoice.docstatus         = 0
@@ -84,10 +84,13 @@ pos_ar.PointOfSale.Controller = class {
 
 			this.selectedItemMaps.set("C1" , new_pos_invoice)
 			this.selectedTab.tabName = `C1`
+
+
 		}catch(err){
 			console.error("Hlafware POS Error ==> " , err)
 			throw err;
 		}
+
         }
 
 
@@ -396,6 +399,7 @@ pos_ar.PointOfSale.Controller = class {
 									this.$leftSection,
 									this.selectedItemMaps,
 									this.selectedTab,
+									this.appData.appData,
 									this.appData.appData.pos_profile.payments,
 									this.selectedPaymentMethod,
 									this.invoiceData,
@@ -653,7 +657,7 @@ pos_ar.PointOfSale.Controller = class {
 		new_pos_invoice.paid_amount       = 0
 		new_pos_invoice.base_paid_amount  = 0
 		new_pos_invoice.creation_time     = frappe.datetime.now_datetime()
-		new_pos_invoice.payments          = [{'mode_of_payment' : this.getDefaultPaymentMethod().mode_of_payment , 'amount' : 0}]
+		new_pos_invoice.payments          = this.getPaymentMethods()
 		new_pos_invoice.is_pos            = 1
 		new_pos_invoice.update_stock      = 1
 		new_pos_invoice.docstatus         = 0

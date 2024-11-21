@@ -179,6 +179,28 @@ pos_ar.PointOfSale.FetchHandler = class FetchHandler{
 	}
 
 
+	async fetchPosProfileModeOfPayments(modeOfPaymentsIds){
+		try{
+			const filter = {disabled : 0}
+			/*if(since){
+				filter.modified = ['>',since]
+			}*/
+			let modeOfPayments = []
+
+			for (let i = 0; i < modeOfPaymentsIds.length; i++) {
+				const r =  await frappe.db.get_doc('Mode of Payment', modeOfPaymentsIds[i])
+				modeOfPayments.push(r)
+			}
+
+			return modeOfPayments
+		}
+		catch(error){
+			console.error('Error fetching pos profile list : ' , error)
+			return null;
+		}
+	}
+
+
 	async fetchCompany(companyId){
 		try{
 			return await frappe.db.get_doc('Company' , companyId)

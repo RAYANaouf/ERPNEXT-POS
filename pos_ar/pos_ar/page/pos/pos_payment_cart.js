@@ -5,6 +5,7 @@ pos_ar.PointOfSale.pos_payment_cart = class{
 		wrapper,
 		selectedItemMap,
 		selectedTab,
+		appData,
 		paymentMethods,
 		selectedPaymentMythod,
 		invoiceData,
@@ -17,6 +18,7 @@ pos_ar.PointOfSale.pos_payment_cart = class{
 		this.wrapper                 = wrapper               ;
 		this.selected_item_map       = selectedItemMap       ;
 		this.selected_tab            = selectedTab           ;
+		this.app_data                = appData               ;
 		this.payment_methods         = paymentMethods        ;
 		this.selected_payment_method = selectedPaymentMythod ;
 		this.invoice_data            = invoiceData           ;
@@ -63,22 +65,13 @@ pos_ar.PointOfSale.pos_payment_cart = class{
 		this.cart_content_top_section    = this.cart_content.find('#paymentContentTopSection')
 		this.cart_content_bottom_section = this.cart_content.find('#paymentContentBottomSection')
 
+
 		this.payment_methods.forEach(method =>{
-			if(this._payment_method.name == method.name){
-				this.cart_content_top_section.append(`<div id="${method.name}" class="paymentMethodBox selected"><div id="cashBoxTitle" class="title">${method.mode_of_payment}</div><input type="float" id="cachInput" value="0"  ></div>`)
-			}
-			else{
-				this.cart_content_top_section.append(`<div id="${method.name}" class="paymentMethodBox"><div id="cashBoxTitle" class="title">${method.mode_of_payment}</div><input type="float" id="cachInput" value="0"  ></div>`)
-			}
+			const selected    = this._payment_method.name == method.name ? "selected" : "" ;
+			const amountField = this.getModeOfPaymentById(method.mode_of_payment).type == 'Phone' ? "display:none;" : ""
+			this.cart_content_top_section.append(`<div id="${method.name}" class="paymentMethodBox ${selected}"><div id="BoxTitle" class="title">${method.mode_of_payment}</div><input type="number" id="cachInput" class="paymentInput" value="0" style="${amountField}"  ></div>`)
 		})
 
-		//this.cart_content_top_section.append('<div id="cashBox" class="paymentMethodBox"><div id="cashBoxTitle" class="title">Cash</div><input type="float" id="cachInput" value="0"  ></div>')
-		this.cart_content_top_section.append('<div id="paymentOnTimeBox" class="paymentMethodBox"  style="display:none;" ><div id="paymentOnTimeBoxTitle" class="title">On Time</div><input type="float" id="paymentOnTimeInput" value="0" ></div>')
-		this.cart_content_top_section.append('<div id="redeemLoyaltyPoints" class="paymentMethodBox" style="display:none;" ><div id="redeemLoyaltyPointsTitle" class="title"">Redeem Loyalty Points</div><input type="float" id="RedeemLayoutPointsInput" value="0" disabled></div>')
-
-		this.cashBox          = this.cart_content_top_section.find("#cashBox")
-		this.onTimeBox        = this.cart_content_top_section.find("#paymentOnTimeBox")
-		this.redeemLoyaltyBox = this.cart_content_top_section.find("#redeemLoyaltyPoints")
 
 		this.cart_content_bottom_section.append('<h4>Additional Information</h4>')
 
@@ -90,14 +83,38 @@ pos_ar.PointOfSale.pos_payment_cart = class{
 		this.payment_details.append('<hr>')
 		this.payment_details.append(`<div id="paymentPaidAmount" class="columnBox"><div id="paymentPaidAmountTitle" class="rowBox centerItem">Paid Amount</div><div id="paimentPaidAmountValue"  class="rowBox centerItem"> 0 DA </div></div>`)
 		this.payment_details.append('<hr>')
-		this.payment_details.append(`<div id="paymentToChange" class="columnBox"><div id="paimentToChangeTitle" class="rowBox centerItem">To Change</div><div id="paimentToChangeValue"  class="rowBox centerItem"> ${this.toChange}DA </div></div>`)
+		this.payment_details.append(`<div id="paymentToChange" class="columnBox"><div id="paimentToChangeTitle" class="rowBox centerItem">To Change</div><div id="paimentToChangeValue"  class="rowBox centerItem"> ${this.calculateToChange()} DA </div></div>`)
 
+	}
+
+
+
+	preparDefault(){
+		this.calculateGrandTotal();
+		// Get the selected payment method's box
+		const selectedBox = $(`#${this._payment_method.name}`);
+		if (selectedBox.length) {
+			// Set the input field value to grandTotal
+			selectedBox.find('.paymentInput').val(this.invoice_data.grandTotal);
+
+			// Update the payment method amount in the map
+			this.selected_item_map.get(this.selected_tab.tabName).payments.forEach(mode => {
+				if (mode.mode_of_payment == this._payment_method.mode_of_payment) {
+					mode.amount = this.invoice_data.grandTotal;
+				}
+			});
+
+			// Update paid amount and change display
+			this.updatePaidAmount();
+			this.updateToChange();
+		}
 	}
 
 
 	showCart(){
 		this.cart.css('display' , 'flex');
-		this.clearData();
+		this.preparDefault();
+		//this.clearData();
 	}
 
 	hideCart(){
@@ -105,24 +122,24 @@ pos_ar.PointOfSale.pos_payment_cart = class{
 	}
 
 
-	clearData(){
+	/*clearData(){
 
 		this.invoice_data.paidAmount = 0 ;
 		this.invoice_data.toChange = 0 ;
 
-		this.cashBox.find('#cachInput').val(0)
+		//this.cashBox.find('#cachInput').val(0)
 
 		this.calculateGrandTotal();
-		this.calculateToChange();
+		this.updateToChange();
 		this.refreshPaidAmount();
 
-	}
+	}*
 
 
 	refreshData(){
 		console.log("refreshing data")
 
-		this.cashBox.find('#cachInput').val(this.invoice_data.paidAmount)
+		//this.cashBox.find('#cachInput').val(this.invoice_data.paidAmount)
 
 		this.calculateGrandTotal();
 		this.calculateToChange();
@@ -148,48 +165,50 @@ pos_ar.PointOfSale.pos_payment_cart = class{
 				}
 			})
 
+			// Reset input fields in all other boxes
+			$('.paymentMethodBox').not(this).find('.paymentInput').val(0);
+ 			// Set the selected box input field to grandTotal
+			$(this).find('.paymentInput').val(me.invoice_data.grandTotal);
 
-			const posInvoice = me.selected_item_map.get(me.selected_tab.tabName).payments = [ {"mode_of_payment" : me._payment_method.mode_of_payment , "amount" : 0} ]
+			me.selected_item_map.get(me.selected_tab.tabName).payments.forEach(mode =>{
+				if(mode.mode_of_payment != me._payment_method.mode_of_payment){
+					mode.amount = 0
+				}
+				else{
+					//check if not pay
+					if(me.getModeOfPaymentById(mode.mode_of_payment).type == "Phone" ){
+						mode.amount = 0
+					}else{
+						mode.amount = me.invoice_data.grandTotal
+					}
+				}
+			})
+			me.updatePaidAmount()
+			me.updateToChange()
 
+			console.log("see debuging :::::: " , me.selected_item_map.get(me.selected_tab.tabName).payments)
 		});
 
-		this.cashBox.on('click' , (event)=>{
-			this.selected_payment_method.methodName = "cash"
-			this.cashBox.addClass('selected')
-			this.onTimeBox.removeClass('selected')
-			this.redeemLoyaltyBox.removeClass('selected')
 
-			//refresh UI
-			this.invoice_data.paidAmount = this.cashBox.find('#cachInput').val()
-			this.refreshPaidAmount();
-		})
 
-		this.onTimeBox.on('click' , (event)=>{
-			this.selected_payment_method.methodName = "onTime"
-			this.cashBox.removeClass('selected')
-			this.onTimeBox.addClass('selected')
-			this.redeemLoyaltyBox.removeClass('selected')
+		// Add a listener for all inputs within .paymentMethodBox
+		this.cart_content_top_section.on('input', '.paymentInput', function () {
 
-			//refresh UI
-			this.invoice_data.paidAmount = this.onTimeBox.find('#paymentOnTimeInput').val()
-			this.refreshPaidAmount();
+			const inputValue = parseFloat($(this).val()) || 0; // Get the input value
+			const boxId = $(this).closest('.paymentMethodBox').attr('id'); // Get the box ID
 
-		})
+			me.selected_item_map.get(me.selected_tab.tabName).payments.forEach(mode =>{
+				if(mode.mode_of_payment == me._payment_method.mode_of_payment){
+					mode.amount = parseFloat(inputValue)
+				}
+			})
+			me.updatePaidAmount()
+			me.updateToChange()
+		});
 
-		this.redeemLoyaltyBox.on('click' , (event)=>{
-			this.selected_payment_method.methodName = "redeemLoyalty"
-			this.cashBox.removeClass('selected')
-			this.onTimeBox.removeClass('selected')
-			this.redeemLoyaltyBox.addClass('selected')
-
-			//refresh UI
-			this.invoice_data.paidAmount = 0 ;
-			this.refreshPaidAmount();
-
-		})
 
 		//inputs
-		this.cashBox.find('#cachInput').on('input' , (event)=>{
+		/*this.cashBox.find('#cachInput').on('input' , (event)=>{
 
 			const value = event.target.value;
 			if(value.length == 0){
@@ -270,7 +289,7 @@ pos_ar.PointOfSale.pos_payment_cart = class{
 				event.target.value = value
 			}
 			console.log("input" , event.target.value)
-		})
+		})*/
 
 
 		this.cart_footer.find("#completeOrderBtn").on('click' , (event)=>{
@@ -292,6 +311,7 @@ pos_ar.PointOfSale.pos_payment_cart = class{
 
 	handleInput(key){
 
+		/*
 		let previousValue = this.cashBox.find('#cachInput').val() ;
 		// Check if the previous value contains a period (.)
 		if( previousValue.includes('.') && key == "."){
@@ -300,13 +320,10 @@ pos_ar.PointOfSale.pos_payment_cart = class{
 		// Append the key to the paidAmount if there is no period
 		this.invoice_data.paidAmount += key;
 		// Refresh the payment cart
-		this.refreshData();
+		this.refreshData();*/
 	}
 
 	deleteKeyPress(){
-
-		console.log("we are here in deleteKeyPress Cash!")
-
 
 		let cashField = this.cashBox.find('#cachInput');
 		let newValue = 0 ;
@@ -354,25 +371,36 @@ pos_ar.PointOfSale.pos_payment_cart = class{
 	}
 
 
+	calculatePaidAmount(){
+		let paidAmountDA = 0;
+		this.selected_item_map.get(this.selected_tab.tabName).payments.forEach(mode =>{
+			paidAmountDA += mode.amount
+		})
+		return paidAmountDA
+	}
+
+	updatePaidAmount(){
+		this.payment_details.find('#paimentPaidAmountValue').text(`${this.calculatePaidAmount()} DA`)
+	}
+
+
+	calculateToChange(){
+		console.log("see why the error " , " calculatePaidAmount " ,  this.calculatePaidAmount() , " grandTotal " , this.invoice_data.grandTotal)
+		return this.calculatePaidAmount() - this.invoice_data.grandTotal
+	}
+
+
+	updateToChange(){
+		this.payment_details.find('#paimentToChangeValue').text(`${this.calculateToChange().toFixed(2)} DA`)
+	}
 
 
 	calculateGrandTotal(){
 		this.payment_details.find('#paymentGrandTotalValue').text(`${this.invoice_data.grandTotal.toFixed(2)} DA`)
-		this.generateProposedPaidAmount(this.invoice_data.grandTotal);
+		return parseFloat(this.invoice_data.grandTotal.toFixed(2))
 	}
 
-	calculateToChange(){
-		this.invoice_data.toChange = (this.invoice_data.paidAmount - this.invoice_data.grandTotal)
-		this.payment_details.find('#paimentToChangeValue').text(`${this.invoice_data.toChange.toFixed(2)} DA`)
-	}
 
-	refreshPaidAmount(){
-		this.payment_details.find('#paimentPaidAmountValue').text(`${this.invoice_data.paidAmount} DA`)
-		const paid_amount_DA         = this.payment_details.find('#paimentPaidAmountValue').text();
-		const paid_amount_txt        = paid_amount_DA.slice(0 , -2)
-		const paid_amount            = parseFloat(paid_amount_txt)
-		this.invoice_data.paidAmount = paid_amount;
-	}
 
 
 	generateProposedPaidAmount(total){
@@ -383,6 +411,16 @@ pos_ar.PointOfSale.pos_payment_cart = class{
 		while( counter < total ){
 			counter += money[pointer]
 		}
+	}
+
+	getModeOfPaymentById(id){
+		let r = null
+		this.app_data.posProfileModeOfPayments.forEach(mode=>{
+			if(mode.name == id){
+				r = mode
+			}
+		})
+		return r
 	}
 
 }
