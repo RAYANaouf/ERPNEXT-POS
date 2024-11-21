@@ -65,15 +65,12 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 		this.wrapper.append('<div id="tabs"    class="rowBox"><div id="tabs_container" class="rowBox"></div></div>')
 		this.wrapper.append('<div id="CartBox" class="columnBox"></div>')
 
-
 		this.tabs_bar       = this.wrapper.find("#tabs")
 		this.tabs_container = this.tabs_bar.find('#tabs_container')
 		this.cartBox        = this.wrapper.find("#CartBox")
 
-
 		this.tabs_container.append('<div class="tab selected rowBox align_center"><div class="tabName">C1</div><img src="/assets/pos_ar/images/cancel.png" width="10px" height="10px" class="tabDeleteBtn"></div>')
 		this.tabs_bar.append('<div id="addTabBtn" class="tab unselected">+</div>')
-
 
 		this.add_tab_button = this.tabs_bar.find('#addTabBtn')
 

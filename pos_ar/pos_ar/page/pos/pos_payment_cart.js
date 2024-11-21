@@ -62,10 +62,13 @@ pos_ar.PointOfSale.pos_payment_cart = class{
 		this.cart_content_top_section    = this.cart_content.find('#paymentContentTopSection')
 		this.cart_content_bottom_section = this.cart_content.find('#paymentContentBottomSection')
 
-		console.log("see methods " , this.payment_methods)
 		this.payment_methods.forEach(method =>{
 			this.cart_content_top_section.append(`<div id="cashBox" class="paymentMethodBox"><div id="cashBoxTitle" class="title">${method.mode_of_payment}</div><input type="float" id="cachInput" value="0"  ></div>`)
 		})
+		// Use event delegation to handle clicks
+		this.cart_content_top_section.on('click', '.paymentMethodBox', function () {
+			console.log('Clicked:', $(this).find('.title').text());
+		});
 
 		//this.cart_content_top_section.append('<div id="cashBox" class="paymentMethodBox"><div id="cashBoxTitle" class="title">Cash</div><input type="float" id="cachInput" value="0"  ></div>')
 		this.cart_content_top_section.append('<div id="paymentOnTimeBox" class="paymentMethodBox"  style="display:none;" ><div id="paymentOnTimeBoxTitle" class="title">On Time</div><input type="float" id="paymentOnTimeInput" value="0" ></div>')
@@ -78,7 +81,7 @@ pos_ar.PointOfSale.pos_payment_cart = class{
 		this.cart_content_bottom_section.append('<h4>Additional Information</h4>')
 
 		this.cart_footer.append('<div id="paymentDetailsContainer" class="rowBox align_center"></div>');
-		this.cart_footer.append('<button type="button" id="completeOrderBtn">Complete Order</button>');
+		this.cart_footer.append('<button class="posBtn1" type="button" id="completeOrderBtn">Complete Order</button>');
 
 		this.payment_details = this.cart_footer.find('#paymentDetailsContainer')
 		this.payment_details.append('<div class="columnBox"><div id="paymentGrandTotalTitle" class="rowBox centerItem">Grand Total</div><div id="paymentGrandTotalValue" class="rowBox centerItem"></div></div>')
