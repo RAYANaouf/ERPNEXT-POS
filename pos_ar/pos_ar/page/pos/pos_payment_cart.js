@@ -1,5 +1,4 @@
 
-
 pos_ar.PointOfSale.pos_payment_cart = class{
 
 	constructor(
@@ -24,6 +23,8 @@ pos_ar.PointOfSale.pos_payment_cart = class{
 		this.on_close_cart           = onClose               ;
 		this.on_complete             = onComplete            ;
 		this.on_input                = onInput               ;
+
+		this._payment_method = this.payment_methods[0]
 
 		this.start_work();
 	}
@@ -63,12 +64,13 @@ pos_ar.PointOfSale.pos_payment_cart = class{
 		this.cart_content_bottom_section = this.cart_content.find('#paymentContentBottomSection')
 
 		this.payment_methods.forEach(method =>{
-			this.cart_content_top_section.append(`<div id="cashBox" class="paymentMethodBox"><div id="cashBoxTitle" class="title">${method.mode_of_payment}</div><input type="float" id="cachInput" value="0"  ></div>`)
+			if(this._payment_method.name == method.name){
+				this.cart_content_top_section.append(`<div id="${method.name}" class="paymentMethodBox selected"><div id="cashBoxTitle" class="title">${method.mode_of_payment}</div><input type="float" id="cachInput" value="0"  ></div>`)
+			}
+			else{
+				this.cart_content_top_section.append(`<div id="${method.name}" class="paymentMethodBox"><div id="cashBoxTitle" class="title">${method.mode_of_payment}</div><input type="float" id="cachInput" value="0"  ></div>`)
+			}
 		})
-		// Use event delegation to handle clicks
-		this.cart_content_top_section.on('click', '.paymentMethodBox', function () {
-			console.log('Clicked:', $(this).find('.title').text());
-		});
 
 		//this.cart_content_top_section.append('<div id="cashBox" class="paymentMethodBox"><div id="cashBoxTitle" class="title">Cash</div><input type="float" id="cachInput" value="0"  ></div>')
 		this.cart_content_top_section.append('<div id="paymentOnTimeBox" class="paymentMethodBox"  style="display:none;" ><div id="paymentOnTimeBoxTitle" class="title">On Time</div><input type="float" id="paymentOnTimeInput" value="0" ></div>')
@@ -131,6 +133,25 @@ pos_ar.PointOfSale.pos_payment_cart = class{
 	/****************************************  listeners  ***********************************************/
 
 	setListeners(){
+
+		const me = this
+		// Use event delegation to handle clicks
+		this.cart_content_top_section.on('click', '.paymentMethodBox', function () {
+			// Remove 'selected' class from all .paymentMethodBox elements
+			$('.paymentMethodBox').removeClass('selected');
+			$(this).addClass('selected')
+
+			const clickedId = $(this).attr('id')
+			me.payment_methods.forEach(method=>{
+				if(method.name == clickedId){
+					me._payment_method = method
+				}
+			})
+
+
+			const posInvoice = me.selected_item_map.get(me.selected_tab.tabName).payments = [ {"mode_of_payment" : me._payment_method.mode_of_payment , "amount" : 0} ]
+
+		});
 
 		this.cashBox.on('click' , (event)=>{
 			this.selected_payment_method.methodName = "cash"

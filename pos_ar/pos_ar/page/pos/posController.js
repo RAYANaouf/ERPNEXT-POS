@@ -68,7 +68,7 @@ pos_ar.PointOfSale.Controller = class {
 			new_pos_invoice.paid_amount       = 0
 			new_pos_invoice.base_paid_amount  = 0
 			new_pos_invoice.creation_time     = frappe.datetime.now_datetime()
-			new_pos_invoice.payments          = [{'mode_of_payment' : 'Cash' , 'amount' : 0}]
+			new_pos_invoice.payments          = [{'mode_of_payment' : this.getDefaultPaymentMethod().mode_of_payment , 'amount' : 0}]
 			new_pos_invoice.is_pos            = 1
 			new_pos_invoice.update_stock      = 1
 			new_pos_invoice.docstatus         = 0
@@ -622,14 +622,23 @@ pos_ar.PointOfSale.Controller = class {
 		this.check_in_out_cart.hideCart();
 	}
 
-	getDefaultPaymentMethods(){
-		let result = '';
-		console.log("pos debug : " , this.payment_methods)
-		this.payment_methods.forEach(method =>{
+	getDefaultPaymentMethod(){
+		let result = null;
+		this.appData.appData.pos_profile.payments.forEach(method =>{
 			if(method.default){
-				result = method.mode_of_payment
+				result = method
 			}
 		})
+
+		return result
+	}
+
+	getPaymentMethods(){
+		let result = [];
+		this.appData.appData.pos_profile.payments.forEach(method =>{
+			result.push({'mode_of_payment' : method.mode_of_payment , 'default' : method.default , 'amount' : 0})
+		})
+
 		return result
 	}
 
@@ -644,7 +653,7 @@ pos_ar.PointOfSale.Controller = class {
 		new_pos_invoice.paid_amount       = 0
 		new_pos_invoice.base_paid_amount  = 0
 		new_pos_invoice.creation_time     = frappe.datetime.now_datetime()
-		new_pos_invoice.payments          = [{'mode_of_payment' : this.getDefaultPaymentMethods() , 'amount' : 0}]
+		new_pos_invoice.payments          = [{'mode_of_payment' : this.getDefaultPaymentMethod().mode_of_payment , 'amount' : 0}]
 		new_pos_invoice.is_pos            = 1
 		new_pos_invoice.update_stock      = 1
 		new_pos_invoice.docstatus         = 0

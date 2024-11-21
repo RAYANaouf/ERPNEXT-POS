@@ -66,7 +66,7 @@
         new_pos_invoice.paid_amount = 0;
         new_pos_invoice.base_paid_amount = 0;
         new_pos_invoice.creation_time = frappe.datetime.now_datetime();
-        new_pos_invoice.payments = [{ "mode_of_payment": "Cash", "amount": 0 }];
+        new_pos_invoice.payments = [{ "mode_of_payment": this.getDefaultPaymentMethod().mode_of_payment, "amount": 0 }];
         new_pos_invoice.is_pos = 1;
         new_pos_invoice.update_stock = 1;
         new_pos_invoice.docstatus = 0;
@@ -520,13 +520,19 @@
       this.settings_cart.hideCart();
       this.check_in_out_cart.hideCart();
     }
-    getDefaultPaymentMethods() {
-      let result = "";
-      console.log("pos debug : ", this.payment_methods);
-      this.payment_methods.forEach((method) => {
+    getDefaultPaymentMethod() {
+      let result = null;
+      this.appData.appData.pos_profile.payments.forEach((method) => {
         if (method.default) {
-          result = method.mode_of_payment;
+          result = method;
         }
+      });
+      return result;
+    }
+    getPaymentMethods() {
+      let result = [];
+      this.appData.appData.pos_profile.payments.forEach((method) => {
+        result.push({ "mode_of_payment": method.mode_of_payment, "default": method.default, "amount": 0 });
       });
       return result;
     }
@@ -540,7 +546,7 @@
       new_pos_invoice.paid_amount = 0;
       new_pos_invoice.base_paid_amount = 0;
       new_pos_invoice.creation_time = frappe.datetime.now_datetime();
-      new_pos_invoice.payments = [{ "mode_of_payment": this.getDefaultPaymentMethods(), "amount": 0 }];
+      new_pos_invoice.payments = [{ "mode_of_payment": this.getDefaultPaymentMethod().mode_of_payment, "amount": 0 }];
       new_pos_invoice.is_pos = 1;
       new_pos_invoice.update_stock = 1;
       new_pos_invoice.docstatus = 0;
@@ -2149,6 +2155,7 @@
       this.on_close_cart = onClose;
       this.on_complete = onComplete;
       this.on_input = onInput;
+      this._payment_method = this.payment_methods[0];
       this.start_work();
     }
     start_work() {
@@ -2175,10 +2182,11 @@
       this.cart_content_top_section = this.cart_content.find("#paymentContentTopSection");
       this.cart_content_bottom_section = this.cart_content.find("#paymentContentBottomSection");
       this.payment_methods.forEach((method) => {
-        this.cart_content_top_section.append(`<div id="cashBox" class="paymentMethodBox"><div id="cashBoxTitle" class="title">${method.mode_of_payment}</div><input type="float" id="cachInput" value="0"  ></div>`);
-      });
-      this.cart_content_top_section.on("click", ".paymentMethodBox", function() {
-        console.log("Clicked:", $(this).find(".title").text());
+        if (this._payment_method.name == method.name) {
+          this.cart_content_top_section.append(`<div id="${method.name}" class="paymentMethodBox selected"><div id="cashBoxTitle" class="title">${method.mode_of_payment}</div><input type="float" id="cachInput" value="0"  ></div>`);
+        } else {
+          this.cart_content_top_section.append(`<div id="${method.name}" class="paymentMethodBox"><div id="cashBoxTitle" class="title">${method.mode_of_payment}</div><input type="float" id="cachInput" value="0"  ></div>`);
+        }
       });
       this.cart_content_top_section.append('<div id="paymentOnTimeBox" class="paymentMethodBox"  style="display:none;" ><div id="paymentOnTimeBoxTitle" class="title">On Time</div><input type="float" id="paymentOnTimeInput" value="0" ></div>');
       this.cart_content_top_section.append('<div id="redeemLoyaltyPoints" class="paymentMethodBox" style="display:none;" ><div id="redeemLoyaltyPointsTitle" class="title"">Redeem Loyalty Points</div><input type="float" id="RedeemLayoutPointsInput" value="0" disabled></div>');
@@ -2218,6 +2226,18 @@
       this.refreshPaidAmount();
     }
     setListeners() {
+      const me = this;
+      this.cart_content_top_section.on("click", ".paymentMethodBox", function() {
+        $(".paymentMethodBox").removeClass("selected");
+        $(this).addClass("selected");
+        const clickedId = $(this).attr("id");
+        me.payment_methods.forEach((method) => {
+          if (method.name == clickedId) {
+            me._payment_method = method;
+          }
+        });
+        const posInvoice = me.selected_item_map.get(me.selected_tab.tabName).payments = [{ "mode_of_payment": me._payment_method.mode_of_payment, "amount": 0 }];
+      });
       this.cashBox.on("click", (event2) => {
         this.selected_payment_method.methodName = "cash";
         this.cashBox.addClass("selected");
@@ -3942,4 +3962,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.57PS2XDV.js.map
+//# sourceMappingURL=pos.bundle.MSVAE2G6.js.map
