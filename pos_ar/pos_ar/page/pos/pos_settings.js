@@ -91,11 +91,12 @@ pos_ar.PointOfSale.pos_settings = class{
 
 	refreshGeneralSettings(){
 
-		const priceBase = this.settings_data.settings.itemPriceBasedOn
-		const priceBase = this.settings_data.settings.showItemDetails
-		const priceBase = this.settings_data.settings.showItemImage
-		const priceBase = this.settings_data.settings.showDiscountField
-		const priceBase = this.settings_data.settings.search_by_group
+		const priceBase           = this.settings_data.settings.itemPriceBasedOn
+		const showItemDetailsCart = this.settings_data.settings.showItemDetails
+		const showItemImage       = this.settings_data.settings.showItemImage
+		const showDiscountField   = this.settings_data.settings.showDiscountField
+		const searchByGroup       = this.settings_data.settings.search_by_group
+
 		//left container
 		this.leftContainer.addClass('columnBox')
 		this.leftContainer.append('<h4 class="CartTitle" style="margin-bottom:35px; font-size:35px;" >General Settings</h4>')
@@ -108,8 +109,22 @@ pos_ar.PointOfSale.pos_settings = class{
 		this.general_settings_c1 = this.general_settings_content.find('div.c1')
 		this.general_settings_c2 = this.general_settings_content.find('div.c2')
 
+		//price base on
 		this.general_settings_c1.append('<label for="priceBasedOn"> Item Price Based On : </label>')
 		this.general_settings_c1.append('<select  name="priceBasedOn" id="priceBasedOnSelect" ></select>')
+		this.item_price_based_on_select = this.general_settings_c1.find('#priceBasedOnSelect')
+
+		this.settings_data.getAllPriceBases().forEach( base =>{
+			if(this.settings_data.settings.itemPriceBasedOn == base){
+				this.item_price_based_on_select.append(`<option value="${base}" selected> ${base} </option>`)
+			}else{
+				this.item_price_based_on_select.append(`<option value="${base}"> ${base} </option>`)
+			}
+		})
+
+		//price base on
+		this.general_settings_c1.append('<label for="showItemDetailsCartCheckBox"> Show Item Details Cart : </label>')
+		this.general_settings_c1.append('<select  name="showItemDetailsCartCheckBox" id="showItemDetailsCartCheckBox" ></select>')
 		this.item_price_based_on_select = this.general_settings_c1.find('#priceBasedOnSelect')
 
 		this.settings_data.getAllPriceBases().forEach( base =>{
