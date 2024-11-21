@@ -179,7 +179,7 @@ pos_ar.PointOfSale.FetchHandler = class FetchHandler{
 	}
 
 
-	async fetchPosProfileModeOfPayments(modeOfPaymentsIds){
+	async fetchPosProfileModeOfPayments(modeOfPaymentsIds , company){
 		try{
 			const filter = {disabled : 0}
 			/*if(since){
@@ -188,7 +188,7 @@ pos_ar.PointOfSale.FetchHandler = class FetchHandler{
 			let modeOfPayments = []
 
 			for (let i = 0; i < modeOfPaymentsIds.length; i++) {
-				const r =  await frappe.db.get_doc('Mode of Payment', modeOfPaymentsIds[i])
+				const r =  await frappe.db.get_doc('Mode of Payment', modeOfPaymentsIds[i] , { "company" : company})
 				modeOfPayments.push(r)
 			}
 

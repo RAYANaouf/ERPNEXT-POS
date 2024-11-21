@@ -92,6 +92,10 @@ pos_ar.PointOfSale.pos_settings = class{
 	refreshGeneralSettings(){
 
 		const priceBase = this.settings_data.settings.itemPriceBasedOn
+		const priceBase = this.settings_data.settings.showItemDetails
+		const priceBase = this.settings_data.settings.showItemImage
+		const priceBase = this.settings_data.settings.showDiscountField
+		const priceBase = this.settings_data.settings.search_by_group
 		//left container
 		this.leftContainer.addClass('columnBox')
 		this.leftContainer.append('<h4 class="CartTitle" style="margin-bottom:35px; font-size:35px;" >General Settings</h4>')

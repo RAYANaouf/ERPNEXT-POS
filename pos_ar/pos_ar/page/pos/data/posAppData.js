@@ -24,7 +24,7 @@ pos_ar.PointOfSale.posAppData = class {
 			await this.getItems();
 			frappe.show_progress('Please Wait', 3, 12, 'loading pos profiles');
 			await this.getPosProfiles();
-			frappe.show_progress('Please Wait', 4, 12, 'Please wait');
+			frappe.show_progress('Please Wait', 4, 12, 'mode of payment');
 			await this.getPosProfileModeOfPayments(this.appData.pos_profile)
 			await this.getBins();
 			frappe.show_progress('Please Wait', 5, 12, 'loading warehouses');
@@ -99,7 +99,7 @@ pos_ar.PointOfSale.posAppData = class {
 		posProfile.payments.forEach(modeId=>{
 			modeOfPaymentsIds.push(modeId.mode_of_payment)
 		})
-		this.appData.posProfileModeOfPayments = await this.api_handler.fetchPosProfileModeOfPayments(modeOfPaymentsIds)
+		this.appData.posProfileModeOfPayments = await this.api_handler.fetchPosProfileModeOfPayments(modeOfPaymentsIds , posProfile.company)
 	}
 	async getBins(){
 		//get local
