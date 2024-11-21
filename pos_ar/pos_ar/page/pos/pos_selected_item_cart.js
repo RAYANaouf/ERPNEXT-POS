@@ -21,6 +21,7 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 		onCheckoutClick    ,
 	){
 
+
 		this.wrapper                 = wrapper         ;
 		this.settings_data           = settingsData    ;
 		this.selected_item_maps      = selectedItemMaps;
@@ -517,21 +518,17 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 		this.discountInput.on('input' , (event)=> {
 			if(event.target.value == ''){
 				this.selected_item_maps.get(this.selected_tab.tabName).additional_discount_percentage = 0
-				this.invoice_data.discount = 0 ;
 				return;
 			}
 			else if(event.target.value > 100){
 				this.selected_item_maps.get(this.selected_tab.tabName).additional_discount_percentage = 100
-				this.invoice_data.discount = 100 ;
 				return;
 			}
 
 
 			this.selected_item_maps.get(this.selected_tab.tabName).additional_discount_percentage = parseFloat(event.target.value)
-			this.invoice_data.discount = parseFloat(event.target.value)
 
 			//recalculation
-			console.log("value ::: " , this.invoice_data.discount)
 			this.calculateNetTotal()
 			this.calculateVAT()
 			this.calculateGrandTotal()
@@ -545,7 +542,6 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 			}
 
 			//recalculation
-			console.log("value ::: " , this.invoice_data.discount)
 			this.calculateNetTotal()
 			this.calculateVAT()
 			this.calculateGrandTotal()
@@ -576,8 +572,8 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 			netTotal += item.rate * item.qty
 		})
 
-		if(this.invoice_data.discount > 0){
-			netTotal -= (netTotal * (this.invoice_data.discount / 100))
+		if(this.selected_item_maps.get(this.selected_tab.tabName).additional_discount_percentage > 0){
+			netTotal -= (netTotal * (this.selected_item_maps.get(this.selected_tab.tabName).additional_discount_percentage / 100))
 		}
 		const netTotal_HTML = document.getElementById("netTotalValue");
 		netTotal_HTML.textContent  = netTotal;

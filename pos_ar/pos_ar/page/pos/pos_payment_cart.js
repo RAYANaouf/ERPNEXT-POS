@@ -207,89 +207,11 @@ pos_ar.PointOfSale.pos_payment_cart = class{
 		});
 
 
-		//inputs
-		/*this.cashBox.find('#cachInput').on('input' , (event)=>{
-
-			const value = event.target.value;
-			if(value.length == 0){
-				event.target.value = 0
-			}
-			else if (!value.slice(0,-1).includes(".")  && value[value.length-1] == "."){
-				event.target.value = value
-			}
-			else if(value[value.length-1] == "."){
-				event.target.value = value.slice(0,-1);
-			}
-			else if(value[value.length-1] == " "){
-				event.target.value = value.slice(0,-1);
-			}
-			else if(isNaN(value[value.length-1])){
-				event.target.value = value.slice(0,-1);
-			}
-			else{
-				event.target.value = value
-			}
-
-			this.invoice_data.paidAmount = event.target.value;
-			this.refreshPaidAmount();
-			this.calculateToChange();
-			console.log("input" , event.target.value)
-		})
-
+		/*
 		this.cashBox.find('#cachInput').on('focus' , (event)=>{
 			this.on_input('focus' , 'cash' , null)
 		})
-
-		this.onTimeBox.find('#paymentOnTimeInput').on('input' , (event)=>{
-			const value = event.target.value;
-			if(value.length == 0){
-				event.target.value = 0
-			}
-			else if (!value.slice(0,-1).includes(".")  && value[value.length-1] == "."){
-				event.target.value = value
-			}
-			else if(value[value.length-1] == "."){
-				event.target.value = value.slice(0,-1);
-			}
-			else if(value[value.length-1] == " "){
-				event.target.value = value.slice(0,-1);
-			}
-			else if(isNaN(value[value.length-1])){
-				event.target.value = value.slice(0,-1);
-			}
-			else{
-				event.target.value = value
-			}
-
-			this.invoice_data.paidAmount = event.target.value;
-			this.refreshPaidAmount();
-			this.calculateToChange();
-			console.log("input" , event.target.value)
-		})
-
-		this.redeemLoyaltyBox.find('#RedeemLayoutPointsInput').on('input' , (event)=>{
-			const value = event.target.value;
-			if(value.length == 0){
-				event.target.value = 0
-			}
-			else if (!value.slice(0,-1).includes(".")  && value[value.length-1] == "."){
-				event.target.value = value
-			}
-			else if(value[value.length-1] == "."){
-				event.target.value = value.slice(0,-1);
-			}
-			else if(value[value.length-1] == " "){
-				event.target.value = value.slice(0,-1);
-			}
-			else if(isNaN(value[value.length-1])){
-				console.log("===}> " , value[value.length-1])
-				event.target.value = value.slice(0,-1);
-			}
-			else{
-				event.target.value = value
-			}
-			console.log("input" , event.target.value)
-		})*/
+		*/
 
 
 		this.cart_footer.find("#completeOrderBtn").on('click' , (event)=>{
@@ -402,16 +324,6 @@ pos_ar.PointOfSale.pos_payment_cart = class{
 
 
 
-
-	generateProposedPaidAmount(total){
-		const money = [10,20,50,100,200,500,1000,2000];
-		let counter = 0;
-		let pointer = 7;
-
-		while( counter < total ){
-			counter += money[pointer]
-		}
-	}
 
 	getModeOfPaymentById(id){
 		let r = null

@@ -653,7 +653,7 @@ pos_ar.PointOfSale.Controller = class {
 		new_pos_invoice.pos_profile       = this.appData.appData.pos_profile.name
 		new_pos_invoice.items             = [];
 		new_pos_invoice.taxes_and_charges = this.appData.appData.pos_profile.taxes_and_charges
-		new_pos_invoice.additional_discount_percentage = this.invoiceData.discount
+		new_pos_invoice.additional_discount_percentage = 0
 		new_pos_invoice.paid_amount       = 0
 		new_pos_invoice.base_paid_amount  = 0
 		new_pos_invoice.creation_time     = frappe.datetime.now_datetime()
@@ -949,10 +949,9 @@ pos_ar.PointOfSale.Controller = class {
 		if(items.length ==0)
 			return
 
-		this.selectedItemMaps.get(this.selectedTab.tabName).paid_amount        = this.invoiceData.paidAmount
-		this.selectedItemMaps.get(this.selectedTab.tabName).base_paid_amount   = this.invoiceData.paidAmount
-		this.selectedItemMaps.get(this.selectedTab.tabName).payments           = [{'mode_of_payment' : 'Cash' , 'amount' : this.invoiceData.paidAmount}]
-		this.selectedItemMaps.get(this.selectedTab.tabName).outstanding_amount = this.invoiceData.grandTotal - this.invoiceData.paidAmount
+		this.selectedItemMaps.get(this.selectedTab.tabName).paid_amount        = this.calculatePaidAmount(this.selectedItemMaps.get(this.selectedTab.tabName))
+		this.selectedItemMaps.get(this.selectedTab.tabName).base_paid_amount   = this.calculatePaidAmount(this.selectedItemMaps.get(this.selectedTab.tabName))
+		this.selectedItemMaps.get(this.selectedTab.tabName).outstanding_amount = this.invoiceData.grandTotal - this.calculatePaidAmount(this.selectedItemMaps.get(this.selectedTab.tabName))
 		this.selectedItemMaps.get(this.selectedTab.tabName).docstatus          = 1
 
 		//set status
@@ -1280,5 +1279,12 @@ pos_ar.PointOfSale.Controller = class {
 		})
 	}
 
+	calculatePaidAmount(posInvoice){
+		let paidAmountDA = 0;
+		posInvoice.payments.forEach(mode =>{
+			paidAmountDA += mode.amount
+		})
+		return paidAmountDA
+	}
 
 };
