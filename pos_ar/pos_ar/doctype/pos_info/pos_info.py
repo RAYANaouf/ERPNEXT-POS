@@ -36,3 +36,19 @@ def check_opening_entry(user , posProfile):
         )
 
         return open_vouchers
+
+
+
+@frappe.whitelist()
+def get_mode_of_payments():
+
+    # Use SQL to fetch data directly
+    query = """
+        SELECT *
+        FROM `tabMode of Payment`
+        WHERE docstatus = 1
+    """
+    mode_of_payments = frappe.db.sql(query,  as_dict=True)
+
+    return mode_of_payments
+

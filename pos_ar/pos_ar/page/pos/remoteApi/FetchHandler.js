@@ -93,6 +93,10 @@ pos_ar.PointOfSale.FetchHandler = class FetchHandler{
 		return []
 	}
 */
+
+
+
+
 	async fetchItemBarCodes() {
 		try {
 			const response = await frappe.call({
@@ -179,12 +183,12 @@ pos_ar.PointOfSale.FetchHandler = class FetchHandler{
 	}
 
 
-	async fetchPosProfileModeOfPayments(modeOfPaymentsIds , company){
+	/*async fetchPosProfileModeOfPayments(modeOfPaymentsIds , company){
 		try{
 			const filter = {disabled : 0}
-			/*if(since){
-				filter.modified = ['>',since]
-			}*/
+			//if(since){
+			//	filter.modified = ['>',since]
+			//}
 			let modeOfPayments = []
 
 			for (let i = 0; i < modeOfPaymentsIds.length; i++) {
@@ -198,7 +202,22 @@ pos_ar.PointOfSale.FetchHandler = class FetchHandler{
 			console.error('Error fetching pos profile list : ' , error)
 			return null;
 		}
+	}*/
+
+	async fetchPosProfileModeOfPayments(modeOfPaymentsIds , company) {
+		try {
+			const response = await frappe.call({
+				method: 'pos_ar.pos_ar.doctype.pos_info.pos_info.get_mode_of_payments',
+				args: { }
+			});
+			return response.message;  // The fetched item barcodes
+		} catch (error) {
+			console.error('Error fetching mode_of_payments', error);
+			return [];
+		}
 	}
+
+
 
 
 	async fetchCompany(companyId){
