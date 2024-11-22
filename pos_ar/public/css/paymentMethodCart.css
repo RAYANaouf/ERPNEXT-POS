@@ -9,7 +9,7 @@
         box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
 
         overflow-y    : auto ;
-        border        : 2px solid #c0c0c0 ;
+        border        : 4px solid #a0a0a0 ;
         border-radius : 16px;
 }
 
@@ -53,6 +53,12 @@
         color       : #777777 ;
         font-size   : 16px    ;
         font-weight : 400     ;
+	
+}
+.paymentMethodBox .title.selected{
+        color       : #9B5788 ;
+        font-size   : 18px    ;
+	font-weight : 600     ; 
 	
 }
 

@@ -97,12 +97,12 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 		this.priceListInput = this.priceListInputContainer.find('#PriceListInput')
 
 		this.cartHeader = this.cartBox.find('#cartHeader')
-		this.cartHeader.append('<div><h6>Item</h6></div>')
+		this.cartHeader.append('<div style="font-size:16px;font-weight:600;"><p>Item</p></div>')
 		this.cartHeader.append('<div id="cartHeaderTitles" class="rowBox"></div>')
 
 		this.cartHeaderTitles = this.cartHeader.find('#cartHeaderTitles')
-		this.cartHeaderTitles.append('<div id="quantityTitle"><h6>Quantity</h6></div>')
-		this.cartHeaderTitles.append('<div id="amountTitle">  <h6>Amount  </h6></div>')
+		this.cartHeaderTitles.append('<div id="quantityTitle" style="font-size:16px;font-weight:600;" >  <p>Quantity</p></div>')
+		this.cartHeaderTitles.append('<div id="amountTitle"   style="font-size:16px;font-weight:600;" >  <p>Amount  </p></div>')
 
 		this.selectedItemContainer = this.cartBox.find('#selectedItemsContainer')
 

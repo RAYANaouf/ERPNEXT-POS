@@ -22,10 +22,12 @@ pos_ar.PointOfSale.pos_debt_cart = class{
 		this.rightContainer = this.wrapper.find('#debtRightContainer')
 	}
 	showCart(){
+		console.log("showing ...")
 		this.leftContainer.css('display' , 'flex')
 		this.rightContainer.css('display' , 'flex')
 	}
 	hideCart(){
+		console.log("hiding ...")
 		this.leftContainer.css('display' , 'none')
 		this.rightContainer.css('display' , 'none')
 	}

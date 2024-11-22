@@ -69,7 +69,7 @@ pos_ar.PointOfSale.pos_payment_cart = class{
 		this.payment_methods.forEach(method =>{
 			const selected    = this._payment_method.name == method.name ? "selected" : "" ;
 			const amountField = this.getModeOfPaymentById(method.mode_of_payment).type == 'Phone' ? "display:none;" : ""
-			this.cart_content_top_section.append(`<div id="${method.name}" class="paymentMethodBox ${selected}"><div id="BoxTitle" class="title">${method.mode_of_payment}</div><input type="number" id="cachInput" class="paymentInput" value="0" style="${amountField}"  ></div>`)
+			this.cart_content_top_section.append(`<div id="${method.name}" class="paymentMethodBox ${selected}"><div id="BoxTitle" class="title ${selected}">${method.mode_of_payment}</div><input type="number" id="cachInput" class="paymentInput" value="0" style="${amountField}"  ></div>`)
 		})
 
 
@@ -156,8 +156,10 @@ pos_ar.PointOfSale.pos_payment_cart = class{
 		this.cart_content_top_section.on('click', '.paymentMethodBox', function () {
 			// Remove 'selected' class from all .paymentMethodBox elements
 			$('.paymentMethodBox').removeClass('selected');
+			$('.paymentMethodBox div.title').removeClass('selected');
+			//add to clicked ones
 			$(this).addClass('selected')
-
+			$(this).find('.title').addClass('selected')
 			const clickedId = $(this).attr('id')
 			me.payment_methods.forEach(method=>{
 				if(method.name == clickedId){
@@ -185,8 +187,6 @@ pos_ar.PointOfSale.pos_payment_cart = class{
 			})
 			me.updatePaidAmount()
 			me.updateToChange()
-
-			console.log("see debuging :::::: " , me.selected_item_map.get(me.selected_tab.tabName).payments)
 		});
 
 
