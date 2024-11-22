@@ -380,7 +380,9 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 		else{
 			this.cartDetails.addClass('columnBox')
 			this.cartDetails.removeClass('rowBox')
-			discount.css('display','flex')
+			if(this.settings_data.settings.showDiscountField){
+				discount.css('display','flex')
+			}
 			this.vat.css('display' , 'flex')
 
 			//reset

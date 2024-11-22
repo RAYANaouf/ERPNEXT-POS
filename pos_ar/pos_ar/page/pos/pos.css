@@ -64,7 +64,7 @@
 	display : none ;
 }
 
-#MainContainer input
+#MainContainer input:not([type="checkbox"])
 {
 	height        : 35px     ;
 	padding       : 0px 8px  ;
@@ -76,7 +76,7 @@
 	border-radius : 10px     ;
 
 }
-#MainContainer input:focus,
+#MainContainer input:focus:not([type="checkbox"]),
 #MainContainer select:focus{
 	outline : none !important;
 	background : #fcfcfc !important;
@@ -96,7 +96,7 @@
 
 }
 
-#MainContainer input:disabled{
+#MainContainer input:disabled:not([type="checkbox"]){
 	border : none !important;
 	background : #fafafa !important;
 }

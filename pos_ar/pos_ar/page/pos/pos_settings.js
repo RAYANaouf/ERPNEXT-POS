@@ -92,10 +92,11 @@ pos_ar.PointOfSale.pos_settings = class{
 	refreshGeneralSettings(){
 
 		const priceBase           = this.settings_data.settings.itemPriceBasedOn
-		const showItemDetailsCart = this.settings_data.settings.showItemDetails
-		const showItemImage       = this.settings_data.settings.showItemImage
-		const showDiscountField   = this.settings_data.settings.showDiscountField
-		const searchByGroup       = this.settings_data.settings.search_by_group
+		const showItemDetailsCart = this.settings_data.settings.showItemDetails   ? "checked" : ""
+		const showItemImage       = this.settings_data.settings.showItemImage     ? "checked" : ""
+		const showDiscountField   = this.settings_data.settings.showDiscountField ? "checked" : ""
+		const searchByGroup       = this.settings_data.settings.search_by_group   ? "checked" : ""
+
 
 		//left container
 		this.leftContainer.addClass('columnBox')
@@ -110,7 +111,7 @@ pos_ar.PointOfSale.pos_settings = class{
 		this.general_settings_c2 = this.general_settings_content.find('div.c2')
 
 		//price base on
-		this.general_settings_c1.append('<label for="priceBasedOn"> Item Price Based On : </label>')
+		this.general_settings_c1.append('<label for="priceBasedOn" style="font-weight:600;"> Item Price Based On : </label>')
 		this.general_settings_c1.append('<select  name="priceBasedOn" id="priceBasedOnSelect" ></select>')
 		this.item_price_based_on_select = this.general_settings_c1.find('#priceBasedOnSelect')
 
@@ -122,30 +123,76 @@ pos_ar.PointOfSale.pos_settings = class{
 			}
 		})
 
-		//price base on
-		this.general_settings_c1.append('<label for="showItemDetailsCartCheckBox"> Show Item Details Cart : </label>')
-		this.general_settings_c1.append('<select  name="showItemDetailsCartCheckBox" id="showItemDetailsCartCheckBox" ></select>')
-		this.item_price_based_on_select = this.general_settings_c1.find('#priceBasedOnSelect')
+		//show item details cart
+		this.general_settings_c1.append('<div for="showItemDetailsCartCheckBox" style="font-weight:600;"> Item Details Cart : </div>')
+		this.general_settings_c1.append(`<div class="rowBox align_center" style="height:50px;"><label for="showItemDetailsCartCheckBox" style="margin-right:16px;width:50%;" > show cart: </label> <input type="checkbox"  name="showItemDetailsCartCheckBox" id="showItemDetailsCartCheckBox" ${showItemDetailsCart} ></div>`)
 
-		this.settings_data.getAllPriceBases().forEach( base =>{
-			if(this.settings_data.settings.itemPriceBasedOn == base){
-				this.item_price_based_on_select.append(`<option value="${base}" selected> ${base} </option>`)
-			}else{
-				this.item_price_based_on_select.append(`<option value="${base}"> ${base} </option>`)
-			}
-		})
+		//show item details cart
+		this.general_settings_c1.append('<div for="showItemDetailsCartCheckBox" style="font-weight:600;"> Item Image : </div>')
+		this.general_settings_c1.append(`<div class="rowBox align_center" style="height:50px;" ><label for="showItemImageCheckBox" style="margin-right:16px;width:50%;"> show item image: </label> <input type="checkbox"  name="showItemImageCheckBox" id="showItemImageCheckBox" ${showItemImage} ></div>`)
+
+		//show item details cart
+		this.general_settings_c1.append('<div for="showItemDetailsCartCheckBox" style="font-weight:600;"> Discount feature : </div>')
+		this.general_settings_c1.append(`<div class="rowBox align_center" style="height:50px;" ><label for="showDiscountFieldCheckBox" style="margin-right:16px;width:50%;"> show discount field: </label> <input type="checkbox"  name="showDiscountFieldCheckBox" id="showDiscountFieldCheckBox" ${showDiscountField} ></div>`)
+
+		//show item details cart
+		this.general_settings_c1.append('<div for="showItemDetailsCartCheckBox" style="font-weight:600;"> filter item by group : </div>')
+		this.general_settings_c1.append(`<div class="rowBox align_center" style="height:50px;" ><label for="showItemGroupFilterCheckBox" style="margin-right:16px;width:50%;"> show item group filter: </label> <input type="checkbox"  name="showItemGroupFilterCheckBox" id="showItemGroupFilterCheckBox" ${searchByGroup} ></div>`)
+
 
 		//set listeners
-		console.log("got you man")
 		this.item_price_based_on_select.on('input' , (event)=>{
-			console.log("im inside man")
 			this.settings_data.setPriceItemBasedOn(
 				event.target.value,
 				()=>{
-					console.log("debuging : we are here man ")
 					this.on_settings_change("itemPriceBasedOn")
 				},()=>{
-					console.error("error to affect the ui by the settings changes (settings.js)")
+					console.error("error to save the settings changes (settings.js)")
+				}
+			)
+		})
+
+		this.general_settings_c1.find("#showItemDetailsCartCheckBox").on('click' , (event)=>{
+			this.settings_data.settings.showItemDetails =  $(event.target).is(':checked')
+			this.settings_data.setSettings(
+				this.settings_data.settings,
+				()=>{
+					this.on_settings_change("showItemDetails")
+				},()=>{
+					console.error("error to save the settings changes (settings.js)")
+				}
+			)
+		})
+		this.general_settings_c1.find("#showItemImageCheckBox").on('click' , (event)=>{
+			this.settings_data.settings.showItemImage =  $(event.target).is(':checked')
+			this.settings_data.setSettings(
+				this.settings_data.settings,
+				()=>{
+					this.on_settings_change("showItemImage")
+				},()=>{
+					console.error("error to save the settings changes (settings.js)")
+				}
+			)
+		})
+		this.general_settings_c1.find("#showDiscountFieldCheckBox").on('click' , (event)=>{
+			this.settings_data.settings.showDiscountField =  $(event.target).is(':checked')
+			this.settings_data.setSettings(
+				this.settings_data.settings,
+				()=>{
+					this.on_settings_change("showDiscountField")
+				},()=>{
+					console.error("error to save the settings changes (settings.js)")
+				}
+			)
+		})
+		this.general_settings_c1.find("#showItemGroupFilterCheckBox").on('click' , (event)=>{
+			this.settings_data.settings.search_by_group =  $(event.target).is(':checked')
+			this.settings_data.setSettings(
+				this.settings_data.settings,
+				()=>{
+					this.on_settings_change("")
+				},()=>{
+					console.error("error to save the settings changes (settings.js)")
 				}
 			)
 		})

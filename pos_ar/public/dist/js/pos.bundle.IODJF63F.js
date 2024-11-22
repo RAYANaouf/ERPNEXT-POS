@@ -62,7 +62,7 @@
         new_pos_invoice.pos_profile = this.appData.appData.pos_profile.name;
         new_pos_invoice.items = [];
         new_pos_invoice.taxes_and_charges = this.appData.appData.pos_profile.taxes_and_charges;
-        new_pos_invoice.additional_discount_percentage = this.invoiceData.discount;
+        new_pos_invoice.additional_discount_percentage = 0;
         new_pos_invoice.paid_amount = 0;
         new_pos_invoice.base_paid_amount = 0;
         new_pos_invoice.creation_time = frappe.datetime.now_datetime();
@@ -1562,7 +1562,9 @@
       } else {
         this.cartDetails.addClass("columnBox");
         this.cartDetails.removeClass("rowBox");
-        discount.css("display", "flex");
+        if (this.settings_data.settings.showDiscountField) {
+          discount.css("display", "flex");
+        }
         this.vat.css("display", "flex");
         quantity.css("font-size", "small");
         netTotal.css("font-size", "small");
@@ -3263,10 +3265,10 @@
     }
     refreshGeneralSettings() {
       const priceBase = this.settings_data.settings.itemPriceBasedOn;
-      const showItemDetailsCart = this.settings_data.settings.showItemDetails;
-      const showItemImage = this.settings_data.settings.showItemImage;
-      const showDiscountField = this.settings_data.settings.showDiscountField;
-      const searchByGroup = this.settings_data.settings.search_by_group;
+      const showItemDetailsCart = this.settings_data.settings.showItemDetails ? "checked" : "";
+      const showItemImage = this.settings_data.settings.showItemImage ? "checked" : "";
+      const showDiscountField = this.settings_data.settings.showDiscountField ? "checked" : "";
+      const searchByGroup = this.settings_data.settings.search_by_group ? "checked" : "";
       this.leftContainer.addClass("columnBox");
       this.leftContainer.append('<h4 class="CartTitle" style="margin-bottom:35px; font-size:35px;" >General Settings</h4>');
       this.leftContainer.append('<div id="settingsCartContentsContainer">  </div>');
@@ -3275,7 +3277,7 @@
       this.general_settings_content = this.contentsContainer.find("#generalSettingsContent");
       this.general_settings_c1 = this.general_settings_content.find("div.c1");
       this.general_settings_c2 = this.general_settings_content.find("div.c2");
-      this.general_settings_c1.append('<label for="priceBasedOn"> Item Price Based On : </label>');
+      this.general_settings_c1.append('<label for="priceBasedOn" style="font-weight:600;"> Item Price Based On : </label>');
       this.general_settings_c1.append('<select  name="priceBasedOn" id="priceBasedOnSelect" ></select>');
       this.item_price_based_on_select = this.general_settings_c1.find("#priceBasedOnSelect");
       this.settings_data.getAllPriceBases().forEach((base) => {
@@ -3285,27 +3287,70 @@
           this.item_price_based_on_select.append(`<option value="${base}"> ${base} </option>`);
         }
       });
-      this.general_settings_c1.append('<label for="showItemDetailsCartCheckBox"> Show Item Details Cart : </label>');
-      this.general_settings_c1.append('<select  name="showItemDetailsCartCheckBox" id="showItemDetailsCartCheckBox" ></select>');
-      this.item_price_based_on_select = this.general_settings_c1.find("#priceBasedOnSelect");
-      this.settings_data.getAllPriceBases().forEach((base) => {
-        if (this.settings_data.settings.itemPriceBasedOn == base) {
-          this.item_price_based_on_select.append(`<option value="${base}" selected> ${base} </option>`);
-        } else {
-          this.item_price_based_on_select.append(`<option value="${base}"> ${base} </option>`);
-        }
-      });
-      console.log("got you man");
+      this.general_settings_c1.append('<div for="showItemDetailsCartCheckBox" style="font-weight:600;"> Item Details Cart : </div>');
+      this.general_settings_c1.append(`<div class="rowBox align_center" style="height:50px;"><label for="showItemDetailsCartCheckBox" style="margin-right:16px;width:50%;" > show cart: </label> <input type="checkbox"  name="showItemDetailsCartCheckBox" id="showItemDetailsCartCheckBox" ${showItemDetailsCart} ></div>`);
+      this.general_settings_c1.append('<div for="showItemDetailsCartCheckBox" style="font-weight:600;"> Item Image : </div>');
+      this.general_settings_c1.append(`<div class="rowBox align_center" style="height:50px;" ><label for="showItemImageCheckBox" style="margin-right:16px;width:50%;"> show item image: </label> <input type="checkbox"  name="showItemImageCheckBox" id="showItemImageCheckBox" ${showItemImage} ></div>`);
+      this.general_settings_c1.append('<div for="showItemDetailsCartCheckBox" style="font-weight:600;"> Discount feature : </div>');
+      this.general_settings_c1.append(`<div class="rowBox align_center" style="height:50px;" ><label for="showDiscountFieldCheckBox" style="margin-right:16px;width:50%;"> show discount field: </label> <input type="checkbox"  name="showDiscountFieldCheckBox" id="showDiscountFieldCheckBox" ${showDiscountField} ></div>`);
+      this.general_settings_c1.append('<div for="showItemDetailsCartCheckBox" style="font-weight:600;"> filter item by group : </div>');
+      this.general_settings_c1.append(`<div class="rowBox align_center" style="height:50px;" ><label for="showItemGroupFilterCheckBox" style="margin-right:16px;width:50%;"> show item group filter: </label> <input type="checkbox"  name="showItemGroupFilterCheckBox" id="showItemGroupFilterCheckBox" ${searchByGroup} ></div>`);
       this.item_price_based_on_select.on("input", (event2) => {
-        console.log("im inside man");
         this.settings_data.setPriceItemBasedOn(
           event2.target.value,
           () => {
-            console.log("debuging : we are here man ");
             this.on_settings_change("itemPriceBasedOn");
           },
           () => {
-            console.error("error to affect the ui by the settings changes (settings.js)");
+            console.error("error to save the settings changes (settings.js)");
+          }
+        );
+      });
+      this.general_settings_c1.find("#showItemDetailsCartCheckBox").on("click", (event2) => {
+        this.settings_data.settings.showItemDetails = $(event2.target).is(":checked");
+        this.settings_data.setSettings(
+          this.settings_data.settings,
+          () => {
+            this.on_settings_change("showItemDetails");
+          },
+          () => {
+            console.error("error to save the settings changes (settings.js)");
+          }
+        );
+      });
+      this.general_settings_c1.find("#showItemImageCheckBox").on("click", (event2) => {
+        this.settings_data.settings.showItemImage = $(event2.target).is(":checked");
+        this.settings_data.setSettings(
+          this.settings_data.settings,
+          () => {
+            this.on_settings_change("showItemImage");
+          },
+          () => {
+            console.error("error to save the settings changes (settings.js)");
+          }
+        );
+      });
+      this.general_settings_c1.find("#showDiscountFieldCheckBox").on("click", (event2) => {
+        this.settings_data.settings.showDiscountField = $(event2.target).is(":checked");
+        this.settings_data.setSettings(
+          this.settings_data.settings,
+          () => {
+            this.on_settings_change("showDiscountField");
+          },
+          () => {
+            console.error("error to save the settings changes (settings.js)");
+          }
+        );
+      });
+      this.general_settings_c1.find("#showItemGroupFilterCheckBox").on("click", (event2) => {
+        this.settings_data.settings.search_by_group = $(event2.target).is(":checked");
+        this.settings_data.setSettings(
+          this.settings_data.settings,
+          () => {
+            this.on_settings_change("");
+          },
+          () => {
+            console.error("error to save the settings changes (settings.js)");
           }
         );
       });
@@ -3933,4 +3978,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.3C7WL4JF.js.map
+//# sourceMappingURL=pos.bundle.IODJF63F.js.map
