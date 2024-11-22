@@ -1273,14 +1273,14 @@
       });
       this.check_in_box.on("click", (event2) => {
         this.check_in_out_type = "In";
-        this.check_in_box.css("border", "3px solid #ac6500");
+        this.check_in_box.css("border", "3px solid #9B5788");
         this.check_in_box.css("background", "#ffffff");
         this.check_out_box.css("border", "2px solid #e0e0e0");
         this.check_out_box.css("background", "#fafafa");
       });
       this.check_out_box.on("click", (event2) => {
         this.check_in_out_type = "Out";
-        this.check_out_box.css("border", "3px solid #ac6500");
+        this.check_out_box.css("border", "3px solid #9B5788");
         this.check_out_box.css("background", "#ffffff");
         this.check_in_box.css("border", "2px solid #e0e0e0");
         this.check_in_box.css("background", "#fafafa");
@@ -3985,4 +3985,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.JYLDZXEC.js.map
+//# sourceMappingURL=pos.bundle.GZJXMKA3.js.map

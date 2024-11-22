@@ -6,7 +6,7 @@
 	height    : 100% ;
 	padding   : 4px 16px 4px 16px ;
 	background    : #FFFFFF ;
-	border        : 4px solid #c0c0c0 ;
+	border        : 4px solid #a0a0a0 ;
 	border-radius : 16px;
 
 	animation : mymove 1s ;
@@ -170,7 +170,7 @@
 	width     : 100% ;
 	padding   : 4px 16px 4px 16px ;
 	background    : #FFFFFF ;
-	border        : 4px solid #c0c0c0 ;
+	border        : 4px solid #a0a0a0 ;
 	border-radius : 16px;
 
 	flex-grow : 1 ;
@@ -258,7 +258,7 @@
 	width     : 100% ;
 	height    : 100% ;
 	background    : #FFFFFF ;
-	border        : 2px solid #c0c0c0 ;
+	border        : 2px solid #a0a0a0 ;
 	border-radius : 16px;
 
 	animation : mymove 1s ;
@@ -285,8 +285,8 @@
 }
 
 .settings_tab.active{
-	border-left : 6px solid #ac6500;
-	background  : #ac650030        ;
+	border-left : 6px solid #9B5788;
+	background  : #9B578830        ;
 }
 
 /*** right container ***/
@@ -295,7 +295,7 @@
 	height    : 100% ;
 	padding   : 4px 25px 4px 25px ;
 	background    : #FFFFFF ;
-	border        : 2px solid #c0c0c0 ;
+	border        : 2px solid #a0a0a0 ;
 	border-radius : 16px;
 
 	animation : mymove 1s ;

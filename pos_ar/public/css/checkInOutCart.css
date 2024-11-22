@@ -7,7 +7,7 @@
 	height    : 100% ;
 	padding   : 4px 16px 4px 16px ;
 	background    : #FFFFFF ;
-	border        : 4px solid #c0c0c0 ;
+	border        : 4px solid #a0a0a0 ;
 	border-radius : 16px;
 
 	animation : mymove 1s ;
@@ -23,7 +23,7 @@
 
 	font-size : 18px ;
 	font-weight : 600 ;
-	color       : #6a3e00 ;
+	color       : #663959 ;
 }
 #detailsCheckInOutHeader>div{
 	width   : 33.34% ;
@@ -47,13 +47,11 @@
 
 #detailsCheckInOutContent{
 	width : 100%;
-	background : #fafafa ;	
-
 	flex-grow : 1 ;
 }
 
 #detailsCheckInOutContent span.key{
-	color       : #6a3e00 ;
+	color       : #663959 ;
 	font-size   : 25px    ;
 	font-weight : 700     ;
 }
@@ -71,7 +69,7 @@
 	justify-content : space-between;
 }
 #detailsCheckInOutContent div.l3 div.title{
-	color       : #6a3e00 ;
+	color       : #663959 ;
 	font-size   : 25px    ;
 	font-weight : 700     ;
 }
@@ -99,7 +97,7 @@
         width     : 100% ;
         padding   : 4px 16px 4px 16px ;
         background    : #FFFFFF ;
-        border        : 4px solid #c0c0c0 ;
+        border        : 4px solid #a0a0a0 ;
         border-radius : 16px;
 
         flex-grow : 1 ;
@@ -131,14 +129,14 @@
 	cursor          : pointer ;
 }
 #checkInOutTabContainer div.tab:hover{
-	background : #ac650040;
+	background : #9B578840;
 }
 #checkInOutTabContainer div.tab.selected{
-	border-bottom : 3px solid #ac6500 ;
+	border-bottom : 3px solid #9B5788 ;
 
 	font-weight : 600     ;
 	font-size   : 20px    ;
-	color       : #6a3e00 ;
+	color       : #663959 ;
 
 }
 

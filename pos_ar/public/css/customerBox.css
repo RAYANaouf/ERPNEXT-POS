@@ -41,8 +41,8 @@
 
 }
 #SyncBox.NotSynced{
-        border        : 2px solid #ac6500 ;
-	color         : #ac6500           ;
+        border        : 2px solid #663959 ;
+	color         : #9B5788           ;
 }
 #SyncBox.Synced{
         border        : 2px solid green   ;
@@ -124,7 +124,7 @@
 
 	padding : 4px 10px ;
 	margin-right : 16px ;  
-	border  : 2px solid #ac6500;
+	border  : 2px solid #663959;
 	border-radius : 10px ;
 	
 	cursor : pointer ;	
@@ -142,9 +142,9 @@
 
 #LeftSection #syncBtn.NotSynced:hover{
 
-	border  : 2px solid #6a3e00;
+	border  : 2px solid #663959;
 	color   : white ;
-	background : #ac6500 ; 
+	background : #9B5788 ; 
 }
 
 #LeftSection #syncBtn.Synced:hover{
@@ -160,7 +160,7 @@
 	max-height : 80vh    ;
 	width      : 70%     ;
 	background : #ffffff ;
-	border     : 3px solid #ac6500 ;	
+	border     : 3px solid #9B5788 ;	
 	border-radius : 25px ;
 
 	display   : none     ;
@@ -208,7 +208,7 @@
 }
 
 #checkTypeContainer .checkType.selected{
-	border     : 2px solid #ac6500;
+	border     : 2px solid #9B5788;
 	background : #ffffff          ;
 }
 #checkTypeContainer #checkInType{
@@ -290,7 +290,7 @@
 	height     : 75px ;
 	width      : calc(100%-16px) ;
 	margin     : 16px 0px 0px 0px;
-	border-top : 2px solid #ac6500 ;
+	border-top : 2px solid #9B5788 ;
 }
 #btnsContainers div.dialogBtn{
 	height : 75px ;
@@ -303,9 +303,9 @@
 }
 
 #confirmBtn{
-	border-left : 2px solid #ac6500 ;
+	border-left : 2px solid #9B5788 ;
 	font-weight : 700     ;
-	color       : #ac6500 ;
+	color       : #9B5788 ;
 }
 
 #btnsContainers div.dialogBtn:hover{
