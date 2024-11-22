@@ -146,6 +146,7 @@
       this.init_paymentCart();
       this.init_historyCart();
       this.init_checkInOutCart();
+      this.init_debtCart();
       this.init_settingsCart();
     }
     async checkForPOSEntry() {
@@ -382,6 +383,11 @@
         this.db
       );
     }
+    init_debtCart() {
+      this.debt_cart = new pos_ar.PointOfSale.pos_debt_cart(
+        this.wrapper
+      );
+    }
     init_settingsCart() {
       this.settings_cart = new pos_ar.PointOfSale.pos_settings(
         this.wrapper,
@@ -407,13 +413,14 @@
       const clonedItem = structuredClone(item);
       Object.assign(this.selectedItem, clonedItem);
       if (this.settings_data.settings.showItemDetails) {
+        console.log(" we are here : ");
         this.item_details.show_cart();
         this.item_selector.hideCart();
+        this.selected_item_cart.showKeyboard();
+        this.payment_cart.hideCart();
+        this.settings_cart.hideCart();
+        this.selected_item_cart.setKeyboardOrientation("landscape");
       }
-      this.selected_item_cart.showKeyboard();
-      this.payment_cart.hideCart();
-      this.settings_cart.hideCart();
-      this.selected_item_cart.setKeyboardOrientation("landscape");
       this.item_details.refreshDate(item);
     }
     saveCheckInOut(checkInOut) {
@@ -435,6 +442,7 @@
       }
     }
     onDebtClick() {
+      this.debt_cart.showCart();
     }
     savePosInvoice(saveWithZeroRate) {
       if (this.checkIfRateZero(this.selectedItemMaps.get(this.selectedTab.tabName)) && !saveWithZeroRate) {
@@ -3994,5 +4002,31 @@
       return [];
     }
   };
+
+  // ../pos_ar/pos_ar/pos_ar/page/pos/pos_debt_cart.js
+  pos_ar.PointOfSale.pos_debt_cart = class {
+    constructor(wrapper) {
+      this.wrapper = wrapper;
+      this.start_work();
+    }
+    start_work() {
+      console.log("hello from pos_debt_cart");
+      this.prepare_cart();
+    }
+    prepare_cart() {
+      this.wrapper.find("#LeftSection").append('<div id="debtLeftContainer" class="columnBox"></div>');
+      this.wrapper.find("#RightSection").append('<div id="debtRightContainer" class="columnBox"></div>');
+      this.leftContainer = this.wrapper.find("#debtLeftContainer");
+      this.rightContainer = this.wrapper.find("#debtRightContainer");
+    }
+    showCart() {
+      this.leftContainer.css("display", "flex");
+      this.rightContainer.css("display", "flex");
+    }
+    hideCart() {
+      this.leftContainer.css("display", "none");
+      this.rightContainer.css("display", "none");
+    }
+  };
 })();
-//# sourceMappingURL=pos.bundle.J24Z35JK.js.map
+//# sourceMappingURL=pos.bundle.6IE6XWRW.js.map

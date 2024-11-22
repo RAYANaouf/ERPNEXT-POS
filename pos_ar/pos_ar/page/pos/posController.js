@@ -168,6 +168,7 @@ pos_ar.PointOfSale.Controller = class {
 		this.init_paymentCart();
 		this.init_historyCart();
 		this.init_checkInOutCart();
+		this.init_debtCart();
 		this.init_settingsCart();
 	}
 
@@ -433,6 +434,12 @@ pos_ar.PointOfSale.Controller = class {
 								)
         }
 
+        init_debtCart(){
+		this.debt_cart = new pos_ar.PointOfSale.pos_debt_cart(
+									this.wrapper
+								)
+	}
+
 
         init_settingsCart(){
 		this.settings_cart = new pos_ar.PointOfSale.pos_settings(
@@ -474,15 +481,17 @@ pos_ar.PointOfSale.Controller = class {
 
 		//show details depend on settings
 		if(this.settings_data.settings.showItemDetails){
+			console.log(" we are here : ")
 			this.item_details.show_cart();
 			this.item_selector.hideCart();
+			this.selected_item_cart.showKeyboard();
+			//close
+			this.payment_cart.hideCart();
+			this.settings_cart.hideCart();
+			//change display
+			this.selected_item_cart.setKeyboardOrientation("landscape");
+
 		}
-		this.selected_item_cart.showKeyboard();
-		//close
-		this.payment_cart.hideCart();
-		this.settings_cart.hideCart();
-		//change display
-		this.selected_item_cart.setKeyboardOrientation("landscape");
 		//refresh data
 		this.item_details.refreshDate(item);
 	}
@@ -511,7 +520,7 @@ pos_ar.PointOfSale.Controller = class {
 	}
 
 	onDebtClick(){
-		
+		this.debt_cart.showCart();
 	}
 
 	savePosInvoice(saveWithZeroRate){

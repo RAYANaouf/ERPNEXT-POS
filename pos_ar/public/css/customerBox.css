@@ -5,6 +5,7 @@
 
 #LeftSection #MenuBox, 
 #LeftSection #HomeBox,
+#LeftSection #DebtBox,
 #LeftSection #exchangeBtn
 {
         height : 55px  ;
@@ -21,6 +22,7 @@
 }
 #LeftSection #MenuBox:hover, 
 #LeftSection #HomeBox:hover,
+#LeftSection #DebtBox:hover,
 #LeftSection #exchangeBtn:hover
 {
 	background     : #f0f0f0 ;
@@ -56,20 +58,18 @@
 	width : 35px ;
 	height : 35px;
 }
-#LeftSection #HomeBox{
+#LeftSection #HomeBox,
+#LeftSection #DebtBox
+{
 	margin-right : 16px ;
 }
 
-#MenuBox:hover,
-#HomeBox:hover,
-#SyncBox:hover
-{
-        background     : #f0f0f0 ;
-}
 
 
 #LeftSection #MenuBox img,
-#LeftSection #HomeBox img{
+#LeftSection #HomeBox img,
+#LeftSection #DebtBox img
+{
 	height : 25px ;
 	width  : 25px ;
 }

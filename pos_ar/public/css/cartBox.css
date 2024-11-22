@@ -90,8 +90,8 @@ div.tab img{
 /* element  */
 #RightSection #CartBox .ItemElement{
         width   : calc(100% - 32px)  ;
-        height  : 45px     ;
-        min-height : 45px  ;
+        height  : 40px     ;
+        min-height : 40px  ;
         margin  : 0px 16px ;
         padding : 4px      ;
 
@@ -121,7 +121,7 @@ div.tab img{
 
 #RightSection #CartBox .ItemElement .selectedItemName{
         padding : 6px 0px 0px 0px  ;
-	font-size : 20px ;
+	font-size : 18px ;
 }
 
 #RightSection #CartBox .ItemElement .itemQuantity{
