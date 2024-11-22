@@ -91,13 +91,8 @@ pos_ar.PointOfSale.pos_item_selector = class {
         	const itemsContainer_html = document.getElementById("itemsContainer");
         	itemsContainer_html.innerHTML = "";
 
-		if(filtered_item_list.length == 1){
-			this.auto_select(filtered_item_list[0])
-			const itemInput = document.getElementById("ItemInput");
-			itemInput.value = ''
-		}
 
-		for(let i=0 ; i<filtered_item_list.length && i<800 ; i++){
+		for(let i=0 ; i<filtered_item_list.length && i<700 ; i++){
 			let item = filtered_item_list[i];
                 	const itemBox = document.createElement("div");
                 	itemBox.classList.add("itemBox");
@@ -172,6 +167,13 @@ pos_ar.PointOfSale.pos_item_selector = class {
 
 		// Extract the parent item IDs from the filtered barcodes
 		const barcodeItemIds   = filteredBarcodes.map(cod => cod.parent)
+		if(barcodeItemIds.length == 1){
+			//auto fill
+			this.auto_select(this.item_list.find(item => item.name==barcodeItemIds[0] ) )
+			const itemInput = document.getElementById("ItemInput");
+			itemInput.value = ''
+			return this.item_list
+		}
 
 		return this.item_list.filter(item =>  barcodeItemIds.includes(item.name)  || item.item_name.toLowerCase().includes(value.toLowerCase()))
 	}

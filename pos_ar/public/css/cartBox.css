@@ -90,8 +90,8 @@ div.tab img{
 /* element  */
 #RightSection #CartBox .ItemElement{
         width   : calc(100% - 32px)  ;
-        height  : 60px     ;
-        min-height : 60px  ;
+        height  : 45px     ;
+        min-height : 45px  ;
         margin  : 0px 16px ;
         padding : 4px      ;
 
@@ -101,24 +101,17 @@ div.tab img{
 
 
 #RightSection #CartBox .ItemElement:hover{
-        background : #F0F0F0 ;
-
-        border     : 3px solid #e0e0e0 ;
-        border-radius : 12px  ;
-
+        background : #F5F5F5 ;
 }
 
 #RightSection #CartBox .ItemElement.selected{
-        background : #ffffff ;
-
-        border     : 3px solid #ac6500 ;
-        border-radius : 12px  ;
+        background : #eaeaea ;
 }
 
 
 #RightSection #CartBox .ItemElement .selectedItemImage{
-        width      : 45px ;
-        height     : 45px ;
+        width      : 40px ;
+        height     : 40px ;
         margin     : 0px 16px 0px 5px  ;
         background : #e0e0e0 ;
         border-radius : 12px ;
