@@ -155,7 +155,7 @@ pos_ar.PointOfSale.Controller = class {
                 this.wrapper.append('<link rel="stylesheet" type="text/css" href="/assets/pos_ar/css/cartBox.css">')
                 this.wrapper.append('<link rel="stylesheet" type="text/css" href="/assets/pos_ar/css/historyCarts.css">')
 
-                this.wrapper.append('<div id="MainContainer" class="rowBox"></div>');
+                this.wrapper.append('<div id="MainContainer" class="rowBoxReverse"></div>');
                 this.$components_wrapper = this.wrapper.find("#MainContainer");
         }
 
@@ -466,8 +466,6 @@ pos_ar.PointOfSale.Controller = class {
 	onSelectedItemClick(item){
 		const clonedItem = structuredClone(item)
 		Object.assign(this.selectedItem , clonedItem)
-
-		console.log("selected item ==> " , this.selectedItem)
 
 		//show details depend on settings
 		if(this.settings_data.settings.showItemDetails){

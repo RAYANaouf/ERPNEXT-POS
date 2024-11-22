@@ -134,7 +134,7 @@
       this.wrapper.append('<link rel="stylesheet" type="text/css" href="/assets/pos_ar/css/customerBox.css">');
       this.wrapper.append('<link rel="stylesheet" type="text/css" href="/assets/pos_ar/css/cartBox.css">');
       this.wrapper.append('<link rel="stylesheet" type="text/css" href="/assets/pos_ar/css/historyCarts.css">');
-      this.wrapper.append('<div id="MainContainer" class="rowBox"></div>');
+      this.wrapper.append('<div id="MainContainer" class="rowBoxReverse"></div>');
       this.$components_wrapper = this.wrapper.find("#MainContainer");
     }
     prepare_components() {
@@ -404,7 +404,6 @@
     onSelectedItemClick(item) {
       const clonedItem = structuredClone(item);
       Object.assign(this.selectedItem, clonedItem);
-      console.log("selected item ==> ", this.selectedItem);
       if (this.settings_data.settings.showItemDetails) {
         this.item_details.show_cart();
         this.item_selector.hideCart();
@@ -3979,4 +3978,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.YHJABCHW.js.map
+//# sourceMappingURL=pos.bundle.EHNIMGB6.js.map
