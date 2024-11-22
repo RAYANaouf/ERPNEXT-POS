@@ -32,7 +32,7 @@ pos_ar.PointOfSale.pos_customer_box = class{
 
 	prepare_customer_box(){
 
-		this.wrapper.append('<div id="ActionsContainerBox" class="rowBox align_center">');
+		this.wrapper.append('<div id="ActionsContainerBox" class="rowBox align_center" style="order:1;">');
 		this.actionContainer = this.wrapper.find('#ActionsContainerBox');
 
 		this.actionContainer.append('<div id="SyncBox"     class="rowBox centerItem" >');

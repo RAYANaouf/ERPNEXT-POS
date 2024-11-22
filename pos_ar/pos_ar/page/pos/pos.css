@@ -52,6 +52,10 @@
 	display        : flex   ; 
 	flex-direction : column ;
 }
+.columnBoxReverse {
+	display        : flex   ; 
+	flex-direction : column-reverse ;
+}
 
 .C_A_Center{
 	align-items    : center ; 

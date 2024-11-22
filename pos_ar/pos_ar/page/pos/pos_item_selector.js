@@ -41,7 +41,7 @@ pos_ar.PointOfSale.pos_item_selector = class {
 
 	/***********************  ui  functions  ***************************************/
 	prepare_select_box(){
-		this.wrapper.append('<div id="SelectorBox" class="columnBox"></div>')
+		this.wrapper.append('<div id="SelectorBox" class="columnBox" ></div>')
 
 		this.selectorBox  = this.wrapper.find("#SelectorBox");
 		this.selectorBox.append('<div id="selectorBoxHeader" class="rowBox header"></div>')

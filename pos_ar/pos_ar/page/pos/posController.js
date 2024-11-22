@@ -59,7 +59,7 @@ pos_ar.PointOfSale.Controller = class {
 
 			await this.handleAppData();
 
-			let new_pos_invoice = frappe.model.get_new_doc('POS Invoice');
+			let new_pos_invoice               = frappe.model.get_new_doc('POS Invoice');
 			new_pos_invoice.customer          = this.defaultCustomer.name
 			new_pos_invoice.pos_profile       = this.appData.appData.pos_profile.name
 			new_pos_invoice.items             = [];
@@ -314,13 +314,14 @@ pos_ar.PointOfSale.Controller = class {
 
 
         set_right_and_left_sections(){
-                this.$components_wrapper.append('<div id="LeftSection" class="columnBox"></div>')
+                this.$components_wrapper.append('<div id="LeftSection" class="columnBoxReverse"></div>')
                 this.$components_wrapper.append('<div id="RightSection" class="columnBox"></div>')
 
 		this.$rightSection = this.$components_wrapper.find("#RightSection")
 		this.$leftSection  = this.$components_wrapper.find("#LeftSection")
 
         }
+
 
         init_item_selector(){
 
@@ -338,17 +339,6 @@ pos_ar.PointOfSale.Controller = class {
 					)
 	}
 
-	init_customer_box(){
-		this.customer_box  = new pos_ar.PointOfSale.pos_customer_box(
-									this.$rightSection ,
-									this.appData.appData.customers,
-									this.defaultCustomer ,
-									this.backHome.bind(this),
-									this.onSync.bind(this),
-									this.saveCheckInOut.bind(this),
-									this.onMenuClick.bind(this)
-								)
-	}
         init_selected_item(){
 		this.selected_item_cart  = new pos_ar.PointOfSale.pos_selected_item_cart(
 									this.$rightSection    ,
@@ -439,6 +429,17 @@ pos_ar.PointOfSale.Controller = class {
 								)
         }
 
+	init_customer_box(){
+		this.customer_box  = new pos_ar.PointOfSale.pos_customer_box(
+									this.$leftSection ,
+									this.appData.appData.customers,
+									this.defaultCustomer ,
+									this.backHome.bind(this),
+									this.onSync.bind(this),
+									this.saveCheckInOut.bind(this),
+									this.onMenuClick.bind(this)
+								)
+	}
 
 
         /*********************  callbacks functions ******************************/
@@ -460,6 +461,7 @@ pos_ar.PointOfSale.Controller = class {
 		this.selected_item_cart.calculateGrandTotal();
 		this.selected_item_cart.refreshSelectedItem();
 
+		this.savePosInvoice(true)
 	}
 
 
@@ -505,13 +507,17 @@ pos_ar.PointOfSale.Controller = class {
 		}
 	}
 
-	onCheckout(){
-		if(this.checkIfRateZero(this.selectedItemMaps.get(this.selectedTab.tabName))){
+	savePosInvoice(saveWithZeroRate){
+		if(this.checkIfRateZero(this.selectedItemMaps.get(this.selectedTab.tabName)) && !saveWithZeroRate){
 			frappe.throw("Item with rate equal 0")
 			return ;
 		}
 		this.selectedItemMaps.get(this.selectedTab.tabName).synced = false ;
 		this.appData.savePosInvoice(this.selectedItemMaps.get(this.selectedTab.tabName))
+
+	}
+	onCheckout(){
+		this.savePosInvoice(true)
 		//show
 		this.payment_cart.showCart();
 		//hide
@@ -659,6 +665,7 @@ pos_ar.PointOfSale.Controller = class {
 		new_pos_invoice.is_pos            = 1
 		new_pos_invoice.update_stock      = 1
 		new_pos_invoice.docstatus         = 0
+		new_pos_invoice.synced            = false
 		new_pos_invoice.status            = 'Draft'
 		new_pos_invoice.priceList         = this.defaultPriceList.name
 		//build refNm   posProfile-date-time
@@ -788,6 +795,8 @@ pos_ar.PointOfSale.Controller = class {
 			this.item_details.refreshDate(this.selectedItem);
 
 		}
+
+		this.savePosInvoice(true)
 	}
 
 
@@ -905,11 +914,14 @@ pos_ar.PointOfSale.Controller = class {
 		this.selected_item_cart.refreshSelectedItem()
 		this.item_details.refreshDate(this.selectedItem);
 
-
+		this.savePosInvoice(true)
 	}
 
 
 	onCompleteOrder(){
+
+		this.savePosInvoice(true)
+
 		//check if they set a customer
 		if(this.defaultCustomer.name == ""){
 			frappe.warn(

@@ -275,7 +275,7 @@
       };
     }
     set_right_and_left_sections() {
-      this.$components_wrapper.append('<div id="LeftSection" class="columnBox"></div>');
+      this.$components_wrapper.append('<div id="LeftSection" class="columnBoxReverse"></div>');
       this.$components_wrapper.append('<div id="RightSection" class="columnBox"></div>');
       this.$rightSection = this.$components_wrapper.find("#RightSection");
       this.$leftSection = this.$components_wrapper.find("#LeftSection");
@@ -294,17 +294,6 @@
         (item) => {
           this.itemClick_selector(item);
         }
-      );
-    }
-    init_customer_box() {
-      this.customer_box = new pos_ar.PointOfSale.pos_customer_box(
-        this.$rightSection,
-        this.appData.appData.customers,
-        this.defaultCustomer,
-        this.backHome.bind(this),
-        this.onSync.bind(this),
-        this.saveCheckInOut.bind(this),
-        this.onMenuClick.bind(this)
       );
     }
     init_selected_item() {
@@ -389,6 +378,17 @@
         this.onSettingsChange.bind(this)
       );
     }
+    init_customer_box() {
+      this.customer_box = new pos_ar.PointOfSale.pos_customer_box(
+        this.$leftSection,
+        this.appData.appData.customers,
+        this.defaultCustomer,
+        this.backHome.bind(this),
+        this.onSync.bind(this),
+        this.saveCheckInOut.bind(this),
+        this.onMenuClick.bind(this)
+      );
+    }
     itemClick_selector(item) {
       const itemCloned = structuredClone(item);
       itemCloned.discount_amount = 0;
@@ -400,6 +400,7 @@
       this.selected_item_cart.calculateQnatity();
       this.selected_item_cart.calculateGrandTotal();
       this.selected_item_cart.refreshSelectedItem();
+      this.savePosInvoice(true);
     }
     onSelectedItemClick(item) {
       const clonedItem = structuredClone(item);
@@ -432,13 +433,16 @@
         this.selected_item_cart.refreshSelectedItem();
       }
     }
-    onCheckout() {
-      if (this.checkIfRateZero(this.selectedItemMaps.get(this.selectedTab.tabName))) {
+    savePosInvoice(saveWithZeroRate) {
+      if (this.checkIfRateZero(this.selectedItemMaps.get(this.selectedTab.tabName)) && !saveWithZeroRate) {
         frappe.throw("Item with rate equal 0");
         return;
       }
       this.selectedItemMaps.get(this.selectedTab.tabName).synced = false;
       this.appData.savePosInvoice(this.selectedItemMaps.get(this.selectedTab.tabName));
+    }
+    onCheckout() {
+      this.savePosInvoice(true);
       this.payment_cart.showCart();
       this.item_selector.hideCart();
       this.item_details.hide_cart();
@@ -550,6 +554,7 @@
       new_pos_invoice.is_pos = 1;
       new_pos_invoice.update_stock = 1;
       new_pos_invoice.docstatus = 0;
+      new_pos_invoice.synced = false;
       new_pos_invoice.status = "Draft";
       new_pos_invoice.priceList = this.defaultPriceList.name;
       const date = new Date();
@@ -631,6 +636,7 @@
         this.selected_item_cart.refreshSelectedItem();
         this.item_details.refreshDate(this.selectedItem);
       }
+      this.savePosInvoice(true);
     }
     onKeyPressed(action, key) {
       var _a;
@@ -700,8 +706,10 @@
       this.editPosItemQty(this.selectedItem.name, this.selectedItem.qty);
       this.selected_item_cart.refreshSelectedItem();
       this.item_details.refreshDate(this.selectedItem);
+      this.savePosInvoice(true);
     }
     onCompleteOrder() {
+      this.savePosInvoice(true);
       if (this.defaultCustomer.name == "") {
         frappe.warn(
           "Customer didnt selected!",
@@ -1000,7 +1008,7 @@
       this.setItemInFlow(this.getItemByItemGroup(""));
     }
     prepare_select_box() {
-      this.wrapper.append('<div id="SelectorBox" class="columnBox"></div>');
+      this.wrapper.append('<div id="SelectorBox" class="columnBox" ></div>');
       this.selectorBox = this.wrapper.find("#SelectorBox");
       this.selectorBox.append('<div id="selectorBoxHeader" class="rowBox header"></div>');
       this.header = this.selectorBox.find("#selectorBoxHeader");
@@ -1150,7 +1158,7 @@
       this.setListeners();
     }
     prepare_customer_box() {
-      this.wrapper.append('<div id="ActionsContainerBox" class="rowBox align_center">');
+      this.wrapper.append('<div id="ActionsContainerBox" class="rowBox align_center" style="order:1;">');
       this.actionContainer = this.wrapper.find("#ActionsContainerBox");
       this.actionContainer.append('<div id="SyncBox"     class="rowBox centerItem" >');
       this.actionContainer.append('<div id="HomeBox"     class="rowBox centerItem"  style="display:none;">');
@@ -2641,7 +2649,7 @@
     }
     static async openDatabase() {
       return new Promise((resolve, reject) => {
-        const request = window.indexedDB.open("POSDB_test32", 1);
+        const request = window.indexedDB.open("POSDB_test33", 1);
         request.onerror = (event2) => {
           reject(request.error);
         };
@@ -3659,7 +3667,7 @@
         await this.getItems();
         frappe.show_progress("Please Wait", 3, 12, "loading pos profiles");
         await this.getPosProfiles();
-        frappe.show_progress("Please Wait", 4, 12, "mode of payment");
+        frappe.show_progress("Please Wait", 4, 12, "loading mode of payment");
         await this.getPosProfileModeOfPayments(this.appData.pos_profile);
         await this.getBins();
         frappe.show_progress("Please Wait", 5, 12, "loading warehouses");
@@ -3757,7 +3765,6 @@
     }
     async getDeletedDocs() {
       this.appData.deleted_documents = await this.api_handler.fetchDeletedDocs(this.since);
-      console.log("debuuuuuuuuuuuging : ", this.appData.deleted_documents);
     }
     saveCheckInOut(checkInOut, onSuccess, onFailure) {
       this.db.saveCheckInOut(checkInOut, onSuccess, onFailure);
@@ -3978,4 +3985,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.EHNIMGB6.js.map
+//# sourceMappingURL=pos.bundle.JYLDZXEC.js.map

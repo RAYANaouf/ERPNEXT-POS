@@ -24,7 +24,7 @@ pos_ar.PointOfSale.posAppData = class {
 			await this.getItems();
 			frappe.show_progress('Please Wait', 3, 12, 'loading pos profiles');
 			await this.getPosProfiles();
-			frappe.show_progress('Please Wait', 4, 12, 'mode of payment');
+			frappe.show_progress('Please Wait', 4, 12, 'loading mode of payment');
 			await this.getPosProfileModeOfPayments(this.appData.pos_profile)
 			await this.getBins();
 			frappe.show_progress('Please Wait', 5, 12, 'loading warehouses');
@@ -169,7 +169,6 @@ pos_ar.PointOfSale.posAppData = class {
 	async getDeletedDocs(){
 		//get local
 		this.appData.deleted_documents = await this.api_handler.fetchDeletedDocs(this.since);
-		console.log("debuuuuuuuuuuuging : " , this.appData.deleted_documents)
 	}
 
 
