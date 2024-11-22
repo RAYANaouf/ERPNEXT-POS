@@ -2,8 +2,8 @@
 
 /*make the body width biger*/
 [data-route = "pos"] .container.page-body{
-	width : 95%  ; 
-	max-width : 95%  ; 
+	width : 100vw  ; 
+	max-width : 100vw  ; 
 }
 
 /*hide the top bar of the page*/
@@ -152,9 +152,11 @@
 
 
 #MainContainer{
-	height : 100vh ;
-	width  : 100% ;
-	padding : 26px 0px ;
+	height     : 100vh ;
+	width      : 100% ;
+	padding    : 26px 0px ;
+
+	background : #9B578850 ;
 }
 
 

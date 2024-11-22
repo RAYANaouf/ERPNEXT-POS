@@ -8,6 +8,7 @@ pos_ar.PointOfSale.pos_customer_box = class{
 		onSync           ,
 		saveCheckInOut   ,
 		onMenuClick      ,
+		onDebtClick      ,
 	){
 		this.wrapper           = wrapper          ;
 		this.customers_list    = customersList    ;
@@ -16,6 +17,7 @@ pos_ar.PointOfSale.pos_customer_box = class{
 		this.on_sync           = onSync           ;
 		this.on_menu_click     = onMenuClick      ;
 		this.save_check_in_out = saveCheckInOut   ;
+		this.on_debt_click     = onDebtClick      ;
 
 		//local
 		this.online       = true  ;
@@ -37,8 +39,9 @@ pos_ar.PointOfSale.pos_customer_box = class{
 
 		this.actionContainer.append('<div id="SyncBox"     class="rowBox centerItem" >');
 		this.actionContainer.append('<div id="HomeBox"     class="rowBox centerItem"  style="display:none;">');
+		this.actionContainer.append('<div id="DebtBox"     class="rowBox centerItem" >');
 		this.actionContainer.append('<div id="exchangeBtn" class="rowBox centerItem" style="margin-right:16px;" >  <img src="/assets/pos_ar/images/exchange.png">  </div>');
-		this.actionContainer.append('<div id="MenuBox"     class="rowBox centerItem">');
+		this.actionContainer.append('<div id="MenuBox"     class="rowBox centerItem" >');
 
 		//sync btn
 		this.sync_btn = this.actionContainer.find('#SyncBox')
@@ -49,6 +52,9 @@ pos_ar.PointOfSale.pos_customer_box = class{
 		//home btn
 		this.home = this.actionContainer.find('#HomeBox')
 		this.home.append('<img src="/assets/pos_ar/images/home.png" alt="Home" id="homeBoxIcon">')
+		//debt btn
+		this.debt = this.actionContainer.find('#DebtBox')
+		this.debt.append('<img src="/assets/pos_ar/images/debt.png" alt="Debt" id="debtBoxIcon">')
 		//menu btn
 		this.menu = this.actionContainer.find('#MenuBox')
 		this.menu.append('<img src="/assets/pos_ar/images/menu.png" alt="Menu" id="MenuBtn" >')
@@ -169,6 +175,10 @@ pos_ar.PointOfSale.pos_customer_box = class{
 
 		this.home.on('click' , (event)=>{
 			this.back_home()
+		})
+
+		this.debt.on('click' , (event)=>{
+			this.on_debt_click()
 		})
 
 		this.exchange_btn.on('click' , (event)=>{

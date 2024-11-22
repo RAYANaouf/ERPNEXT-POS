@@ -280,6 +280,18 @@
       this.$rightSection = this.$components_wrapper.find("#RightSection");
       this.$leftSection = this.$components_wrapper.find("#LeftSection");
     }
+    init_customer_box() {
+      this.customer_box = new pos_ar.PointOfSale.pos_customer_box(
+        this.$leftSection,
+        this.appData.appData.customers,
+        this.defaultCustomer,
+        this.backHome.bind(this),
+        this.onSync.bind(this),
+        this.saveCheckInOut.bind(this),
+        this.onMenuClick.bind(this),
+        this.onDebtClick.bind(this)
+      );
+    }
     init_item_selector() {
       this.item_selector = new pos_ar.PointOfSale.pos_item_selector(
         this.$leftSection,
@@ -378,17 +390,6 @@
         this.onSettingsChange.bind(this)
       );
     }
-    init_customer_box() {
-      this.customer_box = new pos_ar.PointOfSale.pos_customer_box(
-        this.$leftSection,
-        this.appData.appData.customers,
-        this.defaultCustomer,
-        this.backHome.bind(this),
-        this.onSync.bind(this),
-        this.saveCheckInOut.bind(this),
-        this.onMenuClick.bind(this)
-      );
-    }
     itemClick_selector(item) {
       const itemCloned = structuredClone(item);
       itemCloned.discount_amount = 0;
@@ -432,6 +433,8 @@
         this.selected_item_cart.resetItemRateBaseOnPriceList();
         this.selected_item_cart.refreshSelectedItem();
       }
+    }
+    onDebtClick() {
     }
     savePosInvoice(saveWithZeroRate) {
       if (this.checkIfRateZero(this.selectedItemMaps.get(this.selectedTab.tabName)) && !saveWithZeroRate) {
@@ -1140,7 +1143,7 @@
 
   // ../pos_ar/pos_ar/pos_ar/page/pos/pos_customer_box.js
   pos_ar.PointOfSale.pos_customer_box = class {
-    constructor(wrapper, customersList, selectedCustomer, backHome, onSync, saveCheckInOut, onMenuClick) {
+    constructor(wrapper, customersList, selectedCustomer, backHome, onSync, saveCheckInOut, onMenuClick, onDebtClick) {
       this.wrapper = wrapper;
       this.customers_list = customersList;
       this.selected_customer = selectedCustomer;
@@ -1148,6 +1151,7 @@
       this.on_sync = onSync;
       this.on_menu_click = onMenuClick;
       this.save_check_in_out = saveCheckInOut;
+      this.on_debt_click = onDebtClick;
       this.online = true;
       this.show_menu = false;
       this.start_work();
@@ -1162,14 +1166,17 @@
       this.actionContainer = this.wrapper.find("#ActionsContainerBox");
       this.actionContainer.append('<div id="SyncBox"     class="rowBox centerItem" >');
       this.actionContainer.append('<div id="HomeBox"     class="rowBox centerItem"  style="display:none;">');
+      this.actionContainer.append('<div id="DebtBox"     class="rowBox centerItem" >');
       this.actionContainer.append('<div id="exchangeBtn" class="rowBox centerItem" style="margin-right:16px;" >  <img src="/assets/pos_ar/images/exchange.png">  </div>');
-      this.actionContainer.append('<div id="MenuBox"     class="rowBox centerItem">');
+      this.actionContainer.append('<div id="MenuBox"     class="rowBox centerItem" >');
       this.sync_btn = this.actionContainer.find("#SyncBox");
       this.sync_btn.append('<div id="syncBoxContent"> Sync </div>');
       this.sync_btn_content = this.sync_btn.find("#syncBoxContent");
       this.exchange_btn = this.actionContainer.find("#exchangeBtn");
       this.home = this.actionContainer.find("#HomeBox");
       this.home.append('<img src="/assets/pos_ar/images/home.png" alt="Home" id="homeBoxIcon">');
+      this.debt = this.actionContainer.find("#DebtBox");
+      this.debt.append('<img src="/assets/pos_ar/images/debt.png" alt="Debt" id="debtBoxIcon">');
       this.menu = this.actionContainer.find("#MenuBox");
       this.menu.append('<img src="/assets/pos_ar/images/menu.png" alt="Menu" id="MenuBtn" >');
       this.menu.append('<div id="menuItemsContainer"     class="columnBox">');
@@ -1264,6 +1271,9 @@
       });
       this.home.on("click", (event2) => {
         this.back_home();
+      });
+      this.debt.on("click", (event2) => {
+        this.on_debt_click();
       });
       this.exchange_btn.on("click", (event2) => {
         this.showCheckInOutDialog();
@@ -3985,4 +3995,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.GZJXMKA3.js.map
+//# sourceMappingURL=pos.bundle.J24Z35JK.js.map

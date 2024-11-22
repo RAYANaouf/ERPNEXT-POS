@@ -323,6 +323,20 @@ pos_ar.PointOfSale.Controller = class {
         }
 
 
+	init_customer_box(){
+		this.customer_box  = new pos_ar.PointOfSale.pos_customer_box(
+									this.$leftSection ,
+									this.appData.appData.customers,
+									this.defaultCustomer ,
+									this.backHome.bind(this),
+									this.onSync.bind(this),
+									this.saveCheckInOut.bind(this),
+									this.onMenuClick.bind(this),
+									this.onDebtClick.bind(this)
+								)
+	}
+
+
         init_item_selector(){
 
                 this.item_selector = new pos_ar.PointOfSale.pos_item_selector(
@@ -429,17 +443,6 @@ pos_ar.PointOfSale.Controller = class {
 								)
         }
 
-	init_customer_box(){
-		this.customer_box  = new pos_ar.PointOfSale.pos_customer_box(
-									this.$leftSection ,
-									this.appData.appData.customers,
-									this.defaultCustomer ,
-									this.backHome.bind(this),
-									this.onSync.bind(this),
-									this.saveCheckInOut.bind(this),
-									this.onMenuClick.bind(this)
-								)
-	}
 
 
         /*********************  callbacks functions ******************************/
@@ -505,6 +508,10 @@ pos_ar.PointOfSale.Controller = class {
 			//redraw
 			this.selected_item_cart.refreshSelectedItem()
 		}
+	}
+
+	onDebtClick(){
+		
 	}
 
 	savePosInvoice(saveWithZeroRate){
