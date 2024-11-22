@@ -46,7 +46,6 @@ def get_mode_of_payments():
     query = """
         SELECT *
         FROM `tabMode of Payment`
-        WHERE docstatus = 1
     """
     mode_of_payments = frappe.db.sql(query,  as_dict=True)
 

@@ -210,6 +210,7 @@ pos_ar.PointOfSale.FetchHandler = class FetchHandler{
 				method: 'pos_ar.pos_ar.doctype.pos_info.pos_info.get_mode_of_payments',
 				args: { }
 			});
+			console.log("see :::====> " , response.message)
 			return response.message;  // The fetched item barcodes
 		} catch (error) {
 			console.error('Error fetching mode_of_payments', error);
