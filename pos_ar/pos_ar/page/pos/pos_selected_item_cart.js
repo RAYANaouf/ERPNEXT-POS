@@ -106,12 +106,12 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 
 		this.selectedItemContainer = this.cartBox.find('#selectedItemsContainer')
 
-		this.cartFooter = this.cartBox.find('#cartFooter')
+		this.cartFooter    = this.cartBox.find('#cartFooter')
 		this.cartFooter.append('<div id="cartDetails" class="columnBox"></div>')
 		this.cartFooter.append('<div id="editSelectedItemCart"></div>')
 		this.cartFooter.append('<button class="posBtn1" type="button" id="checkoutBtn"> Payment </button>')
 
-		this.cartDetails = this.cartFooter.find('#cartDetails')
+		this.cartDetails   = this.cartFooter.find('#cartDetails')
 
 		this.cartDetails.append('<div id="discount" class="rowBox align_center row_sbtw"></div>')
 		this.cartDetails.append('<div id="totalQuantity" class="rowBox align_center row_sbtw"></div>')
@@ -158,22 +158,22 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 		this.editSelectedItem.append('<div class="grid-container">')
 
 		this.buttonsContainer = this.editSelectedItem.find('.grid-container')
-		this.buttonsContainer.append('<button id="key_1"        class="grid-item">1</button>')
-		this.buttonsContainer.append('<button id="key_2"        class="grid-item">2</button>')
-		this.buttonsContainer.append('<button id="key_3"        class="grid-item">3</button>')
-		this.buttonsContainer.append('<button id="key_quantity" class="grid-item">Quantity</button>')
-		this.buttonsContainer.append('<button id="key_4"        class="grid-item">4</button>')
-		this.buttonsContainer.append('<button id="key_5"        class="grid-item">5</button>')
-		this.buttonsContainer.append('<button id="key_6"        class="grid-item">6</button>')
-		this.buttonsContainer.append('<button id="key_rate"     class="grid-item">Rate</button>')
-		this.buttonsContainer.append('<button id="key_7"        class="grid-item">7</button>')
-		this.buttonsContainer.append('<button id="key_8"        class="grid-item">8</button>')
-		this.buttonsContainer.append('<button id="key_9"        class="grid-item">9</button>')
-		this.buttonsContainer.append('<button id="key_discount" class="grid-item">Discount</button>')
-		this.buttonsContainer.append('<button id="key_point"    class="grid-item">.</button>')
-		this.buttonsContainer.append('<button id="key_0"        class="grid-item">0</button>')
-		this.buttonsContainer.append('<button id="key_delete"   class="grid-item">Delete</button>')
-		this.buttonsContainer.append('<button id="key_remove"   class="grid-item" style="color:red;font-weight:700;">Remove</button>')
+		this.buttonsContainer.append('<button id="key_1"        class="grid-item"  data-action="1"        > 1         </button>')
+		this.buttonsContainer.append('<button id="key_2"        class="grid-item"  data-action="2"        > 2         </button>')
+		this.buttonsContainer.append('<button id="key_3"        class="grid-item"  data-action="3"        > 3         </button>')
+		this.buttonsContainer.append('<button id="key_quantity" class="grid-item"  data-action="Quantity" > Quantité  </button>')
+		this.buttonsContainer.append('<button id="key_4"        class="grid-item"  data-action="4"        > 4         </button>')
+		this.buttonsContainer.append('<button id="key_5"        class="grid-item"  data-action="5"        > 5         </button>')
+		this.buttonsContainer.append('<button id="key_6"        class="grid-item"  data-action="6"        > 6         </button>')
+		this.buttonsContainer.append('<button id="key_rate"     class="grid-item"  data-action="Rate"     > Prix      </button>')
+		this.buttonsContainer.append('<button id="key_7"        class="grid-item"  data-action="7"        > 7         </button>')
+		this.buttonsContainer.append('<button id="key_8"        class="grid-item"  data-action="8"        > 8         </button>')
+		this.buttonsContainer.append('<button id="key_9"        class="grid-item"  data-action="9"        > 9         </button>')
+		this.buttonsContainer.append('<button id="key_discount" class="grid-item"  data-action="Discount" > Remise    </button>')
+		this.buttonsContainer.append('<button id="key_point"    class="grid-item"  data-action="."        > .         </button>')
+		this.buttonsContainer.append('<button id="key_0"        class="grid-item"  data-action="0"        > 0         </button>')
+		this.buttonsContainer.append('<button id="key_delete"   class="grid-item"  data-action="Delete"   > Supprimer </button>')
+		this.buttonsContainer.append('<button id="key_remove"   class="grid-item"  data-action="Remove" style="color:red;font-weight:700;">Retirer</button>')
 
 		this.checkoutBtn = this.cartFooter.find('#checkoutBtn')
 		this.checkoutBtn.on('mousedown' , event =>{
@@ -182,7 +182,6 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 	}
 
 	fulfillingSelects(){
-
 		this.price_lists.forEach(priceList =>{
 			this.priceListInput.append(`<option value="${priceList.name}">${priceList.price_list_name}</option>`)
 		})
@@ -215,7 +214,6 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 
 
 			this.selected_tab.tabName = clickedTab
-			console.log("clicked tab : " , clickedTab , "selected one : " , this.selected_tab , " clicked element : " , event.target)
 
 			//update UI
 			this.refreshTabs();
@@ -458,13 +456,13 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 		keys.forEach(key =>{
 			key.on('mousedown' , (event)=>{
 				event.preventDefault();
-				const keyContent = key.text();
+				const keyContent = key.data('action');
 
 				if(!isNaN(keyContent)){
-					this.on_key_pressed( "addToField" , key.text())
+					this.on_key_pressed( "addToField" , keyContent)
 				}
 				else if(keyContent == "."){
-					this.on_key_pressed( "addToField" , key.text())
+					this.on_key_pressed( "addToField" , keyContent)
 				}
 				else if(keyContent == "Quantity"){
 					this.on_key_pressed( "quantity" , null)
@@ -504,7 +502,6 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 
 			if(this.selected_item_maps.size > 0  ){
 				this.selected_tab.tabName = Array.from(this.selected_item_maps.keys())[0]
-				console.log("this.selected_tab.tabName : " , this.selected_tab)
 			}
 			else{
 				this.createNewTab()

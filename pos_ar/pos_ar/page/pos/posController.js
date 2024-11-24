@@ -38,6 +38,8 @@ pos_ar.PointOfSale.Controller = class {
 			this.appData       = new pos_ar.PointOfSale.posAppData(this.db , this.dataHandler)
 			await this.appData.getAllData()
 
+			this.toggleKeyboardMode(!this.settings_data.settings.showItemDetails);
+
 			console.log("see app data : " , this.appData.appData)
 
 			this.prepare_container();
@@ -471,6 +473,10 @@ pos_ar.PointOfSale.Controller = class {
 		this.selected_item_cart.calculateGrandTotal();
 		this.selected_item_cart.refreshSelectedItem();
 
+
+		this.selectedField.field_name = "quantity"
+		this.selected_item_cart.makeSelectedButtonHighlighted();
+
 		this.savePosInvoice(true)
 	}
 
@@ -481,7 +487,6 @@ pos_ar.PointOfSale.Controller = class {
 
 		//show details depend on settings
 		if(this.settings_data.settings.showItemDetails){
-			console.log(" we are here : ")
 			this.item_details.show_cart();
 			this.item_selector.hideCart();
 			this.selected_item_cart.showKeyboard();
@@ -492,6 +497,10 @@ pos_ar.PointOfSale.Controller = class {
 			this.selected_item_cart.setKeyboardOrientation("landscape");
 
 		}
+
+		this.selectedField.field_name = "quantity"
+		this.selected_item_cart.makeSelectedButtonHighlighted();
+
 		//refresh data
 		this.item_details.refreshDate(item);
 	}
@@ -730,7 +739,6 @@ pos_ar.PointOfSale.Controller = class {
 
 	onInput( event , field , value){
 
-
 		if(event == "focus" || event == "blur"){
 			if(event == "focus")
 				Object.assign(this.selectedField , {field_name : field})
@@ -818,16 +826,18 @@ pos_ar.PointOfSale.Controller = class {
 
 	onKeyPressed( action  , key){
 
-		console.log("on key pressed ==> action : " , action , " key : " , key )
-
 		if(action == "quantity"){
-			this.item_details.requestFocus("quantity")
+			this.selectedField.field_name = "quantity"
+			this.selected_item_cart.makeSelectedButtonHighlighted();
+			//this.item_details.requestFocus("quantity")
 		}
 		else if(action == "rate"){
-			this.item_details.requestFocus("rate")
+			this.selectedField.field_name = "rate"
+			this.selected_item_cart.makeSelectedButtonHighlighted();
+			//this.item_details.requestFocus("rate")
 		}
 		else if(action == "discount"){
-			this.item_details.requestFocus("discount_percentage")
+			//this.item_details.requestFocus("discount_percentage")
 		}
 		else if(action == "remove"){
 			this.deleteItemFromPOsInvoice(this.selectedItem.name)
@@ -1169,6 +1179,88 @@ pos_ar.PointOfSale.Controller = class {
 	}
 
 	/*****************************  tools  **********************************/
+
+	toggleKeyboardMode(active){
+		if(active){
+			document.addEventListener('keydown', event =>{
+				console.log(event.key)
+				if(event.key == "q"){
+					this.selectedField.field_name = "quantity"
+					this.selected_item_cart.makeSelectedButtonHighlighted();
+				}else if(event.key == "p"){
+					this.selectedField.field_name = "rate"
+					this.selected_item_cart.makeSelectedButtonHighlighted();
+				}else if(event.key == "Backspace"){
+					if(this.selectedField.field_name == "quantity"){
+						const lastValue = parseFloat(this.selectedItem.qty)
+						let newValue    = 0
+
+						// Remove the last character and parse the remaining value
+						newValue = parseFloat(`${lastValue}`.slice(0, -1)) || 0;
+
+						this.selectedItem.qty = parseFloat(newValue);
+						this.editPosItemQty(this.selectedItem.name , this.selectedItem.qty);
+						//redrawing
+						this.selected_item_cart.refreshSelectedItem();
+					}else if(this.selectedField.field_name == "rate"){
+						const lastValue = parseFloat(this.selectedItem.rate)
+						let newValue = parseFloat(`${lastValue}`.slice(0,-1)) || 0 ;
+						this.selectedItem.rate = parseFloat(newValue);
+
+						//recalculate the rate
+						let oldRate = this.selectedItem.rate;
+						let persont = this.selectedItem.discount_percentage
+						let montant = oldRate * (persont / 100)
+
+						this.selectedItem.discount_percentage = persont;
+						this.selectedItem.discount_amount     = montant;
+
+						this.editPosItemDiscountAmount(this.selectedItem.name , this.selectedItem.discount_amount);
+						this.editPosItemRate(this.selectedItem.name , this.selectedItem.rate);
+
+						//redrawing
+						this.selected_item_cart.refreshSelectedItem();
+						this.item_details.refreshDate(this.selectedItem);
+					}
+				}else if(this.selectedField.field_name == "quantity"){
+					if(parseFloat(event.key) || event.key == "0"){
+						const lastValue = parseFloat(this.selectedItem.qty)
+						const newValue  = `${lastValue}` + event.key
+						this.selectedItem.qty = parseFloat(newValue);
+						this.editPosItemQty(this.selectedItem.name , this.selectedItem.qty);
+						//redrawing
+						this.selected_item_cart.refreshSelectedItem();
+					}
+				}else if(this.selectedField.field_name == "rate"){
+					if(parseFloat(event.key) ||  event.key == "0"){
+						const lastValue = parseFloat(this.selectedItem.rate)
+						const newValue  = `${lastValue}` + event.key
+						this.selectedItem.rate = parseFloat(newValue);
+
+						//recalculate the rate
+						let oldRate = this.selectedItem.rate;
+						let persont = this.selectedItem.discount_percentage
+						let montant = oldRate * (persont / 100)
+
+						this.selectedItem.discount_percentage = persont;
+						this.selectedItem.discount_amount     = montant;
+
+						this.editPosItemDiscountAmount(this.selectedItem.name , this.selectedItem.discount_amount);
+						this.editPosItemRate(this.selectedItem.name , this.selectedItem.rate);
+
+						//redrawing
+						this.selected_item_cart.refreshSelectedItem();
+						this.item_details.refreshDate(this.selectedItem);
+					}
+				}
+			})
+
+		}else{
+			document.removeEventListener('keydown' , event =>{})
+		}
+	}
+
+
 	getItemPrice(item , priceList){
 		//check the mode
 		const mode = this.settings_data.settings.itemPriceBasedOn
