@@ -1181,9 +1181,21 @@ pos_ar.PointOfSale.Controller = class {
 	/*****************************  tools  **********************************/
 
 	toggleKeyboardMode(active){
+
+
 		if(active){
 			document.addEventListener('keydown', event =>{
 				console.log(event.key)
+				// Check if the user is typing in an input or textarea
+				const activeElement = document.activeElement;
+				const isInputFocused =
+					activeElement.tagName === "INPUT" ||
+					activeElement.tagName === "TEXTAREA" ||
+					activeElement.isContentEditable;
+
+				// Ignore keydown events if the user is typing in a field
+				if (isInputFocused) return;
+
 				if(event.key == "q"){
 					this.selectedField.field_name = "quantity"
 					this.selected_item_cart.makeSelectedButtonHighlighted();
