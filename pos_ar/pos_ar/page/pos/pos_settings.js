@@ -96,6 +96,7 @@ pos_ar.PointOfSale.pos_settings = class{
 		const showItemImage       = this.settings_data.settings.showItemImage     ? "checked" : ""
 		const showDiscountField   = this.settings_data.settings.showDiscountField ? "checked" : ""
 		const searchByGroup       = this.settings_data.settings.search_by_group   ? "checked" : ""
+		const keyboardStyle       = this.settings_data.settings.keyboard_style
 
 
 		//left container
@@ -123,6 +124,20 @@ pos_ar.PointOfSale.pos_settings = class{
 			}
 		})
 
+
+		//keyboard style
+		this.general_settings_c2.append('<label for="keyboardStyle" style="font-weight:600;"> Keyboard Style : </label>')
+		this.general_settings_c2.append('<select  name="keyboardStyle" id="keyboardStyle" ></select>')
+		this.keyboard_style_select = this.general_settings_c2.find('#keyboardStyle')
+
+		this.settings_data.getAllKeyboardStyles().forEach( style =>{
+			if(this.settings_data.settings.keyboardStyle == style){
+				this.keyboard_style_select.append(`<option value="${style}" selected> ${style} </option>`)
+			}else{
+				this.keyboard_style_select.append(`<option value="${style}"> ${style} </option>`)
+			}
+		})
+
 		//show item details cart
 		this.general_settings_c1.append('<div for="showItemDetailsCartCheckBox" style="font-weight:600;"> Item Details Cart : </div>')
 		this.general_settings_c1.append(`<div class="rowBox align_center" style="height:50px;"><label for="showItemDetailsCartCheckBox" style="margin-right:16px;width:50%;" > show cart: </label> <input type="checkbox"  name="showItemDetailsCartCheckBox" id="showItemDetailsCartCheckBox" ${showItemDetailsCart} ></div>`)
@@ -146,6 +161,18 @@ pos_ar.PointOfSale.pos_settings = class{
 				event.target.value,
 				()=>{
 					this.on_settings_change("itemPriceBasedOn")
+				},()=>{
+					console.error("error to save the settings changes (settings.js)")
+				}
+			)
+		})
+
+		this.keyboard_style_select.on('input' , (event)=>{
+			this.settings_data.settings.keyboardStyle =  event.target.value
+			this.settings_data.setSettings(
+				this.settings_data.settings,
+				()=>{
+					this.on_settings_change("showItemImage")
 				},()=>{
 					console.error("error to save the settings changes (settings.js)")
 				}

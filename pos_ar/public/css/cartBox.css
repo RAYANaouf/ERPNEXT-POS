@@ -46,7 +46,6 @@ div.tab img{
 #RightSection #CartBox{
         width         : 100% ;
         height        : calc(100% - 55px) ;
-        padding       : 0px 0px 16px 0px ;
         background    : #FFFFFF ;
 
         border        : 4px solid #a0a0a0 ;
@@ -178,72 +177,22 @@ div.tab img{
         font-size : larger ;
 }
 
-#RightSection #CartBox #checkoutBtn{
-        width   : calc(100% - 32px)  ;
-        margin  : 0px 16px 0px 16px  ;
-        padding : 8px 0px ;
-
-        color      : #FFFFFF  ;
-        font-size  : larger;
-        font-weight: 600;
-
-        background : #9B5788 ;
-        border  : 3px solid #663959;
-        border-radius : 8px  ;
-        outline : none ;
-}
 #RightSection #CartBox #checkoutBtn:hover{
-        border  : 4px solid #663959;
-        font-weight: 700;
-}
-
-
-#RightSection #editSelectedItemCart{
-        width  : clac(100% - 32px) ;
-        margin : 0px 16px    ;
-        padding    : 0px 0px 16px 0px ;
-
-        animation : mymove 2s  ;
-
-        overFlow-y    : hidden;
-
-        display       : none ;
-
+        font-weight: 700  !important;
+        font-size  : 24px !important;
 }
 
 
 
-/*grid*/
-.grid-container {
-	width   : 100%;
-        display : grid;
-        grid-template-columns : auto auto auto auto ;
 
-}
-.grid-item {
-        height          : 45px ;
-        padding         : 4px  ;
-        margin          : 6px  ;
 
-        background      : #f5f5f5;
-        border          : 2px solid #e0e0e0;
-        border-radius   : 12px  ;
-        color           : black ;
-        font-size       : small ;
-        text-align      : center;
-
-        display         : flex  ;
-        justify-content : center;
-        align-items     : center;
-}
 .grid-item:hover {
-        background      : #e0e0e0;
-        border          : 2px solid #e0e0e0;
+        background      : #e0e0e0  !important; 
 }
 
 .grid-item.selected {
-        border       : 2px solid #c0c0c0 ;
-        background   : #e0e0e0 ;
+        border       : 2px solid #c0c0c0 !important;
+        background   : #e0e0e0 !important;
 
 }
 

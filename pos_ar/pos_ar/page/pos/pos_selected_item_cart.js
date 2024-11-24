@@ -63,6 +63,44 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 
 	prepare_selected_item_cart(){
 
+
+
+		//styles
+		let containerBoxStyle   = ''
+		let containerStyle = ''
+		let btnStyle       = ''
+		let checkoutBtn    = ''
+
+
+		if(this.settings_data.settings.keyboardStyle == this.settings_data.keyboard_styles[0]){
+			containerBoxStyle   =
+				'margin:0px 16px;padding:0px 0px 16px 0px;'
+			containerStyle =
+				'width:100%;display:grid;grid-template-columns:auto auto auto auto;'
+			btnStyle =
+				'height:45px;padding:4px;margin:6px;background:#f5f5f5;border:2px solid #e0e0e0;border-radius:12px;'+
+				'color:black;font-size:small;text-align:center;'+
+				'display:flex;justify-content:center;align-items:center;'
+			checkoutBtn =
+				'width:calc(100% - 32px);margin:0px 16px 16px 16px;padding : 8px 0px ;'+
+				'color:#FFFFFF;font-size:larger;font-weight:600;'+
+				'background:#9B5788;border:3px solid #663959;border-radius:8px;outline:none;'
+		}
+		else{
+			containerBoxStyle   =
+				'width:100%;'
+			containerStyle =
+				'width:100%;border-top:1px solid #a0a0a0;border-bottom:1px solid #a0a0a0;display:grid;grid-template-columns:auto auto auto auto;'
+
+			btnStyle = 'height:45px;padding:4px;background:#f5f5f5;border:1px solid #a0a0a0;color:black;font-size:small;text-align:center;display:flex;justify-content:center;align-items:center;'
+			checkoutBtn =
+				'width:100%;height:55px;'+
+				'color:#FFFFFF;font-size:19px;font-weight:600;'+
+				'background:#9B5788;border:none;border-top:4px solid #663959;border-radius:0px;outline:none;'
+		}
+
+
+
 		this.wrapper.append('<div id="tabs"    class="rowBox"><div id="tabs_container" class="rowBox"></div></div>')
 		this.wrapper.append('<div id="CartBox" class="columnBox"></div>')
 
@@ -108,8 +146,8 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 
 		this.cartFooter    = this.cartBox.find('#cartFooter')
 		this.cartFooter.append('<div id="cartDetails" class="columnBox"></div>')
-		this.cartFooter.append('<div id="editSelectedItemCart"></div>')
-		this.cartFooter.append('<button class="posBtn1" type="button" id="checkoutBtn"> Payment </button>')
+		this.cartFooter.append(`<div id="editSelectedItemCart" style="${containerBoxStyle}"></div>`)
+		this.cartFooter.append(`<button class="posBtn1" type="button" id="checkoutBtn" style="${checkoutBtn}"> Payment </button>`)
 
 		this.cartDetails   = this.cartFooter.find('#cartDetails')
 
@@ -153,27 +191,28 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 		}
 
 
+
 		this.editSelectedItem = this.cartFooter.find('#editSelectedItemCart')
 		this.editSelectedItem.css('display','flex');
-		this.editSelectedItem.append('<div class="grid-container">')
+		this.editSelectedItem.append(`<div class="grid-container"  style="${containerStyle}">`)
 
 		this.buttonsContainer = this.editSelectedItem.find('.grid-container')
-		this.buttonsContainer.append('<button id="key_1"        class="grid-item"  data-action="1"        > 1         </button>')
-		this.buttonsContainer.append('<button id="key_2"        class="grid-item"  data-action="2"        > 2         </button>')
-		this.buttonsContainer.append('<button id="key_3"        class="grid-item"  data-action="3"        > 3         </button>')
-		this.buttonsContainer.append('<button id="key_quantity" class="grid-item"  data-action="Quantity" > Quantité  </button>')
-		this.buttonsContainer.append('<button id="key_4"        class="grid-item"  data-action="4"        > 4         </button>')
-		this.buttonsContainer.append('<button id="key_5"        class="grid-item"  data-action="5"        > 5         </button>')
-		this.buttonsContainer.append('<button id="key_6"        class="grid-item"  data-action="6"        > 6         </button>')
-		this.buttonsContainer.append('<button id="key_rate"     class="grid-item"  data-action="Rate"     > Prix      </button>')
-		this.buttonsContainer.append('<button id="key_7"        class="grid-item"  data-action="7"        > 7         </button>')
-		this.buttonsContainer.append('<button id="key_8"        class="grid-item"  data-action="8"        > 8         </button>')
-		this.buttonsContainer.append('<button id="key_9"        class="grid-item"  data-action="9"        > 9         </button>')
-		this.buttonsContainer.append('<button id="key_discount" class="grid-item"  data-action="Discount" > Remise    </button>')
-		this.buttonsContainer.append('<button id="key_point"    class="grid-item"  data-action="."        > .         </button>')
-		this.buttonsContainer.append('<button id="key_0"        class="grid-item"  data-action="0"        > 0         </button>')
-		this.buttonsContainer.append('<button id="key_delete"   class="grid-item"  data-action="Delete"   > Supprimer </button>')
-		this.buttonsContainer.append('<button id="key_remove"   class="grid-item"  data-action="Remove" style="color:red;font-weight:700;">Retirer</button>')
+		this.buttonsContainer.append(`<button id="key_1"        class="grid-item"  style="${btnStyle}" data-action="1"        > 1         </button>`)
+		this.buttonsContainer.append(`<button id="key_2"        class="grid-item"  style="${btnStyle}" data-action="2"        > 2         </button>`)
+		this.buttonsContainer.append(`<button id="key_3"        class="grid-item"  style="${btnStyle}" data-action="3"        > 3         </button>`)
+		this.buttonsContainer.append(`<button id="key_quantity" class="grid-item"  style="${btnStyle}" data-action="Quantity" > Quantité  </button>`)
+		this.buttonsContainer.append(`<button id="key_4"        class="grid-item"  style="${btnStyle}" data-action="4"        > 4         </button>`)
+		this.buttonsContainer.append(`<button id="key_5"        class="grid-item"  style="${btnStyle}" data-action="5"        > 5         </button>`)
+		this.buttonsContainer.append(`<button id="key_6"        class="grid-item"  style="${btnStyle}" data-action="6"        > 6         </button>`)
+		this.buttonsContainer.append(`<button id="key_rate"     class="grid-item"  style="${btnStyle}" data-action="Rate"     > Prix      </button>`)
+		this.buttonsContainer.append(`<button id="key_7"        class="grid-item"  style="${btnStyle}" data-action="7"        > 7         </button>`)
+		this.buttonsContainer.append(`<button id="key_8"        class="grid-item"  style="${btnStyle}" data-action="8"        > 8         </button>`)
+		this.buttonsContainer.append(`<button id="key_9"        class="grid-item"  style="${btnStyle}" data-action="9"        > 9         </button>`)
+		this.buttonsContainer.append(`<button id="key_discount" class="grid-item"  style="${btnStyle}" data-action="Discount" > Remise    </button>`)
+		this.buttonsContainer.append(`<button id="key_point"    class="grid-item"  style="${btnStyle}" data-action="."        > .         </button>`)
+		this.buttonsContainer.append(`<button id="key_0"        class="grid-item"  style="${btnStyle}" data-action="0"        > 0         </button>`)
+		this.buttonsContainer.append(`<button id="key_delete"   class="grid-item"  style="${btnStyle}" data-action="Delete"   > Supprimer </button>`)
+		this.buttonsContainer.append(`<button id="key_remove"   class="grid-item"  style="${btnStyle}color:red;font-weight:700;" data-action="Remove">Retirer</button>`)
 
 		this.checkoutBtn = this.cartFooter.find('#checkoutBtn')
 		this.checkoutBtn.on('mousedown' , event =>{

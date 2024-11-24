@@ -4,8 +4,9 @@ pos_ar.PointOfSale.posSettingsData = class{
 	constructor(db){
 
 		this.db = db;
-		//Array of valid price bases
-		this.price_bases = ['brand' , 'priceList']
+		//Array of valid values
+		this.price_bases     = ['brand'   , 'priceList']
+		this.keyboard_styles = ['primery' , 'secondary']
 		//Default setting (it could be more)
 		this.db.getSettings(
 			(res)=>{
@@ -14,10 +15,11 @@ pos_ar.PointOfSale.posSettingsData = class{
 				}else{
 					//default
 					this.settings = {
-						itemPriceBasedOn  : 'brand',
-						showItemDetails   : false  ,
-						showItemImage     : false  ,
-						showDiscountField : false  ,
+						itemPriceBasedOn  : 'brand'     ,
+						keyboardStyle     : 'secondary' ,
+						showItemDetails   : false       ,
+						showItemImage     : false       ,
+						showDiscountField : false       ,
 						search_by_group   : false
 					}
 				}
@@ -26,10 +28,11 @@ pos_ar.PointOfSale.posSettingsData = class{
 			(err)=>{
 				console.log("error when trying to get the setting from local, so we use the default.")
 				this.settings = {
-					itemPriceBasedOn  : 'brand',
-					showItemDetails   : false  ,
-					showItemImage     : false  ,
-					showDiscountField : false  ,
+					itemPriceBasedOn  : 'brand'     ,
+					keyboardStyle     : 'secondary' ,
+					showItemDetails   : false       ,
+					showItemImage     : false       ,
+					showDiscountField : false       ,
 					search_by_group   : false
 				}
 
@@ -39,6 +42,9 @@ pos_ar.PointOfSale.posSettingsData = class{
 
 	getAllPriceBases(){
 		return this.price_bases;
+	}
+	getAllKeyboardStyles(){
+		return this.keyboard_styles;
 	}
 
 	//PriceItemBasedOn
