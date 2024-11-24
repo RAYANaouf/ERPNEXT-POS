@@ -846,16 +846,54 @@ pos_ar.PointOfSale.Controller = class {
 		}
 		else if(action == "delete"){
 
+
+			//check if the details cart is appear
+			if(!this.settings_data.settings.showItemDetails){
+				if(this.selectedField.field_name == "quantity"){
+					const oldValue = parseFloat(this.selectedItem.qty)
+					const newValue = `${oldValue}`.slice(0, -1)
+					this.selectedItem.qty = parseFloat(newValue) || 0;
+				}
+				else if(this.selectedField.field_name == "rate"){
+					const oldValue = parseFloat(this.selectedItem.rate)
+					const newValue = `${oldValue}`.slice(0, -1)
+
+					this.selectedItem.rate = parseFloat(newValue) || 0;
+
+					//recalculate the rate
+					let oldRate = this.selectedItem.rate;
+					let persont = this.selectedItem.discount_percentage
+					let montant = oldRate * (persont / 100)
+
+					this.selectedItem.discount_amount     = montant;
+				}
+
+
+				//update the posInvoice
+				this.editPosItemDiscountAmount(this.selectedItem.name , this.selectedItem.discount_amount);
+				this.editPosItemRate(this.selectedItem.name , this.selectedItem.rate);
+				this.editPosItemQty(this.selectedItem.name , this.selectedItem.qty);
+
+				//update the ui
+				this.selected_item_cart.refreshSelectedItem()
+				this.item_details.refreshDate(this.selectedItem);
+
+				this.savePosInvoice(true)
+
+
+				//return to prevent the remaining code
+				return
+
+			}
+
 			let newValue =  parseFloat(this.item_details.deleteCharacter())
 
 			if(this.selectedField.field_name == "quantity"){
 				this.selectedItem.qty = newValue;
-				const posItems = this.selectedItemMaps.get(this.selectedTab.tabName)
 			}
 			else if(this.selectedField.field_name == "rate"){
 
 				this.selectedItem.rate = newValue;
-				const posItems = this.selectedItemMaps.get(this.selectedTab.tabName)
 
 				//recalculate the rate
 				let oldRate = this.selectedItem.rate;
@@ -899,12 +937,25 @@ pos_ar.PointOfSale.Controller = class {
 			else{
 
 				if( this.selectedField.field_name ==  "quantity" ){
-					const newVal = this.selectedItem.qty + key
-					this.selectedItem.qty = parseFloat(newVal);
+					const oldValue = parseFloat(this.selectedItem.qty)
+					const newValue = `${oldValue}` + key
+					this.selectedItem.qty = parseFloat(newValue);
 				}
 				else if( this.selectedField.field_name ==  "rate" ){
-					const newVal = this.selectedItem.rate + key
-					this.selectedItem.rate = parseFloat(newVal);
+						const lastValue = parseFloat(this.selectedItem.rate)
+						const newValue  = `${lastValue}` + key
+						this.selectedItem.rate = parseFloat(newValue);
+
+						//recalculate the rate
+						let oldRate = this.selectedItem.rate;
+						let persont = this.selectedItem.discount_percentage
+						let montant = oldRate * (persont / 100)
+
+						this.selectedItem.discount_percentage = persont;
+						this.selectedItem.discount_amount     = montant;
+
+						this.editPosItemDiscountAmount(this.selectedItem.name , this.selectedItem.discount_amount);
+						this.editPosItemRate(this.selectedItem.name , this.selectedItem.rate);
 
 				}
 				else if( this.selectedField.field_name ==  "discount_percentage" ){
