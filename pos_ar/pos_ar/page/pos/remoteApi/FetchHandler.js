@@ -173,7 +173,12 @@ pos_ar.PointOfSale.FetchHandler = class FetchHandler{
 			/*if(since){
 				filter.modified = ['>',since]
 			}*/
-			const r = await frappe.db.get_doc('POS Profile', null , { disabled:0 } )
+			const pos = await frappe.db.get_list('POS Profile' , {
+				fields  : ['name'],
+				filters : filter ,
+				limit   : 1
+			})
+			const r = await frappe.db.get_doc('POS Profile', pos[0].name  )
 			return r
 		}
 		catch(error){
