@@ -23,6 +23,8 @@ pos_ar.PointOfSale.Controller = class {
 		this.invoiceData = { netTotal : 0 , grandTotal : 0 , paidAmount : 0 , toChange : 0 , discount : 0}
 		this.db          = null;
 
+		this.syncInput = false
+
                 this.start_app();
         }
 
@@ -458,6 +460,9 @@ pos_ar.PointOfSale.Controller = class {
 
 
 	itemClick_selector(item , refresh){
+
+		this.syncInput = false
+
 		const  itemCloned = structuredClone(item);
 
 		itemCloned.discount_amount     = 0;
@@ -487,6 +492,9 @@ pos_ar.PointOfSale.Controller = class {
 
 
 	onSelectedItemClick(item){
+
+		this.syncInput = false
+
 		const clonedItem = structuredClone(item)
 		Object.assign(this.selectedItem , clonedItem)
 
@@ -941,12 +949,24 @@ pos_ar.PointOfSale.Controller = class {
 			else{
 
 				if( this.selectedField.field_name ==  "quantity" ){
-					const oldValue = parseFloat(this.selectedItem.qty)
+					let oldValue = 0
+					if(!this.syncInput){
+						oldValue = 0
+						this.syncInput = true
+					}else{
+						oldValue = parseFloat(this.selectedItem.qty)
+					}
 					const newValue = `${oldValue}` + key
 					this.selectedItem.qty = parseFloat(newValue);
 				}
 				else if( this.selectedField.field_name ==  "rate" ){
-						const lastValue = parseFloat(this.selectedItem.rate)
+						let lastValue = 0
+						if(!this.syncInput){
+							lastValue = 0
+							this.syncInput = true
+						}else{
+							lastValue = parseFloat(this.selectedItem.rate)
+						}
 						const newValue  = `${lastValue}` + key
 						this.selectedItem.rate = parseFloat(newValue);
 
@@ -1291,7 +1311,13 @@ pos_ar.PointOfSale.Controller = class {
 					}
 				}else if(this.selectedField.field_name == "quantity"){
 					if(parseFloat(event.key) || event.key == "0"){
-						const lastValue = parseFloat(this.selectedItem.qty)
+						let lastValue = 0
+						if(!this.syncInput){
+							lastValue      = 0
+							this.syncInput = true
+						}else{
+							lastValue = parseFloat(this.selectedItem.qty)
+						}
 						const newValue  = `${lastValue}` + event.key
 						this.selectedItem.qty = parseFloat(newValue);
 						this.editPosItemQty(this.selectedItem.name , this.selectedItem.qty);
@@ -1300,7 +1326,13 @@ pos_ar.PointOfSale.Controller = class {
 					}
 				}else if(this.selectedField.field_name == "rate"){
 					if(parseFloat(event.key) ||  event.key == "0"){
-						const lastValue = parseFloat(this.selectedItem.rate)
+						let lastValue = 0
+						if(!this.syncInput){
+							lastValue      = 0
+							this.syncInput = true
+						}else{
+							lastValue = parseFloat(this.selectedItem.rate)
+						}
 						const newValue  = `${lastValue}` + event.key
 						this.selectedItem.rate = parseFloat(newValue);
 
