@@ -409,6 +409,9 @@ pos_ar.PointOfSale.pos_history = class {
 		const [date, time]  = creation_time.split(' ')
 
 
+		console.log("check the logo : " , this.company.company_logo)
+
+
 		let invoiceHTML =
 			'<style>'+
 				'#company_container {'+
@@ -459,7 +462,7 @@ pos_ar.PointOfSale.pos_history = class {
 				'<div style="display:flex; flex-direction:column;">'+
 					'<div id="logContainer"  >'+
 						'<div style="width:20%;"></div>'+
-						`<img src="${this.company.company_logo}">`+
+						`<img src="http://102.220.31.43/private/files/logo.jpg">`+
 						'<div style="width:20%;"></div>'+
 					'</div>'+
 					'<div id="company_container">' +
