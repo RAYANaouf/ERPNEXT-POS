@@ -480,6 +480,8 @@ pos_ar.PointOfSale.Controller = class {
 		this.selectedField.field_name = "quantity"
 		this.selected_item_cart.makeSelectedButtonHighlighted();
 
+		this.selected_item_cart.scrollToBottom()
+
 		this.savePosInvoice(true)
 	}
 

@@ -413,6 +413,7 @@
       }
       this.selectedField.field_name = "quantity";
       this.selected_item_cart.makeSelectedButtonHighlighted();
+      this.selected_item_cart.scrollToBottom();
       this.savePosInvoice(true);
     }
     onSelectedItemClick(item) {
@@ -1675,6 +1676,10 @@
       this.calculateVAT();
       this.calculateQnatity();
       this.calculateGrandTotal();
+    }
+    scrollToBottom() {
+      console.log("scrolling");
+      this.selectedItemContainer.scrollTop(this.selectedItemContainer[0].scrollHeight);
     }
     createNewTab() {
       if (this.tabs_container.find("div.tab").length >= 7) {
@@ -4189,4 +4194,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.IKFYIYRU.js.map
+//# sourceMappingURL=pos.bundle.GMC4XF52.js.map
