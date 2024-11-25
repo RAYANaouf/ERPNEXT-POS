@@ -271,19 +271,40 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 
 			const clickedTab = $(event.target).closest('.tab').find('.tabName').text();
 
-			this.selected_item_maps.delete(clickedTab)
 
-			if(this.selected_item_maps.size > 0  ){
-				this.selected_tab.tabName = Array.from(this.selected_item_maps.keys())[0]
-				console.log("this.selected_tab.tabName : " , this.selected_tab)
+			// Check if the associated invoice is empty
+			const invoiceItems = this.selected_item_maps.get(clickedTab).items; // Assuming invoice data is stored in `selected_item_maps`
+			if (invoiceItems && invoiceItems.length > 0) {
+				frappe.confirm('Are you sure you want to proceed?',
+					() => {
+						 this.selected_item_maps.delete(clickedTab)
+
+						if(this.selected_item_maps.size > 0  ){
+							this.selected_tab.tabName = Array.from(this.selected_item_maps.keys())[0]
+							console.log("this.selected_tab.tabName : " , this.selected_tab)
+						}
+						else{
+							this.createNewTab()
+						}
+						this.refreshTabs()
+						this.refreshSelectedItem()
+					}, () => {
+						// action to perform if No is selected
+					})
+			}else{
+				console.log("debug : " , invoiceItems , " && " , invoiceItems.length )
+				this.selected_item_maps.delete(clickedTab)
+
+				if(this.selected_item_maps.size > 0  ){
+					this.selected_tab.tabName = Array.from(this.selected_item_maps.keys())[0]
+					console.log("this.selected_tab.tabName : " , this.selected_tab)
+				}
+				else{
+					this.createNewTab()
+				}
+				this.refreshTabs()
+				this.refreshSelectedItem()
 			}
-			else{
-				this.createNewTab()
-			}
-
-
-			this.refreshTabs()
-			this.refreshSelectedItem()
 
 
 		})

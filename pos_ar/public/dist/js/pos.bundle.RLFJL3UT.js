@@ -1636,15 +1636,36 @@
       this.tabs_container.find(".tabDeleteBtn").on("click", (event2) => {
         event2.stopPropagation();
         const clickedTab = $(event2.target).closest(".tab").find(".tabName").text();
-        this.selected_item_maps.delete(clickedTab);
-        if (this.selected_item_maps.size > 0) {
-          this.selected_tab.tabName = Array.from(this.selected_item_maps.keys())[0];
-          console.log("this.selected_tab.tabName : ", this.selected_tab);
+        const invoiceItems = this.selected_item_maps.get(clickedTab).items;
+        if (invoiceItems && invoiceItems.length > 0) {
+          frappe.confirm(
+            "Are you sure you want to proceed?",
+            () => {
+              this.selected_item_maps.delete(clickedTab);
+              if (this.selected_item_maps.size > 0) {
+                this.selected_tab.tabName = Array.from(this.selected_item_maps.keys())[0];
+                console.log("this.selected_tab.tabName : ", this.selected_tab);
+              } else {
+                this.createNewTab();
+              }
+              this.refreshTabs();
+              this.refreshSelectedItem();
+            },
+            () => {
+            }
+          );
         } else {
-          this.createNewTab();
+          console.log("debug : ", invoiceItems, " && ", invoiceItems.length);
+          this.selected_item_maps.delete(clickedTab);
+          if (this.selected_item_maps.size > 0) {
+            this.selected_tab.tabName = Array.from(this.selected_item_maps.keys())[0];
+            console.log("this.selected_tab.tabName : ", this.selected_tab);
+          } else {
+            this.createNewTab();
+          }
+          this.refreshTabs();
+          this.refreshSelectedItem();
         }
-        this.refreshTabs();
-        this.refreshSelectedItem();
       });
     }
     refreshSelectedItem() {
@@ -2794,7 +2815,7 @@
       const creation_time = pos.creation_time;
       const [date, time] = creation_time.split(" ");
       console.log("check the logo : ", this.company.company_logo);
-      let invoiceHTML = `<style>#company_container {width: 100% ; height: 40px ; display:flex; align-items:center; font-size : 12px;}table{width: 100%; margin-top:16px;}tr{width:100%; height:16px;}tr:nth-child(1){}#first_row{border: 5px solid black;}#logContainer{width: 100%;height:80px;display : flex;justify-content:center;}#logContainer img{width:50%; height:100%;}#top_data_container{width:100%;display:flex;}#top_data_container>div.c1{font-size:12px;flex-grow:1;}#top_data_container>div.c2{font-size:12px;flex-grow:1;display:flex;flex-direction:column;align-items:end;}td>div{height:18px; width:100%;font-size:12px;display:flex; justify-content:center; align-items:center;}#footer_message{height:20px;}</style><div style="display:flex; flex-direction:column;"><div id="logContainer"  ><div style="width:20%;"></div><img src="http://102.220.31.43/private/files/logo.jpg"><div style="width:20%;"></div></div><div id="company_container"><div style="flex-grow:1;"></div><p style="margin:0px 25px;">${this.company.company_name}</p><div style="flex-grow:1;"></div></div><div id="top_data_container"><div class="c1"><div class="customer"> Customer : ${pos.customer} </div><div class="refrence"> Commande : ${pos.refNum} </div></div><div class="c2"><div class="date"> ${date}/${time} </div></div></div><table><tr id="first_row" ><th style="boder:1px solid black;">Nom</th><th>Qt\xE9</th><th>Prix</th><th>Value</th>`;
+      let invoiceHTML = `<style>#company_container {width: 100% ; height: 40px ; display:flex; align-items:center; font-size : 12px;}table{width: 100%; margin-top:16px;}tr{width:100%; height:16px;}tr:nth-child(1){}#first_row{border: 5px solid black;}#logContainer{width: 100%;height:80px;display : flex;justify-content:center;}#logContainer img{width:50%; height:100%;}#top_data_container{width:100%;display:flex;}#top_data_container>div.c1{font-size:12px;flex-grow:1;}#top_data_container>div.c2{font-size:12px;flex-grow:1;display:flex;flex-direction:column;align-items:end;}td>div{height:18px; width:100%;font-size:12px;display:flex; justify-content:center; align-items:center;}#footer_message{height:20px;}</style><div style="display:flex; flex-direction:column;"><div id="logContainer"  ><div style="width:20%;"></div><img src="http://makid_store.localhost:8000/files/1661795110-optilance.png"><div style="width:20%;"></div></div><div id="company_container"><div style="flex-grow:1;"></div><p style="margin:0px 25px;">${this.company.company_name}</p><div style="flex-grow:1;"></div></div><div id="top_data_container"><div class="c1"><div class="customer"> Customer : ${pos.customer} </div><div class="refrence"> Commande : ${pos.refNum} </div></div><div class="c2"><div class="date"> ${date}/${time} </div></div></div><table><tr id="first_row" ><th style="boder:1px solid black;">Nom</th><th>Qt\xE9</th><th>Prix</th><th>Value</th>`;
       pos.items.forEach((item) => {
         netTotal += item.rate * item.qty;
         invoiceHTML += `<tr > <td ><div >${item.item_name}</div></td>  <td><div>${item.qty}</div></td>  <td><div>${item.rate}</div></td>  <td><div>${item.rate * item.qty}</div></td></tr>`;
@@ -4224,4 +4245,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.3ROUMFLS.js.map
+//# sourceMappingURL=pos.bundle.RLFJL3UT.js.map
