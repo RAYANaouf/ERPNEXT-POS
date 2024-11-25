@@ -1712,9 +1712,6 @@
       this.selectedItemContainer.scrollTop(this.selectedItemContainer[0].scrollHeight);
     }
     createNewTab() {
-      if (this.tabs_container.find("div.tab").length >= 15) {
-        return;
-      }
       this.counter += 1;
       this.create_new_tab(this.counter);
       this.refreshTabs();
@@ -4226,4 +4223,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.KPEG23VZ.js.map
+//# sourceMappingURL=pos.bundle.U77ROF36.js.map
