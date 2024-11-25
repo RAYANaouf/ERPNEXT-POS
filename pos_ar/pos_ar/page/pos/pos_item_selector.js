@@ -90,7 +90,7 @@ pos_ar.PointOfSale.pos_item_selector = class {
 	setItemInFlow(filtered_item_list){
         	const itemsContainer_html = document.getElementById("itemsContainer");
         	itemsContainer_html.innerHTML = "";
-
+		const itemInput = document.getElementById("ItemInput");
 
 		for(let i=0 ; i<filtered_item_list.length && i<700 ; i++){
 			let item = filtered_item_list[i];
@@ -100,7 +100,8 @@ pos_ar.PointOfSale.pos_item_selector = class {
                 	itemBox.classList.add("C_A_Center");
 
                 	itemBox.addEventListener('click' , event => {
-				this.on_item_click(item);
+				const isNotImpty = itemInput.value.length > 0
+				this.on_item_click(item , isNotImpty);
                 	});
 
                 	if(item.image){

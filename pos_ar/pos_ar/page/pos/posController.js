@@ -457,7 +457,7 @@ pos_ar.PointOfSale.Controller = class {
         /*********************  callbacks functions ******************************/
 
 
-	itemClick_selector(item){
+	itemClick_selector(item , refresh){
 		const  itemCloned = structuredClone(item);
 
 		itemCloned.discount_amount     = 0;
@@ -473,6 +473,9 @@ pos_ar.PointOfSale.Controller = class {
 		this.selected_item_cart.calculateGrandTotal();
 		this.selected_item_cart.refreshSelectedItem();
 
+		if(refresh){
+			this.item_selector.refreshItemSelector()
+		}
 
 		this.selectedField.field_name = "quantity"
 		this.selected_item_cart.makeSelectedButtonHighlighted();
@@ -671,7 +674,6 @@ pos_ar.PointOfSale.Controller = class {
 		this.appData.appData.pos_profile.payments.forEach(method =>{
 			result.push({'mode_of_payment' : method.mode_of_payment , 'default' : method.default , 'amount' : 0})
 		})
-
 		return result
 	}
 

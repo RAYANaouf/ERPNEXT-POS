@@ -397,7 +397,7 @@
         this.onSettingsChange.bind(this)
       );
     }
-    itemClick_selector(item) {
+    itemClick_selector(item, refresh) {
       const itemCloned = structuredClone(item);
       itemCloned.discount_amount = 0;
       itemCloned.discount_percentage = 0;
@@ -408,6 +408,9 @@
       this.selected_item_cart.calculateQnatity();
       this.selected_item_cart.calculateGrandTotal();
       this.selected_item_cart.refreshSelectedItem();
+      if (refresh) {
+        this.item_selector.refreshItemSelector();
+      }
       this.selectedField.field_name = "quantity";
       this.selected_item_cart.makeSelectedButtonHighlighted();
       this.savePosInvoice(true);
@@ -1156,6 +1159,7 @@
     setItemInFlow(filtered_item_list) {
       const itemsContainer_html = document.getElementById("itemsContainer");
       itemsContainer_html.innerHTML = "";
+      const itemInput = document.getElementById("ItemInput");
       for (let i = 0; i < filtered_item_list.length && i < 700; i++) {
         let item = filtered_item_list[i];
         const itemBox = document.createElement("div");
@@ -1163,7 +1167,8 @@
         itemBox.classList.add("columnBox");
         itemBox.classList.add("C_A_Center");
         itemBox.addEventListener("click", (event2) => {
-          this.on_item_click(item);
+          const isNotImpty = itemInput.value.length > 0;
+          this.on_item_click(item, isNotImpty);
         });
         if (item.image) {
           const itemImage = document.createElement("img");
@@ -4177,4 +4182,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.FZDSXNSW.js.map
+//# sourceMappingURL=pos.bundle.7UWZ5RP3.js.map
