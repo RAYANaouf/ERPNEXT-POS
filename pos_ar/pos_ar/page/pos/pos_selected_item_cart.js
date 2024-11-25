@@ -19,6 +19,7 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 		onKeyPressed       ,
 		createNewTab       ,
 		onCheckoutClick    ,
+		savePosInvoice     ,
 	){
 
 
@@ -39,6 +40,7 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 		this.on_selected_item_click  = onSelectedItemClick;
 		this.on_tab_click            = onTabClick      ;
 		this.create_new_tab          = createNewTab    ;
+		this.save_pos_invoice        = savePosInvoice  ;
 
 		//local
 		this.taxes_map   = new Map();
@@ -101,7 +103,7 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 
 
 
-		this.wrapper.append('<div id="tabs"    class="rowBox"><div id="tabs_container" class="rowBox"></div></div>')
+		this.wrapper.append('<div id="tabs"    class="rowBox"><div id="tabs_container" class="rowBox" style="overflow-x:auto;overflow-y:hidden;" ></div></div>')
 		this.wrapper.append('<div id="CartBox" class="columnBox"></div>')
 
 
@@ -387,7 +389,7 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 
 
 	createNewTab(){
-			if(this.tabs_container.find('div.tab').length >= 7){
+			if(this.tabs_container.find('div.tab').length >= 15){
 				return;
 			}
 			this.counter += 1 ;
@@ -608,10 +610,12 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 			this.resetItemRateBaseOnPriceList()
 			//update the UI
 			this.refreshSelectedItem()
+			this.save_pos_invoice()
 		})
 
 		this.customerInput.on('input' , (event)=>{
 			this.selected_item_maps.get(this.selected_tab.tabName).customer = event.target.value;
+			this.save_pos_invoice()
 		})
 	}
 

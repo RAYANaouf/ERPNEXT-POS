@@ -335,7 +335,8 @@
           this.onKeyPressed(action, key);
         },
         this.createNewTab.bind(this),
-        this.onCheckout.bind(this)
+        this.onCheckout.bind(this),
+        this.savePosInvoice.bind(this)
       );
     }
     init_item_details() {
@@ -456,6 +457,7 @@
       this.debt_cart.showCart();
     }
     savePosInvoice(saveWithZeroRate) {
+      console.log("saving...");
       if (this.checkIfRateZero(this.selectedItemMaps.get(this.selectedTab.tabName)) && !saveWithZeroRate) {
         frappe.throw("Item with rate equal 0");
         return;
@@ -1471,7 +1473,7 @@
 
   // ../pos_ar/pos_ar/pos_ar/page/pos/pos_selected_item_cart.js
   pos_ar.PointOfSale.pos_selected_item_cart = class {
-    constructor(wrapper, settingsData, selectedItemMaps, priceLists, customerList, brandList, salesTaxes, invoiceData, selectedTab, selectedItem, selectedField, getItemPrice, onSelectedItemClick, onTabClick, onKeyPressed, createNewTab, onCheckoutClick) {
+    constructor(wrapper, settingsData, selectedItemMaps, priceLists, customerList, brandList, salesTaxes, invoiceData, selectedTab, selectedItem, selectedField, getItemPrice, onSelectedItemClick, onTabClick, onKeyPressed, createNewTab, onCheckoutClick, savePosInvoice) {
       this.wrapper = wrapper;
       this.settings_data = settingsData;
       this.selected_item_maps = selectedItemMaps;
@@ -1489,6 +1491,7 @@
       this.on_selected_item_click = onSelectedItemClick;
       this.on_tab_click = onTabClick;
       this.create_new_tab = createNewTab;
+      this.save_pos_invoice = savePosInvoice;
       this.taxes_map = /* @__PURE__ */ new Map();
       this.total_tax_amout = 0;
       this.counter = 1;
@@ -1517,7 +1520,7 @@
         btnStyle = "height:45px;padding:4px;background:#f5f5f5;border:1px solid #a0a0a0;color:black;font-size:small;text-align:center;display:flex;justify-content:center;align-items:center;";
         checkoutBtn = "width:100%;height:55px;color:#FFFFFF;font-size:19px;font-weight:600;background:#9B5788;border:none;border-top:4px solid #663959;border-radius:0px;outline:none;";
       }
-      this.wrapper.append('<div id="tabs"    class="rowBox"><div id="tabs_container" class="rowBox"></div></div>');
+      this.wrapper.append('<div id="tabs"    class="rowBox"><div id="tabs_container" class="rowBox" style="overflow-x:auto;overflow-y:hidden;" ></div></div>');
       this.wrapper.append('<div id="CartBox" class="columnBox"></div>');
       this.tabs_bar = this.wrapper.find("#tabs");
       this.tabs_container = this.tabs_bar.find("#tabs_container");
@@ -1709,7 +1712,7 @@
       this.selectedItemContainer.scrollTop(this.selectedItemContainer[0].scrollHeight);
     }
     createNewTab() {
-      if (this.tabs_container.find("div.tab").length >= 7) {
+      if (this.tabs_container.find("div.tab").length >= 15) {
         return;
       }
       this.counter += 1;
@@ -1868,9 +1871,11 @@
         this.selected_item_maps.get(this.selected_tab.tabName).priceList = event2.target.value;
         this.resetItemRateBaseOnPriceList();
         this.refreshSelectedItem();
+        this.save_pos_invoice();
       });
       this.customerInput.on("input", (event2) => {
         this.selected_item_maps.get(this.selected_tab.tabName).customer = event2.target.value;
+        this.save_pos_invoice();
       });
     }
     calculateNetTotal() {
@@ -4221,4 +4226,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.YHUZWMTT.js.map
+//# sourceMappingURL=pos.bundle.KPEG23VZ.js.map

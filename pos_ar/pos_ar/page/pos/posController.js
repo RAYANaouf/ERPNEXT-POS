@@ -382,7 +382,8 @@ pos_ar.PointOfSale.Controller = class {
 										this.onKeyPressed(action , key)
 									},
 									this.createNewTab.bind(this),
-									this.onCheckout.bind(this)
+									this.onCheckout.bind(this),
+									this.savePosInvoice.bind(this)
 								)
 	}
 
@@ -546,6 +547,7 @@ pos_ar.PointOfSale.Controller = class {
 	}
 
 	savePosInvoice(saveWithZeroRate){
+		console.log("saving...")
 		if(this.checkIfRateZero(this.selectedItemMaps.get(this.selectedTab.tabName)) && !saveWithZeroRate){
 			frappe.throw("Item with rate equal 0")
 			return ;
