@@ -337,10 +337,18 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 			//quantity
 			itemQuantity.textContent = item.qty
 			itemQuantity.classList.add("itemQuantity");
+			itemQuantity.style.fontSize   = "18px"
+			itemQuantity.style.fontWeight = "600"
 			rightGroup.appendChild(itemQuantity);
 			//price
 			itemPrice.textContent = (item.rate - item.discount_amount) + " DA"
 			itemPrice.classList.add("itemPrice");
+			itemPrice.style.fontSize   = "18px"
+			itemPrice.style.fontWeight = "600"
+			itemPrice.style.width      = "90px"
+			itemPrice.style.display    = "flex"
+			itemPrice.style.flexDirection = "row-reverse"
+
 			rightGroup.appendChild(itemPrice);
 
 			//leftGroup

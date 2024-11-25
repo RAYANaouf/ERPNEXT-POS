@@ -1647,9 +1647,16 @@
         leftGroup.appendChild(itemName);
         itemQuantity.textContent = item.qty;
         itemQuantity.classList.add("itemQuantity");
+        itemQuantity.style.fontSize = "18px";
+        itemQuantity.style.fontWeight = "600";
         rightGroup.appendChild(itemQuantity);
         itemPrice2.textContent = item.rate - item.discount_amount + " DA";
         itemPrice2.classList.add("itemPrice");
+        itemPrice2.style.fontSize = "18px";
+        itemPrice2.style.fontWeight = "600";
+        itemPrice2.style.width = "90px";
+        itemPrice2.style.display = "flex";
+        itemPrice2.style.flexDirection = "row-reverse";
         rightGroup.appendChild(itemPrice2);
         leftGroup.classList.add("rowBox", "align_center", "leftGroup");
         itemElement.appendChild(leftGroup);
@@ -4182,4 +4189,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.7UWZ5RP3.js.map
+//# sourceMappingURL=pos.bundle.IKFYIYRU.js.map
