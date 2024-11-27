@@ -462,7 +462,7 @@ pos_ar.PointOfSale.pos_history = class {
 				'<div style="display:flex; flex-direction:column;">'+
 					'<div id="logContainer"  >'+
 						'<div style="width:20%;"></div>'+
-						'<img src="http://102.220.31.43/private/files/logo.jpg">'+
+						'<img src="/assets/pos_ar/images/logo.jpg">'+
 						'<div style="width:20%;"></div>'+
 					'</div>'+
 					'<div id="company_container">' +
