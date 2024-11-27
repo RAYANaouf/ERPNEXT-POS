@@ -543,9 +543,6 @@ pos_ar.PointOfSale.Controller = class {
 		}
 	}
 
-	onDebtClick(){
-		this.debt_cart.showCart();
-	}
 
 	savePosInvoice(saveWithZeroRate){
 		if(this.checkIfRateZero(this.selectedItemMaps.get(this.selectedTab.tabName)) && !saveWithZeroRate){
@@ -564,6 +561,7 @@ pos_ar.PointOfSale.Controller = class {
 		this.item_selector.hideCart();
 		this.item_details.hide_cart();
 		this.settings_cart.hideCart();
+		this.debt_cart.hideCart();
 		//change displayk
 		this.payment_cart.calculateGrandTotal()
 		this.selected_item_cart.setKeyboardOrientation("landscape");
@@ -581,10 +579,27 @@ pos_ar.PointOfSale.Controller = class {
 		if(this.settings_data.settings.showItemDetails){
 			this.selected_item_cart.hideKeyboard();
 		}
+		this.debt_cart.hideCart();
 		this.settings_cart.hideCart();
 		//change display
 		this.selected_item_cart.setKeyboardOrientation("portrait");
 		this.selected_item_cart.cleanHeighlight();
+	}
+
+
+
+	onDebtClick(){
+		//show
+		this.debt_cart.showCart();
+		this.customer_box.showHomeBar();
+
+		//hide
+		this.item_selector.hideCart();
+		this.selected_item_cart.hideCart();
+		this.item_details.hide_cart();
+		this.settings_cart.hideCart();
+		this.payment_cart.hideCart();
+		this.check_in_out_cart.hideCart();
 	}
 
 	auto_select(item){
@@ -620,6 +635,7 @@ pos_ar.PointOfSale.Controller = class {
 			this.customer_box.hideSyncBar();
 			this.settings_cart.hideCart();
 			this.check_in_out_cart.hideCart();
+			this.debt_cart.hideCart();
 		}
 		else if(menu == 'close_pos'){
 			this.onClosePOS()
@@ -635,6 +651,7 @@ pos_ar.PointOfSale.Controller = class {
 			this.payment_cart.hideCart()  ;
 			this.history_cart.hide_cart() ;
 			this.check_in_out_cart.hideCart();
+			this.debt_cart.hideCart();
 			//hide section
 			this.customer_box.hideSyncBar();
 		}
@@ -650,6 +667,8 @@ pos_ar.PointOfSale.Controller = class {
 			this.payment_cart.hideCart()  ;
 			this.history_cart.hide_cart() ;
 			this.settings_cart.hideCart() ;
+			this.debt_cart.hideCart();
+
 			//hide section
 			this.customer_box.hideSyncBar();
 		}
@@ -667,6 +686,7 @@ pos_ar.PointOfSale.Controller = class {
 		this.item_details.hide_cart()  ;
 		this.history_cart.hide_cart()  ;
 		this.settings_cart.hideCart()  ;
+		this.debt_cart.hideCart();
 		this.check_in_out_cart.hideCart();
 	}
 

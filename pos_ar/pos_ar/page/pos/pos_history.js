@@ -462,7 +462,7 @@ pos_ar.PointOfSale.pos_history = class {
 				'<div style="display:flex; flex-direction:column;">'+
 					'<div id="logContainer"  >'+
 						'<div style="width:20%;"></div>'+
-						'<img src="/assets/pos_ar/images/logo.jpg">'+
+						'<img src="/assets/pos_ar/images/logo.jpg"  id="company_logo">'+
 						'<div style="width:20%;"></div>'+
 					'</div>'+
 					'<div id="company_container">' +
@@ -513,14 +513,22 @@ pos_ar.PointOfSale.pos_history = class {
 
 
 
-
 		// Open a new window and print the HTML content
 		const printWindow = window.open('', '_blank');
 		printWindow.document.write(invoiceHTML);
 		printWindow.document.close();
-		printWindow.focus();
-		printWindow.print();
-		printWindow.close();
+
+
+		const logoImage = printWindow.document.getElementById('company_logo');
+		logoImage.onload = () => {
+			printWindow.focus();
+			printWindow.print();
+			printWindow.close();
+		};
+
+
+
+
         }
 
 }
