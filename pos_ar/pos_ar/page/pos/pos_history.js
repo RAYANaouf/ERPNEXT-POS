@@ -453,7 +453,7 @@ pos_ar.PointOfSale.pos_history = class {
 				'td>div{'+
 					'height:18px; width:100%;'+
 					'font-size:12px;'+
-					'display:flex; justify-content:center; align-items:center;'+
+					'display:flex; justify-content:start; align-items:center;'+
 				'}'+
 				'#footer_message{'+
 					'height:20px;'+
@@ -472,7 +472,7 @@ pos_ar.PointOfSale.pos_history = class {
 					'</div>'+
 					'<div id="top_data_container">'+
 						'<div class="c1">'+
-							`<div class="customer"> Customer : ${pos.customer} </div>`+
+							`<div class="customer" style="font-weight:600;font-size:18px;"> Customer : ${pos.customer} </div>`+
 							`<div class="refrence"> Commande : ${pos.refNum} </div>`+
 						'</div>'+
 						'<div class="c2">'+

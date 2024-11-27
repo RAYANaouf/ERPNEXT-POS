@@ -671,6 +671,8 @@
         this.selectedField.field_name = "rate";
         this.selected_item_cart.makeSelectedButtonHighlighted();
       } else if (action == "discount") {
+      } else if (action == "print") {
+        this.history_cart.print_receipt(this.selectedItemMaps.get(this.selectedTab.tabName));
       } else if (action == "remove") {
         this.deleteItemFromPOsInvoice(this.selectedItem.name);
         this.selected_item_cart.refreshSelectedItem();
@@ -1599,7 +1601,7 @@
       this.buttonsContainer.append(`<button id="key_7"        class="grid-item"  style="${btnStyle}" data-action="7"        > 7         </button>`);
       this.buttonsContainer.append(`<button id="key_8"        class="grid-item"  style="${btnStyle}" data-action="8"        > 8         </button>`);
       this.buttonsContainer.append(`<button id="key_9"        class="grid-item"  style="${btnStyle}" data-action="9"        > 9         </button>`);
-      this.buttonsContainer.append(`<button id="key_discount" class="grid-item"  style="${btnStyle}" data-action="Discount" > Remise    </button>`);
+      this.buttonsContainer.append(`<button id="key_print"    class="grid-item"  style="${btnStyle}" data-action="Print"    > Print     </button>`);
       this.buttonsContainer.append(`<button id="key_point"    class="grid-item"  style="${btnStyle}" data-action="."        > .         </button>`);
       this.buttonsContainer.append(`<button id="key_0"        class="grid-item"  style="${btnStyle}" data-action="0"        > 0         </button>`);
       this.buttonsContainer.append(`<button id="key_delete"   class="grid-item"  style="${btnStyle}" data-action="Delete"   > Supprimer </button>`);
@@ -1779,19 +1781,18 @@
     makeSelectedButtonHighlighted() {
       const quantityButton = this.buttonsContainer.find("#key_quantity");
       const rateButton = this.buttonsContainer.find("#key_rate");
-      const discountButton = this.buttonsContainer.find("#key_discount");
+      const printButton = this.buttonsContainer.find("#key_print");
       if (this.selected_field.field_name == "quantity") {
         quantityButton.addClass("selected");
         rateButton.removeClass("selected");
-        discountButton.removeClass("selected");
+        printButton.removeClass("selected");
       } else if (this.selected_field.field_name == "rate") {
         quantityButton.removeClass("selected");
         rateButton.addClass("selected");
-        discountButton.removeClass("selected");
+        printButton.removeClass("selected");
       } else if (this.selected_field.field_name == "discount_percentage") {
         quantityButton.removeClass("selected");
         rateButton.removeClass("selected");
-        discountButton.addClass("selected");
       } else {
         quantityButton.removeClass("selected");
         rateButton.removeClass("selected");
@@ -1818,12 +1819,12 @@
       const key_8 = this.buttonsContainer.find("#key_8");
       const key_9 = this.buttonsContainer.find("#key_9");
       const key_quantity = this.buttonsContainer.find("#key_quantity");
-      const key_discount = this.buttonsContainer.find("#key_discount");
+      const key_print = this.buttonsContainer.find("#key_print");
       const key_rate = this.buttonsContainer.find("#key_rate");
       const key_remove = this.buttonsContainer.find("#key_remove");
       const key_delete = this.buttonsContainer.find("#key_delete");
       const key_point = this.buttonsContainer.find("#key_point");
-      let keys = [key_0, key_1, key_2, key_3, key_4, key_5, key_6, key_7, key_8, key_9, key_quantity, key_discount, key_rate, key_remove, key_delete, key_point];
+      let keys = [key_0, key_1, key_2, key_3, key_4, key_5, key_6, key_7, key_8, key_9, key_quantity, key_print, key_rate, key_remove, key_delete, key_point];
       keys.forEach((key) => {
         key.on("mousedown", (event2) => {
           event2.preventDefault();
@@ -1838,6 +1839,8 @@
             this.on_key_pressed("rate", null);
           } else if (keyContent == "Discount" && this.settings_data.settings.showDiscountField) {
             this.on_key_pressed("discount", null);
+          } else if (keyContent == "Print") {
+            this.on_key_pressed("print", null);
           } else if (keyContent == "Remove") {
             this.on_key_pressed("remove", null);
           } else if (keyContent == "Delete") {
@@ -2815,7 +2818,7 @@
       const creation_time = pos.creation_time;
       const [date, time] = creation_time.split(" ");
       console.log("check the logo : ", this.company.company_logo);
-      let invoiceHTML = `<style>#company_container {width: 100% ; height: 40px ; display:flex; align-items:center; font-size : 12px;}table{width: 100%; margin-top:16px;}tr{width:100%; height:16px;}tr:nth-child(1){}#first_row{border: 5px solid black;}#logContainer{width: 100%;height:80px;display : flex;justify-content:center;}#logContainer img{width:50%; height:100%;}#top_data_container{width:100%;display:flex;}#top_data_container>div.c1{font-size:12px;flex-grow:1;}#top_data_container>div.c2{font-size:12px;flex-grow:1;display:flex;flex-direction:column;align-items:end;}td>div{height:18px; width:100%;font-size:12px;display:flex; justify-content:center; align-items:center;}#footer_message{height:20px;}</style><div style="display:flex; flex-direction:column;"><div id="logContainer"  ><div style="width:20%;"></div><img src="http://makid_store.localhost:8000/files/1661795110-optilance.png"><div style="width:20%;"></div></div><div id="company_container"><div style="flex-grow:1;"></div><p style="margin:0px 25px;">${this.company.company_name}</p><div style="flex-grow:1;"></div></div><div id="top_data_container"><div class="c1"><div class="customer"> Customer : ${pos.customer} </div><div class="refrence"> Commande : ${pos.refNum} </div></div><div class="c2"><div class="date"> ${date}/${time} </div></div></div><table><tr id="first_row" ><th style="boder:1px solid black;">Nom</th><th>Qt\xE9</th><th>Prix</th><th>Value</th>`;
+      let invoiceHTML = `<style>#company_container {width: 100% ; height: 40px ; display:flex; align-items:center; font-size : 12px;}table{width: 100%; margin-top:16px;}tr{width:100%; height:16px;}tr:nth-child(1){}#first_row{border: 5px solid black;}#logContainer{width: 100%;height:80px;display : flex;justify-content:center;}#logContainer img{width:50%; height:100%;}#top_data_container{width:100%;display:flex;}#top_data_container>div.c1{font-size:12px;flex-grow:1;}#top_data_container>div.c2{font-size:12px;flex-grow:1;display:flex;flex-direction:column;align-items:end;}td>div{height:18px; width:100%;font-size:12px;display:flex; justify-content:start; align-items:center;}#footer_message{height:20px;}</style><div style="display:flex; flex-direction:column;"><div id="logContainer"  ><div style="width:20%;"></div><img src="http://makid_store.localhost:8000/files/1661795110-optilance.png"><div style="width:20%;"></div></div><div id="company_container"><div style="flex-grow:1;"></div><p style="margin:0px 25px;">${this.company.company_name}</p><div style="flex-grow:1;"></div></div><div id="top_data_container"><div class="c1"><div class="customer" style="font-weight:600;font-size:18px;"> Customer : ${pos.customer} </div><div class="refrence"> Commande : ${pos.refNum} </div></div><div class="c2"><div class="date"> ${date}/${time} </div></div></div><table><tr id="first_row" ><th style="boder:1px solid black;">Nom</th><th>Qt\xE9</th><th>Prix</th><th>Value</th>`;
       pos.items.forEach((item) => {
         netTotal += item.rate * item.qty;
         invoiceHTML += `<tr > <td ><div >${item.item_name}</div></td>  <td><div>${item.qty}</div></td>  <td><div>${item.rate}</div></td>  <td><div>${item.rate * item.qty}</div></td></tr>`;
@@ -4245,4 +4248,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.RLFJL3UT.js.map
+//# sourceMappingURL=pos.bundle.4LXTUNRA.js.map

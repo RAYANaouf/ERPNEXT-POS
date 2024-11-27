@@ -1,3 +1,4 @@
+
 pos_ar.PointOfSale.Controller = class {
         constructor(wrapper) {
 		//principales variable
@@ -851,6 +852,10 @@ pos_ar.PointOfSale.Controller = class {
 			//this.item_details.requestFocus("rate")
 		}
 		else if(action == "discount"){
+			//this.item_details.requestFocus("discount_percentage")
+		}
+		else if(action == "print"){
+			this.history_cart.print_receipt( this.selectedItemMaps.get(this.selectedTab.tabName) )
 			//this.item_details.requestFocus("discount_percentage")
 		}
 		else if(action == "remove"){
