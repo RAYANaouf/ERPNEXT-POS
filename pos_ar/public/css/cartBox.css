@@ -180,6 +180,10 @@ div.tab img{
         font-weight: 700  !important;
         font-size  : 24px !important;
 }
+#RightSection #CartBox #printBtn:hover{
+        font-weight: 700  !important;
+        font-size  : 24px !important;
+}
 
 
 
@@ -190,8 +194,8 @@ div.tab img{
 }
 
 .grid-item.selected {
-        border       : 2px solid #c0c0c0 !important;
-        background   : #e0e0e0 !important;
+        border       : 2px solid #a0a0a0 !important;
+        background   : #b0b0b0 !important;
 
 }
 

@@ -1,5 +1,4 @@
 
-
 pos_ar.PointOfSale.pos_selected_item_cart = class{
 
 	constructor(
@@ -150,7 +149,7 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 		this.cartFooter    = this.cartBox.find('#cartFooter')
 		this.cartFooter.append('<div id="cartDetails" class="columnBox"></div>')
 		this.cartFooter.append(`<div id="editSelectedItemCart" style="${containerBoxStyle}"></div>`)
-		this.cartFooter.append(`<button class="posBtn1" type="button" id="checkoutBtn" style="${checkoutBtn}"> Payment </button>`)
+		this.cartFooter.append(`<div id="mainBtnContainer" class="rowBox centerItem"  style="${checkoutBtn}">  </div>`)
 
 		this.cartDetails   = this.cartFooter.find('#cartDetails')
 
@@ -211,16 +210,25 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 		this.buttonsContainer.append(`<button id="key_7"        class="grid-item"  style="${btnStyle}" data-action="7"        > 7         </button>`)
 		this.buttonsContainer.append(`<button id="key_8"        class="grid-item"  style="${btnStyle}" data-action="8"        > 8         </button>`)
 		this.buttonsContainer.append(`<button id="key_9"        class="grid-item"  style="${btnStyle}" data-action="9"        > 9         </button>`)
-		this.buttonsContainer.append(`<button id="key_print"    class="grid-item"  style="${btnStyle}" data-action="Print"    > Print     </button>`)
+		this.buttonsContainer.append(`<button id="key_discount" class="grid-item"  style="${btnStyle}" data-action="Discount" > Remise    </button>`)
 		this.buttonsContainer.append(`<button id="key_point"    class="grid-item"  style="${btnStyle}" data-action="."        > .         </button>`)
 		this.buttonsContainer.append(`<button id="key_0"        class="grid-item"  style="${btnStyle}" data-action="0"        > 0         </button>`)
 		this.buttonsContainer.append(`<button id="key_delete"   class="grid-item"  style="${btnStyle}" data-action="Delete"   > Supprimer </button>`)
 		this.buttonsContainer.append(`<button id="key_remove"   class="grid-item"  style="${btnStyle}color:red;font-weight:700;" data-action="Remove">Retirer</button>`)
 
-		this.checkoutBtn = this.cartFooter.find('#checkoutBtn')
-		this.checkoutBtn.on('mousedown' , event =>{
+		this.mainBtnContainer = this.cartFooter.find('#mainBtnContainer')
+
+		this.mainBtnContainer.append(`<button type="button" id="checkoutBtn" style="width:50%;background:none;border:none;color:white;"> Payment </button>`)
+		this.mainBtnContainer.append(`<button type="button" id="printBtn"    style="width:50%;background:none;border:none;color:white;"> Print </button>`)
+
+
+		this.mainBtnContainer.find("#checkoutBtn").on('mousedown' , event =>{
 			this.on_checkout_click();
 		})
+		this.mainBtnContainer.find("#printBtn").on('mousedown' , event =>{
+			this.on_key_pressed( "print" , null);
+		})
+
 	}
 
 	fulfillingSelects(){
@@ -469,21 +477,22 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 	makeSelectedButtonHighlighted(){
 		const quantityButton = this.buttonsContainer.find('#key_quantity')
 		const rateButton     = this.buttonsContainer.find('#key_rate')
-		const printButton    = this.buttonsContainer.find('#key_print')
+		const discountButton = this.buttonsContainer.find('#key_discount')
 
 		if(this.selected_field.field_name == "quantity"){
 			quantityButton.addClass('selected')
 			rateButton.removeClass('selected')
-			printButton.removeClass('selected')
+			discountButton.removeClass('selected')
 		}
 		else if(this.selected_field.field_name == "rate"){
 			quantityButton.removeClass('selected')
 			rateButton.addClass('selected')
-			printButton.removeClass('selected')
+			discountButton.removeClass('selected')
 		}
 		else if(this.selected_field.field_name == "discount_percentage"){
 			quantityButton.removeClass('selected')
 			rateButton.removeClass('selected')
+			discountButton.addClass('selected')
 		}
 		else{
 			quantityButton.removeClass('selected')
@@ -518,13 +527,13 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 		const key_8        = this.buttonsContainer.find('#key_8')
 		const key_9        = this.buttonsContainer.find('#key_9')
 		const key_quantity = this.buttonsContainer.find('#key_quantity')
-		const key_print    = this.buttonsContainer.find('#key_print')
+		const key_discount = this.buttonsContainer.find('#key_discount')
 		const key_rate     = this.buttonsContainer.find('#key_rate')
 		const key_remove   = this.buttonsContainer.find('#key_remove')
 		const key_delete   = this.buttonsContainer.find('#key_delete')
 		const key_point    = this.buttonsContainer.find('#key_point')
 
-		let keys = [key_0 , key_1 , key_2 , key_3 , key_4 , key_5 , key_6 , key_7 , key_8 , key_9 , key_quantity , key_print , key_rate , key_remove , key_delete , key_point]
+		let keys = [key_0 , key_1 , key_2 , key_3 , key_4 , key_5 , key_6 , key_7 , key_8 , key_9 , key_quantity , key_discount , key_rate , key_remove , key_delete , key_point]
 
 
 		keys.forEach(key =>{
@@ -546,9 +555,6 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 				}
 				else if(keyContent == "Discount" && this.settings_data.settings.showDiscountField){
 					this.on_key_pressed( "discount" , null)
-				}
-				else if(keyContent == "Print"){
-					this.on_key_pressed( "print" , null)
 				}
 				else if(keyContent == "Remove"){
 					this.on_key_pressed( "remove" , null)
