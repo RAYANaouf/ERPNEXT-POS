@@ -548,7 +548,6 @@ pos_ar.PointOfSale.Controller = class {
 	}
 
 	savePosInvoice(saveWithZeroRate){
-		console.log("saving...")
 		if(this.checkIfRateZero(this.selectedItemMaps.get(this.selectedTab.tabName)) && !saveWithZeroRate){
 			frappe.throw("Item with rate equal 0")
 			return ;
@@ -851,8 +850,13 @@ pos_ar.PointOfSale.Controller = class {
 			this.selected_item_cart.makeSelectedButtonHighlighted();
 			//this.item_details.requestFocus("rate")
 		}
-		else if(action == "discount"){
-			//this.item_details.requestFocus("discount_percentage")
+		else if(action == "minus"){
+			this.syncInput = true
+			const newValue = parseFloat(this.selectedItem.qty) * -1
+			this.selectedItem.qty = parseFloat(newValue);
+			this.editPosItemQty(this.selectedItem.name , this.selectedItem.qty);
+			//redrawing
+			this.selected_item_cart.refreshSelectedItem();
 		}
 		else if(action == "print"){
 			this.history_cart.print_receipt( this.selectedItemMaps.get(this.selectedTab.tabName) )
@@ -1317,7 +1321,7 @@ pos_ar.PointOfSale.Controller = class {
 						this.item_details.refreshDate(this.selectedItem);
 					}
 				}else if(this.selectedField.field_name == "quantity"){
-					if(parseFloat(event.key) || event.key == "0"){
+					if(parseFloat(event.key) || event.key == "0" ){
 						let lastValue = 0
 						if(!this.syncInput){
 							lastValue      = 0
@@ -1326,6 +1330,13 @@ pos_ar.PointOfSale.Controller = class {
 							lastValue = parseFloat(this.selectedItem.qty)
 						}
 						const newValue  = `${lastValue}` + event.key
+						this.selectedItem.qty = parseFloat(newValue);
+						this.editPosItemQty(this.selectedItem.name , this.selectedItem.qty);
+						//redrawing
+						this.selected_item_cart.refreshSelectedItem();
+					}else if(event.key == "-"){
+						this.syncInput = true
+						const newValue = parseFloat(this.selectedItem.qty) * -1
 						this.selectedItem.qty = parseFloat(newValue);
 						this.editPosItemQty(this.selectedItem.name , this.selectedItem.qty);
 						//redrawing
