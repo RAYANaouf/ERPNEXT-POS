@@ -218,8 +218,8 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 
 		this.mainBtnContainer = this.cartFooter.find('#mainBtnContainer')
 
-		this.mainBtnContainer.append(`<button type="button" id="checkoutBtn" style="width:50%;background:none;border:none;color:white;"> Payment </button>`)
-		this.mainBtnContainer.append(`<button type="button" id="printBtn"    style="width:50%;background:none;border:none;color:white;"> Print </button>`)
+		this.mainBtnContainer.append(`<button type="button" id="checkoutBtn" style="width:50%;height:100%;background:none;border:none;color:white;"> Payment </button>`)
+		this.mainBtnContainer.append(`<button type="button" id="printBtn"    style="width:50%;height:100%;background:#DF482D;border:none;border-left:1px solid #663959;color:white;"> Print </button>`)
 
 
 		this.mainBtnContainer.find("#checkoutBtn").on('mousedown' , event =>{

@@ -1608,8 +1608,8 @@
       this.buttonsContainer.append(`<button id="key_delete"   class="grid-item"  style="${btnStyle}" data-action="Delete"   > Supprimer </button>`);
       this.buttonsContainer.append(`<button id="key_remove"   class="grid-item"  style="${btnStyle}color:red;font-weight:700;" data-action="Remove">Retirer</button>`);
       this.mainBtnContainer = this.cartFooter.find("#mainBtnContainer");
-      this.mainBtnContainer.append(`<button type="button" id="checkoutBtn" style="width:50%;background:none;border:none;color:white;"> Payment </button>`);
-      this.mainBtnContainer.append(`<button type="button" id="printBtn"    style="width:50%;background:none;border:none;color:white;"> Print </button>`);
+      this.mainBtnContainer.append(`<button type="button" id="checkoutBtn" style="width:50%;height:100%;background:none;border:none;color:white;"> Payment </button>`);
+      this.mainBtnContainer.append(`<button type="button" id="printBtn"    style="width:50%;height:100%;background:#DF482D;border:none;border-left:1px solid #663959;color:white;"> Print </button>`);
       this.mainBtnContainer.find("#checkoutBtn").on("mousedown", (event2) => {
         this.on_checkout_click();
       });
@@ -4253,4 +4253,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.EHHPTRHE.js.map
+//# sourceMappingURL=pos.bundle.Y7PCEUMT.js.map
