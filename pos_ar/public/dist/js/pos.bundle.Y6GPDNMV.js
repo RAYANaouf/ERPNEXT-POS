@@ -4076,7 +4076,8 @@
         return await frappe.db.get_list("Customer", {
           fields: ["name", "customer_name"],
           filters: filter,
-          limit: 1e5
+          limit: 1e5,
+          order_by: "customer_name ASC"
         });
       } catch (error) {
         console.error("Error fetching customers:", error);
@@ -4102,7 +4103,8 @@
         return await frappe.db.get_list("Item Group", {
           fields: ["name", "item_group_name", "parent_item_group", "is_group"],
           filters: filter,
-          limit: 1e5
+          limit: 1e5,
+          order_by: "item_group_name ASC"
         });
       } catch (error) {
         console.error("Error fetching Item Group :", error);
@@ -4115,7 +4117,8 @@
         return await frappe.db.get_list("Item", {
           fields: ["name", "item_name", "image", "brand", "item_group", "description", "stock_uom", "barcodes"],
           filters: filter,
-          limit: 1e5
+          limit: 1e5,
+          order_by: "item_name ASC"
         });
       } catch (error) {
         console.error("Error fetching Item Group :", error);
@@ -4277,4 +4280,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.J4SOR5VP.js.map
+//# sourceMappingURL=pos.bundle.Y6GPDNMV.js.map
