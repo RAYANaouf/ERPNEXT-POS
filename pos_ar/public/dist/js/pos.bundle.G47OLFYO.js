@@ -4311,11 +4311,13 @@
       this.wrapper = wrapper;
       this.app_data = appData;
       this.selected_client = {};
+      this.payment_amount = 0;
       this.start_work();
     }
     start_work() {
       this.prepare_cart();
       this.refreshClientPart();
+      this.setListener();
     }
     prepare_cart() {
       this.wrapper.find("#LeftSection").append('<div id="debtLeftContainer" class="columnBox"  ></div>');
@@ -4325,10 +4327,11 @@
       const headerStyle = "height:55px;padding:0px 16px;";
       const listStyle = "flex-grow:1;width:100%;margin:0px 16px;";
       const debtListStyle = "width:100%;height:100%;margin:16px;height:100%;";
+      const inputStyle = "width:40%;margin: 0px 16px;";
       this.rightContainer.append(`<div class="rowBox centerItem"  style="${headerStyle}" ><input type="text" id="searchBar" placeholder="Search..." style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;"></div>`);
       this.rightContainer.append(`<div id="debt_customerList" class="columnBox" style="${listStyle}"></div>`);
       this.customerList = this.rightContainer.find("#debt_customerList");
-      this.leftContainer.append(`<div id="debt_debtsList"  class="columnBox" style="${debtListStyle}"></div>`);
+      this.leftContainer.append(`<div class="rowBox C_A_Center" style="margin:16px;" ><div> Amount </div><input id="debt_paymentAmount" type="number" style="${inputStyle}"></input></div>`);
       this.leftContainer.append(`<div id="debt_debtsList"  class="columnBox" style="${debtListStyle}"></div>`);
       this.debtList = this.leftContainer.find("#debt_debtsList");
     }
@@ -4342,6 +4345,11 @@
       this.leftContainer.css("display", "none");
       this.rightContainer.css("display", "none");
     }
+    setListener() {
+      this.leftContainer.find("#debt_paymentAmount").on("input", (event2) => {
+        this.payment_amount = parseFloat(this.leftContainer.find("#debt_paymentAmount").val());
+      });
+    }
     refreshClientPart() {
       const customerStyle = "height:35px;width:calc(100% - 32px);";
       this.customerList.html("");
@@ -4351,7 +4359,6 @@
           $(".customerBox").removeClass("selected");
           customerBox.addClass("selected");
           this.selected_client = structuredClone(customer);
-          console.log("passing +==>  ", this.selected_client);
           this.refreshClientDebtPart(customer);
         });
         this.customerList.append(customerBox);
@@ -4379,11 +4386,14 @@
       });
     }
     async payPosInvoice(invoice) {
-      const outstandingAmount = invoice.outstanding_amount;
-      const paymentAmount = 1e3;
-      const result = await this.app_data.update_invoice_payment(invoice.name, 1e3);
+      const paymentAmount = this.payment_amount;
+      this.payment_amount -= invoice.outstanding_amount;
+      const result = await this.app_data.update_invoice_payment(invoice.name, paymentAmount);
+      console.log("rest : ", result);
+      this.payment_amount = result.remaining;
+      this.leftContainer.find("#debt_paymentAmount").val(result.remaining);
       this.refreshClientDebtPart(this.selected_client);
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.MKY7BZU6.js.map
+//# sourceMappingURL=pos.bundle.G47OLFYO.js.map

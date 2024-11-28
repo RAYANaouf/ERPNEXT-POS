@@ -10,13 +10,14 @@ pos_ar.PointOfSale.pos_debt_cart = class{
 
 		//local vars
 		this.selected_client = {}
+		this.payment_amount = 0
 		this.start_work()
 	}
 
 	start_work(){
 		this.prepare_cart()
 		this.refreshClientPart()
-
+		this.setListener()
 	}
 
 	prepare_cart(){
@@ -29,7 +30,7 @@ pos_ar.PointOfSale.pos_debt_cart = class{
 		const headerStyle     = "height:55px;padding:0px 16px;"
 		const listStyle       = "flex-grow:1;width:100%;margin:0px 16px;"
 		const debtListStyle   = "width:100%;height:100%;margin:16px;height:100%;"
-
+		const inputStyle      = "width:40%;margin: 0px 16px;"
 		//customer part
 		this.rightContainer.append(`<div class="rowBox centerItem"  style="${headerStyle}" ><input type="text" id="searchBar" placeholder="Search..." style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;"></div>`)
 		this.rightContainer.append(`<div id="debt_customerList" class="columnBox" style="${listStyle}"></div>`)
@@ -37,7 +38,7 @@ pos_ar.PointOfSale.pos_debt_cart = class{
 		this.customerList = this.rightContainer.find('#debt_customerList')
 
 		//debts part
-		this.leftContainer.append(`<div id="debt_debtsList"  class="columnBox" style="${debtListStyle}"></div>`)
+		this.leftContainer.append(`<div class="rowBox C_A_Center" style="margin:16px;" ><div> Amount </div><input id="debt_paymentAmount" type="number" style="${inputStyle}"></input></div>`)
 		this.leftContainer.append(`<div id="debt_debtsList"  class="columnBox" style="${debtListStyle}"></div>`)
 		this.debtList     = this.leftContainer.find('#debt_debtsList')
 	}
@@ -50,6 +51,12 @@ pos_ar.PointOfSale.pos_debt_cart = class{
 		console.log("hiding ...")
 		this.leftContainer.css('display' , 'none')
 		this.rightContainer.css('display' , 'none')
+	}
+
+	setListener(){
+		this.leftContainer.find("#debt_paymentAmount").on('input',event =>{
+			this.payment_amount = parseFloat(this.leftContainer.find("#debt_paymentAmount").val())
+		})
 	}
 
 	refreshClientPart(){
@@ -67,7 +74,6 @@ pos_ar.PointOfSale.pos_debt_cart = class{
 				customerBox.addClass('selected');
 				// Update the selected customer
 				this.selected_client = structuredClone(customer)
-				console.log("passing +==>  " , this.selected_client)
 				this.refreshClientDebtPart(customer)
         		});
 			this.customerList.append(customerBox)
@@ -108,15 +114,17 @@ pos_ar.PointOfSale.pos_debt_cart = class{
 
 	async payPosInvoice(invoice){
 
-		// Get the current outstanding amount for the invoice
-		const outstandingAmount = invoice.outstanding_amount;
-
 		// The amount to be paid (could be dynamic based on user input, here we assume 1000 DA as example)
-		const paymentAmount = 1000;
+		const paymentAmount = this.payment_amount;
+		this.payment_amount -= invoice.outstanding_amount;
 
 
 		// Call the server method to update the invoice payment
-		const result = await this.app_data.update_invoice_payment(invoice.name, 1000);
+		const result = await this.app_data.update_invoice_payment(invoice.name, paymentAmount);
+
+		console.log("rest : " , result)
+		this.payment_amount = result.remaining
+		this.leftContainer.find("#debt_paymentAmount").val(result.remaining)
 
 		this.refreshClientDebtPart(this.selected_client)
 	}
