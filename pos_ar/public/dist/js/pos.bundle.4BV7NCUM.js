@@ -45,13 +45,15 @@
         this.appData = new pos_ar.PointOfSale.posAppData(this.db, this.dataHandler);
         await this.appData.getAllData();
         this.toggleKeyboardMode(!this.settings_data.settings.showItemDetails);
-        console.log("see app data : ", this.appData.appData);
+        console.log("see app data : ", this.appData.appData, "opened pos : ", await this.appData.getAllOpenedPosInvoice());
         this.prepare_container();
         await this.prepare_app_data();
         await this.checkForPOSEntry();
         await this.prepare_components();
         this.checkUnSyncedPos();
         this.setListeners();
+        const openedPos = await this.appData.getAllOpenedPosInvoice();
+        this.restorePosInvoices(openedPos);
       } catch (err) {
         console.error("halfware POS Err ==> ", err);
       }
@@ -74,6 +76,7 @@
         new_pos_invoice.docstatus = 0;
         new_pos_invoice.status = "Draft";
         new_pos_invoice.priceList = this.defaultPriceList.name;
+        new_pos_invoice.opened = 1;
         const date = new Date();
         const [year, month, day] = date.toISOString().split("T")[0].split("-");
         const hour = date.getHours();
@@ -336,7 +339,8 @@
         },
         this.createNewTab.bind(this),
         this.onCheckout.bind(this),
-        this.savePosInvoice.bind(this)
+        this.savePosInvoice.bind(this),
+        this.db
       );
     }
     init_item_details() {
@@ -577,6 +581,22 @@
       });
       return result;
     }
+    restorePosInvoices(posInvoices) {
+      posInvoices.forEach((pos) => {
+        const tab = this.selected_item_cart.createTabForEditPOS();
+        this.selectedItemMaps.set(`C${tab}`, pos);
+        this.selectedTab.tabName = `C${tab}`;
+        this.item_selector.showCart();
+        this.customer_box.showHomeBar();
+        this.selected_item_cart.showCart();
+        this.item_details.hide_cart();
+        this.payment_cart.hideCart();
+        this.history_cart.hide_cart();
+        this.settings_cart.hideCart();
+        this.selected_item_cart.refreshTabs();
+        this.selected_item_cart.refreshSelectedItem();
+      });
+    }
     createNewTab(counter) {
       let new_pos_invoice = frappe.model.get_new_doc("POS Invoice");
       new_pos_invoice.customer = this.defaultCustomer.name;
@@ -594,6 +614,7 @@
       new_pos_invoice.synced = false;
       new_pos_invoice.status = "Draft";
       new_pos_invoice.priceList = this.defaultPriceList.name;
+      new_pos_invoice.opened = 1;
       const date = new Date();
       const [year, month, day] = date.toISOString().split("T")[0].split("-");
       const hour = date.getHours();
@@ -838,6 +859,7 @@
         frappe.db.insert(
           pos
         ).then((r) => {
+          pos.opened = 0;
           this.appData.updatePosInvoice(pos);
           this.history_cart.print_receipt(pos);
           this.selectedItemMaps.delete(this.selectedTab.tabName);
@@ -866,6 +888,7 @@
         }
         this.onClose_payment_cart();
         pos.synced = false;
+        pos.opened = 0;
         this.appData.updatePosInvoice(pos);
         this.unsyncedPos += 1;
         this.customer_box.setNotSynced(this.unsyncedPos);
@@ -1513,7 +1536,7 @@
 
   // ../pos_ar/pos_ar/pos_ar/page/pos/pos_selected_item_cart.js
   pos_ar.PointOfSale.pos_selected_item_cart = class {
-    constructor(wrapper, settingsData, selectedItemMaps, priceLists, customerList, brandList, salesTaxes, invoiceData, selectedTab, selectedItem, selectedField, getItemPrice, onSelectedItemClick, onTabClick, onKeyPressed, createNewTab, onCheckoutClick, savePosInvoice) {
+    constructor(wrapper, settingsData, selectedItemMaps, priceLists, customerList, brandList, salesTaxes, invoiceData, selectedTab, selectedItem, selectedField, getItemPrice, onSelectedItemClick, onTabClick, onKeyPressed, createNewTab, onCheckoutClick, savePosInvoice, db) {
       this.wrapper = wrapper;
       this.settings_data = settingsData;
       this.selected_item_maps = selectedItemMaps;
@@ -1532,6 +1555,8 @@
       this.on_tab_click = onTabClick;
       this.create_new_tab = createNewTab;
       this.save_pos_invoice = savePosInvoice;
+      this.db = db;
+      console.log("check the db : ", this.db);
       this.taxes_map = /* @__PURE__ */ new Map();
       this.total_tax_amout = 0;
       this.counter = 1;
@@ -1553,12 +1578,12 @@
         containerBoxStyle = "margin:0px 16px;padding:0px 0px 16px 0px;";
         containerStyle = "width:100%;display:grid;grid-template-columns:auto auto auto auto;";
         btnStyle = "height:45px;padding:4px;margin:6px;background:#f5f5f5;border:2px solid #e0e0e0;border-radius:12px;color:black;font-size:small;text-align:center;display:flex;justify-content:center;align-items:center;";
-        checkoutBtn = "width:calc(100% - 32px);margin:0px 16px 16px 16px;padding : 8px 0px ;color:#FFFFFF;font-size:larger;font-weight:600;background:#9B5788;border:3px solid #663959;border-radius:8px;outline:none;";
+        checkoutBtn = "width:calc(100% - 32px);margin:0px 16px 16px 16px;padding : 8px 0px ;color:#FFFFFF;font-size:larger;font-weight:600;background:#44A292;border:3px solid #2D6B61;border-radius:8px;outline:none;";
       } else {
         containerBoxStyle = "width:100%;";
         containerStyle = "width:100%;border-top:1px solid #a0a0a0;border-bottom:1px solid #a0a0a0;display:grid;grid-template-columns:auto auto auto auto;";
         btnStyle = "height:45px;padding:4px;background:#f5f5f5;border:1px solid #a0a0a0;color:black;font-size:small;text-align:center;display:flex;justify-content:center;align-items:center;";
-        checkoutBtn = "width:100%;height:55px;color:#FFFFFF;font-size:19px;font-weight:600;background:#9B5788;border:none;border-top:4px solid #663959;border-radius:0px;outline:none;";
+        checkoutBtn = "width:100%;height:55px;color:#FFFFFF;font-size:19px;font-weight:600;background:#44A292;border:none;border-top:4px solid #2D6B61;border-radius:0px;outline:none;";
       }
       this.wrapper.append('<div id="tabs"    class="rowBox"><div id="tabs_container" class="rowBox" style="overflow-x:auto;overflow-y:hidden;" ></div></div>');
       this.wrapper.append('<div id="CartBox" class="columnBox"></div>');
@@ -1646,7 +1671,7 @@
       this.buttonsContainer.append(`<button id="key_remove"   class="grid-item"  style="${btnStyle}color:red;font-weight:700;" data-action="Remove">Retirer</button>`);
       this.mainBtnContainer = this.cartFooter.find("#mainBtnContainer");
       this.mainBtnContainer.append(`<button type="button" id="checkoutBtn" style="width:50%;height:100%;background:none;border:none;border-right:2px solid #663959;color:white;"> Payment </button>`);
-      this.mainBtnContainer.append(`<button type="button" id="printBtn"    style="width:50%;height:100%;background:#DF482D;border:none;border-left:2px solid #663959;color:white;"> Print </button>`);
+      this.mainBtnContainer.append(`<button type="button" id="printBtn"    style="width:50%;height:100%;background:#E1472B;border:none;border-left:2px solid #2D6B61;color:white;"> Print </button>`);
       this.mainBtnContainer.find("#checkoutBtn").on("mousedown", (event2) => {
         this.on_checkout_click();
       });
@@ -1686,6 +1711,8 @@
           frappe.confirm(
             "Are you sure you want to proceed?",
             () => {
+              console.log("see here : ", this.selected_item_maps.get(clickedTab));
+              this.db.deletePosInvoice(this.selected_item_maps.get(clickedTab).name);
               this.selected_item_maps.delete(clickedTab);
               if (this.selected_item_maps.size > 0) {
                 this.selected_tab.tabName = Array.from(this.selected_item_maps.keys())[0];
@@ -1777,6 +1804,12 @@
       this.selectedItemContainer.scrollTop(this.selectedItemContainer[0].scrollHeight);
     }
     createNewTab() {
+      this.counter += 1;
+      this.create_new_tab(this.counter);
+      this.refreshTabs();
+      this.refreshSelectedItem();
+    }
+    restorePos(pos) {
       this.counter += 1;
       this.create_new_tab(this.counter);
       this.refreshTabs();
@@ -1893,18 +1926,6 @@
     setListener() {
       this.add_tab_button.on("mousedown", (event2) => {
         this.createNewTab();
-      });
-      this.tabs_container.find(".tabDeleteBtn").on("click", (event2) => {
-        event2.stopPropagation();
-        const clickedTab = $(event2.target).closest(".tab").find(".tabName").text();
-        this.selected_item_maps.delete(clickedTab);
-        if (this.selected_item_maps.size > 0) {
-          this.selected_tab.tabName = Array.from(this.selected_item_maps.keys())[0];
-        } else {
-          this.createNewTab();
-        }
-        this.refreshTabs();
-        this.refreshSelectedItem();
       });
       this.discountInput.on("input", (event2) => {
         if (event2.target.value == "") {
@@ -2935,6 +2956,7 @@
           if (!db.objectStoreNames.contains("POS Invoice")) {
             const posInvoiceStore = db.createObjectStore("POS Invoice", { keyPath: "name" });
             posInvoiceStore.createIndex("docstatus", "docstatus", { unique: false });
+            posInvoiceStore.createIndex("opened", "opened", { unique: false });
           }
           if (!db.objectStoreNames.contains("check_in_out")) {
             db.createObjectStore("check_in_out", { keyPath: "name" });
@@ -3271,6 +3293,20 @@
         };
       });
     }
+    getAllOpenedPosInvoice() {
+      return new Promise((resolve, reject) => {
+        const transaction = this.db.transaction(["POS Invoice"], "readwrite");
+        const store = transaction.objectStore("POS Invoice");
+        const result = store.getAll();
+        result.onsuccess = (event2) => {
+          const value = event2.target.result;
+          resolve(value.filter((pos) => pos.opened == 1));
+        };
+        result.onerror = (err) => {
+          reject(err);
+        };
+      });
+    }
     getAllPosInvoice_callback(onSuccess, onFailure) {
       const transaction = this.db.transaction(["POS Invoice"], "readwrite");
       const store = transaction.objectStore("POS Invoice");
@@ -3324,6 +3360,7 @@
       };
     }
     deletePosInvoice(invoiceName) {
+      console.log("deleting .... ", invoiceName);
       return new Promise((resolve, reject) => {
         const transaction = this.db.transaction(["POS Invoice"], "readwrite");
         const store = transaction.objectStore("POS Invoice");
@@ -4081,6 +4118,9 @@
       console.log("app data : ", invoiceName, "and", amount);
       return await this.api_handler.update_invoice_payment(invoiceName, amount);
     }
+    async getAllOpenedPosInvoice() {
+      return await this.db.getAllOpenedPosInvoice();
+    }
     combineLocalAndUpdated(local, updated) {
       const combinedMap = new Map(local.map((item) => [item.name, item]));
       this.appData.deleted_documents.forEach((deleted) => {
@@ -4410,4 +4450,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.XQNRQDYB.js.map
+//# sourceMappingURL=pos.bundle.4BV7NCUM.js.map

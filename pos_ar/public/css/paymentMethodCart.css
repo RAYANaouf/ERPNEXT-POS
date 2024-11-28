@@ -56,7 +56,7 @@
 	
 }
 .paymentMethodBox .title.selected{
-        color       : #9B5788 ;
+        color       : #2D6B61 ;
         font-size   : 18px    ;
 	font-weight : 600     ; 
 	
@@ -68,7 +68,7 @@
 }
 
 .paymentMethodBox.selected{
-        border : 3px solid #9B5788;	
+        border : 3px solid #2D6B61;	
 }
 
 

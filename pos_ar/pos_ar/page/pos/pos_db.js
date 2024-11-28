@@ -53,6 +53,8 @@ pos_ar.PointOfSale.pos_db  = class POSDatabase {
 				if (!db.objectStoreNames.contains('POS Invoice')) {
 					const posInvoiceStore = db.createObjectStore('POS Invoice', { keyPath : 'name' });
 					posInvoiceStore.createIndex( 'docstatus' , 'docstatus' , {unique : false} )
+					// Optionally, you can add other indexes like for 'opened'
+					posInvoiceStore.createIndex('opened', 'opened', { unique: false });
 				}
 				if (!db.objectStoreNames.contains('check_in_out')) {
 					db.createObjectStore('check_in_out', { keyPath : 'name' });
@@ -515,6 +517,24 @@ pos_ar.PointOfSale.pos_db  = class POSDatabase {
 			}
 		})
 	}
+
+	//async
+	getAllOpenedPosInvoice(){
+		return new Promise((resolve,reject)=>{
+			const transaction = this.db.transaction(['POS Invoice'] , "readwrite");
+			const store       = transaction.objectStore('POS Invoice');
+			const result      = store.getAll()
+			result.onsuccess = (event) => {
+				const value = event.target.result
+				resolve(value.filter(pos => pos.opened == 1));
+			}
+			result.onerror = (err)=>{
+				reject(err)
+			}
+		})
+
+	}
+
 	//callBack version
 	getAllPosInvoice_callback(onSuccess,onFailure){
 		const transaction = this.db.transaction(['POS Invoice'] , "readwrite");
@@ -576,6 +596,7 @@ pos_ar.PointOfSale.pos_db  = class POSDatabase {
 
 	// New delete function to remove a POS Invoice
 	deletePosInvoice(invoiceName) {
+		console.log("deleting .... " , invoiceName)
 		return new Promise((resolve,reject)=>{
 			const transaction = this.db.transaction(['POS Invoice'], "readwrite");
 			const store = transaction.objectStore('POS Invoice');

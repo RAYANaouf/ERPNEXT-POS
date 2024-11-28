@@ -20,6 +20,7 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 		createNewTab       ,
 		onCheckoutClick    ,
 		savePosInvoice     ,
+		db                 ,
 	){
 
 
@@ -41,7 +42,8 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 		this.on_tab_click            = onTabClick      ;
 		this.create_new_tab          = createNewTab    ;
 		this.save_pos_invoice        = savePosInvoice  ;
-
+		this.db                      = db              ;
+		console.log("check the db : " , this.db)
 		//local
 		this.taxes_map   = new Map();
 		this.total_tax_amout = 0 ;
@@ -84,7 +86,7 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 			checkoutBtn =
 				'width:calc(100% - 32px);margin:0px 16px 16px 16px;padding : 8px 0px ;'+
 				'color:#FFFFFF;font-size:larger;font-weight:600;'+
-				'background:#9B5788;border:3px solid #663959;border-radius:8px;outline:none;'
+				'background:#44A292;border:3px solid #2D6B61;border-radius:8px;outline:none;'
 		}
 		else{
 			containerBoxStyle   =
@@ -96,7 +98,7 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 			checkoutBtn =
 				'width:100%;height:55px;'+
 				'color:#FFFFFF;font-size:19px;font-weight:600;'+
-				'background:#9B5788;border:none;border-top:4px solid #663959;border-radius:0px;outline:none;'
+				'background:#44A292;border:none;border-top:4px solid #2D6B61;border-radius:0px;outline:none;'
 		}
 
 
@@ -217,7 +219,7 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 		this.mainBtnContainer = this.cartFooter.find('#mainBtnContainer')
 
 		this.mainBtnContainer.append(`<button type="button" id="checkoutBtn" style="width:50%;height:100%;background:none;border:none;border-right:2px solid #663959;color:white;"> Payment </button>`)
-		this.mainBtnContainer.append(`<button type="button" id="printBtn"    style="width:50%;height:100%;background:#DF482D;border:none;border-left:2px solid #663959;color:white;"> Print </button>`)
+		this.mainBtnContainer.append(`<button type="button" id="printBtn"    style="width:50%;height:100%;background:#E1472B;border:none;border-left:2px solid #2D6B61;color:white;"> Print </button>`)
 
 
 		this.mainBtnContainer.find("#checkoutBtn").on('mousedown' , event =>{
@@ -284,8 +286,9 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 			if (invoiceItems && invoiceItems.length > 0) {
 				frappe.confirm('Are you sure you want to proceed?',
 					() => {
-						 this.selected_item_maps.delete(clickedTab)
-
+						console.log("see here : " , this.selected_item_maps.get(clickedTab))
+						this.db.deletePosInvoice(this.selected_item_maps.get(clickedTab).name)
+						this.selected_item_maps.delete(clickedTab)
 						if(this.selected_item_maps.size > 0  ){
 							this.selected_tab.tabName = Array.from(this.selected_item_maps.keys())[0]
 							console.log("this.selected_tab.tabName : " , this.selected_tab)
@@ -419,6 +422,14 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 	createNewTab(){
 			this.counter += 1 ;
 			this.create_new_tab(this.counter);
+			//update UI
+			this.refreshTabs()
+			this.refreshSelectedItem()
+	}
+	restorePos(pos){
+			this.counter += 1 ;
+			this.create_new_tab(this.counter);
+			
 			//update UI
 			this.refreshTabs()
 			this.refreshSelectedItem()
@@ -573,13 +584,15 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 		})
 
 
-		this.tabs_container.find(".tabDeleteBtn").on('click' , (event) => {
+		/*this.tabs_container.find(".tabDeleteBtn").on('click' , (event) => {
 			//Stop the click event from propagating to the parent .tab
 		        event.stopPropagation();
 
 			const clickedTab = $(event.target).closest('.tab').find('.tabName').text();
 
 			this.selected_item_maps.delete(clickedTab)
+			console.log("delete after..")
+			this.db.deletePosInvoice(this.selected_item_maps.get(clickedTab).name)
 
 			if(this.selected_item_maps.size > 0  ){
 				this.selected_tab.tabName = Array.from(this.selected_item_maps.keys())[0]
@@ -592,7 +605,7 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 			this.refreshTabs()
 			this.refreshSelectedItem()
 
-		})
+		})*/
 
 
 		this.discountInput.on('input' , (event)=> {

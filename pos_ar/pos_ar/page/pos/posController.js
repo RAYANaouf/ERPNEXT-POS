@@ -44,7 +44,8 @@ pos_ar.PointOfSale.Controller = class {
 
 			this.toggleKeyboardMode(!this.settings_data.settings.showItemDetails);
 
-			console.log("see app data : " , this.appData.appData)
+			console.log("see app data : " , this.appData.appData , "opened pos : " , await this.appData.getAllOpenedPosInvoice())
+
 
 			this.prepare_container();
 			//prepare app data
@@ -55,6 +56,10 @@ pos_ar.PointOfSale.Controller = class {
 			await  this.prepare_components();
 			this.checkUnSyncedPos();
 			this.setListeners();
+
+			const openedPos = await this.appData.getAllOpenedPosInvoice()
+			this.restorePosInvoices(openedPos)
+
 		}catch(err){
 			console.error("halfware POS Err ==> " , err)
 		}
@@ -80,6 +85,7 @@ pos_ar.PointOfSale.Controller = class {
 			new_pos_invoice.docstatus         = 0
 			new_pos_invoice.status            = 'Draft'
 			new_pos_invoice.priceList         = this.defaultPriceList.name
+			new_pos_invoice.opened            = 1
 			//build refNm   posProfile-date-time
 			const date = new Date()
 			const [year,month,day] = date.toISOString().split('T')[0].split('-')
@@ -385,7 +391,8 @@ pos_ar.PointOfSale.Controller = class {
 									},
 									this.createNewTab.bind(this),
 									this.onCheckout.bind(this),
-									this.savePosInvoice.bind(this)
+									this.savePosInvoice.bind(this),
+									this.db
 								)
 	}
 
@@ -712,6 +719,35 @@ pos_ar.PointOfSale.Controller = class {
 		return result
 	}
 
+	restorePosInvoices(posInvoices){
+
+		posInvoices.forEach((pos)=>{
+			const tab = this.selected_item_cart.createTabForEditPOS()
+
+			this.selectedItemMaps.set(`C${tab}` , pos)
+			this.selectedTab.tabName = `C${tab}`
+
+			//show
+			this.item_selector.showCart();
+			this.customer_box.showHomeBar();
+			this.selected_item_cart.showCart()
+
+			//hide
+			this.item_details.hide_cart() ;
+			this.payment_cart.hideCart()  ;
+			this.history_cart.hide_cart() ;
+			this.settings_cart.hideCart();
+
+			//refresh the data :
+			this.selected_item_cart.refreshTabs()
+                        this.selected_item_cart.refreshSelectedItem()
+
+
+		})
+
+
+	}
+
 	createNewTab(counter){
 
 		let new_pos_invoice = frappe.model.get_new_doc('POS Invoice');
@@ -730,6 +766,7 @@ pos_ar.PointOfSale.Controller = class {
 		new_pos_invoice.synced            = false
 		new_pos_invoice.status            = 'Draft'
 		new_pos_invoice.priceList         = this.defaultPriceList.name
+		new_pos_invoice.opened            = 1
 		//build refNm   posProfile-date-time
 		const date = new Date()
 		const [year,month,day] = date.toISOString().split('T')[0].split('-')
@@ -1116,7 +1153,8 @@ pos_ar.PointOfSale.Controller = class {
 		this.selectedItemMaps.get(this.selectedTab.tabName).status            = status
 
 		//copy the pos is important otherwise it will deleted and the selectedTab change and then it will save the
-		//wrong one. because insert take a while after the callback will called.
+		//wrong one. because insert take a while after the callback will called.		console.log("debuging rayan :::: " , this.selected_item_cart)
+
 		const pos = structuredClone(this.selectedItemMaps.get(this.selectedTab.tabName))
 
 
@@ -1126,6 +1164,7 @@ pos_ar.PointOfSale.Controller = class {
 			frappe.db.insert(
 				pos
 			).then(r =>{
+				pos.opened = 0;
 				this.appData.updatePosInvoice(pos)
 
 				/*** START : deleting pos when finishing **/
@@ -1178,6 +1217,7 @@ pos_ar.PointOfSale.Controller = class {
 
 
 			pos.synced = false ;
+			pos.opened = 0;
 			this.appData.updatePosInvoice(pos)
 
 			this.unsyncedPos += 1 ;

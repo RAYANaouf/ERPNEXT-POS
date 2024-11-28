@@ -17,7 +17,7 @@
 }
 
 [data-route = "pos"] .content{
-	background : #9B578850 ;
+	background : #44A29265 ;
 }
 
 
@@ -112,15 +112,15 @@
 
 
 .posBtn1{
-	border        : 3px solid #663959 ;
-	background    : #9B5788           ;
+	border        : 3px solid #2D6B61 ;
+	background    : #44A292           ;
 	border-radius : 8px               ;	
 
 	color         : white             ;
 }
 
 .posBtn1:hover{
-	border        : 4px solid #663959 ;	
+	border        : 4px solid #2D6B61 ;	
 }
 
 
@@ -155,7 +155,6 @@
 	height     : 100vh ;
 	width      : 100% ;
 
-	background : #9B578850 ;
 }
 
 

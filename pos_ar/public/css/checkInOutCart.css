@@ -23,7 +23,7 @@
 
 	font-size : 18px ;
 	font-weight : 600 ;
-	color       : #663959 ;
+	color       : #2D6B61 ;
 }
 #detailsCheckInOutHeader>div{
 	width   : 33.34% ;
@@ -51,7 +51,7 @@
 }
 
 #detailsCheckInOutContent span.key{
-	color       : #663959 ;
+	color       : #2D6B61 ;
 	font-size   : 25px    ;
 	font-weight : 700     ;
 }
@@ -69,7 +69,7 @@
 	justify-content : space-between;
 }
 #detailsCheckInOutContent div.l3 div.title{
-	color       : #663959 ;
+	color       : #2D6B61 ;
 	font-size   : 25px    ;
 	font-weight : 700     ;
 }
@@ -132,11 +132,11 @@
 	background : #9B578840;
 }
 #checkInOutTabContainer div.tab.selected{
-	border-bottom : 3px solid #9B5788 ;
+	border-bottom : 3px solid #2D6B61 ;
 
 	font-weight : 600     ;
 	font-size   : 20px    ;
-	color       : #663959 ;
+	color       : #2D6B61 ;
 
 }
 

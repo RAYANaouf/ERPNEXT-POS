@@ -211,6 +211,10 @@ pos_ar.PointOfSale.posAppData = class {
 		return await this.api_handler.update_invoice_payment( invoiceName , amount)
 	}
 
+	async getAllOpenedPosInvoice(){
+		return await this.db.getAllOpenedPosInvoice()
+	}
+
 	/******************  function ***************************/
 	combineLocalAndUpdated(local,updated){
 		// Create a map from the local data array using a unique identifier (name)

@@ -54,7 +54,7 @@
 
 
 #LeftSection #SelectorBox #itemsContainer .itemBox:hover {
-        border     : 3px solid #9B5788 ;
+        border     : 3px solid #2D6B61 ;
 }
 
 #LeftSection #SelectorBox #itemsContainer .itemBox .itemImage{
@@ -76,7 +76,7 @@
 
 #LeftSection #SelectorBox #itemsContainer .itemBox .itemPrice{
         padding : 0px 4px ;
-        background : #9B5788  ;
+        background : #44A292  ;
         color      : white    ;
 
         font-size  : smaller  ;
