@@ -886,9 +886,21 @@ pos_ar.PointOfSale.Controller = class {
 			//this.item_details.requestFocus("discount_percentage")
 		}
 		else if(action == "remove"){
-			this.deleteItemFromPOsInvoice(this.selectedItem.name)
-			this.selected_item_cart.refreshSelectedItem();
-			this.onClose_details()
+			this.syncInput = false;
+
+			this.deleteItemFromPOsInvoice(this.selectedItem.name);
+
+			/*const index = this.selectedItemMaps.get(this.selectedTab.tabName).items.findIndex(item => item.name === this.selectedItem.name);
+
+			if(this.selectedItemMaps.get(this.selectedTab.tabName).items.length > 1){
+				this.deleteItemFromPOsInvoice(this.selectedItem.name);
+				const cloned = structuredClone(this.selectedItemMaps.get(this.selectedTab.tabName).items[index-1])
+				Object.assign(this.selectedItem , cloned)
+			}else{
+				this.deleteItemFromPOsInvoice(this.selectedItem.name);
+				Object.assign(this.selectedItem , {})
+			}*/
+
 		}
 		else if(action == "delete"){
 
@@ -1339,6 +1351,11 @@ pos_ar.PointOfSale.Controller = class {
 				}else if(event.key == "p"){
 					this.selectedField.field_name = "rate"
 					this.selected_item_cart.makeSelectedButtonHighlighted();
+				}else if(event.key == "Delete"){
+					this.deleteItemFromPOsInvoice(this.selectedItem.name)
+					this.selected_item_cart.refreshSelectedItem();
+					this.onClose_details()
+
 				}else if(event.key == "Backspace"){
 					if(this.selectedField.field_name == "quantity"){
 						const lastValue = parseFloat(this.selectedItem.qty)

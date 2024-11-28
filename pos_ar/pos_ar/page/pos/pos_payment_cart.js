@@ -91,6 +91,17 @@ pos_ar.PointOfSale.pos_payment_cart = class{
 
 	preparDefault(){
 		this.calculateGrandTotal();
+
+		//reset selected method
+		this._payment_method = this.payment_methods[0]
+		//reset style for  method box
+		this.cart_content_top_section.find('.paymentMethodBox').removeClass('selected');
+		this.cart_content_top_section.find(`.paymentMethodBox#${this._payment_method.name}`).addClass('selected');
+		this.cart_content_top_section.find('.paymentMethodBox .title').removeClass('selected');
+		this.cart_content_top_section.find(`.paymentMethodBox#${this._payment_method.name} .title`).addClass('selected');
+
+
+
 		// Get the selected payment method's box
 		const selectedBox = $(`#${this._payment_method.name}`);
 		if (selectedBox.length) {

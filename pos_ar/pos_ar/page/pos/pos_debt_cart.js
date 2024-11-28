@@ -9,8 +9,10 @@ pos_ar.PointOfSale.pos_debt_cart = class{
 		this.app_data          = appData
 
 		//local vars
+		this._filtredClientList = this.app_data.appData.customers
 		this.selected_client = {}
 		this.payment_amount = 0
+
 		this.start_work()
 	}
 
@@ -32,7 +34,7 @@ pos_ar.PointOfSale.pos_debt_cart = class{
 		const debtListStyle   = "width:100%;height:100%;margin:16px;height:100%;"
 		const inputStyle      = "width:40%;margin: 0px 16px;"
 		//customer part
-		this.rightContainer.append(`<div class="rowBox centerItem"  style="${headerStyle}" ><input type="text" id="searchBar" placeholder="Search..." style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;"></div>`)
+		this.rightContainer.append(`<div class="rowBox centerItem"  style="${headerStyle}" ><input type="text" id="debt_filterClientList" placeholder="Search..." style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;"></div>`)
 		this.rightContainer.append(`<div id="debt_customerList" class="columnBox" style="${listStyle}"></div>`)
 
 		this.customerList = this.rightContainer.find('#debt_customerList')
@@ -43,17 +45,24 @@ pos_ar.PointOfSale.pos_debt_cart = class{
 		this.debtList     = this.leftContainer.find('#debt_debtsList')
 	}
 	showCart(){
-		console.log("showing ...")
 		this.leftContainer.css('display' , 'flex')
 		this.rightContainer.css('display' , 'flex')
 	}
 	hideCart(){
-		console.log("hiding ...")
 		this.leftContainer.css('display' , 'none')
 		this.rightContainer.css('display' , 'none')
 	}
 
 	setListener(){
+		//filter clients
+		this.rightContainer.find("#debt_filterClientList").on('input' , event =>{
+			const value = this.rightContainer.find("#debt_filterClientList").val().trim().toLowerCase();
+			this._filtredClientList = this.app_data.appData.customers.filter(customer =>
+				customer.customer_name.toLowerCase().includes(value)
+			);
+ 			this.refreshClientPart()
+
+		})
 		this.leftContainer.find("#debt_paymentAmount").on('input',event =>{
 			this.payment_amount = parseFloat(this.leftContainer.find("#debt_paymentAmount").val())
 		})
@@ -64,7 +73,7 @@ pos_ar.PointOfSale.pos_debt_cart = class{
 		const customerStyle = "height:35px;width:calc(100% - 32px);"
 
 		this.customerList.html('')
-		this.app_data.appData.customers.forEach(customer=>{
+		this._filtredClientList.forEach(customer=>{
 			const customerBox = $(`<div  style="${customerStyle}" class="rowBox C_A_Center customerBox" > ${customer.name} </div>`)
 		        // Set an onclick listener for the customer box
         		customerBox.on('click', () => {
@@ -89,7 +98,6 @@ pos_ar.PointOfSale.pos_debt_cart = class{
 		const result = await this.app_data.fetchDebts(customer.name)
 
 		result.forEach(invoice=>{
-			console.log("debuging :::===>>>>>")
 			const customerBox = $(
 				`<div  style="${invoiceStyle}" class="rowBox C_A_Center invoiceBox" data-invoice-name="${invoice.name}"></div>`
 			)

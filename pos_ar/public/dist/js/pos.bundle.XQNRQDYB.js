@@ -692,9 +692,8 @@
       } else if (action == "print") {
         this.history_cart.print_receipt(this.selectedItemMaps.get(this.selectedTab.tabName));
       } else if (action == "remove") {
+        this.syncInput = false;
         this.deleteItemFromPOsInvoice(this.selectedItem.name);
-        this.selected_item_cart.refreshSelectedItem();
-        this.onClose_details();
       } else if (action == "delete") {
         if (!this.settings_data.settings.showItemDetails) {
           if (this.selectedField.field_name == "quantity") {
@@ -984,6 +983,10 @@
           } else if (event2.key == "p") {
             this.selectedField.field_name = "rate";
             this.selected_item_cart.makeSelectedButtonHighlighted();
+          } else if (event2.key == "Delete") {
+            this.deleteItemFromPOsInvoice(this.selectedItem.name);
+            this.selected_item_cart.refreshSelectedItem();
+            this.onClose_details();
           } else if (event2.key == "Backspace") {
             if (this.selectedField.field_name == "quantity") {
               const lastValue = parseFloat(this.selectedItem.qty);
@@ -1709,6 +1712,7 @@
       });
     }
     refreshSelectedItem() {
+      console.log("so refreshing with : ", this.selected_item.name);
       this.priceListInput.val(this.selected_item_maps.get(this.selected_tab.tabName).priceList);
       this.customerInput.val(this.selected_item_maps.get(this.selected_tab.tabName).customer);
       const selectedItemsContainer = document.getElementById("selectedItemsContainer");
@@ -2447,6 +2451,11 @@
     }
     preparDefault() {
       this.calculateGrandTotal();
+      this._payment_method = this.payment_methods[0];
+      this.cart_content_top_section.find(".paymentMethodBox").removeClass("selected");
+      this.cart_content_top_section.find(`.paymentMethodBox#${this._payment_method.name}`).addClass("selected");
+      this.cart_content_top_section.find(".paymentMethodBox .title").removeClass("selected");
+      this.cart_content_top_section.find(`.paymentMethodBox#${this._payment_method.name} .title`).addClass("selected");
       const selectedBox = $(`#${this._payment_method.name}`);
       if (selectedBox.length) {
         selectedBox.find(".paymentInput").val(this.invoice_data.grandTotal);
@@ -4310,6 +4319,7 @@
     constructor(wrapper, appData) {
       this.wrapper = wrapper;
       this.app_data = appData;
+      this._filtredClientList = this.app_data.appData.customers;
       this.selected_client = {};
       this.payment_amount = 0;
       this.start_work();
@@ -4328,7 +4338,7 @@
       const listStyle = "flex-grow:1;width:100%;margin:0px 16px;";
       const debtListStyle = "width:100%;height:100%;margin:16px;height:100%;";
       const inputStyle = "width:40%;margin: 0px 16px;";
-      this.rightContainer.append(`<div class="rowBox centerItem"  style="${headerStyle}" ><input type="text" id="searchBar" placeholder="Search..." style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;"></div>`);
+      this.rightContainer.append(`<div class="rowBox centerItem"  style="${headerStyle}" ><input type="text" id="debt_filterClientList" placeholder="Search..." style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;"></div>`);
       this.rightContainer.append(`<div id="debt_customerList" class="columnBox" style="${listStyle}"></div>`);
       this.customerList = this.rightContainer.find("#debt_customerList");
       this.leftContainer.append(`<div class="rowBox C_A_Center" style="margin:16px;" ><div> Amount </div><input id="debt_paymentAmount" type="number" style="${inputStyle}"></input></div>`);
@@ -4336,16 +4346,21 @@
       this.debtList = this.leftContainer.find("#debt_debtsList");
     }
     showCart() {
-      console.log("showing ...");
       this.leftContainer.css("display", "flex");
       this.rightContainer.css("display", "flex");
     }
     hideCart() {
-      console.log("hiding ...");
       this.leftContainer.css("display", "none");
       this.rightContainer.css("display", "none");
     }
     setListener() {
+      this.rightContainer.find("#debt_filterClientList").on("input", (event2) => {
+        const value = this.rightContainer.find("#debt_filterClientList").val().trim().toLowerCase();
+        this._filtredClientList = this.app_data.appData.customers.filter(
+          (customer) => customer.customer_name.toLowerCase().includes(value)
+        );
+        this.refreshClientPart();
+      });
       this.leftContainer.find("#debt_paymentAmount").on("input", (event2) => {
         this.payment_amount = parseFloat(this.leftContainer.find("#debt_paymentAmount").val());
       });
@@ -4353,7 +4368,7 @@
     refreshClientPart() {
       const customerStyle = "height:35px;width:calc(100% - 32px);";
       this.customerList.html("");
-      this.app_data.appData.customers.forEach((customer) => {
+      this._filtredClientList.forEach((customer) => {
         const customerBox = $(`<div  style="${customerStyle}" class="rowBox C_A_Center customerBox" > ${customer.name} </div>`);
         customerBox.on("click", () => {
           $(".customerBox").removeClass("selected");
@@ -4370,7 +4385,6 @@
       this.debtList.html("");
       const result = await this.app_data.fetchDebts(customer.name);
       result.forEach((invoice) => {
-        console.log("debuging :::===>>>>>");
         const customerBox = $(
           `<div  style="${invoiceStyle}" class="rowBox C_A_Center invoiceBox" data-invoice-name="${invoice.name}"></div>`
         );
@@ -4396,4 +4410,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.G47OLFYO.js.map
+//# sourceMappingURL=pos.bundle.XQNRQDYB.js.map
