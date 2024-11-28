@@ -202,16 +202,16 @@ pos_ar.PointOfSale.posAppData = class {
 	}
 
 
-	async fetchDebts(customerName){
-		return await this.api_handler.fetchDebts(customerName)
-	}
 
-	async update_invoice_payment(invoiceName , amount){
-		console.log("app data : " , invoiceName , "and" , amount)
-		return await this.api_handler.update_invoice_payment( invoiceName , amount)
-	}
 
-	/******************  function ***************************/
+
+
+	/********************** api call without cache  ******************/
+
+	
+
+
+	/***********************  function *******************************/
 	combineLocalAndUpdated(local,updated){
 		// Create a map from the local data array using a unique identifier (name)
 		const combinedMap = new Map(local.map(item => [item.name, item]));
@@ -225,5 +225,6 @@ pos_ar.PointOfSale.posAppData = class {
 
 		return Array.from(combinedMap.values())
 	}
+
 
 }

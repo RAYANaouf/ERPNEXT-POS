@@ -211,7 +211,8 @@ div.tab img{
 	height        : 100%  ;
 	background    : white ;
 	display       : none  ;
-
+	overflow-y    : auto  ;
+	overflow-x    : hidden;
 }
 
 #debtRightContainer{
@@ -220,6 +221,17 @@ div.tab img{
 	height        : 100%  ;
 	background    : white ;
 	display       : none  ;
-
+	overflow-y    : auto  ;
+	overflow-x    : hidden;
 }
+
+#debt_customerList .customerBox:hover{
+	background : #f0f0f0 !important ;
+	cursor     : pointer ;
+}
+#debt_customerList .customerBox.selected{
+	background : #c0c0c0 !important ;
+}
+
+
 

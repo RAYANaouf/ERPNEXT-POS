@@ -85,7 +85,7 @@ pos_ar.PointOfSale.pos_item_selector = class {
 
 		const groupItemListInput = document.getElementById("ItemGroupInput");
 		this.setItemInFlow(this.getItemByItemGroup(groupItemListInput.value));
-s	}
+	}
 	setItemInFlow(filtered_item_list){
         	const itemsContainer_html = document.getElementById("itemsContainer");
         	itemsContainer_html.innerHTML = "";

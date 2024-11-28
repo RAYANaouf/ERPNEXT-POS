@@ -218,7 +218,6 @@ pos_ar.PointOfSale.FetchHandler = class FetchHandler{
 				method: 'pos_ar.pos_ar.doctype.pos_info.pos_info.get_mode_of_payments',
 				args: { }
 			});
-			console.log("see :::====> " , response.message)
 			return response.message;  // The fetched item barcodes
 		} catch (error) {
 			console.error('Error fetching mode_of_payments', error);
@@ -283,6 +282,51 @@ pos_ar.PointOfSale.FetchHandler = class FetchHandler{
 			return []
 		}
 		return []
+	}
+
+
+	async fetchDebts(customer_name) {
+		try {
+			console.log("im here with >>====> " , customer_name)
+			const response = await frappe.call({
+				method: "pos_ar.pos_ar.doctype.pos_info.pos_info.get_customer_debts",
+				args: { customer_name },
+			});
+
+			console.log("see the result : " , response)
+
+			if (response.message && !response.message.error) {
+				return response.message
+			} else {
+				return []
+			}
+		} catch (error) {
+			console.error("Error fetching debts:", error);
+			frappe.msgprint(__('Error fetching debts.'));
+		}
+	}
+
+
+
+	async update_invoice_payment(invoice_name , payment_amount) {
+		console.log("fetcher : " , invoice_name , "and" , payment_amount)
+		try {
+			const response = await frappe.call({
+				method: "pos_ar.pos_ar.doctype.pos_info.pos_info.update_invoice_payment",
+				args: { invoice_name , payment_amount },
+			});
+
+			console.log("see the result : " , response)
+
+			if (response.message && !response.message.error) {
+				return response.message
+			} else {
+				return []
+			}
+		} catch (error) {
+			console.error("Error fetching debts:", error);
+			frappe.msgprint(__('Error fetching debts.'));
+		}
 	}
 
 

@@ -21,6 +21,7 @@ pos_ar.PointOfSale.Controller = class {
 		//sell invoice
 		this.POSOpeningEntry = {}
 
+
 		this.invoiceData = { netTotal : 0 , grandTotal : 0 , paidAmount : 0 , toChange : 0 , discount : 0}
 		this.db          = null;
 
@@ -442,7 +443,8 @@ pos_ar.PointOfSale.Controller = class {
 
         init_debtCart(){
 		this.debt_cart = new pos_ar.PointOfSale.pos_debt_cart(
-									this.wrapper
+									this.wrapper,
+									this.appData
 								)
 	}
 
@@ -519,6 +521,7 @@ pos_ar.PointOfSale.Controller = class {
 		//refresh data
 		this.item_details.refreshDate(item);
 	}
+
 
 	saveCheckInOut(checkInOut){
 		this.appData.saveCheckInOut(
@@ -1112,34 +1115,62 @@ pos_ar.PointOfSale.Controller = class {
 				pos
 			).then(r =>{
 				this.appData.updatePosInvoice(pos)
+
+				/*** START : deleting pos when finishing **/
+				//print the pos
+				this.history_cart.print_receipt(pos)
+
+				this.selectedItemMaps.delete(this.selectedTab.tabName)
+
+				//tabs
+				let tabs = Array.from(this.selectedItemMaps.keys())
+				//if there are still tabs it will just set the first as selected
+				//otherwise it will create one using the selected_item_cart class and set it as selected
+				if(tabs.length > 0){
+					this.selectedTab.tabName = tabs[0]
+					this.selected_item_cart.refreshTabs();
+					this.selected_item_cart.refreshSelectedItem();
+				}
+				else{
+					this.selected_item_cart.createNewTab();
+				}
+				this.onClose_payment_cart()
+				/*** END   : deleting pos when finishing **/
+
+
 			}).catch(err=>{
 				console.log("cant push pos invoice : " , err);
 			})
 		}
 		else{
+			/*** START : deleting pos when finishing **/
+			//print the pos
+			this.history_cart.print_receipt(pos)
+
+			this.selectedItemMaps.delete(this.selectedTab.tabName)
+
+			//tabs
+			let tabs = Array.from(this.selectedItemMaps.keys())
+			//if there are still tabs it will just set the first as selected
+			//otherwise it will create one using the selected_item_cart class and set it as selected
+			if(tabs.length > 0){
+				this.selectedTab.tabName = tabs[0]
+				this.selected_item_cart.refreshTabs();
+				this.selected_item_cart.refreshSelectedItem();
+			}
+			else{
+				this.selected_item_cart.createNewTab();
+			}
+			this.onClose_payment_cart()
+			/*** END : deleting pos when finishing **/
+
+
 			pos.synced = false ;
 			this.appData.updatePosInvoice(pos)
+
 			this.unsyncedPos += 1 ;
 			this.customer_box.setNotSynced(this.unsyncedPos);
 		}
-		//print the pos
-		this.history_cart.print_receipt(pos)
-
-		this.selectedItemMaps.delete(this.selectedTab.tabName)
-
-		//tabs
-		let tabs = Array.from(this.selectedItemMaps.keys())
-		//if there are still tabs it will just set the first as selected
-		//otherwise it will create one using the selected_item_cart class and set it as selected
-		if(tabs.length > 0){
-			this.selectedTab.tabName = tabs[0]
-			this.selected_item_cart.refreshTabs();
-			this.selected_item_cart.refreshSelectedItem();
-		}
-		else{
-			this.selected_item_cart.createNewTab();
-		}
-		this.onClose_payment_cart()
 	}
 
 
