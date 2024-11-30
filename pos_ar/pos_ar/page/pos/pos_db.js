@@ -10,7 +10,7 @@ pos_ar.PointOfSale.pos_db  = class POSDatabase {
 		return new Promise((resolve , reject) => {
 
 			// Let us open our database
-			const request = window.indexedDB.open( 'POSDB_test33' , 1);
+			const request = window.indexedDB.open( 'POSDB_test34' , 1);
 
 			request.onerror = (event) => {
 				// Do something with request.error!
@@ -596,7 +596,6 @@ pos_ar.PointOfSale.pos_db  = class POSDatabase {
 
 	// New delete function to remove a POS Invoice
 	deletePosInvoice(invoiceName) {
-		console.log("deleting .... " , invoiceName)
 		return new Promise((resolve,reject)=>{
 			const transaction = this.db.transaction(['POS Invoice'], "readwrite");
 			const store = transaction.objectStore('POS Invoice');

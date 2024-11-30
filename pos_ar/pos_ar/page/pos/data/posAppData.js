@@ -205,16 +205,66 @@ pos_ar.PointOfSale.posAppData = class {
 	async fetchDebts(customerName){
 		return await this.api_handler.fetchDebts(customerName)
 	}
+	async fetchDebtsSalesInvoices(customerName){
+		return await this.api_handler.fetchDebtsSalesInvoices(customerName)
+	}
 
 	async update_invoice_payment(invoiceName , amount){
-		console.log("app data : " , invoiceName , "and" , amount)
-		return await this.api_handler.update_invoice_payment( invoiceName , amount)
+
+		const rest = await this.api_handler.update_invoice_payment( invoiceName , amount)
+
+		await this.getPosInvoices()
+
+		this.appData.pos_invoices.forEach(invoice=>{
+			if(invoice.real_name == invoiceName){
+				let newInvoice = structuredClone(invoice)
+				newInvoice.outstanding_amount = rest.outstanding_amount
+				newInvoice.paid_amount        = rest.paid_amount
+				newInvoice.status             = rest.paid
+				newInvoice.real_name          = rest.real_name
+				this.db.updatePosInvoice(newInvoice)
+			}
+		})
+
+		return rest
+	}
+	async update_sales_invoice_payment(invoiceName , amount){
+
+		console.log("rayanoo")
+
+		const rest = await this.api_handler.update_sales_invoice_payment( invoiceName , amount)
+
+		console.log("we are hereeeee : " , rest)
+
+		await this.getPosInvoices()
+
+		/*this.appData.pos_invoices.forEach(invoice=>{
+			console.log("testing inside ==>  invoice.real_name : " , invoice.real_name , " == invoiceName : " , invoiceName )
+			if(invoice.real_name == invoiceName){
+				let newInvoice = structuredClone(invoice)
+				newInvoice.outstanding_amount = rest.outstanding_amount
+				newInvoice.paid_amount        = rest.paid_amount
+				newInvoice.status             = rest.paid
+				newInvoice.real_name          = rest.real_name
+				console.log("debuging ::: " , " rest " , rest , " invoice " , newInvoice  )
+				this.db.updatePosInvoice(newInvoice)
+			}
+		})*/
+
+		return rest
 	}
 
 	async getAllOpenedPosInvoice(){
 		return await this.db.getAllOpenedPosInvoice()
 	}
 
+	async deletePosInvoice_callback(invoiceName,onSuccess,onFailure){
+		this.db.deletePosInvoice_callback(
+			invoiceName,
+			onSuccess,
+			onFailure
+		)
+	}
 	/******************  function ***************************/
 	combineLocalAndUpdated(local,updated){
 		// Create a map from the local data array using a unique identifier (name)

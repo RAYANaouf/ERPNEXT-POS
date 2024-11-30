@@ -28,7 +28,6 @@ pos_ar.PointOfSale.pos_history = class {
 		this.prepare_history_cart();
 		const result = await this.db.getAllPosInvoice()
 
-		console.log("the db data " , result)
 		this.localPosInvoice.pos_invoices = result ;
 
 		this.filtered_pos_list = this.localPosInvoice.pos_invoices.filter( pos => {
@@ -62,7 +61,7 @@ pos_ar.PointOfSale.pos_history = class {
 
 
 		//pos details  the container of the pos details
-		this.left_container.append('<div id="PosContentHeader" class="rowBox" ><div class="c1 columnBox"><div id="posCustomer">Customer</div><div id="posSoldBy"></div></div><div class="c2 columnBox"><div id="posCost">0,0000 DA</div><div id="posId">ACC-PSINV-2024-ID</div><div id="posStatus">POS Status</div></div></div>')
+		this.left_container.append('<div id="PosContentHeader" class="rowBox" ><div class="c1 columnBox"><div id="posCustomer">Customer</div><div id="posSoldBy"></div><div id="posStatus" class="Paid"></div></div><div class="c2 columnBox"><div id="posCost">0,0000 DA</div><div id="posId">ACC-PSINV-2024-ID</div><div id="posRealId">POS realI</div></div></div>')
 
 		//first this.selected_pos.taxes_and_charges = ""section is the header information
 		this.pos_header = this.left_container.find('#PosContentHeader');
@@ -206,12 +205,15 @@ pos_ar.PointOfSale.pos_history = class {
 			this.setData();
 		}
 
-
 		this.pos_header.find('#posCustomer').text(this.selected_pos.customer?? "CustomerName")
 		//this.pos_header.find('#posSoldBy').text('Sold By : ' + this.selected_pos.owner?? "saler")
 		//it is not the paid amount it should be the total invoice amount
 		this.pos_header.find('#posCost').text(this.selected_pos.paid_amount??0 + "DA")
-		this.pos_header.find('#posId').text(this.selected_pos.name?? "POS Invoice Name")
+		this.pos_header.find('#posId').text(this.selected_pos.name?? "POS Invoice CachId")
+
+		if(this.selected_pos.real_name && this.selected_pos.real_name != "" && this.selected_pos.real_name != null){
+			this.pos_header.find('#posRealId').text(this.selected_pos.real_name?? "")
+		}
 		this.pos_header.find('#posStatus').text(this.selected_pos.status)
 		this.pos_header.find('#posStatus').removeClass().addClass(`${this.selected_pos.status}`)
 

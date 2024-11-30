@@ -62,6 +62,7 @@
       try {
         await this.handleAppData();
         let new_pos_invoice = frappe.model.get_new_doc("POS Invoice");
+        new_pos_invoice.custom_cach_name = new_pos_invoice.name;
         new_pos_invoice.customer = this.defaultCustomer.name;
         new_pos_invoice.pos_profile = this.appData.appData.pos_profile.name;
         new_pos_invoice.items = [];
@@ -599,6 +600,7 @@
     }
     createNewTab(counter) {
       let new_pos_invoice = frappe.model.get_new_doc("POS Invoice");
+      new_pos_invoice.custom_cach_name = new_pos_invoice.name;
       new_pos_invoice.customer = this.defaultCustomer.name;
       new_pos_invoice.pos_profile = this.appData.appData.pos_profile.name;
       new_pos_invoice.items = [];
@@ -860,8 +862,9 @@
           pos
         ).then((r) => {
           pos.opened = 0;
-          this.appData.updatePosInvoice(pos);
+          pos.real_name = r.name;
           this.history_cart.print_receipt(pos);
+          this.appData.updatePosInvoice(pos);
           this.selectedItemMaps.delete(this.selectedTab.tabName);
           let tabs = Array.from(this.selectedItemMaps.keys());
           if (tabs.length > 0) {
@@ -919,6 +922,7 @@
             ).then((r) => {
               const updatedPos = structuredClone(pos);
               updatedPos.synced = true;
+              updatedPos.real_name = r.name;
               this.appData.updatePosInvoice(updatedPos);
               counter += 1;
               frappe.show_progress("Syncing Invoices...", counter, allUnsyncedPos.length, "syncing");
@@ -2634,7 +2638,6 @@
     async start_work() {
       this.prepare_history_cart();
       const result = await this.db.getAllPosInvoice();
-      console.log("the db data ", result);
       this.localPosInvoice.pos_invoices = result;
       this.filtered_pos_list = this.localPosInvoice.pos_invoices.filter((pos) => {
         if (pos.status == "Draft") {
@@ -2659,7 +2662,7 @@
       this.wrapper.find("#RightSection").append('<div id="historyRightContainer" class="columnBox"></div>');
       this.left_container = this.wrapper.find("#historyLeftContainer");
       this.right_container = this.wrapper.find("#historyRightContainer");
-      this.left_container.append('<div id="PosContentHeader" class="rowBox" ><div class="c1 columnBox"><div id="posCustomer">Customer</div><div id="posSoldBy"></div></div><div class="c2 columnBox"><div id="posCost">0,0000 DA</div><div id="posId">ACC-PSINV-2024-ID</div><div id="posStatus">POS Status</div></div></div>');
+      this.left_container.append('<div id="PosContentHeader" class="rowBox" ><div class="c1 columnBox"><div id="posCustomer">Customer</div><div id="posSoldBy"></div><div id="posStatus" class="Paid"></div></div><div class="c2 columnBox"><div id="posCost">0,0000 DA</div><div id="posId">ACC-PSINV-2024-ID</div><div id="posRealId">POS realI</div></div></div>');
       this.pos_header = this.left_container.find("#PosContentHeader");
       this.left_container.append('<div id="posContent" class="columnBox"></div>');
       this.pos_content = this.left_container.find("#posContent");
@@ -2744,7 +2747,7 @@
       this.refreshPosDetailsData();
     }
     refreshPosDetailsData() {
-      var _a, _b, _c;
+      var _a, _b, _c, _d;
       if (this.selected_pos == null) {
         this.setEmpty();
         return;
@@ -2753,7 +2756,10 @@
       }
       this.pos_header.find("#posCustomer").text((_a = this.selected_pos.customer) != null ? _a : "CustomerName");
       this.pos_header.find("#posCost").text((_b = this.selected_pos.paid_amount) != null ? _b : 0 + "DA");
-      this.pos_header.find("#posId").text((_c = this.selected_pos.name) != null ? _c : "POS Invoice Name");
+      this.pos_header.find("#posId").text((_c = this.selected_pos.name) != null ? _c : "POS Invoice CachId");
+      if (this.selected_pos.real_name && this.selected_pos.real_name != "" && this.selected_pos.real_name != null) {
+        this.pos_header.find("#posRealId").text((_d = this.selected_pos.real_name) != null ? _d : "");
+      }
       this.pos_header.find("#posStatus").text(this.selected_pos.status);
       this.pos_header.find("#posStatus").removeClass().addClass(`${this.selected_pos.status}`);
       if (this.selected_pos.status == "Draft") {
@@ -2920,7 +2926,7 @@
     }
     static async openDatabase() {
       return new Promise((resolve, reject) => {
-        const request = window.indexedDB.open("POSDB_test33", 1);
+        const request = window.indexedDB.open("POSDB_test34", 1);
         request.onerror = (event2) => {
           reject(request.error);
         };
@@ -3360,7 +3366,6 @@
       };
     }
     deletePosInvoice(invoiceName) {
-      console.log("deleting .... ", invoiceName);
       return new Promise((resolve, reject) => {
         const transaction = this.db.transaction(["POS Invoice"], "readwrite");
         const store = transaction.objectStore("POS Invoice");
@@ -4114,12 +4119,40 @@
     async fetchDebts(customerName) {
       return await this.api_handler.fetchDebts(customerName);
     }
+    async fetchDebtsSalesInvoices(customerName) {
+      return await this.api_handler.fetchDebtsSalesInvoices(customerName);
+    }
     async update_invoice_payment(invoiceName, amount) {
-      console.log("app data : ", invoiceName, "and", amount);
-      return await this.api_handler.update_invoice_payment(invoiceName, amount);
+      const rest = await this.api_handler.update_invoice_payment(invoiceName, amount);
+      await this.getPosInvoices();
+      this.appData.pos_invoices.forEach((invoice) => {
+        if (invoice.real_name == invoiceName) {
+          let newInvoice = structuredClone(invoice);
+          newInvoice.outstanding_amount = rest.outstanding_amount;
+          newInvoice.paid_amount = rest.paid_amount;
+          newInvoice.status = rest.paid;
+          newInvoice.real_name = rest.real_name;
+          this.db.updatePosInvoice(newInvoice);
+        }
+      });
+      return rest;
+    }
+    async update_sales_invoice_payment(invoiceName, amount) {
+      console.log("rayanoo");
+      const rest = await this.api_handler.update_sales_invoice_payment(invoiceName, amount);
+      console.log("we are hereeeee : ", rest);
+      await this.getPosInvoices();
+      return rest;
     }
     async getAllOpenedPosInvoice() {
       return await this.db.getAllOpenedPosInvoice();
+    }
+    async deletePosInvoice_callback(invoiceName, onSuccess, onFailure) {
+      this.db.deletePosInvoice_callback(
+        invoiceName,
+        onSuccess,
+        onFailure
+      );
     }
     combineLocalAndUpdated(local, updated) {
       const combinedMap = new Map(local.map((item) => [item.name, item]));
@@ -4318,12 +4351,26 @@
     }
     async fetchDebts(customer_name) {
       try {
-        console.log("im here with >>====> ", customer_name);
         const response = await frappe.call({
           method: "pos_ar.pos_ar.doctype.pos_info.pos_info.get_customer_debts",
           args: { customer_name }
         });
-        console.log("see the result : ", response);
+        if (response.message && !response.message.error) {
+          return response.message;
+        } else {
+          return [];
+        }
+      } catch (error) {
+        console.error("Error fetching debts:", error);
+        frappe.msgprint(__("Error fetching debts."));
+      }
+    }
+    async fetchDebtsSalesInvoices(customer_name) {
+      try {
+        const response = await frappe.call({
+          method: "pos_ar.pos_ar.doctype.pos_info.pos_info.get_customer_debts_sales_invoices",
+          args: { customer_name }
+        });
         if (response.message && !response.message.error) {
           return response.message;
         } else {
@@ -4335,13 +4382,27 @@
       }
     }
     async update_invoice_payment(invoice_name, payment_amount) {
-      console.log("fetcher : ", invoice_name, "and", payment_amount);
       try {
         const response = await frappe.call({
           method: "pos_ar.pos_ar.doctype.pos_info.pos_info.update_invoice_payment",
           args: { invoice_name, payment_amount }
         });
-        console.log("see the result : ", response);
+        if (response.message && !response.message.error) {
+          return response.message;
+        } else {
+          return [];
+        }
+      } catch (error) {
+        console.error("Error fetching debts:", error);
+        frappe.msgprint(__("Error fetching debts."));
+      }
+    }
+    async update_sales_invoice_payment(invoice_name, payment_amount) {
+      try {
+        const response = await frappe.call({
+          method: "pos_ar.pos_ar.doctype.pos_info.pos_info.update_sales_invoice_payment",
+          args: { invoice_name, payment_amount }
+        });
         if (response.message && !response.message.error) {
           return response.message;
         } else {
@@ -4424,6 +4485,7 @@
       const payBtnStyle = "width:80px;height:35px;color:white;background:green;border-radius:12px;margin:0px 20px;";
       this.debtList.html("");
       const result = await this.app_data.fetchDebts(customer.name);
+      const result2 = await this.app_data.fetchDebtsSalesInvoices(customer.name);
       result.forEach((invoice) => {
         const customerBox = $(
           `<div  style="${invoiceStyle}" class="rowBox C_A_Center invoiceBox" data-invoice-name="${invoice.name}"></div>`
@@ -4434,20 +4496,36 @@
         customerBox.append(`<div style="flex-grow:1;">POS Invoice</div>`);
         customerBox.append(`<div class="rowBox centerItem payBtn" style="${payBtnStyle}">Pay</div>`);
         customerBox.find(".payBtn").on("click", async () => {
-          await this.payPosInvoice(invoice, 1e3);
+          await this.payPosInvoice(invoice);
+        });
+        this.debtList.append(customerBox);
+      });
+      result2.forEach((invoice) => {
+        const customerBox = $(
+          `<div  style="${invoiceStyle}" class="rowBox C_A_Center invoiceBox" data-invoice-name="${invoice.name}"></div>`
+        );
+        customerBox.append(`<div style="flex-grow:1;">${invoice.name}</div>`);
+        customerBox.append(`<div style="flex-grow:1;">${invoice.outstanding_amount} DA</div>`);
+        customerBox.append(`<div style="flex-grow:1;">${invoice.posting_date}</div>`);
+        customerBox.append(`<div style="flex-grow:1;">Sales Invoice</div>`);
+        customerBox.append(`<div class="rowBox centerItem payBtn" style="${payBtnStyle}">Pay</div>`);
+        customerBox.find(".payBtn").on("click", async () => {
+          await this.payPosInvoice(invoice);
         });
         this.debtList.append(customerBox);
       });
     }
     async payPosInvoice(invoice) {
-      const paymentAmount = this.payment_amount;
-      this.payment_amount -= invoice.outstanding_amount;
-      const result = await this.app_data.update_invoice_payment(invoice.name, paymentAmount);
-      console.log("rest : ", result);
+      const result = await this.app_data.update_invoice_payment(invoice.name, this.payment_amount);
       this.payment_amount = result.remaining;
       this.leftContainer.find("#debt_paymentAmount").val(result.remaining);
       this.refreshClientDebtPart(this.selected_client);
     }
+    async paySalesInvoice(invoice) {
+      const result = await this.app_data.update_sales_invoice_payment(invoice.name, this.payment_amount);
+      console.log("see result : ", result);
+      this.refreshClientDebtPart(this.selected_client);
+    }
   };
 })();
-//# sourceMappingURL=pos.bundle.4BV7NCUM.js.map
+//# sourceMappingURL=pos.bundle.JPWFKM6V.js.map

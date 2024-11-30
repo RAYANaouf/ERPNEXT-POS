@@ -95,7 +95,8 @@ pos_ar.PointOfSale.pos_debt_cart = class{
 		const payBtnStyle  = 'width:80px;height:35px;color:white;background:green;border-radius:12px;margin:0px 20px;'
 
 		this.debtList.html('')
-		const result = await this.app_data.fetchDebts(customer.name)
+		const result  = await this.app_data.fetchDebts(customer.name)
+		const result2 = await this.app_data.fetchDebtsSalesInvoices(customer.name)
 
 		result.forEach(invoice=>{
 			const customerBox = $(
@@ -112,27 +113,55 @@ pos_ar.PointOfSale.pos_debt_cart = class{
 				// Get the invoice name from the customerBox
 				//const invoiceName = customerBox.data('invoice-name');
 				// Proceed to pay the invoice with a predefined payment amount (e.g., 1000 DA)
-				await this.payPosInvoice(invoice, 1000);
+				await this.payPosInvoice(invoice);
 			});
 			this.debtList.append(customerBox)
 		})
+
+		result2.forEach(invoice=>{
+			const customerBox = $(
+				`<div  style="${invoiceStyle}" class="rowBox C_A_Center invoiceBox" data-invoice-name="${invoice.name}"></div>`
+			)
+			customerBox.append(`<div style="flex-grow:1;">${invoice.name}</div>`)
+			customerBox.append(`<div style="flex-grow:1;">${invoice.outstanding_amount} DA</div>`)
+			customerBox.append(`<div style="flex-grow:1;">${invoice.posting_date}</div>`)
+			customerBox.append(`<div style="flex-grow:1;">Sales Invoice</div>`)
+			customerBox.append(`<div class="rowBox centerItem payBtn" style="${payBtnStyle}">Pay</div>`)
+
+			 // Set up the click event listener for the Pay button
+			customerBox.find('.payBtn').on('click', async () => {
+				// Get the invoice name from the customerBox
+				//const invoiceName = customerBox.data('invoice-name');
+				// Proceed to pay the invoice with a predefined payment amount (e.g., 1000 DA)
+				await this.payPosInvoice(invoice);
+			});
+			this.debtList.append(customerBox)
+		})
+
+
 
 	}
 
 
 	async payPosInvoice(invoice){
-
-		// The amount to be paid (could be dynamic based on user input, here we assume 1000 DA as example)
-		const paymentAmount = this.payment_amount;
-		this.payment_amount -= invoice.outstanding_amount;
-
-
 		// Call the server method to update the invoice payment
-		const result = await this.app_data.update_invoice_payment(invoice.name, paymentAmount);
+		const result = await this.app_data.update_invoice_payment(invoice.name, this.payment_amount);
 
-		console.log("rest : " , result)
 		this.payment_amount = result.remaining
 		this.leftContainer.find("#debt_paymentAmount").val(result.remaining)
+
+		this.refreshClientDebtPart(this.selected_client)
+	}
+	async paySalesInvoice(invoice){
+		// Call the server method to update the invoice payment
+		const result = await this.app_data.update_sales_invoice_payment(invoice.name, this.payment_amount);
+
+		console.log("see result : " , result)
+
+		/*
+		this.payment_amount = result.remaining
+		this.leftContainer.find("#debt_paymentAmount").val(result.remaining)
+		*/
 
 		this.refreshClientDebtPart(this.selected_client)
 	}

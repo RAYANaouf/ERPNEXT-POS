@@ -71,6 +71,7 @@ pos_ar.PointOfSale.Controller = class {
 			await this.handleAppData();
 
 			let new_pos_invoice               = frappe.model.get_new_doc('POS Invoice');
+			new_pos_invoice.custom_cach_name  = new_pos_invoice.name
 			new_pos_invoice.customer          = this.defaultCustomer.name
 			new_pos_invoice.pos_profile       = this.appData.appData.pos_profile.name
 			new_pos_invoice.items             = [];
@@ -751,6 +752,7 @@ pos_ar.PointOfSale.Controller = class {
 	createNewTab(counter){
 
 		let new_pos_invoice = frappe.model.get_new_doc('POS Invoice');
+		new_pos_invoice.custom_cach_name  = new_pos_invoice.name
 		new_pos_invoice.customer          = this.defaultCustomer.name
 		new_pos_invoice.pos_profile       = this.appData.appData.pos_profile.name
 		new_pos_invoice.items             = [];
@@ -1165,11 +1167,13 @@ pos_ar.PointOfSale.Controller = class {
 				pos
 			).then(r =>{
 				pos.opened = 0;
+				pos.real_name = r.name
+
+				this.history_cart.print_receipt(pos)
 				this.appData.updatePosInvoice(pos)
 
 				/*** START : deleting pos when finishing **/
 				//print the pos
-				this.history_cart.print_receipt(pos)
 
 				this.selectedItemMaps.delete(this.selectedTab.tabName)
 
@@ -1259,6 +1263,7 @@ pos_ar.PointOfSale.Controller = class {
 					).then(r =>{
 						const updatedPos = structuredClone(pos)
 						updatedPos.synced = true;
+						updatedPos.real_name = r.name
 						this.appData.updatePosInvoice(updatedPos)
 						counter += 1 ;
 						frappe.show_progress('Syncing Invoices...' , counter , allUnsyncedPos.length , 'syncing')
