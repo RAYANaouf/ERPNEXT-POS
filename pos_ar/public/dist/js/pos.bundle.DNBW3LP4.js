@@ -2926,7 +2926,7 @@
     }
     static async openDatabase() {
       return new Promise((resolve, reject) => {
-        const request = window.indexedDB.open("POSDB_test34", 1);
+        const request = window.indexedDB.open("POSDB_test33", 1);
         request.onerror = (event2) => {
           reject(request.error);
         };
@@ -4528,4 +4528,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.JPWFKM6V.js.map
+//# sourceMappingURL=pos.bundle.DNBW3LP4.js.map
