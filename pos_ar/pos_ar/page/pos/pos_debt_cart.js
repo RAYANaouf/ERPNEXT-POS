@@ -133,7 +133,7 @@ pos_ar.PointOfSale.pos_debt_cart = class{
 				// Get the invoice name from the customerBox
 				//const invoiceName = customerBox.data('invoice-name');
 				// Proceed to pay the invoice with a predefined payment amount (e.g., 1000 DA)
-				await this.payPosInvoice(invoice);
+				await this.paySalesInvoice(invoice);
 			});
 			this.debtList.append(customerBox)
 		})

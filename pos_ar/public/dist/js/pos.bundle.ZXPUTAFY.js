@@ -4510,7 +4510,7 @@
         customerBox.append(`<div style="flex-grow:1;">Sales Invoice</div>`);
         customerBox.append(`<div class="rowBox centerItem payBtn" style="${payBtnStyle}">Pay</div>`);
         customerBox.find(".payBtn").on("click", async () => {
-          await this.payPosInvoice(invoice);
+          await this.paySalesInvoice(invoice);
         });
         this.debtList.append(customerBox);
       });
@@ -4528,4 +4528,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.DNBW3LP4.js.map
+//# sourceMappingURL=pos.bundle.ZXPUTAFY.js.map
