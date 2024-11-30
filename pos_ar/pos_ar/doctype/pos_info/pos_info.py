@@ -96,6 +96,8 @@ def update_invoice_payment(invoice_name, payment_amount):
 
 	# Create a new POS Invoice by duplicating the old one
 	new_pos_invoice = frappe.copy_doc(pos_invoice)
+	#override date to keep the old one
+	new_pos_invoice.posting_date = pos_invoice.posting_date
 
 	pos_invoice.cancel()
 	frappe.db.commit()
@@ -107,9 +109,9 @@ def update_invoice_payment(invoice_name, payment_amount):
 	# Check if the invoice has an outstanding amount
 	if float(outstanding_amount) > 0:
 		if float(payment_amount) == float(outstanding_amount):
-			new_pos_invoice.payments[0].amount += float(payment_amount)
+			new_pos_invoice.payments[0].amount      += float(payment_amount)
 			new_pos_invoice.payments[0].base_amount += float(payment_amount)
-			new_pos_invoice.outstanding_amount -= float(payment_amount)
+			new_pos_invoice.outstanding_amount      -= float(payment_amount)
 			new_pos_invoice.status = 'Paid'
 			# Save the updated POS Invoice
 			new_pos_invoice.save()
@@ -143,9 +145,9 @@ def update_invoice_payment(invoice_name, payment_amount):
 				'paid'               : new_pos_invoice.status
 			}
 		else:
-			new_pos_invoice.payments[0].amount += float(payment_amount)
+			new_pos_invoice.payments[0].amount      += float(payment_amount)
 			new_pos_invoice.payments[0].base_amount += float(payment_amount)
-			new_pos_invoice.outstanding_amount -= float(payment_amount)
+			new_pos_invoice.outstanding_amount      -= float(payment_amount)
 			# Save the updated POS Invoice
 			new_pos_invoice.save()
 			frappe.db.commit()

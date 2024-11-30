@@ -4423,6 +4423,9 @@
       this._filtredClientList = this.app_data.appData.customers;
       this.selected_client = {};
       this.payment_amount = 0;
+      this._pos_invoice = [];
+      this._sales_invoice = [];
+      this._selected_invoice = [];
       this.start_work();
     }
     start_work() {
@@ -4442,7 +4445,8 @@
       this.rightContainer.append(`<div class="rowBox centerItem"  style="${headerStyle}" ><input type="text" id="debt_filterClientList" placeholder="Search..." style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;"></div>`);
       this.rightContainer.append(`<div id="debt_customerList" class="columnBox" style="${listStyle}"></div>`);
       this.customerList = this.rightContainer.find("#debt_customerList");
-      this.leftContainer.append(`<div class="rowBox C_A_Center" style="margin:16px;" ><div> Amount </div><input id="debt_paymentAmount" type="number" style="${inputStyle}"></input></div>`);
+      this.leftContainer.append(`<div class="rowBox C_A_Center" style="margin:16px;" ><div> Amount </div><input id="debt_paymentAmount" type="number" style="${inputStyle}"></input><div style="flex-grow:1;"></div><div id="total_client_debt"> DA</div></div>`);
+      this.total_client_debt = this.leftContainer.find("#total_client_debt");
       this.leftContainer.append(`<div id="debt_debtsList"  class="columnBox" style="${debtListStyle}"></div>`);
       this.debtList = this.leftContainer.find("#debt_debtsList");
     }
@@ -4480,16 +4484,25 @@
         this.customerList.append(customerBox);
       });
     }
+    refreshTotal(total_debt) {
+      this.total_client_debt.text(`Total Debt : ${total_debt} DA`);
+    }
     async refreshClientDebtPart(customer) {
+      this.refreshTotal("Loading ...");
       const invoiceStyle = "width:calc(100% - 40px);height:60px;min-height:60px;border-bottom:2px solid #505050;";
       const payBtnStyle = "width:80px;height:35px;color:white;background:green;border-radius:12px;margin:0px 20px;";
+      let total_debt = 0;
       this.debtList.html("");
       const result = await this.app_data.fetchDebts(customer.name);
       const result2 = await this.app_data.fetchDebtsSalesInvoices(customer.name);
       result.forEach((invoice) => {
+        console.log("im here ===> ");
+        total_debt += invoice.outstanding_amount;
         const customerBox = $(
           `<div  style="${invoiceStyle}" class="rowBox C_A_Center invoiceBox" data-invoice-name="${invoice.name}"></div>`
         );
+        const checkbox = $(`<input type="checkbox" class="select_checkbox" style="margin:0px 16px;" ></input>`);
+        customerBox.append(checkbox);
         customerBox.append(`<div style="flex-grow:1;">${invoice.name}</div>`);
         customerBox.append(`<div style="flex-grow:1;">${invoice.outstanding_amount} DA</div>`);
         customerBox.append(`<div style="flex-grow:1;">${invoice.posting_date}</div>`);
@@ -4501,9 +4514,11 @@
         this.debtList.append(customerBox);
       });
       result2.forEach((invoice) => {
+        total_debt += invoice.outstanding_amount;
         const customerBox = $(
           `<div  style="${invoiceStyle}" class="rowBox C_A_Center invoiceBox" data-invoice-name="${invoice.name}"></div>`
         );
+        customerBox.append(`<input type="checkbox" style="margin:0px 16px;" ></input>`);
         customerBox.append(`<div style="flex-grow:1;">${invoice.name}</div>`);
         customerBox.append(`<div style="flex-grow:1;">${invoice.outstanding_amount} DA</div>`);
         customerBox.append(`<div style="flex-grow:1;">${invoice.posting_date}</div>`);
@@ -4514,6 +4529,22 @@
         });
         this.debtList.append(customerBox);
       });
+      this.debtList.on("click", '.invoiceBox input[type="checkbox"]', (event2) => {
+        const checkbox = $(event2.target);
+        const invoiceName = checkbox.closest(".invoiceBox").data("invoice-name");
+        if (checkbox.is(":checked")) {
+          if (!this._selected_invoice.includes(invoiceName)) {
+            this._selected_invoice.push(invoiceName);
+          }
+        } else {
+          const index = this._selected_invoice.indexOf(invoiceName);
+          if (index > -1) {
+            this._selected_invoice.splice(index, 1);
+          }
+        }
+        console.log("Selected Invoices:", this._selected_invoice);
+      });
+      this.refreshTotal(total_debt);
     }
     async payPosInvoice(invoice) {
       const result = await this.app_data.update_invoice_payment(invoice.name, this.payment_amount);
@@ -4528,4 +4559,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.ZXPUTAFY.js.map
+//# sourceMappingURL=pos.bundle.2AIAZOZK.js.map
