@@ -44,10 +44,11 @@ pos_ar.PointOfSale.pos_debt_cart = class{
 		this.customerList = this.rightContainer.find('#debt_customerList')
 
 		//debts part
-		this.leftContainer.append(`<div class="rowBox C_A_Center" style="margin:16px;" ><div> Amount </div><input id="debt_paymentAmount" type="number" style="${inputStyle}"></input><div style="flex-grow:1;"></div><div id="total_client_debt"> DA</div></div>`)
-		this.total_client_debt = this.leftContainer.find('#total_client_debt')
+		this.leftContainer.append(`<div class="rowBox C_A_Center" style="margin:16px;" ><div> Amount </div><input id="debt_paymentAmount" type="number" style="${inputStyle}"></input><div style="flex-grow:1;"  id="partially_client_debt"  class="rowBox centerItem"> Selected Debt : 0 DA </div><div style="flex-grow:1;" id="total_client_debt" class="rowBox centerItem"> DA</div></div>`)
+		this.total_client_debt     = this.leftContainer.find('#total_client_debt')
+		this.partially_client_debt = this.leftContainer.find('#partially_client_debt')
 		this.leftContainer.append(`<div id="debt_debtsList"  class="columnBox" style="${debtListStyle}"></div>`)
-		this.debtList     = this.leftContainer.find('#debt_debtsList')
+		this.debtList              = this.leftContainer.find('#debt_debtsList')
 	}
 	showCart(){
 		this.leftContainer.css('display' , 'flex')
@@ -71,6 +72,31 @@ pos_ar.PointOfSale.pos_debt_cart = class{
 		this.leftContainer.find("#debt_paymentAmount").on('input',event =>{
 			this.payment_amount = parseFloat(this.leftContainer.find("#debt_paymentAmount").val())
 		})
+		this.debtList.on('click', '.invoiceBox input[type="checkbox"]', event => {
+			const checkbox                 = $(event.target);
+			const invoiceName              = checkbox.data('invoice-name');
+			const invoiceOutstandingAmount = checkbox.data('outstanding-amount')
+			const invoiceType              = checkbox.data('invoice-type')
+
+			const invoice_data = { 'name' : invoiceName , 'outstanding_amount' : invoiceOutstandingAmount , 'type' : invoiceType }
+
+			if (checkbox.is(':checked')) {
+				// Add the invoice name to the selected list
+				if (!this._selected_invoice.some(invoice => invoice.name == invoiceName)) {
+					this._selected_invoice.push(invoice_data);
+				}
+			} else {
+				// Remove the invoice name from the selected list
+				const index = this._selected_invoice.findIndex(invoice => invoice.name == invoiceName);
+				console.log("let's debuging : " , "invoiceName : " , invoiceName , "index : " , index , "this._selected_invoice : " , this._selected_invoice)
+				if (index > -1) {
+					this._selected_invoice.splice(index, 1);
+				}
+			}
+			this.refresh_partially_paid()
+			console.log('Selected Invoices:', this._selected_invoice); // For debugging
+		});
+
 	}
 
 	refreshClientPart(){
@@ -97,13 +123,22 @@ pos_ar.PointOfSale.pos_debt_cart = class{
 	refreshTotal(total_debt){
 		this.total_client_debt.text(`Total Debt : ${total_debt} DA`);
 	}
+	refresh_partially_paid(){
+		//calculate the client selected pos debt based on selected check box
+		let partially_paid = 0 ;
+		this._selected_invoice.forEach(invoice=>{
+			partially_paid += invoice.outstanding_amount
+			console.log("see invoice ==> " , invoice)
+		})
+
+		this.partially_client_debt.text(`Selected Debt : ${partially_paid} DA`)
+	}
 
 	async  refreshClientDebtPart(customer){
-
-
-
+		//make the total text to loading... indicator rather than false value.
 		this.refreshTotal( "Loading ..." );
-
+		this._selected_invoice = []
+		this.refresh_partially_paid();
 
 		//styles
 		const invoiceStyle = 'width:calc(100% - 40px);height:60px;min-height:60px;border-bottom:2px solid #505050;'
@@ -117,14 +152,12 @@ pos_ar.PointOfSale.pos_debt_cart = class{
 
 		result.forEach(invoice=>{
 
-			console.log('im here ===> ');
-
 			total_debt += invoice.outstanding_amount ;
 
 			const customerBox = $(
 				`<div  style="${invoiceStyle}" class="rowBox C_A_Center invoiceBox" data-invoice-name="${invoice.name}"></div>`
 			)
-			const checkbox = $(`<input type="checkbox" class="select_checkbox" style="margin:0px 16px;" ></input>`)
+			const checkbox = $(`<input type="checkbox" class="select_checkbox" style="margin:0px 16px;" data-invoice-type="POS Invoice" data-invoice-name="${invoice.name}" data-outstanding-amount="${invoice.outstanding_amount}" ></input>`)
 			customerBox.append(checkbox)
 			customerBox.append(`<div style="flex-grow:1;">${invoice.name}</div>`)
 			customerBox.append(`<div style="flex-grow:1;">${invoice.outstanding_amount} DA</div>`)
@@ -141,7 +174,6 @@ pos_ar.PointOfSale.pos_debt_cart = class{
 			});
 
 
-
 			this.debtList.append(customerBox)
 		})
 
@@ -151,7 +183,7 @@ pos_ar.PointOfSale.pos_debt_cart = class{
 			const customerBox = $(
 				`<div  style="${invoiceStyle}" class="rowBox C_A_Center invoiceBox" data-invoice-name="${invoice.name}"></div>`
 			)
-			customerBox.append(`<input type="checkbox" style="margin:0px 16px;" ></input>`)
+			customerBox.append(`<input type="checkbox" style="margin:0px 16px;" data-invoice-type="Sales Invoice" data-invoice-name="${invoice.name}" data-outstanding-amount="${invoice.outstanding_amount}" ></input>`)
 			customerBox.append(`<div style="flex-grow:1;">${invoice.name}</div>`)
 			customerBox.append(`<div style="flex-grow:1;">${invoice.outstanding_amount} DA</div>`)
 			customerBox.append(`<div style="flex-grow:1;">${invoice.posting_date}</div>`)
@@ -169,24 +201,6 @@ pos_ar.PointOfSale.pos_debt_cart = class{
 		})
 
 
-		this.debtList.on('click', '.invoiceBox input[type="checkbox"]', event => {
-			const checkbox = $(event.target);
-			const invoiceName = checkbox.closest('.invoiceBox').data('invoice-name');
-
-			if (checkbox.is(':checked')) {
-				// Add the invoice name to the selected list
-				if (!this._selected_invoice.includes(invoiceName)) {
-					this._selected_invoice.push(invoiceName);
-				}
-			} else {
-				// Remove the invoice name from the selected list
-				const index = this._selected_invoice.indexOf(invoiceName);
-				if (index > -1) {
-					this._selected_invoice.splice(index, 1);
-				}
-			}
-			console.log('Selected Invoices:', this._selected_invoice); // For debugging
-		});
 
 		this.refreshTotal( total_debt );
 
@@ -218,3 +232,4 @@ pos_ar.PointOfSale.pos_debt_cart = class{
 	}
 
 }
+

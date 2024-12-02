@@ -71,7 +71,6 @@ pos_ar.PointOfSale.Controller = class {
 			await this.handleAppData();
 
 			let new_pos_invoice               = frappe.model.get_new_doc('POS Invoice');
-			new_pos_invoice.custom_cach_name  = new_pos_invoice.name
 			new_pos_invoice.customer          = this.defaultCustomer.name
 			new_pos_invoice.pos_profile       = this.appData.appData.pos_profile.name
 			new_pos_invoice.items             = [];
@@ -94,10 +93,10 @@ pos_ar.PointOfSale.Controller = class {
 			const minutes = date.getMinutes()
 			const seconds = date.getMilliseconds()
 			new_pos_invoice.refNum            = this.appData.appData.pos_profile.name+"-"+year+'-'+month+'-'+day+'-'+hour+minutes+seconds
+			new_pos_invoice.custom_cach_name  = new_pos_invoice.refNum
 
 			this.selectedItemMaps.set("C1" , new_pos_invoice)
 			this.selectedTab.tabName = `C1`
-
 
 		}catch(err){
 			console.error("Hlafware POS Error ==> " , err)
@@ -752,7 +751,6 @@ pos_ar.PointOfSale.Controller = class {
 	createNewTab(counter){
 
 		let new_pos_invoice = frappe.model.get_new_doc('POS Invoice');
-		new_pos_invoice.custom_cach_name  = new_pos_invoice.name
 		new_pos_invoice.customer          = this.defaultCustomer.name
 		new_pos_invoice.pos_profile       = this.appData.appData.pos_profile.name
 		new_pos_invoice.items             = [];
@@ -776,6 +774,7 @@ pos_ar.PointOfSale.Controller = class {
 		const minutes = date.getMinutes()
 		const seconds = date.getMilliseconds()
 		new_pos_invoice.refNum            = this.appData.appData.pos_profile.name+"-"+year+'-'+month+'-'+day+'-'+hour+minutes+seconds
+		new_pos_invoice.custom_cach_name  = new_pos_invoice.refNum
 
 		this.selectedItemMaps.set(`C${counter}` , new_pos_invoice)
 		this.selectedTab.tabName = `C${counter}`
@@ -1155,7 +1154,8 @@ pos_ar.PointOfSale.Controller = class {
 		this.selectedItemMaps.get(this.selectedTab.tabName).status            = status
 
 		//copy the pos is important otherwise it will deleted and the selectedTab change and then it will save the
-		//wrong one. because insert take a while after the callback will called.		console.log("debuging rayan :::: " , this.selected_item_cart)
+		//wrong one. because insert take a while after the callback will called.
+		//console.log("debuging rayan :::: " , this.selected_item_cart)
 
 		const pos = structuredClone(this.selectedItemMaps.get(this.selectedTab.tabName))
 

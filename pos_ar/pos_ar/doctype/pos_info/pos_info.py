@@ -16,10 +16,10 @@ def get_customer_debts(customer_name):
 		'POS Invoice',  # DocType
 		fields=['name' , 'outstanding_amount' , 'posting_date'],  # Required fields
                 filters={
-			'customer': customer_name,  # Filter by customer name
-			'outstanding_amount': ['>', 0],  # Only unpaid invoices
-			'docstatus': 1,  # not the canceled ones
-			'consolidated_invoice' : ''
+		     	'customer'             : customer_name ,  # Filter by customer name
+		     	'outstanding_amount'   : ['>', 0]      ,  # Only unpaid invoices
+		     	'docstatus'            : 1             ,  # not the canceled ones
+		     	'consolidated_invoice' : ''
 		}, # Apply filters
 		limit_page_length=100000  # Adjust as needed
 	)
@@ -31,9 +31,9 @@ def get_customer_debts_sales_invoices(customer_name):
 		'Sales Invoice',  # DocType
 		fields=['name' , 'outstanding_amount' , 'posting_date'],  # Required fields
                 filters={
-			'customer': customer_name,  # Filter by customer name
-			'outstanding_amount': ['>', 0],  # Only unpaid invoices
-			'docstatus': 1  # not the canceled ones
+			'customer'           : customer_name ,  # Filter by customer name
+			'outstanding_amount' : ['>', 0]      ,  # Only unpaid invoices
+			'docstatus'          : 1                # not the canceled ones
 		}, # Apply filters
 		limit_page_length=100000  # Adjust as needed
 	)
@@ -105,13 +105,14 @@ def update_invoice_payment(invoice_name, payment_amount):
 
 	# Convert the outstanding amount to float for comparison
 	outstanding_amount = float(new_pos_invoice.outstanding_amount)
+	client_payment_amount = float(payment_amount)
 
 	# Check if the invoice has an outstanding amount
-	if float(outstanding_amount) > 0:
-		if float(payment_amount) == float(outstanding_amount):
-			new_pos_invoice.payments[0].amount      += float(payment_amount)
-			new_pos_invoice.payments[0].base_amount += float(payment_amount)
-			new_pos_invoice.outstanding_amount      -= float(payment_amount)
+	if outstanding_amount > 0:
+		if client_payment_amount == outstanding_amount :
+			new_pos_invoice.payments[0].amount      += client_payment_amount
+			new_pos_invoice.payments[0].base_amount += client_payment_amount
+			new_pos_invoice.outstanding_amount      -= client_payment_amount
 			new_pos_invoice.status = 'Paid'
 			# Save the updated POS Invoice
 			new_pos_invoice.save()
@@ -125,12 +126,12 @@ def update_invoice_payment(invoice_name, payment_amount):
 				'remaining'         : 0,
 				'paid'              : new_pos_invoice.status
 			}
-		elif float(payment_amount) > float(outstanding_amount):
-			new_pos_invoice.payments[0].amount += float(outstanding_amount)
-			new_pos_invoice.payments[0].base_amount += float(outstanding_amount)
+		elif client_payment_amount > outstanding_amount :
+			new_pos_invoice.payments[0].amount += outstanding_amount
+			new_pos_invoice.payments[0].base_amount += outstanding_amount
 			new_pos_invoice.outstanding_amount = 0
 			new_pos_invoice.status = 'Paid'
-			rest = float(payment_amount) - float(outstanding_amount)
+			rest = client_payment_amount - outstanding_amount
 			# Save the updated POS Invoice
 			new_pos_invoice.save()
 			frappe.db.commit()
@@ -145,9 +146,9 @@ def update_invoice_payment(invoice_name, payment_amount):
 				'paid'               : new_pos_invoice.status
 			}
 		else:
-			new_pos_invoice.payments[0].amount      += float(payment_amount)
-			new_pos_invoice.payments[0].base_amount += float(payment_amount)
-			new_pos_invoice.outstanding_amount      -= float(payment_amount)
+			new_pos_invoice.payments[0].amount      += client_payment_amount
+			new_pos_invoice.payments[0].base_amount += client_payment_amount
+			new_pos_invoice.outstanding_amount      -= client_payment_amount
 			# Save the updated POS Invoice
 			new_pos_invoice.save()
 			frappe.db.commit()
@@ -179,6 +180,18 @@ def update_sales_invoice_payment(invoice_name, payment_amount):
 	sales_invoice = frappe.get_doc('Sales Invoice', invoice_name)
 
 	if float(sales_invoice.outstanding_amount) > 0:
+
+		payAmount         = 0
+		outstandingAmount = 0
+		rest = 0
+
+		#Important check if it pay more than outstanding
+		if(payment_amount > sales_invoice.outstanding_amount):
+			payAmount = float(sales_invoice.outstanding_amount)
+			rest      = float(float(payment_amount) - float(sales_invoice.outstanding_amount))
+		else:
+			payAmount = float(payment_amount)
+
 		# Create a Payment Entry
 		payment_entry = frappe.new_doc('Payment Entry')
 		payment_entry.payment_type    = 'Receive'
@@ -193,7 +206,7 @@ def update_sales_invoice_payment(invoice_name, payment_amount):
 		reference_row = payment_entry.append('references', {})
 		reference_row.reference_doctype = 'Sales Invoice'
 		reference_row.reference_name = sales_invoice.name
-		reference_row.allocated_amount = float(payment_amount)
+		reference_row.allocated_amount = float(payAmount)
 
 
 
