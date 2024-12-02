@@ -186,7 +186,7 @@ def update_sales_invoice_payment(invoice_name, payment_amount):
 		rest = 0
 
 		#Important check if it pay more than outstanding
-		if(payment_amount > sales_invoice.outstanding_amount):
+		if(float(payment_amount) > float(sales_invoice.outstanding_amount)):
 			payAmount = float(sales_invoice.outstanding_amount)
 			rest      = float(float(payment_amount) - float(sales_invoice.outstanding_amount))
 		else:
@@ -236,10 +236,7 @@ def update_sales_invoice_payment(invoice_name, payment_amount):
 		payment_entry.submit()
 
 		return {
-			'invoice_name': sales_invoice.name,
-			'paid_amount': payment_amount,
-			'outstanding_amount': sales_invoice.outstanding_amount,
-			'status': sales_invoice.status
+			'remaining': rest,
 		}
 	else:
 		return {'error': 'This invoice is already fully paid or has no outstanding amount.'}

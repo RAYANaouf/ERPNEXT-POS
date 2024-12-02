@@ -4569,9 +4569,10 @@
     }
     async paySalesInvoice(invoice) {
       const result = await this.app_data.update_sales_invoice_payment(invoice.name, this.payment_amount);
-      console.log("see result : ", result);
+      this.payment_amount = result.remaining;
+      this.leftContainer.find("#debt_paymentAmount").val(result.remaining);
       this.refreshClientDebtPart(this.selected_client);
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.SLZGEGOJ.js.map
+//# sourceMappingURL=pos.bundle.PHKXY4RJ.js.map

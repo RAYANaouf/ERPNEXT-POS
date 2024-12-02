@@ -221,12 +221,8 @@ pos_ar.PointOfSale.pos_debt_cart = class{
 		// Call the server method to update the invoice payment
 		const result = await this.app_data.update_sales_invoice_payment(invoice.name, this.payment_amount);
 
-		console.log("see result : " , result)
-
-		/*
 		this.payment_amount = result.remaining
 		this.leftContainer.find("#debt_paymentAmount").val(result.remaining)
-		*/
 
 		this.refreshClientDebtPart(this.selected_client)
 	}
