@@ -38,10 +38,11 @@ pos_ar.PointOfSale.pos_customer_box = class{
 		this.actionContainer = this.wrapper.find('#ActionsContainerBox');
 
 		this.actionContainer.append('<div id="SyncBox"     class="rowBox centerItem" >');
-		this.actionContainer.append('<div id="HomeBox"     class="rowBox centerItem"  style="display:none;">');
+		this.actionContainer.append('<div id="HomeBox"     class="rowBox centerItem" style="display:none;">');
 		this.actionContainer.append('<div id="DebtBox"     class="rowBox centerItem" >');
 		this.actionContainer.append('<div id="exchangeBtn" class="rowBox centerItem" style="margin-right:16px;" >  <img src="/assets/pos_ar/images/exchange.png">  </div>');
 		this.actionContainer.append('<div id="MenuBox"     class="rowBox centerItem" >');
+
 
 		//sync btn
 		this.sync_btn = this.actionContainer.find('#SyncBox')

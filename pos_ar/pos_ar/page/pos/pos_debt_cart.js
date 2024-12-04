@@ -44,11 +44,18 @@ pos_ar.PointOfSale.pos_debt_cart = class{
 		this.customerList = this.rightContainer.find('#debt_customerList')
 
 		//debts part
-		this.leftContainer.append(`<div class="rowBox C_A_Center" style="margin:16px;" ><div> Amount </div><input id="debt_paymentAmount" type="number" style="${inputStyle}"></input><div style="flex-grow:1;"  id="partially_client_debt"  class="rowBox centerItem"> Selected Debt : 0 DA </div><div style="flex-grow:1;" id="total_client_debt" class="rowBox centerItem"> DA</div></div>`)
-		this.total_client_debt     = this.leftContainer.find('#total_client_debt')
-		this.partially_client_debt = this.leftContainer.find('#partially_client_debt')
+		this.leftContainer.append(`<div class="rowBox C_A_Center" style="margin:16px;" ><div> Amount </div><input id="debt_paymentAmount" type="number" style="${inputStyle}"></input><div style="flex-grow:1;" id="total_client_debt" class="rowBox centerItem"> DA</div> <div style="flex-grow:1;"  id="partially_client_debt"  class="rowBox centerItem"> Selected Debt : 0 DA </div>  <div id="pay_selected_invoices_btn" style="background:green;height:35px;width:95px;color:white;cursor:pointer;border-raduis:12px;" class="rowBox centerItem"> Pay </div>  </div>`)
+		this.leftContainer.append(
+				`<script src="https://unpkg.com/@dotlottie/player-component@2.7.12/dist/dotlottie-player.mjs" type="module"></script>`+
+				`<div id="debt_waitingContainer" style="position:absolute;background:#00000050;top:0;left:0;inset: 0;display:none;backdrop-filter: blur(2px);z-index: 10;" class="rowBox centerItem" ><dotlottie-player src="https://lottie.host/d6c76206-aab9-4d5a-af73-c4a6cfc5aaa9/H8vnpKcKj9.lottie" background="transparent" speed="1" style="width: 300px; height: 300px" loop autoplay></dotlottie-player></div>`
+		)
+		this.waiting_cart =  this.leftContainer.find('#debt_waitingContainer')
+		this.total_client_debt         = this.leftContainer.find('#total_client_debt')
+		this.partially_client_debt     = this.leftContainer.find('#partially_client_debt')
+		this.pay_selected_invoices_btn = this.leftContainer.find('#pay_selected_invoices_btn')
 		this.leftContainer.append(`<div id="debt_debtsList"  class="columnBox" style="${debtListStyle}"></div>`)
 		this.debtList              = this.leftContainer.find('#debt_debtsList')
+		this.leftContainer.append('<div id="debt_waitingContainer" ></div>')
 	}
 	showCart(){
 		this.leftContainer.css('display' , 'flex')
@@ -57,6 +64,13 @@ pos_ar.PointOfSale.pos_debt_cart = class{
 	hideCart(){
 		this.leftContainer.css('display' , 'none')
 		this.rightContainer.css('display' , 'none')
+	}
+
+	show_waiting(){
+		this.waiting_cart.css('display' , 'flex')
+	}
+	hide_waiting(){
+		this.waiting_cart.css('display' , 'none')
 	}
 
 	setListener(){
@@ -71,6 +85,9 @@ pos_ar.PointOfSale.pos_debt_cart = class{
 		})
 		this.leftContainer.find("#debt_paymentAmount").on('input',event =>{
 			this.payment_amount = parseFloat(this.leftContainer.find("#debt_paymentAmount").val())
+		})
+		this.pay_selected_invoices_btn.on('click' , event =>{
+			console.log("check the list ==> " , this._selected_invoice)
 		})
 		this.debtList.on('click', '.invoiceBox input[type="checkbox"]', event => {
 			const checkbox                 = $(event.target);
@@ -142,7 +159,7 @@ pos_ar.PointOfSale.pos_debt_cart = class{
 
 		//styles
 		const invoiceStyle = 'width:calc(100% - 40px);height:60px;min-height:60px;border-bottom:2px solid #505050;'
-		const payBtnStyle  = 'width:80px;height:35px;color:white;background:green;border-radius:12px;margin:0px 20px;'
+		const payBtnStyle  = 'width:80px;height:35px;color:white;background:green;border-radius:12px;margin:0px 20px;cursor:pointer;'
 
 		let total_debt = 0 ;
 
@@ -208,23 +225,74 @@ pos_ar.PointOfSale.pos_debt_cart = class{
 	}
 
 
-	async payPosInvoice(invoice){
-		// Call the server method to update the invoice payment
-		const result = await this.app_data.update_invoice_payment(invoice.name, this.payment_amount);
+	async payPosInvoice(invoice) {
+		try {
+			this.show_waiting();
 
-		this.payment_amount = result.remaining
-		this.leftContainer.find("#debt_paymentAmount").val(result.remaining)
+			// Call the server method to update the invoice payment
+			const result = await this.app_data.update_invoice_payment(invoice.name, this.payment_amount);
 
-		this.refreshClientDebtPart(this.selected_client)
+			// Update the payment amount and UI
+			this.payment_amount = result.remaining;
+			this.leftContainer.find("#debt_paymentAmount").val(result.remaining);
+
+			// Refresh the client's debt details
+			await this.refreshClientDebtPart(this.selected_client);
+		} catch (error) {
+			// Handle errors gracefully
+			console.error("Error processing payment:", error);
+
+			// Optional: Notify the user about the error
+			alert("An error occurred while processing the payment. Please try again.");
+		} finally {
+			// Ensure waiting spinner is hidden regardless of success or failure
+			this.hide_waiting();
+		}
 	}
+
+	async paySalesInvoice(invoice) {
+		try {
+			this.show_waiting();
+
+			// Ensure the payment amount is a valid float
+			const paymentAmount = parseFloat(this.payment_amount) || 0;
+
+			// Call the server method to update the invoice payment
+			const result = await this.app_data.update_sales_invoice_payment(invoice.name, paymentAmount);
+
+			// Ensure result is valid and contains the `remaining` field
+			if (result && typeof result.remaining === "number") {
+				// Update the payment amount and UI
+				this.payment_amount = result.remaining;
+				this.leftContainer.find("#debt_paymentAmount").val(result.remaining);
+
+				// Refresh the client's debt details
+				await this.refreshClientDebtPart(this.selected_client);
+			} else {
+				throw new Error("Unexpected server response. Please try again.");
+			}
+		} catch (error) {
+			// Log the error for debugging purposes
+			console.error("Error processing sales invoice payment:", error);
+
+			// Notify the user about the error
+			alert("An error occurred while processing the payment. Please try again later.");
+		} finally {
+			// Ensure the waiting spinner is hidden regardless of success or failure
+			this.hide_waiting();
+		}
+	}
+
 	async paySalesInvoice(invoice){
+		this.show_waiting()
 		// Call the server method to update the invoice payment
-		const result = await this.app_data.update_sales_invoice_payment(invoice.name, this.payment_amount);
+		const result = await this.app_data.update_sales_invoice_payment(invoice.name, parseFloat(this.payment_amount)) || 0;
 
 		this.payment_amount = result.remaining
 		this.leftContainer.find("#debt_paymentAmount").val(result.remaining)
 
 		this.refreshClientDebtPart(this.selected_client)
+		this.hide_waiting()
 	}
 
 }

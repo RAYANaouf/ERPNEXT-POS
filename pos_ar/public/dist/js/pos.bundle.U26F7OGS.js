@@ -1374,7 +1374,7 @@
       this.wrapper.append('<div id="ActionsContainerBox" class="rowBox align_center" style="order:1;">');
       this.actionContainer = this.wrapper.find("#ActionsContainerBox");
       this.actionContainer.append('<div id="SyncBox"     class="rowBox centerItem" >');
-      this.actionContainer.append('<div id="HomeBox"     class="rowBox centerItem"  style="display:none;">');
+      this.actionContainer.append('<div id="HomeBox"     class="rowBox centerItem" style="display:none;">');
       this.actionContainer.append('<div id="DebtBox"     class="rowBox centerItem" >');
       this.actionContainer.append('<div id="exchangeBtn" class="rowBox centerItem" style="margin-right:16px;" >  <img src="/assets/pos_ar/images/exchange.png">  </div>');
       this.actionContainer.append('<div id="MenuBox"     class="rowBox centerItem" >');
@@ -4445,11 +4445,17 @@
       this.rightContainer.append(`<div class="rowBox centerItem"  style="${headerStyle}" ><input type="text" id="debt_filterClientList" placeholder="Search..." style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;"></div>`);
       this.rightContainer.append(`<div id="debt_customerList" class="columnBox" style="${listStyle}"></div>`);
       this.customerList = this.rightContainer.find("#debt_customerList");
-      this.leftContainer.append(`<div class="rowBox C_A_Center" style="margin:16px;" ><div> Amount </div><input id="debt_paymentAmount" type="number" style="${inputStyle}"></input><div style="flex-grow:1;"  id="partially_client_debt"  class="rowBox centerItem"> Selected Debt : 0 DA </div><div style="flex-grow:1;" id="total_client_debt" class="rowBox centerItem"> DA</div></div>`);
+      this.leftContainer.append(`<div class="rowBox C_A_Center" style="margin:16px;" ><div> Amount </div><input id="debt_paymentAmount" type="number" style="${inputStyle}"></input><div style="flex-grow:1;" id="total_client_debt" class="rowBox centerItem"> DA</div> <div style="flex-grow:1;"  id="partially_client_debt"  class="rowBox centerItem"> Selected Debt : 0 DA </div>  <div id="pay_selected_invoices_btn" style="background:green;height:35px;width:95px;color:white;cursor:pointer;border-raduis:12px;" class="rowBox centerItem"> Pay </div>  </div>`);
+      this.leftContainer.append(
+        `<script src="https://unpkg.com/@dotlottie/player-component@2.7.12/dist/dotlottie-player.mjs" type="module"><\/script><div id="debt_waitingContainer" style="position:absolute;background:#00000050;top:0;left:0;inset: 0;display:none;backdrop-filter: blur(2px);z-index: 10;" class="rowBox centerItem" ><dotlottie-player src="https://lottie.host/d6c76206-aab9-4d5a-af73-c4a6cfc5aaa9/H8vnpKcKj9.lottie" background="transparent" speed="1" style="width: 300px; height: 300px" loop autoplay></dotlottie-player></div>`
+      );
+      this.waiting_cart = this.leftContainer.find("#debt_waitingContainer");
       this.total_client_debt = this.leftContainer.find("#total_client_debt");
       this.partially_client_debt = this.leftContainer.find("#partially_client_debt");
+      this.pay_selected_invoices_btn = this.leftContainer.find("#pay_selected_invoices_btn");
       this.leftContainer.append(`<div id="debt_debtsList"  class="columnBox" style="${debtListStyle}"></div>`);
       this.debtList = this.leftContainer.find("#debt_debtsList");
+      this.leftContainer.append('<div id="debt_waitingContainer" ></div>');
     }
     showCart() {
       this.leftContainer.css("display", "flex");
@@ -4458,6 +4464,12 @@
     hideCart() {
       this.leftContainer.css("display", "none");
       this.rightContainer.css("display", "none");
+    }
+    show_waiting() {
+      this.waiting_cart.css("display", "flex");
+    }
+    hide_waiting() {
+      this.waiting_cart.css("display", "none");
     }
     setListener() {
       this.rightContainer.find("#debt_filterClientList").on("input", (event2) => {
@@ -4469,6 +4481,9 @@
       });
       this.leftContainer.find("#debt_paymentAmount").on("input", (event2) => {
         this.payment_amount = parseFloat(this.leftContainer.find("#debt_paymentAmount").val());
+      });
+      this.pay_selected_invoices_btn.on("click", (event2) => {
+        console.log("check the list ==> ", this._selected_invoice);
       });
       this.debtList.on("click", '.invoiceBox input[type="checkbox"]', (event2) => {
         const checkbox = $(event2.target);
@@ -4521,7 +4536,7 @@
       this._selected_invoice = [];
       this.refresh_partially_paid();
       const invoiceStyle = "width:calc(100% - 40px);height:60px;min-height:60px;border-bottom:2px solid #505050;";
-      const payBtnStyle = "width:80px;height:35px;color:white;background:green;border-radius:12px;margin:0px 20px;";
+      const payBtnStyle = "width:80px;height:35px;color:white;background:green;border-radius:12px;margin:0px 20px;cursor:pointer;";
       let total_debt = 0;
       this.debtList.html("");
       const result = await this.app_data.fetchDebts(customer.name);
@@ -4562,17 +4577,46 @@
       this.refreshTotal(total_debt);
     }
     async payPosInvoice(invoice) {
-      const result = await this.app_data.update_invoice_payment(invoice.name, this.payment_amount);
-      this.payment_amount = result.remaining;
-      this.leftContainer.find("#debt_paymentAmount").val(result.remaining);
-      this.refreshClientDebtPart(this.selected_client);
+      try {
+        this.show_waiting();
+        const result = await this.app_data.update_invoice_payment(invoice.name, this.payment_amount);
+        this.payment_amount = result.remaining;
+        this.leftContainer.find("#debt_paymentAmount").val(result.remaining);
+        await this.refreshClientDebtPart(this.selected_client);
+      } catch (error) {
+        console.error("Error processing payment:", error);
+        alert("An error occurred while processing the payment. Please try again.");
+      } finally {
+        this.hide_waiting();
+      }
     }
     async paySalesInvoice(invoice) {
-      const result = await this.app_data.update_sales_invoice_payment(invoice.name, this.payment_amount);
+      try {
+        this.show_waiting();
+        const paymentAmount = parseFloat(this.payment_amount) || 0;
+        const result = await this.app_data.update_sales_invoice_payment(invoice.name, paymentAmount);
+        if (result && typeof result.remaining === "number") {
+          this.payment_amount = result.remaining;
+          this.leftContainer.find("#debt_paymentAmount").val(result.remaining);
+          await this.refreshClientDebtPart(this.selected_client);
+        } else {
+          throw new Error("Unexpected server response. Please try again.");
+        }
+      } catch (error) {
+        console.error("Error processing sales invoice payment:", error);
+        alert("An error occurred while processing the payment. Please try again later.");
+      } finally {
+        this.hide_waiting();
+      }
+    }
+    async paySalesInvoice(invoice) {
+      this.show_waiting();
+      const result = await this.app_data.update_sales_invoice_payment(invoice.name, parseFloat(this.payment_amount)) || 0;
       this.payment_amount = result.remaining;
       this.leftContainer.find("#debt_paymentAmount").val(result.remaining);
       this.refreshClientDebtPart(this.selected_client);
+      this.hide_waiting();
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.PHKXY4RJ.js.map
+//# sourceMappingURL=pos.bundle.U26F7OGS.js.map

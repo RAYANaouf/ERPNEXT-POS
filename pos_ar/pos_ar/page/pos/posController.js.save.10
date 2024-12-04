@@ -21,6 +21,7 @@ pos_ar.PointOfSale.Controller = class {
 		//sell invoice
 		this.POSOpeningEntry = {}
 
+
 		this.invoiceData = { netTotal : 0 , grandTotal : 0 , paidAmount : 0 , toChange : 0 , discount : 0}
 		this.db          = null;
 
@@ -1157,7 +1158,6 @@ pos_ar.PointOfSale.Controller = class {
 		//console.log("debuging rayan :::: " , this.selected_item_cart)
 
 		const pos = structuredClone(this.selectedItemMaps.get(this.selectedTab.tabName))
-
 
 
 		if(status == 'Unpaid'){
