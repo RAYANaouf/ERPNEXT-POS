@@ -4,16 +4,18 @@ pos_ar.PointOfSale.pos_history = class {
 		wrapper,
 		db,
 		selectedPosProfile,
+		appData,
 		company,
 		salesTaxes,
 		onClick
 	){
-		this.wrapper               = wrapper;
-		this.db                    = db;
+		this.wrapper               = wrapper    ;
+		this.db                    = db         ;
 		this.selected_pos_profile  = selectedPosProfile;
-		this.company               = company
-		this.sales_taxes           = salesTaxes;
-		this.on_click              = onClick;
+		this.app_data              = appData    ;
+		this.company               = company    ;
+		this.sales_taxes           = salesTaxes ;
+		this.on_click              = onClick    ;
 
 		//local data
 		this.localPosInvoice   = { lastTime : null , pos_invoices : [] }
@@ -407,11 +409,12 @@ pos_ar.PointOfSale.pos_history = class {
 		let taxes      = 0
 		let grandTotal = 0
 
+		let customer = this.app_data.customers.find(customer => customer.name == pos.customer)
+
+		console.log("find the customer : " , pos.customer , " ====> " , customer )
+
 		const creation_time = pos.creation_time
 		const [date, time]  = creation_time.split(' ')
-
-
-		console.log("check the logo : " , this.company.company_logo)
 
 
 		let invoiceHTML =
@@ -488,6 +491,11 @@ pos_ar.PointOfSale.pos_history = class {
 			netTotal    += item.rate * item.qty
 			invoiceHTML += `<tr > <td ><div >${item.item_name}</div></td>  <td><div>${item.qty}</div></td>  <td><div>${item.rate}</div></td>  <td><div>${item.rate * item.qty}</div></td></tr>`
 		})
+
+			invoiceHTML += `<tr > <td colspan="3" ><div >Totale     : </div></td>   <td><div> ${netTotal+(netTotal*(taxes/100)) - pos.additional_discount_percentage * netTotal} DA </div></td></tr>`
+			invoiceHTML += `<tr > <td colspan="3" ><div >Sold       : </div></td>   <td><div> ${customer.custom_debt} DA </div></td></tr>`
+			invoiceHTML += `<tr > <td colspan="3" ><div >Versement  : </div></td>   <td><div> 0 DA </div></td></tr>`
+
 
 		invoiceHTML += '</table>'
 

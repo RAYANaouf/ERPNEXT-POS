@@ -1,4 +1,5 @@
 
+
 pos_ar.PointOfSale.Controller = class {
         constructor(wrapper) {
 		//principales variable
@@ -433,6 +434,7 @@ pos_ar.PointOfSale.Controller = class {
 									this.wrapper,
 									this.db,
 									this.appData.appData.pos_profile,
+									this.appData.appData,
 									this.company,
 									this.taxes_and_charges,
 									this.historyCartClick.bind(this)

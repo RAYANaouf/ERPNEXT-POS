@@ -380,6 +380,7 @@
         this.wrapper,
         this.db,
         this.appData.appData.pos_profile,
+        this.appData.appData,
         this.company,
         this.taxes_and_charges,
         this.historyCartClick.bind(this)
@@ -2622,10 +2623,11 @@
 
   // ../pos_ar/pos_ar/pos_ar/page/pos/pos_history.js
   pos_ar.PointOfSale.pos_history = class {
-    constructor(wrapper, db, selectedPosProfile, company, salesTaxes, onClick) {
+    constructor(wrapper, db, selectedPosProfile, appData, company, salesTaxes, onClick) {
       this.wrapper = wrapper;
       this.db = db;
       this.selected_pos_profile = selectedPosProfile;
+      this.app_data = appData;
       this.company = company;
       this.sales_taxes = salesTaxes;
       this.on_click = onClick;
@@ -2888,14 +2890,18 @@
       let netTotal = 0;
       let taxes = 0;
       let grandTotal = 0;
+      let customer = this.app_data.customers.find((customer2) => customer2.name == pos.customer);
+      console.log("find the customer : ", pos.customer, " ====> ", customer);
       const creation_time = pos.creation_time;
       const [date, time] = creation_time.split(" ");
-      console.log("check the logo : ", this.company.company_logo);
       let invoiceHTML = `<style>#company_container {width: 100% ; height: 40px ; display:flex; align-items:center; font-size : 12px;}table{width: 100%; margin-top:16px;}tr{width:100%; height:16px;}tr:nth-child(1){}#first_row{border: 5px solid black;}#logContainer{width: 100%;height:80px;display : flex;justify-content:center;}#logContainer img{width:50%; height:100%;}#top_data_container{width:100%;display:flex;}#top_data_container>div.c1{font-size:12px;flex-grow:1;}#top_data_container>div.c2{font-size:12px;flex-grow:1;display:flex;flex-direction:column;align-items:end;}td>div{height:18px; width:100%;font-size:12px;display:flex; justify-content:start; align-items:center;}#footer_message{height:20px;}</style><div style="display:flex; flex-direction:column;"><div id="logContainer"  ><div style="width:20%;"></div><img src="/assets/pos_ar/images/logo.jpg"  id="company_logo"><div style="width:20%;"></div></div><div id="company_container"><div style="flex-grow:1;"></div><p style="margin:0px 25px;">${this.company.company_name}</p><div style="flex-grow:1;"></div></div><div id="top_data_container"><div class="c1"><div class="customer" style="font-weight:600;font-size:18px;"> Customer : ${pos.customer} </div><div class="refrence"> Commande : ${pos.refNum} </div></div><div class="c2"><div class="date"> ${date}/${time} </div></div></div><table><tr id="first_row" ><th style="boder:1px solid black;">Nom</th><th>Qt\xE9</th><th>Prix</th><th>Value</th>`;
       pos.items.forEach((item) => {
         netTotal += item.rate * item.qty;
         invoiceHTML += `<tr > <td ><div >${item.item_name}</div></td>  <td><div>${item.qty}</div></td>  <td><div>${item.rate}</div></td>  <td><div>${item.rate * item.qty}</div></td></tr>`;
       });
+      invoiceHTML += `<tr > <td colspan="3" ><div >Totale     : </div></td>   <td><div> ${netTotal + netTotal * (taxes / 100) - pos.additional_discount_percentage * netTotal} DA </div></td></tr>`;
+      invoiceHTML += `<tr > <td colspan="3" ><div >Sold       : </div></td>   <td><div> ${customer.custom_debt} DA </div></td></tr>`;
+      invoiceHTML += `<tr > <td colspan="3" ><div >Versement  : </div></td>   <td><div> 0 DA </div></td></tr>`;
       invoiceHTML += "</table>";
       invoiceHTML += `<div style="height:23px;"> <p style="font-size:12px;font-weight:500;" ><span style="font-size:12px;font-weight:600;">Sous-total : </span> ${netTotal} DA </p> </div>`;
       invoiceHTML += `<div style="height:23px;"> <p style="font-size:12px;font-weight:500;" ><span style="font-size:12px;font-weight:600;">Reduction : </span> ${pos.additional_discount_percentage * netTotal} DA </p> </div>`;
@@ -4176,7 +4182,7 @@
       try {
         const filter = { disabled: 0 };
         return await frappe.db.get_list("Customer", {
-          fields: ["name", "customer_name"],
+          fields: ["name", "customer_name", "custom_debt"],
           filters: filter,
           limit: 1e5,
           order_by: "customer_name ASC"
@@ -4655,4 +4661,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.VJ3PMPGJ.js.map
+//# sourceMappingURL=pos.bundle.2C7EP7S5.js.map
