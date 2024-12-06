@@ -4138,10 +4138,12 @@
       return rest;
     }
     async update_sales_invoice_payment(invoiceName, amount) {
-      console.log("rayanoo");
       const rest = await this.api_handler.update_sales_invoice_payment(invoiceName, amount);
-      console.log("we are hereeeee : ", rest);
       await this.getPosInvoices();
+      return rest;
+    }
+    async paySelectedInvoice(invoices, amount) {
+      const rest = await this.api_handler.pay_selected_invoice(invoices, amount);
       return rest;
     }
     async getAllOpenedPosInvoice() {
@@ -4413,6 +4415,22 @@
         frappe.msgprint(__("Error fetching debts."));
       }
     }
+    async pay_selected_invoice(invoices, payment_amount) {
+      try {
+        const response = await frappe.call({
+          method: "pos_ar.pos_ar.doctype.pos_info.pos_info.pay_selected_invoice",
+          args: { invoices, payment_amount }
+        });
+        if (response.message && !response.message.error) {
+          return response.message;
+        } else {
+          return [];
+        }
+      } catch (error) {
+        console.error("Error fetching debts:", error);
+        frappe.msgprint(__("Error fetching debts."));
+      }
+    }
   };
 
   // ../pos_ar/pos_ar/pos_ar/page/pos/pos_debt_cart.js
@@ -4482,8 +4500,9 @@
       this.leftContainer.find("#debt_paymentAmount").on("input", (event2) => {
         this.payment_amount = parseFloat(this.leftContainer.find("#debt_paymentAmount").val());
       });
-      this.pay_selected_invoices_btn.on("click", (event2) => {
+      this.pay_selected_invoices_btn.on("click", async () => {
         console.log("check the list ==> ", this._selected_invoice);
+        this.paySelectedInvoice();
       });
       this.debtList.on("click", '.invoiceBox input[type="checkbox"]', (event2) => {
         const checkbox = $(event2.target);
@@ -4497,13 +4516,11 @@
           }
         } else {
           const index = this._selected_invoice.findIndex((invoice) => invoice.name == invoiceName);
-          console.log("let's debuging : ", "invoiceName : ", invoiceName, "index : ", index, "this._selected_invoice : ", this._selected_invoice);
           if (index > -1) {
             this._selected_invoice.splice(index, 1);
           }
         }
         this.refresh_partially_paid();
-        console.log("Selected Invoices:", this._selected_invoice);
       });
     }
     refreshClientPart() {
@@ -4547,7 +4564,6 @@
           `<div  style="${invoiceStyle}" class="rowBox C_A_Center invoiceBox" data-invoice-name="${invoice.name}"></div>`
         );
         const checkbox = $(`<input type="checkbox" class="select_checkbox" style="margin:0px 16px;" data-invoice-type="POS Invoice" data-invoice-name="${invoice.name}" data-outstanding-amount="${invoice.outstanding_amount}" ></input>`);
-        customerBox.append(checkbox);
         customerBox.append(`<div style="flex-grow:1;">${invoice.name}</div>`);
         customerBox.append(`<div style="flex-grow:1;">${invoice.outstanding_amount} DA</div>`);
         customerBox.append(`<div style="flex-grow:1;">${invoice.posting_date}</div>`);
@@ -4577,6 +4593,10 @@
       this.refreshTotal(total_debt);
     }
     async payPosInvoice(invoice) {
+      if (paymentAmount <= 0) {
+        frappe.msgprint(__("The paid amount should be grant than 0"));
+        return;
+      }
       try {
         this.show_waiting();
         const result = await this.app_data.update_invoice_payment(invoice.name, this.payment_amount);
@@ -4593,8 +4613,12 @@
     async paySalesInvoice(invoice) {
       try {
         this.show_waiting();
-        const paymentAmount = parseFloat(this.payment_amount) || 0;
-        const result = await this.app_data.update_sales_invoice_payment(invoice.name, paymentAmount);
+        const paymentAmount2 = parseFloat(this.payment_amount) || 0;
+        if (paymentAmount2 <= 0) {
+          frappe.msgprint(__("The paid amount should be grant than 0"));
+          return;
+        }
+        const result = await this.app_data.update_sales_invoice_payment(invoice.name, paymentAmount2);
         if (result && typeof result.remaining === "number") {
           this.payment_amount = result.remaining;
           this.leftContainer.find("#debt_paymentAmount").val(result.remaining);
@@ -4609,14 +4633,26 @@
         this.hide_waiting();
       }
     }
-    async paySalesInvoice(invoice) {
-      this.show_waiting();
-      const result = await this.app_data.update_sales_invoice_payment(invoice.name, parseFloat(this.payment_amount)) || 0;
-      this.payment_amount = result.remaining;
-      this.leftContainer.find("#debt_paymentAmount").val(result.remaining);
-      this.refreshClientDebtPart(this.selected_client);
-      this.hide_waiting();
+    async paySelectedInvoice() {
+      console.log("we are here");
+      try {
+        this.show_waiting();
+        const paymentAmount2 = parseFloat(this.payment_amount) || 0;
+        const result = await this.app_data.paySelectedInvoice(this._selected_invoice, paymentAmount2);
+        if (result && typeof result.remaining === "number") {
+          this.payment_amount = result.remaining;
+          this.leftContainer.find("#debt_paymentAmount").val(result.remaining);
+          await this.refreshClientDebtPart(this.selected_client);
+        } else {
+          throw new Error("Unexpected server response. Please try again.");
+        }
+      } catch (error) {
+        console.error("Error processing sales invoice payment:", error);
+        alert("An error occurred while processing the payment. Please try again later.");
+      } finally {
+        this.hide_waiting();
+      }
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.U26F7OGS.js.map
+//# sourceMappingURL=pos.bundle.VJ3PMPGJ.js.map

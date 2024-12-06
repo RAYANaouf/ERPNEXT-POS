@@ -86,8 +86,9 @@ pos_ar.PointOfSale.pos_debt_cart = class{
 		this.leftContainer.find("#debt_paymentAmount").on('input',event =>{
 			this.payment_amount = parseFloat(this.leftContainer.find("#debt_paymentAmount").val())
 		})
-		this.pay_selected_invoices_btn.on('click' , event =>{
+		this.pay_selected_invoices_btn.on('click' , async () =>{
 			console.log("check the list ==> " , this._selected_invoice)
+			this.paySelectedInvoice()
 		})
 		this.debtList.on('click', '.invoiceBox input[type="checkbox"]', event => {
 			const checkbox                 = $(event.target);
@@ -105,13 +106,11 @@ pos_ar.PointOfSale.pos_debt_cart = class{
 			} else {
 				// Remove the invoice name from the selected list
 				const index = this._selected_invoice.findIndex(invoice => invoice.name == invoiceName);
-				console.log("let's debuging : " , "invoiceName : " , invoiceName , "index : " , index , "this._selected_invoice : " , this._selected_invoice)
 				if (index > -1) {
 					this._selected_invoice.splice(index, 1);
 				}
 			}
 			this.refresh_partially_paid()
-			console.log('Selected Invoices:', this._selected_invoice); // For debugging
 		});
 
 	}
@@ -175,7 +174,7 @@ pos_ar.PointOfSale.pos_debt_cart = class{
 				`<div  style="${invoiceStyle}" class="rowBox C_A_Center invoiceBox" data-invoice-name="${invoice.name}"></div>`
 			)
 			const checkbox = $(`<input type="checkbox" class="select_checkbox" style="margin:0px 16px;" data-invoice-type="POS Invoice" data-invoice-name="${invoice.name}" data-outstanding-amount="${invoice.outstanding_amount}" ></input>`)
-			customerBox.append(checkbox)
+			//customerBox.append(checkbox)
 			customerBox.append(`<div style="flex-grow:1;">${invoice.name}</div>`)
 			customerBox.append(`<div style="flex-grow:1;">${invoice.outstanding_amount} DA</div>`)
 			customerBox.append(`<div style="flex-grow:1;">${invoice.posting_date}</div>`)
@@ -226,6 +225,13 @@ pos_ar.PointOfSale.pos_debt_cart = class{
 
 
 	async payPosInvoice(invoice) {
+
+			if(paymentAmount <= 0){
+				frappe.msgprint(__('The paid amount should be grant than 0'));
+				return;
+			}
+
+
 		try {
 			this.show_waiting();
 
@@ -257,6 +263,11 @@ pos_ar.PointOfSale.pos_debt_cart = class{
 			// Ensure the payment amount is a valid float
 			const paymentAmount = parseFloat(this.payment_amount) || 0;
 
+			if(paymentAmount <= 0){
+				frappe.msgprint(__('The paid amount should be grant than 0'));
+				return;
+			}
+
 			// Call the server method to update the invoice payment
 			const result = await this.app_data.update_sales_invoice_payment(invoice.name, paymentAmount);
 
@@ -283,17 +294,45 @@ pos_ar.PointOfSale.pos_debt_cart = class{
 		}
 	}
 
-	async paySalesInvoice(invoice){
-		this.show_waiting()
-		// Call the server method to update the invoice payment
-		const result = await this.app_data.update_sales_invoice_payment(invoice.name, parseFloat(this.payment_amount)) || 0;
 
-		this.payment_amount = result.remaining
-		this.leftContainer.find("#debt_paymentAmount").val(result.remaining)
 
-		this.refreshClientDebtPart(this.selected_client)
-		this.hide_waiting()
+	async paySelectedInvoice() {
+		console.log("we are here")
+		try {
+			this.show_waiting();
+
+			// Ensure the payment amount is a valid float
+			const paymentAmount = parseFloat(this.payment_amount) || 0;
+
+			// Call the server method to update the invoice payment
+			const result = await this.app_data.paySelectedInvoice(this._selected_invoice , paymentAmount);
+
+			// Ensure result is valid and contains the `remaining` field
+			if (result && typeof result.remaining === "number") {
+				// Update the payment amount and UI
+				this.payment_amount = result.remaining;
+				this.leftContainer.find("#debt_paymentAmount").val(result.remaining);
+
+				// Refresh the client's debt details
+				await this.refreshClientDebtPart(this.selected_client);
+			} else {
+				throw new Error("Unexpected server response. Please try again.");
+			}
+		} catch (error) {
+			// Log the error for debugging purposes
+			console.error("Error processing sales invoice payment:", error);
+
+			// Notify the user about the error
+			alert("An error occurred while processing the payment. Please try again later.");
+		} finally {
+			// Ensure the waiting spinner is hidden regardless of success or failure
+			this.hide_waiting();
+		}
 	}
+
+
+
+
 
 }
 

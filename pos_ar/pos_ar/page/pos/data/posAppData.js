@@ -230,27 +230,15 @@ pos_ar.PointOfSale.posAppData = class {
 	}
 	async update_sales_invoice_payment(invoiceName , amount){
 
-		console.log("rayanoo")
-
 		const rest = await this.api_handler.update_sales_invoice_payment( invoiceName , amount)
-
-		console.log("we are hereeeee : " , rest)
 
 		await this.getPosInvoices()
 
-		/*this.appData.pos_invoices.forEach(invoice=>{
-			console.log("testing inside ==>  invoice.real_name : " , invoice.real_name , " == invoiceName : " , invoiceName )
-			if(invoice.real_name == invoiceName){
-				let newInvoice = structuredClone(invoice)
-				newInvoice.outstanding_amount = rest.outstanding_amount
-				newInvoice.paid_amount        = rest.paid_amount
-				newInvoice.status             = rest.paid
-				newInvoice.real_name          = rest.real_name
-				console.log("debuging ::: " , " rest " , rest , " invoice " , newInvoice  )
-				this.db.updatePosInvoice(newInvoice)
-			}
-		})*/
+		return rest
+	}
 
+	async paySelectedInvoice(invoices , amount){
+		const rest = await this.api_handler.pay_selected_invoice( invoices , amount)
 		return rest
 	}
 

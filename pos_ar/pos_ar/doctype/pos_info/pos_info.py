@@ -3,10 +3,42 @@
 
 import frappe
 from frappe.model.document import Document
+import json
 
 
 class pos_info(Document):
 	pass
+
+
+
+
+
+def update_customer_debt_on_invoice(doc, method):
+    """
+    Updates the custom_debt field in the Customer Doctype when a Sales Invoice is created or submitted.
+
+    Args:
+        doc (Sales Invoice): The Sales Invoice document.
+        method (str): The trigger method (e.g., 'on_submit', 'on_update').
+    """
+    try:
+        # Calculate the total outstanding amount for the customer
+        total_outstanding = frappe.db.sql("""
+            SELECT SUM(outstanding_amount)
+            FROM `tabSales Invoice`
+            WHERE customer = %s AND docstatus = 1
+        """, (doc.customer,))[0][0] or 0
+
+        # Update the custom_debt field in the Customer Doctype
+        frappe.db.set_value("Customer", doc.customer, "custom_debt", total_outstanding)
+
+        frappe.logger().info(f"Customer {doc.customer}'s debt updated to {total_outstanding}.")
+
+    except Exception as e:
+        frappe.logger().error(f"Error updating debt for customer {doc.customer}: {str(e)}")
+
+
+
 
 
 
@@ -24,6 +56,8 @@ def get_customer_debts(customer_name):
 		limit_page_length=100000  # Adjust as needed
 	)
 	return invoices
+
+
 
 @frappe.whitelist()
 def get_customer_debts_sales_invoices(customer_name):
@@ -121,8 +155,6 @@ def update_invoice_payment(invoice_name, payment_amount):
 			return {
 				'real_name'         : new_pos_invoice.name,
 				'paid_amount'       : new_pos_invoice.paid_amount,
-				'payment_method'    : new_pos_invoice.payments[0],
-				'deb'               : 1,
 				'remaining'         : 0,
 				'paid'              : new_pos_invoice.status
 			}
@@ -139,9 +171,6 @@ def update_invoice_payment(invoice_name, payment_amount):
 			return {
 				'real_name'          : new_pos_invoice.name,
 				'outstanding_amount' : new_pos_invoice.outstanding_amount,
-				'deb'                : 2,
-				'payment_method'     : new_pos_invoice.payments[0],
-				'paid_amount'        : new_pos_invoice.paid_amount,
 				'remaining'          : rest,
 				'paid'               : new_pos_invoice.status
 			}
@@ -155,10 +184,7 @@ def update_invoice_payment(invoice_name, payment_amount):
 			new_pos_invoice.submit()  # Resubmit the invoice
 		return {
 			'real_name'          : new_pos_invoice.name,
-			'payment_method'     : new_pos_invoice.payments[0],
-			'deb'                : 3,
 			'outstanding_amount' : new_pos_invoice.outstanding_amount,
-			'paid_amount'        : new_pos_invoice.paid_amount,
 			'remaining'          : 0,
 			'paid'               : new_pos_invoice.status
 		}
@@ -241,6 +267,24 @@ def update_sales_invoice_payment(invoice_name, payment_amount):
 	else:
 		return {'error': 'This invoice is already fully paid or has no outstanding amount.'}
 
+
+
+
+
+
+@frappe.whitelist()
+def pay_selected_invoice(invoices , payment_amount):
+	selected_invoices = json.loads( invoices )
+	remaining_amount = float(payment_amount)
+
+	for invoice in selected_invoices:
+		invoice_name = invoice.get('name')
+		invoice_type = invoice.get('type')  # 'Sales Invoice' or 'POS Invoice'
+		if invoice_type == "Sales Invoice":
+			result = update_sales_invoice_payment(invoice_name , remaining_amount)
+			remaining_amount = result.get('remaining')
+
+	return {'remaining':remaining_amount}
 
 
 

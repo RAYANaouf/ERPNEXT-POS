@@ -78,26 +78,6 @@ pos_ar.PointOfSale.FetchHandler = class FetchHandler{
 		}
 	}
 
-/*	async fetchItemBarCodes(since) {
-		try {
-			const filter = {parenttype:"Item"}
-			if(since){
-				filter.modified = ['>',since]
-			}
-			return await frappe.db.get_list('Item Barcode', {
-				fields: ['name', 'barcode_type'  ,'parent' , 'uom' , 'barcode' ],
-				filters: filter,
-				limit : 100000
-			})
-		} catch (error) {
-			console.error('Error fetching Item Group :', error);
-			return []
-		}
-		return []
-	}
-*/
-
-
 
 
 	async fetchItemBarCodes() {
@@ -191,26 +171,6 @@ pos_ar.PointOfSale.FetchHandler = class FetchHandler{
 	}
 
 
-	/*async fetchPosProfileModeOfPayments(modeOfPaymentsIds , company){
-		try{
-			const filter = {disabled : 0}
-			//if(since){
-			//	filter.modified = ['>',since]
-			//}
-			let modeOfPayments = []
-
-			for (let i = 0; i < modeOfPaymentsIds.length; i++) {
-				const r =  await frappe.db.get_doc('Mode of Payment', modeOfPaymentsIds[i] , { "company" : company})
-				modeOfPayments.push(r)
-			}
-
-			return modeOfPayments
-		}
-		catch(error){
-			console.error('Error fetching pos profile list : ' , error)
-			return null;
-		}
-	}*/
 
 	async fetchPosProfileModeOfPayments(modeOfPaymentsIds , company) {
 		try {
@@ -347,6 +307,23 @@ pos_ar.PointOfSale.FetchHandler = class FetchHandler{
 			const response = await frappe.call({
 				method: "pos_ar.pos_ar.doctype.pos_info.pos_info.update_sales_invoice_payment",
 				args: { invoice_name , payment_amount },
+			});
+			if (response.message && !response.message.error) {
+				return response.message
+			} else {
+				return []
+			}
+		} catch (error) {
+			console.error("Error fetching debts:", error);
+			frappe.msgprint(__('Error fetching debts.'));
+		}
+	}
+
+	async pay_selected_invoice(invoices , payment_amount) {
+		try {
+			const response = await frappe.call({
+				method: "pos_ar.pos_ar.doctype.pos_info.pos_info.pay_selected_invoice",
+				args: { invoices , payment_amount },
 			});
 			if (response.message && !response.message.error) {
 				return response.message

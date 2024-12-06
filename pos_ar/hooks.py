@@ -236,3 +236,20 @@ fixtures = [
 		'filters': [['dt', '=', 'POS Invoice']]
 	}
 ]
+
+
+
+doc_events = {
+    "Sales Invoice": {
+        "on_submit": "pos_ar.api.update_customer_debt_on_invoice",
+        "on_cancel": "pos_ar.api.update_customer_debt_on_invoice",
+    },
+    "POS Invoice": {
+        "on_submit": "pos_ar.api.update_customer_debt_on_invoice",
+        "on_cancel": "pos_ar.api.update_customer_debt_on_invoice",
+    },
+    "Payment Entry": {
+        "on_submit": "pos_ar.api.update_customer_debt_on_invoice",
+        "on_cancel": "pos_ar.api.update_customer_debt_on_invoice",
+    }
+}

@@ -45,7 +45,6 @@ pos_ar.PointOfSale.Controller = class {
 
 			console.log("see app data : " , this.appData.appData , "opened pos : " , await this.appData.getAllOpenedPosInvoice())
 
-
 			this.prepare_container();
 			//prepare app data
 			await  this.prepare_app_data();
@@ -1165,6 +1164,7 @@ pos_ar.PointOfSale.Controller = class {
 			frappe.db.insert(
 				pos
 			).then(r =>{
+
 				pos.opened = 0;
 				pos.real_name = r.name
 
