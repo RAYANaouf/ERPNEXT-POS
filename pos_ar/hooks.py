@@ -226,17 +226,17 @@ app_include_js = ["/assets/pos_ar/js/pos.bundle.js","/assets/pos_ar/js/sw.js"]
 # 	"Logging DocType Name": 30  # days to retain logs
 # }
 
-fixtures = [
-	{
-		'dt'      : 'DocType',
-		'filters' : [['name' , 'in' , ['check_in_out']]]
-	},
-	{
-		'dt': 'Custom Field',
-		'filters': [['dt', '=', 'POS Invoice']]
-	}
-]
 
+fixtures = [
+    {
+        'dt': 'DocType',
+        'filters': [['name', 'in', ['check_in_out']]]
+    },
+    {
+        'dt': 'Custom Field',
+        'filters': [['dt', 'in', ['POS Invoice', 'Customer']]]
+    }
+]
 
 
 doc_events = {

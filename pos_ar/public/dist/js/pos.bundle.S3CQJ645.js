@@ -2752,6 +2752,7 @@
         posContainer.appendChild(l1);
         posContainer.appendChild(l2);
         posContainer.addEventListener("click", () => {
+          console.log("we are with ", record);
           this.selected_pos = record;
           this.refreshPosDetailsData();
         });
@@ -2932,7 +2933,7 @@
     }
     static async openDatabase() {
       return new Promise((resolve, reject) => {
-        const request = window.indexedDB.open("POSDB_test33", 1);
+        const request = window.indexedDB.open("POSDB_test33", 6);
         request.onerror = (event2) => {
           reject(request.error);
         };
@@ -2941,6 +2942,7 @@
         };
         request.onupgradeneeded = (event2) => {
           const db = event2.target.result;
+          let posInvoiceStore;
           if (!db.objectStoreNames.contains("Customer")) {
             db.createObjectStore("Customer", { keyPath: "name" });
           }
@@ -2966,9 +2968,18 @@
             db.createObjectStore("Bin", { keyPath: "name" });
           }
           if (!db.objectStoreNames.contains("POS Invoice")) {
-            const posInvoiceStore = db.createObjectStore("POS Invoice", { keyPath: "name" });
+            posInvoiceStore = db.createObjectStore("POS Invoice", { keyPath: "name" });
+          } else {
+            posInvoiceStore = event2.target.transaction.objectStore("POS Invoice");
+          }
+          if (!posInvoiceStore.indexNames.contains("docstatus")) {
             posInvoiceStore.createIndex("docstatus", "docstatus", { unique: false });
+          }
+          if (!posInvoiceStore.indexNames.contains("opened")) {
             posInvoiceStore.createIndex("opened", "opened", { unique: false });
+          }
+          if (!posInvoiceStore.indexNames.contains("creation_time")) {
+            posInvoiceStore.createIndex("creation_time", "creation_time", { unique: false });
           }
           if (!db.objectStoreNames.contains("check_in_out")) {
             db.createObjectStore("check_in_out", { keyPath: "name" });
@@ -3295,9 +3306,11 @@
       return new Promise((resolve, reject) => {
         const transaction = this.db.transaction(["POS Invoice"], "readwrite");
         const store = transaction.objectStore("POS Invoice");
-        const result = store.getAll();
+        const dateIndex = store.index("creation_time");
+        const result = dateIndex.getAll();
         result.onsuccess = (event2) => {
           const value = event2.target.result;
+          console.log("see that : ", value);
           resolve(value);
         };
         result.onerror = (err) => {
@@ -4662,4 +4675,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.LJSUAFSX.js.map
+//# sourceMappingURL=pos.bundle.S3CQJ645.js.map

@@ -181,6 +181,7 @@ pos_ar.PointOfSale.pos_history = class {
 			posContainer.appendChild(l2)
 
 			posContainer.addEventListener('click' , () => {
+				console.log("we are with " , record)
 				this.selected_pos = record
 				this.refreshPosDetailsData();
 			})

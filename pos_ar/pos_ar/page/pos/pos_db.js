@@ -10,7 +10,7 @@ pos_ar.PointOfSale.pos_db  = class POSDatabase {
 		return new Promise((resolve , reject) => {
 
 			// Let us open our database
-			const request = window.indexedDB.open( 'POSDB_test33' , 1);
+			const request = window.indexedDB.open( 'POSDB_test33' , 6);
 
 			request.onerror = (event) => {
 				// Do something with request.error!
@@ -24,6 +24,9 @@ pos_ar.PointOfSale.pos_db  = class POSDatabase {
 
  			request.onupgradeneeded = (event) => {
 			 	const db = event.target.result;
+
+
+				let posInvoiceStore;
 
 				// Create object stores (tables)
 				if (!db.objectStoreNames.contains('Customer')) {
@@ -50,18 +53,35 @@ pos_ar.PointOfSale.pos_db  = class POSDatabase {
 				if (!db.objectStoreNames.contains('Bin')) {
 					db.createObjectStore('Bin', { keyPath: 'name' });
 				}
+
+				//pos invoice
 				if (!db.objectStoreNames.contains('POS Invoice')) {
-					const posInvoiceStore = db.createObjectStore('POS Invoice', { keyPath : 'name' });
-					posInvoiceStore.createIndex( 'docstatus' , 'docstatus' , {unique : false} )
-					// Optionally, you can add other indexes like for 'opened'
+					posInvoiceStore = db.createObjectStore('POS Invoice', { keyPath : 'name' });
+				}else{
+					posInvoiceStore = event.target.transaction.objectStore('POS Invoice');
+				}
+
+
+				// Check and create indexes if they do not already exist
+				if (!posInvoiceStore.indexNames.contains('docstatus')) {
+					posInvoiceStore.createIndex('docstatus', 'docstatus', { unique: false });
+				}
+				if (!posInvoiceStore.indexNames.contains('opened')) {
 					posInvoiceStore.createIndex('opened', 'opened', { unique: false });
 				}
+				if (!posInvoiceStore.indexNames.contains('creation_time')) {
+					posInvoiceStore.createIndex('creation_time', 'creation_time', { unique: false });
+				}
+
+
 				if (!db.objectStoreNames.contains('check_in_out')) {
 					db.createObjectStore('check_in_out', { keyPath : 'name' });
 				}
 				if (!db.objectStoreNames.contains('POS Settings')) {
 					db.createObjectStore('POS Settings', { keyPath : 'id' });
 				}
+
+
 
 			};
 
@@ -507,9 +527,12 @@ pos_ar.PointOfSale.pos_db  = class POSDatabase {
 		return new Promise((resolve,reject)=>{
 			const transaction = this.db.transaction(['POS Invoice'] , "readwrite");
 			const store       = transaction.objectStore('POS Invoice');
-			const result      = store.getAll()
+
+			const dateIndex   = store.index('creation_time');
+			const result      = dateIndex.getAll()
 			result.onsuccess = (event) => {
 				const value = event.target.result
+				console.log("see that : " , value)
 				resolve(value);
 			}
 			result.onerror = (err)=>{
