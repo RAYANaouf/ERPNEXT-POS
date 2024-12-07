@@ -852,16 +852,18 @@
         return;
       let total = 0;
       this.selectedItemMaps.get(this.selectedTab.tabName).items.forEach((item) => {
-        total = item.rate * item.qty;
+        total += item.rate * item.qty;
       });
       if (this.calculatePaidAmount(this.selectedItemMaps.get(this.selectedTab.tabName)) > total) {
         this.selectedItemMaps.get(this.selectedTab.tabName).paid_amount = total;
         this.selectedItemMaps.get(this.selectedTab.tabName).base_paid_amount = total;
         this.selectedItemMaps.get(this.selectedTab.tabName).outstanding_amount = 0;
+        this.selectedItemMaps.get(this.selectedTab.tabName).total_customer_payment = this.calculatePaidAmount(this.selectedItemMaps.get(this.selectedTab.tabName));
       } else {
         this.selectedItemMaps.get(this.selectedTab.tabName).paid_amount = this.calculatePaidAmount(this.selectedItemMaps.get(this.selectedTab.tabName));
         this.selectedItemMaps.get(this.selectedTab.tabName).base_paid_amount = this.calculatePaidAmount(this.selectedItemMaps.get(this.selectedTab.tabName));
         this.selectedItemMaps.get(this.selectedTab.tabName).outstanding_amount = this.invoiceData.grandTotal - this.calculatePaidAmount(this.selectedItemMaps.get(this.selectedTab.tabName));
+        this.selectedItemMaps.get(this.selectedTab.tabName).total_customer_payment = this.calculatePaidAmount(this.selectedItemMaps.get(this.selectedTab.tabName));
       }
       this.selectedItemMaps.get(this.selectedTab.tabName).docstatus = 1;
       const status = this.checkIfPaid(this.selectedItemMaps.get(this.selectedTab.tabName));
@@ -2543,13 +2545,6 @@
       this.cart_content_top_section.on("input", ".paymentInput", function() {
         const inputValue = parseFloat($(this).val()) || 0;
         const boxId = $(this).closest(".paymentMethodBox").attr("id");
-        let total = 0;
-        me.selected_item_map.get(me.selected_tab.tabName).items.forEach((item) => {
-          total += item.rate * item.qty;
-        });
-        if (inputValue > total) {
-          $(this).val(total);
-        }
         me.selected_item_map.get(me.selected_tab.tabName).payments.forEach((mode) => {
           if (mode.mode_of_payment == me._payment_method.mode_of_payment) {
             mode.amount = parseFloat(inputValue);
@@ -2918,7 +2913,7 @@
       });
       invoiceHTML += `<tr style="height:23px;font-size:12px;font-weight:700;" > <td colspan="3" ><div >Totale      </div></td>   <td><div> ${netTotal + netTotal * (taxes / 100) - pos.additional_discount_percentage * netTotal} DA </div></td></tr>`;
       invoiceHTML += `<tr style="height:23px;font-size:12px;font-weight:700;" > <td colspan="3" ><div >Sold        </div></td>   <td><div> ${customer.custom_debt} DA </div></td></tr>`;
-      invoiceHTML += `<tr style="height:23px;font-size:12px;font-weight:700;" > <td colspan="3" ><div >Versement   </div></td>   <td><div> ${pos.paid_amount} DA </div></td></tr>`;
+      invoiceHTML += `<tr style="height:23px;font-size:12px;font-weight:700;" > <td colspan="3" ><div >Versement   </div></td>   <td><div> ${pos.total_customer_payment} DA </div></td></tr>`;
       invoiceHTML += "</table>";
       invoiceHTML += '<div id="footer_message" style="width:100%; display:flex; align-items:center; margin-top:30px;"><div style="flex-grow:1;"></div><div style="margin:30px 25px;"> Thank You, Come Again</div><div style="flex-grow:1;"></div></div>';
       invoiceHTML += "</div>";
@@ -4609,7 +4604,8 @@
       this.refreshTotal(total_debt);
     }
     async payPosInvoice(invoice) {
-      if (paymentAmount <= 0) {
+      const paymentAmount = parseFloat(this.payment_amount) || 0;
+      if (this.paymentAmount <= 0) {
         frappe.msgprint(__("The paid amount should be grant than 0"));
         return;
       }
@@ -4629,12 +4625,12 @@
     async paySalesInvoice(invoice) {
       try {
         this.show_waiting();
-        const paymentAmount2 = parseFloat(this.payment_amount) || 0;
-        if (paymentAmount2 <= 0) {
+        const paymentAmount = parseFloat(this.payment_amount) || 0;
+        if (paymentAmount <= 0) {
           frappe.msgprint(__("The paid amount should be grant than 0"));
           return;
         }
-        const result = await this.app_data.update_sales_invoice_payment(invoice.name, paymentAmount2);
+        const result = await this.app_data.update_sales_invoice_payment(invoice.name, paymentAmount);
         if (result && typeof result.remaining === "number") {
           this.payment_amount = result.remaining;
           this.leftContainer.find("#debt_paymentAmount").val(result.remaining);
@@ -4653,8 +4649,8 @@
       console.log("we are here");
       try {
         this.show_waiting();
-        const paymentAmount2 = parseFloat(this.payment_amount) || 0;
-        const result = await this.app_data.paySelectedInvoice(this._selected_invoice, paymentAmount2);
+        const paymentAmount = parseFloat(this.payment_amount) || 0;
+        const result = await this.app_data.paySelectedInvoice(this._selected_invoice, paymentAmount);
         if (result && typeof result.remaining === "number") {
           this.payment_amount = result.remaining;
           this.leftContainer.find("#debt_paymentAmount").val(result.remaining);
@@ -4671,4 +4667,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.AIWUYJ7L.js.map
+//# sourceMappingURL=pos.bundle.V6FA7GFR.js.map

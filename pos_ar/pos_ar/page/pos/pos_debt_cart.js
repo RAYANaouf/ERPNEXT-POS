@@ -226,10 +226,12 @@ pos_ar.PointOfSale.pos_debt_cart = class{
 
 	async payPosInvoice(invoice) {
 
-			if(paymentAmount <= 0){
-				frappe.msgprint(__('The paid amount should be grant than 0'));
-				return;
-			}
+		// Ensure the payment amount is a valid float
+		const paymentAmount = parseFloat(this.payment_amount) || 0;
+		if(this.paymentAmount <= 0){
+			frappe.msgprint(__('The paid amount should be grant than 0'));
+			return;
+		}
 
 
 		try {

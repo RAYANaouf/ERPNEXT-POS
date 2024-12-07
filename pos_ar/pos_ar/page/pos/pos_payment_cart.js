@@ -208,15 +208,6 @@ pos_ar.PointOfSale.pos_payment_cart = class{
 			const inputValue = parseFloat($(this).val()) || 0; // Get the input value
 			const boxId = $(this).closest('.paymentMethodBox').attr('id'); // Get the box ID
 
-			let total = 0 ;
-			me.selected_item_map.get(me.selected_tab.tabName).items.forEach(item=>{
-				total += item.rate * item.qty
-			})
-
-			if(inputValue > total){
-				$(this).val(total)
-			}
-
 			me.selected_item_map.get(me.selected_tab.tabName).payments.forEach(mode =>{
 				if(mode.mode_of_payment == me._payment_method.mode_of_payment){
 					mode.amount = parseFloat(inputValue)
