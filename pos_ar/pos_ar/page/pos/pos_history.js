@@ -492,14 +492,14 @@ pos_ar.PointOfSale.pos_history = class {
 			invoiceHTML += `<tr > <td ><div >${item.item_name}</div></td>  <td><div>${item.qty}</div></td>  <td><div>${item.rate}</div></td>  <td><div>${item.rate * item.qty}</div></td></tr>`
 		})
 
-			invoiceHTML += `<tr > <td colspan="3" ><div >Totale     : </div></td>   <td><div> ${netTotal+(netTotal*(taxes/100)) - pos.additional_discount_percentage * netTotal} DA </div></td></tr>`
-			invoiceHTML += `<tr > <td colspan="3" ><div >Sold       : </div></td>   <td><div> ${customer.custom_debt} DA </div></td></tr>`
-			invoiceHTML += `<tr > <td colspan="3" ><div >Versement  : </div></td>   <td><div> 0 DA </div></td></tr>`
+			invoiceHTML += `<tr style="height:23px;font-size:12px;font-weight:700;" > <td colspan="3" ><div >Totale      </div></td>   <td><div> ${netTotal+(netTotal*(taxes/100)) - pos.additional_discount_percentage * netTotal} DA </div></td></tr>`
+			invoiceHTML += `<tr style="height:23px;font-size:12px;font-weight:700;" > <td colspan="3" ><div >Sold        </div></td>   <td><div> ${customer.custom_debt} DA </div></td></tr>`
+			invoiceHTML += `<tr style="height:23px;font-size:12px;font-weight:700;" > <td colspan="3" ><div >Versement   </div></td>   <td><div> ${pos.paid_amount} DA </div></td></tr>`
 
 
 		invoiceHTML += '</table>'
 
-
+		/*
 
 		invoiceHTML += `<div style="height:23px;"> <p style="font-size:12px;font-weight:500;" ><span style="font-size:12px;font-weight:600;">Sous-total : </span> ${netTotal} DA </p> </div>`
 		invoiceHTML += `<div style="height:23px;"> <p style="font-size:12px;font-weight:500;" ><span style="font-size:12px;font-weight:600;">Reduction : </span> ${pos.additional_discount_percentage * netTotal} DA </p> </div>`
@@ -510,7 +510,7 @@ pos_ar.PointOfSale.pos_history = class {
 		})
 
 		invoiceHTML += `<div style="height:23px;"> <p style="font-size:12px;font-weight:500;" ><span style="font-size:12px;font-weight:600;">Total : </span> ${netTotal+(netTotal*(taxes/100)) - pos.additional_discount_percentage * netTotal} DA </p> </div>`
-
+		*/
 
 		invoiceHTML +=
 		'<div id="footer_message" style="width:100%; display:flex; align-items:center; margin-top:30px;">'+

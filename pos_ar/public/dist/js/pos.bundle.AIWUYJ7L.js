@@ -850,9 +850,19 @@
       this.selectedItemMaps.get(this.selectedTab.tabName).items = items;
       if (items.length == 0)
         return;
-      this.selectedItemMaps.get(this.selectedTab.tabName).paid_amount = this.calculatePaidAmount(this.selectedItemMaps.get(this.selectedTab.tabName));
-      this.selectedItemMaps.get(this.selectedTab.tabName).base_paid_amount = this.calculatePaidAmount(this.selectedItemMaps.get(this.selectedTab.tabName));
-      this.selectedItemMaps.get(this.selectedTab.tabName).outstanding_amount = this.invoiceData.grandTotal - this.calculatePaidAmount(this.selectedItemMaps.get(this.selectedTab.tabName));
+      let total = 0;
+      this.selectedItemMaps.get(this.selectedTab.tabName).items.forEach((item) => {
+        total = item.rate * item.qty;
+      });
+      if (this.calculatePaidAmount(this.selectedItemMaps.get(this.selectedTab.tabName)) > total) {
+        this.selectedItemMaps.get(this.selectedTab.tabName).paid_amount = total;
+        this.selectedItemMaps.get(this.selectedTab.tabName).base_paid_amount = total;
+        this.selectedItemMaps.get(this.selectedTab.tabName).outstanding_amount = 0;
+      } else {
+        this.selectedItemMaps.get(this.selectedTab.tabName).paid_amount = this.calculatePaidAmount(this.selectedItemMaps.get(this.selectedTab.tabName));
+        this.selectedItemMaps.get(this.selectedTab.tabName).base_paid_amount = this.calculatePaidAmount(this.selectedItemMaps.get(this.selectedTab.tabName));
+        this.selectedItemMaps.get(this.selectedTab.tabName).outstanding_amount = this.invoiceData.grandTotal - this.calculatePaidAmount(this.selectedItemMaps.get(this.selectedTab.tabName));
+      }
       this.selectedItemMaps.get(this.selectedTab.tabName).docstatus = 1;
       const status = this.checkIfPaid(this.selectedItemMaps.get(this.selectedTab.tabName));
       this.selectedItemMaps.get(this.selectedTab.tabName).status = status;
@@ -2533,6 +2543,13 @@
       this.cart_content_top_section.on("input", ".paymentInput", function() {
         const inputValue = parseFloat($(this).val()) || 0;
         const boxId = $(this).closest(".paymentMethodBox").attr("id");
+        let total = 0;
+        me.selected_item_map.get(me.selected_tab.tabName).items.forEach((item) => {
+          total += item.rate * item.qty;
+        });
+        if (inputValue > total) {
+          $(this).val(total);
+        }
         me.selected_item_map.get(me.selected_tab.tabName).payments.forEach((mode) => {
           if (mode.mode_of_payment == me._payment_method.mode_of_payment) {
             mode.amount = parseFloat(inputValue);
@@ -2899,17 +2916,10 @@
         netTotal += item.rate * item.qty;
         invoiceHTML += `<tr > <td ><div >${item.item_name}</div></td>  <td><div>${item.qty}</div></td>  <td><div>${item.rate}</div></td>  <td><div>${item.rate * item.qty}</div></td></tr>`;
       });
-      invoiceHTML += `<tr > <td colspan="3" ><div >Totale     : </div></td>   <td><div> ${netTotal + netTotal * (taxes / 100) - pos.additional_discount_percentage * netTotal} DA </div></td></tr>`;
-      invoiceHTML += `<tr > <td colspan="3" ><div >Sold       : </div></td>   <td><div> ${customer.custom_debt} DA </div></td></tr>`;
-      invoiceHTML += `<tr > <td colspan="3" ><div >Versement  : </div></td>   <td><div> 0 DA </div></td></tr>`;
+      invoiceHTML += `<tr style="height:23px;font-size:12px;font-weight:700;" > <td colspan="3" ><div >Totale      </div></td>   <td><div> ${netTotal + netTotal * (taxes / 100) - pos.additional_discount_percentage * netTotal} DA </div></td></tr>`;
+      invoiceHTML += `<tr style="height:23px;font-size:12px;font-weight:700;" > <td colspan="3" ><div >Sold        </div></td>   <td><div> ${customer.custom_debt} DA </div></td></tr>`;
+      invoiceHTML += `<tr style="height:23px;font-size:12px;font-weight:700;" > <td colspan="3" ><div >Versement   </div></td>   <td><div> ${pos.paid_amount} DA </div></td></tr>`;
       invoiceHTML += "</table>";
-      invoiceHTML += `<div style="height:23px;"> <p style="font-size:12px;font-weight:500;" ><span style="font-size:12px;font-weight:600;">Sous-total : </span> ${netTotal} DA </p> </div>`;
-      invoiceHTML += `<div style="height:23px;"> <p style="font-size:12px;font-weight:500;" ><span style="font-size:12px;font-weight:600;">Reduction : </span> ${pos.additional_discount_percentage * netTotal} DA </p> </div>`;
-      this.sales_taxes.forEach((tax) => {
-        taxes += tax.rate;
-        invoiceHTML += `<div style="height:23px;"> <p style="font-size:12px;font-weight:500;" ><span style="font-size:12px;font-weight:600;">${tax.description} : </span> ${tax.rate} % </p> </div>`;
-      });
-      invoiceHTML += `<div style="height:23px;"> <p style="font-size:12px;font-weight:500;" ><span style="font-size:12px;font-weight:600;">Total : </span> ${netTotal + netTotal * (taxes / 100) - pos.additional_discount_percentage * netTotal} DA </p> </div>`;
       invoiceHTML += '<div id="footer_message" style="width:100%; display:flex; align-items:center; margin-top:30px;"><div style="flex-grow:1;"></div><div style="margin:30px 25px;"> Thank You, Come Again</div><div style="flex-grow:1;"></div></div>';
       invoiceHTML += "</div>";
       const printWindow = window.open("", "_blank");
@@ -4661,4 +4671,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.2C7EP7S5.js.map
+//# sourceMappingURL=pos.bundle.AIWUYJ7L.js.map

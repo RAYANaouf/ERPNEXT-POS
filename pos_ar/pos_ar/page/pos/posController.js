@@ -1144,9 +1144,24 @@ pos_ar.PointOfSale.Controller = class {
 		if(items.length ==0)
 			return
 
-		this.selectedItemMaps.get(this.selectedTab.tabName).paid_amount        = this.calculatePaidAmount(this.selectedItemMaps.get(this.selectedTab.tabName))
-		this.selectedItemMaps.get(this.selectedTab.tabName).base_paid_amount   = this.calculatePaidAmount(this.selectedItemMaps.get(this.selectedTab.tabName))
-		this.selectedItemMaps.get(this.selectedTab.tabName).outstanding_amount = this.invoiceData.grandTotal - this.calculatePaidAmount(this.selectedItemMaps.get(this.selectedTab.tabName))
+
+
+
+		let total = 0
+		this.selectedItemMaps.get(this.selectedTab.tabName).items.forEach(item =>{
+			total = item.rate * item.qty
+		})
+
+		if(this.calculatePaidAmount(this.selectedItemMaps.get(this.selectedTab.tabName)) > total){
+			this.selectedItemMaps.get(this.selectedTab.tabName).paid_amount        = total
+			this.selectedItemMaps.get(this.selectedTab.tabName).base_paid_amount   = total
+			this.selectedItemMaps.get(this.selectedTab.tabName).outstanding_amount = 0
+		}else{
+			this.selectedItemMaps.get(this.selectedTab.tabName).paid_amount        = this.calculatePaidAmount(this.selectedItemMaps.get(this.selectedTab.tabName))
+			this.selectedItemMaps.get(this.selectedTab.tabName).base_paid_amount   = this.calculatePaidAmount(this.selectedItemMaps.get(this.selectedTab.tabName))
+			this.selectedItemMaps.get(this.selectedTab.tabName).outstanding_amount = this.invoiceData.grandTotal - this.calculatePaidAmount(this.selectedItemMaps.get(this.selectedTab.tabName))
+		}
+
 		this.selectedItemMaps.get(this.selectedTab.tabName).docstatus          = 1
 
 		//set status
@@ -1157,8 +1172,8 @@ pos_ar.PointOfSale.Controller = class {
 		//wrong one. because insert take a while after the callback will called.
 		//console.log("debuging rayan :::: " , this.selected_item_cart)
 
-		const pos = structuredClone(this.selectedItemMaps.get(this.selectedTab.tabName))
 
+		const pos = structuredClone(this.selectedItemMaps.get(this.selectedTab.tabName))
 
 
 		if(status == 'Unpaid'){
