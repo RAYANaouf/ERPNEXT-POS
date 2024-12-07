@@ -2653,8 +2653,9 @@
       this.prepare_history_cart();
       const result = await this.db.getAllPosInvoice();
       this.localPosInvoice.pos_invoices = result;
+      console.log("just to be sure");
       this.filtered_pos_list = this.localPosInvoice.pos_invoices.filter((pos) => {
-        if (pos.status == "Draft") {
+        if (pos.status == "Unpaid") {
           return true;
         } else {
           return false;
@@ -2663,10 +2664,8 @@
       console.log("log init data : ", this.filtered_pos_list);
       if (this.filtered_pos_list.length == 0) {
         this.selected_pos = null;
-        console.log("first condition");
       } else {
         this.selected_pos = structuredClone(this.filtered_pos_list[0]);
-        console.log("second condition");
       }
       this.refreshData();
       this.setListener();
@@ -2703,7 +2702,7 @@
       this.search_container = this.right_container.find("#historyRightSearchContainer");
       this.search_container.append('<select  id="PosInvoiceTypeInput" placeholder="POS Invoice Type">');
       this.filter_input = this.search_container.find("#PosInvoiceTypeInput");
-      this.filter_input.append('<option value="Draft">Draft</option><option value="Paid">Paid</option> <option value="Unpaid">Unpaid</option>');
+      this.filter_input.append('<option value="Draft">Draft</option><option value="Paid">Paid</option> <option value="Unpaid" selected>Unpaid</option>');
       this.search_container.append('<input type="text" id="historyInput" placeholder="Search by invoice id or custumer name">');
       this.right_container.append('<div id="historyRecentInvoicesContainer" ></div>');
       this.right_data_container = this.right_container.find("#historyRecentInvoicesContainer");
@@ -2813,10 +2812,8 @@
       this.left_container.css("display", "flex");
       this.right_container.css("display", "flex");
       const filter = this.filter_input.val();
-      console.log("filter : ", filter);
       this.db.getAllPosInvoice_callback(
         (result) => {
-          console.log("look at the result : ", result);
           this.localPosInvoice.pos_invoices = result;
           this.filtered_pos_list = this.localPosInvoice.pos_invoices.filter((pos) => {
             if (pos.status == filter) {
@@ -2854,7 +2851,6 @@
     setListener() {
       this.filter_input.on("input", (event2) => {
         const filter = event2.target.value;
-        console.log("filter : ", filter);
         this.filtered_pos_list = this.localPosInvoice.pos_invoices.filter((pos) => {
           if (filter == "") {
             return true;
@@ -2903,7 +2899,6 @@
       let taxes = 0;
       let grandTotal = 0;
       let customer = this.app_data.customers.find((customer2) => customer2.name == pos.customer);
-      console.log("find the customer : ", pos.customer, " ====> ", customer);
       const creation_time = pos.creation_time;
       const [date, time] = creation_time.split(" ");
       let invoiceHTML = `<style>#company_container {width: 100% ; height: 40px ; display:flex; align-items:center; font-size : 12px;}table{width: 100%; margin-top:16px;}tr{width:100%; height:16px;}tr:nth-child(1){}#first_row{border: 5px solid black;}#logContainer{width: 100%;height:80px;display : flex;justify-content:center;}#logContainer img{width:50%; height:100%;}#top_data_container{width:100%;display:flex;}#top_data_container>div.c1{font-size:12px;flex-grow:1;}#top_data_container>div.c2{font-size:12px;flex-grow:1;display:flex;flex-direction:column;align-items:end;}td>div{height:18px; width:100%;font-size:12px;display:flex; justify-content:start; align-items:center;}#footer_message{height:20px;}</style><div style="display:flex; flex-direction:column;"><div id="logContainer"  ><div style="width:20%;"></div><img src="/assets/pos_ar/images/logo.jpg"  id="company_logo"><div style="width:20%;"></div></div><div id="company_container"><div style="flex-grow:1;"></div><p style="margin:0px 25px;">${this.company.company_name}</p><div style="flex-grow:1;"></div></div><div id="top_data_container"><div class="c1"><div class="customer" style="font-weight:600;font-size:18px;"> Customer : ${pos.customer} </div><div class="refrence"> Commande : ${pos.refNum} </div></div><div class="c2"><div class="date"> ${date}/${time} </div></div></div><table><tr id="first_row" ><th style="boder:1px solid black;">Nom</th><th>Qt\xE9</th><th>Prix</th><th>Value</th>`;
@@ -4667,4 +4662,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.V6FA7GFR.js.map
+//# sourceMappingURL=pos.bundle.LJSUAFSX.js.map

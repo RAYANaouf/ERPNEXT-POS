@@ -32,8 +32,10 @@ pos_ar.PointOfSale.pos_history = class {
 
 		this.localPosInvoice.pos_invoices = result ;
 
+		console.log("just to be sure")
+
 		this.filtered_pos_list = this.localPosInvoice.pos_invoices.filter( pos => {
-			if(pos.status == 'Draft' ){
+			if(pos.status == 'Unpaid' ){
 				return true ;
 			}else{
 				return false ;
@@ -42,10 +44,8 @@ pos_ar.PointOfSale.pos_history = class {
 		console.log("log init data : " , this.filtered_pos_list)
 		if(this.filtered_pos_list.length == 0){
 			this.selected_pos = null
-			console.log("first condition")
 		}else{
 			this.selected_pos = structuredClone(this.filtered_pos_list[0])
-			console.log("second condition")
 		}
 		this.refreshData()
 		this.setListener();
@@ -108,7 +108,7 @@ pos_ar.PointOfSale.pos_history = class {
 		this.search_container.append('<select  id="PosInvoiceTypeInput" placeholder="POS Invoice Type">');
 
 		this.filter_input = this.search_container.find("#PosInvoiceTypeInput")
-		this.filter_input.append('<option value="Draft">Draft</option><option value="Paid">Paid</option> <option value="Unpaid">Unpaid</option>')
+		this.filter_input.append('<option value="Draft">Draft</option><option value="Paid">Paid</option> <option value="Unpaid" selected>Unpaid</option>')
 
 		this.search_container.append('<input type="text" id="historyInput" placeholder="Search by invoice id or custumer name">');
 
@@ -280,12 +280,10 @@ pos_ar.PointOfSale.pos_history = class {
 		this.right_container.css('display' , 'flex');
 
 		const filter = this.filter_input.val();
-		console.log("filter : " , filter);
 
 		//refrenshing data
 		this.db.getAllPosInvoice_callback(
 						(result)=>{
-							console.log("look at the result : " , result)
 							this.localPosInvoice.pos_invoices = result ;
 							this.filtered_pos_list = this.localPosInvoice.pos_invoices.filter( pos => {
 
@@ -340,9 +338,6 @@ pos_ar.PointOfSale.pos_history = class {
 
 		this.filter_input.on('input' , (event) => {
 			const filter = event.target.value;
-
-			console.log("filter : " , filter)
-
 
 			this.filtered_pos_list = this.localPosInvoice.pos_invoices.filter( pos => {
 				if(filter == ""){
@@ -410,8 +405,6 @@ pos_ar.PointOfSale.pos_history = class {
 		let grandTotal = 0
 
 		let customer = this.app_data.customers.find(customer => customer.name == pos.customer)
-
-		console.log("find the customer : " , pos.customer , " ====> " , customer )
 
 		const creation_time = pos.creation_time
 		const [date, time]  = creation_time.split(' ')
