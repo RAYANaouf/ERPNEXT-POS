@@ -390,11 +390,20 @@ pos_ar.PointOfSale.pos_history = class {
 
 
 	filterList(search , filter){
+		console.log("log : " , this.filtered_pos_list)
 		this.filtered_pos_list = this.localPosInvoice.pos_invoices.filter( pos => {
-			const matchesCustomer = pos.customer.toLowerCase().includes(search.toLowerCase());
-			const matchesilter    = pos.status == filter
 
-			return matchesCustomer && matchesilter ;
+
+			const matchesCustomer  = (pos.customer  || "" ).toLowerCase().includes(search.toLowerCase());
+			const matchesRefNum    = (pos.refNum    || "" ).toLowerCase().includes(search.toLowerCase());
+			const matchesName      = (pos.real_name || "" ).toLowerCase().includes(search.toLowerCase());
+			const matchesAll       = search == "" ;
+			const matchesFilter    = pos.status == filter ;
+
+			console.log("real_name:" , pos.real_name , "  pos.refNum:" , pos.refNum , " customer : "  , pos.customer  , "result1: " , matchesName  , " result : " ,  ( matchesCustomer || matchesRefNum  || matchesAll )  )
+
+
+			return matchesFilter && ( matchesCustomer || matchesRefNum  || matchesName ||  matchesAll );
 		})
 
 		if(this.filtered_pos_list.length == 0){
