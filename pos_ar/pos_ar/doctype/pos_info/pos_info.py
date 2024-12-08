@@ -40,6 +40,30 @@ def update_customer_debt_on_invoice(doc, method):
 
 
 
+def update_all_customers_debt():
+    """
+    Updates the custom_debt field for all customers in the Customer Doctype.
+    """
+    try:
+        # Get all customers with outstanding sales invoices
+        customer_debts = frappe.db.sql("""
+            SELECT customer, SUM(outstanding_amount) as total_outstanding
+            FROM `tabSales Invoice`
+            WHERE docstatus = 1
+            GROUP BY customer
+        """, as_dict=True)
+
+        # Update each customer's custom_debt field
+        for record in customer_debts:
+            frappe.db.set_value("Customer", record["customer"], "custom_debt", record["total_outstanding"])
+
+        frappe.logger().info("All customer debts updated successfully.")
+    except Exception as e:
+        frappe.logger().error(f"Error updating debts for all customers: {str(e)}")
+
+
+
+
 
 
 @frappe.whitelist()

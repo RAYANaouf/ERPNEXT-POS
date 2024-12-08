@@ -245,8 +245,8 @@ doc_events = {
         "on_cancel": "pos_ar.api.update_customer_debt_on_invoice",
     },
     "POS Invoice": {
-        "on_submit": "pos_ar.api.update_customer_debt_on_invoice",
-        "on_cancel": "pos_ar.api.update_customer_debt_on_invoice",
+        "on_submit": "pos_ar.api.update_all_customers_debt",
+        "on_cancel": "pos_ar.api.update_all_customers_debt",
     },
     "Payment Entry": {
         "on_submit": "pos_ar.api.update_customer_debt_on_invoice",
