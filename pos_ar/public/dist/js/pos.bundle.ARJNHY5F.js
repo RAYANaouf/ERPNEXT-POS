@@ -2645,6 +2645,7 @@
       this.on_click = onClick;
       this.localPosInvoice = { lastTime: null, pos_invoices: [] };
       this.filter = "";
+      this.search_value = "";
       this.filtered_pos_list = [];
       this.selected_pos = null;
       this.start_work();
@@ -2704,6 +2705,7 @@
       this.filter_input = this.search_container.find("#PosInvoiceTypeInput");
       this.filter_input.append('<option value="Draft">Draft</option><option value="Paid">Paid</option> <option value="Unpaid" selected>Unpaid</option>');
       this.search_container.append('<input type="text" id="historyInput" placeholder="Search by invoice id or custumer name">');
+      this.search_field = this.search_container.find("#historyInput");
       this.right_container.append('<div id="historyRecentInvoicesContainer" ></div>');
       this.right_data_container = this.right_container.find("#historyRecentInvoicesContainer");
     }
@@ -2851,22 +2853,12 @@
     }
     setListener() {
       this.filter_input.on("input", (event2) => {
-        const filter = event2.target.value;
-        this.filtered_pos_list = this.localPosInvoice.pos_invoices.filter((pos) => {
-          if (filter == "") {
-            return true;
-          } else if (filter == pos.status) {
-            return true;
-          } else {
-            return false;
-          }
-        });
-        if (this.filtered_pos_list.length == 0) {
-          this.selected_pos = null;
-        } else {
-          this.selected_pos = this.filtered_pos_list[0];
-        }
-        this.refreshData();
+        console.log("we are here1");
+        this.filterList(this.search_field.val(), this.filter_input.val());
+      });
+      this.search_field.on("input", (event2) => {
+        console.log("we are here2");
+        this.filterList(this.search_field.val(), this.filter_input.val());
       });
       this.deleteBtn.on("click", (event2) => {
         this.db.deletePosInvoice_callback(
@@ -2894,6 +2886,19 @@
       this.printBtn.on("click", (event2) => {
         this.print_receipt(this.selected_pos);
       });
+    }
+    filterList(search, filter) {
+      this.filtered_pos_list = this.localPosInvoice.pos_invoices.filter((pos) => {
+        const matchesCustomer = pos.customer.toLowerCase().includes(search.toLowerCase());
+        const matchesilter = pos.status == filter;
+        return matchesCustomer && matchesilter;
+      });
+      if (this.filtered_pos_list.length == 0) {
+        this.selected_pos = null;
+      } else {
+        this.selected_pos = this.filtered_pos_list[0];
+      }
+      this.refreshData();
     }
     print_receipt(pos) {
       let netTotal = 0;
@@ -4675,4 +4680,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.GNL7LK7Z.js.map
+//# sourceMappingURL=pos.bundle.ARJNHY5F.js.map

@@ -20,6 +20,8 @@ pos_ar.PointOfSale.pos_history = class {
 		//local data
 		this.localPosInvoice   = { lastTime : null , pos_invoices : [] }
 		this.filter            = "" ;
+		this.search_value      = "" ;
+
 		this.filtered_pos_list = [] ;
 		this.selected_pos      = null ;
 
@@ -111,6 +113,7 @@ pos_ar.PointOfSale.pos_history = class {
 		this.filter_input.append('<option value="Draft">Draft</option><option value="Paid">Paid</option> <option value="Unpaid" selected>Unpaid</option>')
 
 		this.search_container.append('<input type="text" id="historyInput" placeholder="Search by invoice id or custumer name">');
+		this.search_field = this.search_container.find("#historyInput")
 
 		this.right_container.append('<div id="historyRecentInvoicesContainer" ></div>');
 
@@ -338,29 +341,14 @@ pos_ar.PointOfSale.pos_history = class {
 	setListener(){
 
 		this.filter_input.on('input' , (event) => {
-			const filter = event.target.value;
-
-			this.filtered_pos_list = this.localPosInvoice.pos_invoices.filter( pos => {
-				if(filter == ""){
-					return true ;
-				}
-				else if(filter == pos.status ){
-					return true ;
-				}
-				else{
-					return false ;
-				}
-			})
-
-			if(this.filtered_pos_list.length == 0){
-				this.selected_pos = null;
-			}
-			else{
-				this.selected_pos = this.filtered_pos_list[0]
-			}
-			this.refreshData();
+			console.log("we are here1")
+			this.filterList( this.search_field.val() , this.filter_input.val())
 		});
 
+		this.search_field.on('input' , (event) =>{
+			console.log("we are here2")
+			this.filterList( this.search_field.val() , this.filter_input.val())
+		})
 
 		this.deleteBtn.on('click' , (event)=>{
 			this.db.deletePosInvoice_callback(
@@ -399,6 +387,25 @@ pos_ar.PointOfSale.pos_history = class {
 	}
 
 	/******************************************** functions  ********************************************************/
+
+
+	filterList(search , filter){
+		this.filtered_pos_list = this.localPosInvoice.pos_invoices.filter( pos => {
+			const matchesCustomer = pos.customer.toLowerCase().includes(search.toLowerCase());
+			const matchesilter    = pos.status == filter
+
+			return matchesCustomer && matchesilter ;
+		})
+
+		if(this.filtered_pos_list.length == 0){
+			this.selected_pos = null;
+		}else{
+			this.selected_pos = this.filtered_pos_list[0]
+		}
+		this.refreshData();
+	}
+
+
 	print_receipt(pos) {
 
 		let netTotal   = 0
