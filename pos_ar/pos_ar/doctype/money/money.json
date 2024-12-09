@@ -1,0 +1,30 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2024-12-09 23:27:03.683762",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "5_da"
+ ],
+ "fields": [
+  {
+   "fieldname": "5_da",
+   "fieldtype": "Int",
+   "label": "5 DA"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2024-12-09 23:28:47.168049",
+ "modified_by": "Administrator",
+ "module": "POS AR",
+ "name": "money",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
