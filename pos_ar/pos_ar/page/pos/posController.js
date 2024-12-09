@@ -828,7 +828,30 @@ pos_ar.PointOfSale.Controller = class {
                         this.selected_item_cart.refreshSelectedItem()
 		}
 		else if(event == 'return'){
-			this.backHome();
+			const tab = this.selected_item_cart.createTabForEditPOS()
+
+			console.log("see the result : " , message)
+
+			const returnedPosInvoice = this.makePosInvoiceReturn(message)
+			console.log("returned pos invoice : " , returnedPosInvoice)
+			this.selectedItemMaps.set(`C${tab}` , returnedPosInvoice)
+			this.selectedTab.tabName = `C${tab}`
+
+			//show
+			this.item_selector.showCart();
+			this.customer_box.showHomeBar();
+			this.selected_item_cart.showCart()
+
+			//hide
+			this.item_details.hide_cart() ;
+			this.payment_cart.hideCart()  ;
+			this.history_cart.hide_cart() ;
+			this.settings_cart.hideCart();
+
+			//refresh the data :
+			this.selected_item_cart.refreshTabs()
+                        this.selected_item_cart.refreshSelectedItem()
+
 		}
 	}
 
@@ -1125,6 +1148,8 @@ pos_ar.PointOfSale.Controller = class {
 
 	onCompleteOrder(){
 
+		console.log("head debug top fun : " , this.selectedItemMaps.get(this.selectedTab.tabName))
+
 		this.savePosInvoice(true)
 
 		//check if they set a customer
@@ -1141,14 +1166,15 @@ pos_ar.PointOfSale.Controller = class {
 		}
 		let items = []
 		this.selectedItemMaps.get(this.selectedTab.tabName).items.forEach(  item  =>{
+			 console.log("woohoooooooooooooooooooooooooooooooooooooooo : " , item.name)
 			// we still didnt implement the price_list_rate and base_price_list_rate
 			// same thing with actual_qty refering to the stock quantity
 			let newItem = {
 				'item_name'               : item.item_name,
-				'item_code'               : item.name,
+				'item_code'               : item.item_code,
 				'rate'                    : item.rate,
 				'qty'                     : item.qty,
-				'description'             : item.name,
+				'description'             : item.description,
 				'image'                   : item.image,
 				'use_serial_batch_fields' : 1,
 				'cost_center'             : this.appData.appData.pos_profile.cost_center,
@@ -1165,6 +1191,7 @@ pos_ar.PointOfSale.Controller = class {
 			return
 
 
+		console.log("wiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii : " , items)
 
 
 		let total = 0
@@ -1197,6 +1224,8 @@ pos_ar.PointOfSale.Controller = class {
 
 		const pos = structuredClone(this.selectedItemMaps.get(this.selectedTab.tabName))
 
+
+		console.log("we areeeeeeeeeeeeeeeeeeeeee heeeeeeeeeeeeeeeeeeeer : " , pos)
 
 		if(status == 'Unpaid'){
 			pos.synced = true
@@ -1260,6 +1289,7 @@ pos_ar.PointOfSale.Controller = class {
 
 			pos.synced = false ;
 			pos.opened = 0;
+			console.log("head debug : " , pos)
 			this.appData.updatePosInvoice(pos)
 
 			this.unsyncedPos += 1 ;
@@ -1411,6 +1441,28 @@ pos_ar.PointOfSale.Controller = class {
 	}
 
 	/*****************************  tools  **********************************/
+
+	makePosInvoiceReturn(posInvoice){
+		let invoice = structuredClone(posInvoice)
+		invoice.is_return      = 1;
+		invoice.return_against = posInvoice.real_name
+		invoice.real_name      = ""
+		invoice.consolidated_invoice = null
+		invoice.outstanding_amount = 0 ;
+
+		let newItems = []
+		invoice.items.forEach(item =>{
+			if(item.qty > 0){
+				let newItem = structuredClone(item)
+				newItem.qty = newItem.qty * -1
+				newItem.description = "Returned item"
+				newItems.push(newItem)
+			}
+		})
+		invoice.items = newItems
+		console.log("result : " , invoice)
+		return invoice
+	}
 
 	toggleKeyboardMode(active){
 
@@ -1609,6 +1661,7 @@ pos_ar.PointOfSale.Controller = class {
 		})
 
 		if(!exist){
+			clonedItem.item_code           = clonedItem.name ;
 			clonedItem.discount_amount     = 0 ;
 			clonedItem.discount_percentage = 0 ;
 			clonedItem.qty                 = 1 ;
@@ -1620,6 +1673,8 @@ pos_ar.PointOfSale.Controller = class {
 
 		}
 
+
+		console.log("added ?? : " , posInvoice)
 
 	}
 

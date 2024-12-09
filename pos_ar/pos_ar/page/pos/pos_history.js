@@ -34,8 +34,6 @@ pos_ar.PointOfSale.pos_history = class {
 
 		this.localPosInvoice.pos_invoices = result ;
 
-		console.log("just to be sure")
-
 		this.filtered_pos_list = this.localPosInvoice.pos_invoices.filter( pos => {
 			if(pos.status == 'Unpaid' ){
 				return true ;
@@ -184,6 +182,7 @@ pos_ar.PointOfSale.pos_history = class {
 			posContainer.appendChild(l2)
 
 			posContainer.addEventListener('click' , () => {
+				console.log('click' , record)
 				this.selected_pos = record
 				this.refreshPosDetailsData();
 			})
@@ -216,9 +215,8 @@ pos_ar.PointOfSale.pos_history = class {
 		this.pos_header.find('#posCost').text(this.selected_pos.paid_amount??0 + "DA")
 		this.pos_header.find('#posId').text(this.selected_pos.refNum?? "POS Invoice CachId")
 
-		if(this.selected_pos.real_name && this.selected_pos.real_name != "" && this.selected_pos.real_name != null){
-			this.pos_header.find('#posRealId').text(this.selected_pos.real_name?? "")
-		}
+		this.pos_header.find('#posRealId').text(this.selected_pos.real_name ?? "")
+
 		this.pos_header.find('#posStatus').text(this.selected_pos.status)
 		this.pos_header.find('#posStatus').removeClass().addClass(`${this.selected_pos.status}`)
 
@@ -386,7 +384,8 @@ pos_ar.PointOfSale.pos_history = class {
 		})
 
 		this.returnBtn.on('click' , (event)=>{
-			this.on_click('return' , null );
+			console.log("returned invoice : " , this.selected_pos)
+			this.on_click('return' , this.selected_pos );
 		})
 
 		this.printBtn.on('click' , (event)=>{
@@ -420,6 +419,7 @@ pos_ar.PointOfSale.pos_history = class {
 			this.selected_pos = null;
 		}else{
 			this.selected_pos = this.filtered_pos_list[0]
+			console.log("debuging invoice : " , this.selected_pos , "and : " , this.filtered_pos_list)
 		}
 		this.refreshData();
 	}

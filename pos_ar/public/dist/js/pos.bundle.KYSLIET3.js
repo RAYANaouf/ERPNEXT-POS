@@ -656,7 +656,21 @@
         this.selected_item_cart.refreshTabs();
         this.selected_item_cart.refreshSelectedItem();
       } else if (event2 == "return") {
-        this.backHome();
+        const tab = this.selected_item_cart.createTabForEditPOS();
+        console.log("see the result : ", message);
+        const returnedPosInvoice = this.makePosInvoiceReturn(message);
+        console.log("returned pos invoice : ", returnedPosInvoice);
+        this.selectedItemMaps.set(`C${tab}`, returnedPosInvoice);
+        this.selectedTab.tabName = `C${tab}`;
+        this.item_selector.showCart();
+        this.customer_box.showHomeBar();
+        this.selected_item_cart.showCart();
+        this.item_details.hide_cart();
+        this.payment_cart.hideCart();
+        this.history_cart.hide_cart();
+        this.settings_cart.hideCart();
+        this.selected_item_cart.refreshTabs();
+        this.selected_item_cart.refreshSelectedItem();
       }
     }
     onInput(event2, field, value) {
@@ -830,6 +844,7 @@
       this.savePosInvoice(true);
     }
     onCompleteOrder() {
+      console.log("head debug top fun : ", this.selectedItemMaps.get(this.selectedTab.tabName));
       this.savePosInvoice(true);
       if (this.defaultCustomer.name == "") {
         frappe.warn(
@@ -844,12 +859,13 @@
       }
       let items = [];
       this.selectedItemMaps.get(this.selectedTab.tabName).items.forEach((item) => {
+        console.log("woohoooooooooooooooooooooooooooooooooooooooo : ", item.name);
         let newItem = {
           "item_name": item.item_name,
-          "item_code": item.name,
+          "item_code": item.item_code,
           "rate": item.rate,
           "qty": item.qty,
-          "description": item.name,
+          "description": item.description,
           "image": item.image,
           "use_serial_batch_fields": 1,
           "cost_center": this.appData.appData.pos_profile.cost_center,
@@ -863,6 +879,7 @@
       this.selectedItemMaps.get(this.selectedTab.tabName).items = items;
       if (items.length == 0)
         return;
+      console.log("wiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii : ", items);
       let total = 0;
       this.selectedItemMaps.get(this.selectedTab.tabName).items.forEach((item) => {
         total += item.rate * item.qty;
@@ -882,6 +899,7 @@
       const status = this.checkIfPaid(this.selectedItemMaps.get(this.selectedTab.tabName));
       this.selectedItemMaps.get(this.selectedTab.tabName).status = status;
       const pos = structuredClone(this.selectedItemMaps.get(this.selectedTab.tabName));
+      console.log("we areeeeeeeeeeeeeeeeeeeeee heeeeeeeeeeeeeeeeeeeer : ", pos);
       if (status == "Unpaid") {
         pos.synced = true;
         frappe.db.insert(
@@ -918,6 +936,7 @@
         this.onClose_payment_cart();
         pos.synced = false;
         pos.opened = 0;
+        console.log("head debug : ", pos);
         this.appData.updatePosInvoice(pos);
         this.unsyncedPos += 1;
         this.customer_box.setNotSynced(this.unsyncedPos);
@@ -1021,6 +1040,26 @@
       window.addEventListener("online", function() {
         frappe.msgprint("the connection is back (online mode)");
       });
+    }
+    makePosInvoiceReturn(posInvoice) {
+      let invoice = structuredClone(posInvoice);
+      invoice.is_return = 1;
+      invoice.return_against = posInvoice.real_name;
+      invoice.real_name = "";
+      invoice.consolidated_invoice = null;
+      invoice.outstanding_amount = 0;
+      let newItems = [];
+      invoice.items.forEach((item) => {
+        if (item.qty > 0) {
+          let newItem = structuredClone(item);
+          newItem.qty = newItem.qty * -1;
+          newItem.description = "Returned item";
+          newItems.push(newItem);
+        }
+      });
+      invoice.items = newItems;
+      console.log("result : ", invoice);
+      return invoice;
     }
     toggleKeyboardMode(active) {
       if (active) {
@@ -1163,6 +1202,7 @@
         }
       });
       if (!exist) {
+        clonedItem.item_code = clonedItem.name;
         clonedItem.discount_amount = 0;
         clonedItem.discount_percentage = 0;
         clonedItem.qty = 1;
@@ -1171,6 +1211,7 @@
         const clone = structuredClone(clonedItem);
         Object.assign(this.selectedItem, clone);
       }
+      console.log("added ?? : ", posInvoice);
     }
     deleteItemFromPOsInvoice(itemId) {
       const posInvoice = this.selectedItemMaps.get(this.selectedTab.tabName);
@@ -1586,7 +1627,6 @@
       this.create_new_tab = createNewTab;
       this.save_pos_invoice = savePosInvoice;
       this.db = db;
-      console.log("check the db : ", this.db);
       this.taxes_map = /* @__PURE__ */ new Map();
       this.total_tax_amout = 0;
       this.counter = 1;
@@ -1665,6 +1705,9 @@
       this.netTotal = this.cartDetails.find("#netTotal");
       this.netTotal.append('<div id="netTotalTitle">Net Total</div>');
       this.netTotal.append('<div id="netTotalValue">0.00</div>');
+      if (this.sales_taxes.length == 0) {
+        this.netTotal.css("display", "none");
+      }
       this.vat = this.cartDetails.find("#VAT");
       this.sales_taxes.forEach((tax) => {
         this.vat.append(`<div id="taxConatiner_${tax.name}" class="rowBox align_center row_sbtw"></div>`);
@@ -2667,7 +2710,6 @@
       this.prepare_history_cart();
       const result = await this.db.getAllPosInvoice();
       this.localPosInvoice.pos_invoices = result;
-      console.log("just to be sure");
       this.filtered_pos_list = this.localPosInvoice.pos_invoices.filter((pos) => {
         if (pos.status == "Unpaid") {
           return true;
@@ -2767,6 +2809,7 @@
         posContainer.appendChild(l1);
         posContainer.appendChild(l2);
         posContainer.addEventListener("click", () => {
+          console.log("click", record);
           this.selected_pos = record;
           this.refreshPosDetailsData();
         });
@@ -2785,9 +2828,7 @@
       this.pos_header.find("#posCustomer").text((_a = this.selected_pos.customer) != null ? _a : "CustomerName");
       this.pos_header.find("#posCost").text((_b = this.selected_pos.paid_amount) != null ? _b : 0 + "DA");
       this.pos_header.find("#posId").text((_c = this.selected_pos.refNum) != null ? _c : "POS Invoice CachId");
-      if (this.selected_pos.real_name && this.selected_pos.real_name != "" && this.selected_pos.real_name != null) {
-        this.pos_header.find("#posRealId").text((_d = this.selected_pos.real_name) != null ? _d : "");
-      }
+      this.pos_header.find("#posRealId").text((_d = this.selected_pos.real_name) != null ? _d : "");
       this.pos_header.find("#posStatus").text(this.selected_pos.status);
       this.pos_header.find("#posStatus").removeClass().addClass(`${this.selected_pos.status}`);
       if (this.selected_pos.status == "Draft") {
@@ -2897,7 +2938,8 @@
         this.on_click("edit", this.selected_pos);
       });
       this.returnBtn.on("click", (event2) => {
-        this.on_click("return", null);
+        console.log("returned invoice : ", this.selected_pos);
+        this.on_click("return", this.selected_pos);
       });
       this.printBtn.on("click", (event2) => {
         this.print_receipt(this.selected_pos);
@@ -2920,6 +2962,7 @@
         this.selected_pos = null;
       } else {
         this.selected_pos = this.filtered_pos_list[0];
+        console.log("debuging invoice : ", this.selected_pos, "and : ", this.filtered_pos_list);
       }
       this.refreshData();
     }
@@ -4703,4 +4746,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.ZHJL7JQQ.js.map
+//# sourceMappingURL=pos.bundle.KYSLIET3.js.map

@@ -43,7 +43,6 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 		this.create_new_tab          = createNewTab    ;
 		this.save_pos_invoice        = savePosInvoice  ;
 		this.db                      = db              ;
-		console.log("check the db : " , this.db)
 		//local
 		this.taxes_map   = new Map();
 		this.total_tax_amout = 0 ;
@@ -173,6 +172,10 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 		this.netTotal      = this.cartDetails.find('#netTotal')
 		this.netTotal.append('<div id="netTotalTitle">Net Total</div>')
 		this.netTotal.append('<div id="netTotalValue">0.00</div>')
+
+		if(this.sales_taxes.length == 0){
+			this.netTotal.css('display' , 'none')
+		}
 
 		this.vat           = this.cartDetails.find('#VAT')
 		this.sales_taxes.forEach( tax =>{
