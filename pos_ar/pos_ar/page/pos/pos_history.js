@@ -89,14 +89,14 @@ pos_ar.PointOfSale.pos_history = class {
 		this.paymentsContainer = this.pos_content.find('#posPaymentsContainer')
 		this.methodList        = this.pos_content.find('#posMethodList')
 
-		this.left_container.append('<div id="posActionsContainer" class="rowBox align_content"  style="display = none ;" > <div id="posPrintBtn" class="actionBtn rowBox centerItem"> Print Receipt </div>  <div id="posEmailBtn" class="actionBtn rowBox centerItem"> Email Receipt </div>   <div id="posReturnBtn" class="actionBtn rowBox centerItem"> Return </div>  </div>')
+		this.left_container.append('<div id="posActionsContainer" class="rowBox align_content"  style="display = none ;" > <div id="posPrintBtn" class="actionBtn rowBox centerItem"> Print Receipt </div>  <div id="posDuplicateBtn" class="actionBtn rowBox centerItem"> Duplicate </div>   <div id="posReturnBtn" class="actionBtn rowBox centerItem"> Return </div>  </div>')
 		this.left_container.append('<div id="posDraftActionsContainer" class="rowBox align_content" style="display = none ;"> <div id="posEditBtn" class="actionBtn rowBox centerItem"> Edit Invoice </div>  <div id="posDeleteBtn" class="actionBtn rowBox centerItem"> Delete Invoice </div>  </div>')
 
 		//third and last section is the action buttons
 		this.actionButtonsContainer = this.left_container.find('#posActionsContainer')
-		this.printBtn  = this.actionButtonsContainer.find('#posPrintBtn')
-		this.emailBtn  = this.actionButtonsContainer.find('#posEmailBtn')
-		this.returnBtn = this.actionButtonsContainer.find('#posReturnBtn')
+		this.printBtn      = this.actionButtonsContainer.find('#posPrintBtn')
+		this.duplicateBtn  = this.actionButtonsContainer.find('#posDuplicateBtn')
+		this.returnBtn     = this.actionButtonsContainer.find('#posReturnBtn')
 
 		this.draftActionButtonsContainer = this.left_container.find('#posDraftActionsContainer')
 		this.deleteBtn  = this.draftActionButtonsContainer.find('#posDeleteBtn')
@@ -184,7 +184,6 @@ pos_ar.PointOfSale.pos_history = class {
 			posContainer.appendChild(l2)
 
 			posContainer.addEventListener('click' , () => {
-				console.log("we are with " , record)
 				this.selected_pos = record
 				this.refreshPosDetailsData();
 			})
@@ -243,24 +242,34 @@ pos_ar.PointOfSale.pos_history = class {
 
 		this.totalList.html('');
 
+
+		//if there are no taxes we should show only the grand total
+
 		/////net total
 		let netTotal = 0 ;
 		this.selected_pos.items.forEach(item => {
 			netTotal += item.rate * item.qty
 		})
-		this.totalList.append(`<div class="rowBox align_item"> <div class="name rowBox align_center">Net Total</div> <div class="price rowBox align_center">${netTotal} DA</div> </div>`)
 
 
-		let allTax = 0
-		if(this.selected_pos.taxes_and_charges != "" && this.selected_pos.taxes_and_charges != null){
-			this.sales_taxes.forEach( tax =>{
-				allTax += (tax.rate/100) * netTotal
-				this.totalList.append(`<div class="rowBox align_item"> <div class="name rowBox align_center">${tax.description}</div> <div class="price rowBox align_center">${(tax.rate/100) * netTotal} DA</div> </div>`)
-			})
+		if(this.selected_pos.taxes_and_charges == "" || this.selected_pos.taxes_and_charges == null){
+			// grand otal
+			this.totalList.append(`<div class="rowBox align_item"> <div class="grandTotalName rowBox align_center">Grand Total</div> <div class="grandTotalPrice rowBox align_center">${netTotal} DA</div> </div>`)
+		}else{
+			this.totalList.append(`<div class="rowBox align_item"> <div class="name rowBox align_center">Net Total</div> <div class="price rowBox align_center">${netTotal} DA</div> </div>`)
+			let allTax = 0
+			if(this.selected_pos.taxes_and_charges != "" && this.selected_pos.taxes_and_charges != null){
+				this.sales_taxes.forEach( tax =>{
+					allTax += (tax.rate/100) * netTotal
+					this.totalList.append(`<div class="rowBox align_item"> <div class="name rowBox align_center">${tax.description}</div> <div class="price rowBox align_center">${(tax.rate/100) * netTotal} DA</div> </div>`)
+				})
+			}
+			// grand otal
+			this.totalList.append(`<div class="rowBox align_item"> <div class="grandTotalName rowBox align_center">Grand Total</div> <div class="grandTotalPrice rowBox align_center">${netTotal + allTax} DA</div> </div>`)
 		}
 
-		// grand otal
-		this.totalList.append(`<div class="rowBox align_item"> <div class="grandTotalName rowBox align_center">Grand Total</div> <div class="grandTotalPrice rowBox align_center">${netTotal + allTax} DA</div> </div>`)
+
+
 
 
 
@@ -384,6 +393,10 @@ pos_ar.PointOfSale.pos_history = class {
 			this.print_receipt(this.selected_pos)
 		})
 
+		this.duplicateBtn.on('click' , (event)=>{
+			this.on_click('duplicate' , this.selected_pos );
+		})
+
 	}
 
 	/******************************************** functions  ********************************************************/
@@ -399,9 +412,6 @@ pos_ar.PointOfSale.pos_history = class {
 			const matchesName      = (pos.real_name || "" ).toLowerCase().includes(search.toLowerCase());
 			const matchesAll       = search == "" ;
 			const matchesFilter    = pos.status == filter ;
-
-			console.log("real_name:" , pos.real_name , "  pos.refNum:" , pos.refNum , " customer : "  , pos.customer  , "result1: " , matchesName  , " result : " ,  ( matchesCustomer || matchesRefNum  || matchesAll )  )
-
 
 			return matchesFilter && ( matchesCustomer || matchesRefNum  || matchesName ||  matchesAll );
 		})

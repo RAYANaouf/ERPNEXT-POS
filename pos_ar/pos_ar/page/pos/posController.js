@@ -806,6 +806,26 @@ pos_ar.PointOfSale.Controller = class {
 			//refresh the data :
 			this.selected_item_cart.refreshTabs()
                         this.selected_item_cart.refreshSelectedItem()
+		}else if(event == 'duplicate'){
+			const tab = this.selected_item_cart.createTabForEditPOS()
+
+			this.selectedItemMaps.set(`C${tab}` , message)
+			this.selectedTab.tabName = `C${tab}`
+
+			//show
+			this.item_selector.showCart();
+			this.customer_box.showHomeBar();
+			this.selected_item_cart.showCart()
+
+			//hide
+			this.item_details.hide_cart() ;
+			this.payment_cart.hideCart()  ;
+			this.history_cart.hide_cart() ;
+			this.settings_cart.hideCart();
+
+			//refresh the data :
+			this.selected_item_cart.refreshTabs()
+                        this.selected_item_cart.refreshSelectedItem()
 		}
 		else if(event == 'return'){
 			this.backHome();
