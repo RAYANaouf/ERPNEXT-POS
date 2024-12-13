@@ -844,7 +844,7 @@
       this.savePosInvoice(true);
     }
     onCompleteOrder() {
-      console.log("head debug top fun : ", this.selectedItemMaps.get(this.selectedTab.tabName));
+      this.payment_cart.show_waiting();
       this.savePosInvoice(true);
       if (this.defaultCustomer.name == "") {
         frappe.warn(
@@ -859,7 +859,6 @@
       }
       let items = [];
       this.selectedItemMaps.get(this.selectedTab.tabName).items.forEach((item) => {
-        console.log("woohoooooooooooooooooooooooooooooooooooooooo : ", item.name);
         let newItem = {
           "item_name": item.item_name,
           "item_code": item.item_code,
@@ -879,7 +878,6 @@
       this.selectedItemMaps.get(this.selectedTab.tabName).items = items;
       if (items.length == 0)
         return;
-      console.log("wiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii : ", items);
       let total = 0;
       this.selectedItemMaps.get(this.selectedTab.tabName).items.forEach((item) => {
         total += item.rate * item.qty;
@@ -899,12 +897,12 @@
       const status = this.checkIfPaid(this.selectedItemMaps.get(this.selectedTab.tabName));
       this.selectedItemMaps.get(this.selectedTab.tabName).status = status;
       const pos = structuredClone(this.selectedItemMaps.get(this.selectedTab.tabName));
-      console.log("we areeeeeeeeeeeeeeeeeeeeee heeeeeeeeeeeeeeeeeeeer : ", pos);
       if (status == "Unpaid") {
         pos.synced = true;
         frappe.db.insert(
           pos
         ).then((r) => {
+          this.payment_cart.hide_waiting();
           pos.opened = 0;
           pos.real_name = r.name;
           this.history_cart.print_receipt(pos);
@@ -920,9 +918,11 @@
           }
           this.onClose_payment_cart();
         }).catch((err) => {
+          this.payment_cart.hide_waiting();
           console.log("cant push pos invoice : ", err);
         });
       } else {
+        this.payment_cart.hide_waiting();
         this.history_cart.print_receipt(pos);
         this.selectedItemMaps.delete(this.selectedTab.tabName);
         let tabs = Array.from(this.selectedItemMaps.keys());
@@ -2512,6 +2512,11 @@
     }
     prepare_payment_cart() {
       this.wrapper.append('<div id="paymentMethodCart" class="columnBox align_center"></div>');
+      this.paymentCart = this.wrapper.find("#paymentMethodCart");
+      this.paymentCart.append(
+        `<script src="https://unpkg.com/@dotlottie/player-component@2.7.12/dist/dotlottie-player.mjs" type="module"><\/script><div id="payment_waitingContainer" style="position:absolute;background:#00000050;top:0;left:0;inset: 0;display:none;backdrop-filter: blur(2px);z-index: 10;" class="rowBox centerItem" ><dotlottie-player src="https://lottie.host/d6c76206-aab9-4d5a-af73-c4a6cfc5aaa9/H8vnpKcKj9.lottie" background="transparent" speed="1" style="width: 300px; height: 300px" loop autoplay></dotlottie-player></div>`
+      );
+      this.waiting_cart = this.wrapper.find("#payment_waitingContainer");
       this.cart = this.wrapper.find("#paymentMethodCart");
       this.cart.append('<div id="paymentMethodCartHeader" class="rowBox header align_center row_sbtw"></div>');
       this.cart.append('<div id="paymentMethodContent" class="columnBox align_center"></div>');
@@ -2568,6 +2573,14 @@
     }
     hideCart() {
       this.cart.css("display", "none");
+    }
+    show_waiting() {
+      console.log("we are heeer display", this.waiting_cart);
+      this.waiting_cart.css("display", "flex");
+    }
+    hide_waiting() {
+      console.log("we are heeer for hide");
+      this.waiting_cart.css("display", "none");
     }
     setListeners() {
       const me = this;
@@ -3378,13 +3391,19 @@
         const transaction = this.db.transaction(["POS Invoice"], "readwrite");
         const store = transaction.objectStore("POS Invoice");
         const dateIndex = store.index("creation_time");
-        const result = dateIndex.getAll();
-        result.onsuccess = (event2) => {
-          const value = event2.target.result;
-          console.log("see that : ", value);
-          resolve(value);
+        const invoices = [];
+        const request = dateIndex.openCursor(null, "prev");
+        request.onsuccess = (event2) => {
+          const cursor = event2.target.result;
+          if (cursor) {
+            invoices.push(cursor.value);
+            cursor.continue();
+          } else {
+            console.log("check the response : ", invoices);
+            resolve(invoices);
+          }
         };
-        result.onerror = (err) => {
+        request.onerror = (err) => {
           reject(err);
         };
       });
@@ -3406,12 +3425,20 @@
     getAllPosInvoice_callback(onSuccess, onFailure) {
       const transaction = this.db.transaction(["POS Invoice"], "readwrite");
       const store = transaction.objectStore("POS Invoice");
-      const result = store.getAll();
-      result.onsuccess = (event2) => {
-        const value = event2.target.result;
-        onSuccess(value);
+      const dateIndex = store.index("creation_time");
+      const invoices = [];
+      const request = dateIndex.openCursor(null, "prev");
+      request.onsuccess = (event2) => {
+        const cursor = event2.target.result;
+        if (cursor) {
+          invoices.push(cursor.value);
+          cursor.continue();
+        } else {
+          console.log("check the response : ", invoices);
+          onSuccess(invoices);
+        }
       };
-      result.onerror = (err) => {
+      request.onerror = (err) => {
         onFailure(err);
       };
     }
@@ -4746,4 +4773,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.KYSLIET3.js.map
+//# sourceMappingURL=pos.bundle.VEELROUT.js.map

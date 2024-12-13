@@ -527,17 +527,25 @@ pos_ar.PointOfSale.pos_db  = class POSDatabase {
 		return new Promise((resolve,reject)=>{
 			const transaction = this.db.transaction(['POS Invoice'] , "readwrite");
 			const store       = transaction.objectStore('POS Invoice');
-
 			const dateIndex   = store.index('creation_time');
-			const result      = dateIndex.getAll()
-			result.onsuccess = (event) => {
-				const value = event.target.result
-				console.log("see that : " , value)
-				resolve(value);
-			}
-			result.onerror = (err)=>{
+
+			const invoices    = []
+			const request     = dateIndex.openCursor(null , 'prev') //use prev for descenfing order
+
+			request.onsuccess = (event) =>{
+				const cursor = event.target.result;
+				if(cursor){
+					invoices.push(cursor.value);
+					cursor.continue() //Move to the next record
+				}else{
+					console.log('check the response : ' , invoices)
+					resolve(invoices);
+				}
+			};
+			request.onerror = (err)=>{
 				reject(err)
 			}
+
 		})
 	}
 
@@ -562,12 +570,22 @@ pos_ar.PointOfSale.pos_db  = class POSDatabase {
 	getAllPosInvoice_callback(onSuccess,onFailure){
 		const transaction = this.db.transaction(['POS Invoice'] , "readwrite");
 		const store       = transaction.objectStore('POS Invoice');
-		const result      = store.getAll()
-		result.onsuccess = (event) => {
-			const value = event.target.result
-			onSuccess(value);
-		}
-		result.onerror = (err)=>{
+		const dateIndex = store.index('creation_time');
+
+		const invoices  = []
+		const request   = dateIndex.openCursor(null , 'prev') //use prev for descenfing order
+
+		request.onsuccess = (event) =>{
+			const cursor = event.target.result;
+			if(cursor){
+				invoices.push(cursor.value);
+				cursor.continue() //Move to the next record
+			}else{
+				console.log('check the response : ' , invoices)
+				onSuccess(invoices);
+			}
+		};
+		request.onerror = (err)=>{
 			onFailure(err)
 		}
 	}

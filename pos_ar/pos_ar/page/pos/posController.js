@@ -1148,7 +1148,7 @@ pos_ar.PointOfSale.Controller = class {
 
 	onCompleteOrder(){
 
-		console.log("head debug top fun : " , this.selectedItemMaps.get(this.selectedTab.tabName))
+		this.payment_cart.show_waiting()
 
 		this.savePosInvoice(true)
 
@@ -1166,7 +1166,6 @@ pos_ar.PointOfSale.Controller = class {
 		}
 		let items = []
 		this.selectedItemMaps.get(this.selectedTab.tabName).items.forEach(  item  =>{
-			 console.log("woohoooooooooooooooooooooooooooooooooooooooo : " , item.name)
 			// we still didnt implement the price_list_rate and base_price_list_rate
 			// same thing with actual_qty refering to the stock quantity
 			let newItem = {
@@ -1189,10 +1188,6 @@ pos_ar.PointOfSale.Controller = class {
 		this.selectedItemMaps.get(this.selectedTab.tabName).items = items
 		if(items.length ==0)
 			return
-
-
-		console.log("wiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii : " , items)
-
 
 		let total = 0
 		this.selectedItemMaps.get(this.selectedTab.tabName).items.forEach(item =>{
@@ -1225,13 +1220,13 @@ pos_ar.PointOfSale.Controller = class {
 		const pos = structuredClone(this.selectedItemMaps.get(this.selectedTab.tabName))
 
 
-		console.log("we areeeeeeeeeeeeeeeeeeeeee heeeeeeeeeeeeeeeeeeeer : " , pos)
-
 		if(status == 'Unpaid'){
 			pos.synced = true
 			frappe.db.insert(
 				pos
 			).then(r =>{
+
+ 				this.payment_cart.hide_waiting()
 
 				pos.opened = 0;
 				pos.real_name = r.name
@@ -1261,10 +1256,13 @@ pos_ar.PointOfSale.Controller = class {
 
 
 			}).catch(err=>{
+				this.payment_cart.hide_waiting()
 				console.log("cant push pos invoice : " , err);
 			})
 		}
 		else{
+
+			this.payment_cart.hide_waiting()
 			/*** START : deleting pos when finishing **/
 			//print the pos
 			this.history_cart.print_receipt(pos)

@@ -42,6 +42,14 @@ pos_ar.PointOfSale.pos_payment_cart = class{
 
 	prepare_payment_cart(){
 		this.wrapper.append('<div id="paymentMethodCart" class="columnBox align_center"></div>')
+		this.paymentCart = this.wrapper.find('#paymentMethodCart')
+
+                this.paymentCart.append(
+                                `<script src="https://unpkg.com/@dotlottie/player-component@2.7.12/dist/dotlottie-player.mjs" type="module"></script>`+
+                                `<div id="payment_waitingContainer" style="position:absolute;background:#00000050;top:0;left:0;inset: 0;display:none;backdrop-filter: blur(2px);z-index: 10;" class="rowBox centerItem" ><dotlottie-player src="https://lottie.host/d6c76206-aab9-4d5a-af73-c4a6cfc5aaa9/H8vnpKcKj9.lottie" background="transparent" speed="1" style="width: 300px; height: 300px" loop autoplay></dotlottie-player></div>`
+                )
+
+		this.waiting_cart = this.wrapper.find('#payment_waitingContainer')
 
 		this.cart = this.wrapper.find('#paymentMethodCart')
 		this.cart.append('<div id="paymentMethodCartHeader" class="rowBox header align_center row_sbtw"></div>')
@@ -132,6 +140,14 @@ pos_ar.PointOfSale.pos_payment_cart = class{
 		this.cart.css('display' , 'none');
 	}
 
+	show_waiting(){
+		console.log("we are heeer display" , this.waiting_cart)
+		this.waiting_cart.css('display' , 'flex')
+	}
+	hide_waiting(){
+		console.log("we are heeer for hide")
+		this.waiting_cart.css('display' , 'none')
+	}
 
 	/*clearData(){
 
