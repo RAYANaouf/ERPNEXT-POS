@@ -858,6 +858,7 @@
         return;
       }
       let items = [];
+      let is_return = 1;
       this.selectedItemMaps.get(this.selectedTab.tabName).items.forEach((item) => {
         let newItem = {
           "item_name": item.item_name,
@@ -874,7 +875,10 @@
           "income_account": this.appData.appData.pos_profile.income_account
         };
         items.push(newItem);
+        if (item.qty > 0)
+          is_return = 0;
       });
+      this.selectedItemMaps.get(this.selectedTab.tabName).is_return = is_return;
       this.selectedItemMaps.get(this.selectedTab.tabName).items = items;
       if (items.length == 0)
         return;
@@ -4773,4 +4777,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.VEELROUT.js.map
+//# sourceMappingURL=pos.bundle.5FDR3TM3.js.map

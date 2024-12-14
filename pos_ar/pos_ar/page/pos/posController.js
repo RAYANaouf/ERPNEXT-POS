@@ -1165,6 +1165,8 @@ pos_ar.PointOfSale.Controller = class {
 			return ;
 		}
 		let items = []
+		let is_return = 1;
+
 		this.selectedItemMaps.get(this.selectedTab.tabName).items.forEach(  item  =>{
 			// we still didnt implement the price_list_rate and base_price_list_rate
 			// same thing with actual_qty refering to the stock quantity
@@ -1183,7 +1185,11 @@ pos_ar.PointOfSale.Controller = class {
 				'income_account'          : this.appData.appData.pos_profile.income_account,
 			}
 			items.push(newItem)
+			if(item.qty > 0)
+				is_return = 0
 		})
+
+		this.selectedItemMaps.get(this.selectedTab.tabName).is_return = is_return
 
 		this.selectedItemMaps.get(this.selectedTab.tabName).items = items
 		if(items.length ==0)
