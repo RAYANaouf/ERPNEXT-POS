@@ -5,17 +5,19 @@ pos_ar.PointOfSale.pos_history = class {
 		db,
 		selectedPosProfile,
 		appData,
+		appSettings,
 		company,
 		salesTaxes,
 		onClick
 	){
-		this.wrapper               = wrapper    ;
-		this.db                    = db         ;
+		this.wrapper               = wrapper     ;
+		this.db                    = db          ;
 		this.selected_pos_profile  = selectedPosProfile;
-		this.app_data              = appData    ;
-		this.company               = company    ;
-		this.sales_taxes           = salesTaxes ;
-		this.on_click              = onClick    ;
+		this.app_data              = appData     ;
+		this.app_settings          = appSettings ;
+		this.company               = company     ;
+		this.sales_taxes           = salesTaxes  ;
+		this.on_click              = onClick     ;
 
 		//local data
 		this.localPosInvoice   = { lastTime : null , pos_invoices : [] }
@@ -432,6 +434,12 @@ pos_ar.PointOfSale.pos_history = class {
 		let grandTotal = 0
 
 		let customer = this.app_data.customers.find(customer => customer.name == pos.customer)
+
+		let ancien_sold = customer.custom_debt;
+
+		if(this.app_settings.settings.onlineDebt){
+			
+		}
 
 		const creation_time = pos.creation_time
 		const [date, time]  = creation_time.split(' ')

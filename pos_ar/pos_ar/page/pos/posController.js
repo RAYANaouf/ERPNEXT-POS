@@ -435,6 +435,7 @@ pos_ar.PointOfSale.Controller = class {
 									this.db,
 									this.appData.appData.pos_profile,
 									this.appData.appData,
+									this.settings_data,
 									this.company,
 									this.taxes_and_charges,
 									this.historyCartClick.bind(this)
@@ -1423,7 +1424,17 @@ pos_ar.PointOfSale.Controller = class {
 			child.user          = check.owner
 		})
 
-		frappe.set_route("Form", "POS Closing Entry", voucher.name);
+		//frappe.set_route("Form", "POS Closing Entry", voucher.name);
+
+		frappe.set_route("Form", "POS Closing Entry", voucher.name).then(() => {
+			// Block back navigation
+			window.addEventListener('popstate', (event) => {
+				frappe.set_route("Form", "POS Closing Entry", voucher.name);
+			});
+		});
+
+		//location.replace(frappe.utils.get_url_to_form("POS Closing Entry", voucher.name));
+
 		//delete the open entry because you create the closing entr,
 		//that my the user submited it, so when the code find its name empty,
 		//it will try to fetch an open pos entry if there is no one opening,
