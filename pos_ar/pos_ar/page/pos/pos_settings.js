@@ -96,8 +96,11 @@ pos_ar.PointOfSale.pos_settings = class{
 		const showItemImage       = this.settings_data.settings.showItemImage     ? "checked" : ""
 		const showDiscountField   = this.settings_data.settings.showDiscountField ? "checked" : ""
 		const searchByGroup       = this.settings_data.settings.search_by_group   ? "checked" : ""
+		const onlineDebt          = this.settings_data.settings.onlineDebt        ? "checked" : ""
 		const keyboardStyle       = this.settings_data.settings.keyboard_style
 
+
+		console.log("check it here : " , this.settings_data.settings.onlineDebt);
 
 		//left container
 		this.leftContainer.addClass('columnBox')
@@ -137,6 +140,12 @@ pos_ar.PointOfSale.pos_settings = class{
 				this.keyboard_style_select.append(`<option value="${style}"> ${style} </option>`)
 			}
 		})
+
+
+		this.general_settings_c2.append('<div for="showItemDetailsCartCheckBox" style="font-weight:600;"> Get Client Debt OnLine : </div>')
+		this.general_settings_c2.append(`<div class="rowBox align_center" style="height:50px;"><label for="onlineDebtCheckBox" style="margin-right:16px;width:50%;" > online debt: </label> <input type="checkbox"  name="onlineDebtCheckBox" id="onlineDebtCheckBoxCheckBox" ${onlineDebt} ></div>`)
+
+
 
 		//show item details cart
 		this.general_settings_c1.append('<div for="showItemDetailsCartCheckBox" style="font-weight:600;"> Item Details Cart : </div>')
@@ -223,6 +232,18 @@ pos_ar.PointOfSale.pos_settings = class{
 				}
 			)
 		})
+		this.general_settings_c2.find('#onlineDebtCheckBoxCheckBox').on('click' , (event)=>{
+			this.settings_data.settings.onlineDebt =  $(event.target).is(':checked')
+			this.settings_data.setSettings(
+				this.settings_data.settings,
+				()=>{
+					this.on_settings_change("")
+				},()=>{
+					console.error("error to save the settings changes (pos_settings.js)")
+				}
+			)
+		})
+
 
 	}
 	refreshAboutUs(){

@@ -7,11 +7,25 @@ pos_ar.PointOfSale.posSettingsData = class{
 		//Array of valid values
 		this.price_bases     = ['brand'   , 'priceList']
 		this.keyboard_styles = ['primery' , 'secondary']
+
+		const defaults = {
+			itemPriceBasedOn  : 'brand'     ,
+			keyboardStyle     : 'secondary' ,
+			showItemDetails   : false       ,
+			showItemImage     : false       ,
+			showDiscountField : false       ,
+			onlineDebt        : true        ,
+			testing           : false,
+			search_by_group   : false
+		}
+
+
 		//Default setting (it could be more)
 		this.db.getSettings(
+
 			(res)=>{
 				if(res && res.itemPriceBasedOn ){
-					this.settings = res
+					this.settings = {...defaults , ...( res || {} ) }
 				}else{
 					//default
 					this.settings = {
@@ -20,9 +34,12 @@ pos_ar.PointOfSale.posSettingsData = class{
 						showItemDetails   : false       ,
 						showItemImage     : false       ,
 						showDiscountField : false       ,
+						onlineDebt        : true        ,
 						search_by_group   : false
 					}
 				}
+
+				console.log("test result : " , this.settings)
 
 			},
 			(err)=>{
@@ -33,6 +50,7 @@ pos_ar.PointOfSale.posSettingsData = class{
 					showItemDetails   : false       ,
 					showItemImage     : false       ,
 					showDiscountField : false       ,
+					onlineDebt        : true        ,
 					search_by_group   : false
 				}
 

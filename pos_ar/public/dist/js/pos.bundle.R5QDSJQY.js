@@ -3690,7 +3690,9 @@
       const showItemImage = this.settings_data.settings.showItemImage ? "checked" : "";
       const showDiscountField = this.settings_data.settings.showDiscountField ? "checked" : "";
       const searchByGroup = this.settings_data.settings.search_by_group ? "checked" : "";
+      const onlineDebt = this.settings_data.settings.onlineDebt ? "checked" : "";
       const keyboardStyle = this.settings_data.settings.keyboard_style;
+      console.log("check it here : ", this.settings_data.settings.onlineDebt);
       this.leftContainer.addClass("columnBox");
       this.leftContainer.append('<h4 class="CartTitle" style="margin-bottom:35px; font-size:35px;" >General Settings</h4>');
       this.leftContainer.append('<div id="settingsCartContentsContainer">  </div>');
@@ -3719,6 +3721,8 @@
           this.keyboard_style_select.append(`<option value="${style}"> ${style} </option>`);
         }
       });
+      this.general_settings_c2.append('<div for="showItemDetailsCartCheckBox" style="font-weight:600;"> Get Client Debt OnLine : </div>');
+      this.general_settings_c2.append(`<div class="rowBox align_center" style="height:50px;"><label for="onlineDebtCheckBox" style="margin-right:16px;width:50%;" > online debt: </label> <input type="checkbox"  name="onlineDebtCheckBox" id="onlineDebtCheckBoxCheckBox" ${onlineDebt} ></div>`);
       this.general_settings_c1.append('<div for="showItemDetailsCartCheckBox" style="font-weight:600;"> Item Details Cart : </div>');
       this.general_settings_c1.append(`<div class="rowBox align_center" style="height:50px;"><label for="showItemDetailsCartCheckBox" style="margin-right:16px;width:50%;" > show cart: </label> <input type="checkbox"  name="showItemDetailsCartCheckBox" id="showItemDetailsCartCheckBox" ${showItemDetailsCart} ></div>`);
       this.general_settings_c1.append('<div for="showItemDetailsCartCheckBox" style="font-weight:600;"> Item Image : </div>');
@@ -3795,6 +3799,18 @@
           },
           () => {
             console.error("error to save the settings changes (settings.js)");
+          }
+        );
+      });
+      this.general_settings_c2.find("#onlineDebtCheckBoxCheckBox").on("click", (event2) => {
+        this.settings_data.settings.onlineDebt = $(event2.target).is(":checked");
+        this.settings_data.setSettings(
+          this.settings_data.settings,
+          () => {
+            this.on_settings_change("");
+          },
+          () => {
+            console.error("error to save the settings changes (pos_settings.js)");
           }
         );
       });
@@ -4006,10 +4022,20 @@
       this.db = db;
       this.price_bases = ["brand", "priceList"];
       this.keyboard_styles = ["primery", "secondary"];
+      const defaults = {
+        itemPriceBasedOn: "brand",
+        keyboardStyle: "secondary",
+        showItemDetails: false,
+        showItemImage: false,
+        showDiscountField: false,
+        onlineDebt: true,
+        testing: false,
+        search_by_group: false
+      };
       this.db.getSettings(
         (res) => {
           if (res && res.itemPriceBasedOn) {
-            this.settings = res;
+            this.settings = __spreadValues(__spreadValues({}, defaults), res || {});
           } else {
             this.settings = {
               itemPriceBasedOn: "brand",
@@ -4017,9 +4043,11 @@
               showItemDetails: false,
               showItemImage: false,
               showDiscountField: false,
+              onlineDebt: true,
               search_by_group: false
             };
           }
+          console.log("test result : ", this.settings);
         },
         (err) => {
           console.log("error when trying to get the setting from local, so we use the default.");
@@ -4029,6 +4057,7 @@
             showItemDetails: false,
             showItemImage: false,
             showDiscountField: false,
+            onlineDebt: true,
             search_by_group: false
           };
         }
@@ -4777,4 +4806,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.5FDR3TM3.js.map
+//# sourceMappingURL=pos.bundle.R5QDSJQY.js.map
