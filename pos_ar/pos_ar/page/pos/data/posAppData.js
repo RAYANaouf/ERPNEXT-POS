@@ -209,6 +209,12 @@ pos_ar.PointOfSale.posAppData = class {
 		return await this.api_handler.fetchDebtsSalesInvoices(customerName)
 	}
 
+
+
+	async fetchCustomerDebt( customerName){
+		return await this.api_handler.fetchCustomerDebt( customerName )
+	}
+
 	async update_invoice_payment(invoiceName , amount){
 
 		const rest = await this.api_handler.update_invoice_payment( invoiceName , amount)

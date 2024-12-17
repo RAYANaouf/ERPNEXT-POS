@@ -427,18 +427,21 @@ pos_ar.PointOfSale.pos_history = class {
 	}
 
 
-	print_receipt(pos) {
+	async print_receipt(pos) {
 
 		let netTotal   = 0
 		let taxes      = 0
 		let grandTotal = 0
 
-		let customer = this.app_data.customers.find(customer => customer.name == pos.customer)
+		console.log("appData : " , this.app_data)
+		let customer = this.app_data.appData.customers.find(customer => customer.name == pos.customer)
 
 		let ancien_sold = customer.custom_debt;
 
+		console.log("check the condition : " , this.app_settings.settings.onlineDebt )
 		if(this.app_settings.settings.onlineDebt){
-			
+			ancien_sold = await this.app_data.fetchCustomerDebt(customer.name);
+			console.log("the result id : " , ancien_sold)
 		}
 
 		const creation_time = pos.creation_time
@@ -521,7 +524,7 @@ pos_ar.PointOfSale.pos_history = class {
 		})
 
 			invoiceHTML += `<tr style="height:23px;font-size:12px;font-weight:700;" > <td colspan="3" ><div >      </div></td>   <td><div> ${netTotal+(netTotal*(taxes/100)) - pos.additional_discount_percentage * netTotal} DA </div></td></tr>`
-			invoiceHTML += `<tr style="height:23px;font-size:12px;font-weight:700;" > <td colspan="3" ><div >Ancien Sold        </div></td>   <td><div> ${customer.custom_debt} DA </div></td></tr>`
+			invoiceHTML += `<tr style="height:23px;font-size:12px;font-weight:700;" > <td colspan="3" ><div >Ancien Sold        </div></td>   <td><div> ${ancien_sold} DA </div></td></tr>`
 			invoiceHTML += `<tr style="height:23px;font-size:12px;font-weight:700;" > <td colspan="3" ><div >Versement   </div></td>   <td><div> ${pos.total_customer_payment} DA </div></td></tr>`
 
 

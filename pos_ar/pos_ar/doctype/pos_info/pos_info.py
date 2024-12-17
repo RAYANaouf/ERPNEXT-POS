@@ -39,6 +39,19 @@ def update_customer_debt_on_invoice(doc, method):
 
 
 
+@frappe.whitelist()
+def get_customer_debt( name ):
+
+    debt = frappe.db.sql("""
+        SELECT custom_debt
+        FROM `tabCustomer`
+        where name like %s
+    """, (name,) ) [0][0] or 0
+
+    return debt
+
+
+
 
 def update_all_customers_debt():
     """
@@ -142,6 +155,7 @@ def get_mode_of_payments():
     mode_of_payments = frappe.db.sql(query,  as_dict=True)
 
     return mode_of_payments
+
 
 
 

@@ -434,7 +434,7 @@ pos_ar.PointOfSale.Controller = class {
 									this.wrapper,
 									this.db,
 									this.appData.appData.pos_profile,
-									this.appData.appData,
+									this.appData,
 									this.settings_data,
 									this.company,
 									this.taxes_and_charges,

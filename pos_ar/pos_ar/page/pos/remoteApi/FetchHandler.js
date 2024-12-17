@@ -94,6 +94,20 @@ pos_ar.PointOfSale.FetchHandler = class FetchHandler{
 	}
 
 
+	async fetchCustomerDebt( name ) {
+		try {
+			const response = await frappe.call({
+				method: 'pos_ar.pos_ar.doctype.pos_info.pos_info.get_customer_debt',
+				args: { name }
+			});
+			return response.message;  // The fetched item barcodes
+		} catch (error) {
+			console.error('Error fetching Item Barcodes:', error);
+			return [];
+		}
+	}
+
+
 
 	async fetchItemPrice(since) {
 		try {
