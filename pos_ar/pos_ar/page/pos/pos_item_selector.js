@@ -87,9 +87,22 @@ pos_ar.PointOfSale.pos_item_selector = class {
 		this.setItemInFlow(this.getItemByItemGroup(groupItemListInput.value));
 	}
 	setItemInFlow(filtered_item_list){
-        	const itemsContainer_html = document.getElementById("itemsContainer");
-        	itemsContainer_html.innerHTML = "";
+        const itemsContainer_html = document.getElementById("itemsContainer");
+        itemsContainer_html.innerHTML = "";
 		const itemInput = document.getElementById("ItemInput");
+
+		if (filtered_item_list.length === 0) {
+			itemsContainer_html.innerHTML = `
+				<div class="no-items-found">
+					<svg width="64" height="64" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+						<path d="M15.5 15.5L19 19" stroke="#9CA3AF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+						<path d="M5 11C5 14.3137 7.68629 17 11 17C12.6597 17 14.1621 16.3261 15.2483 15.2483C16.3261 14.1621 17 12.6597 17 11C17 7.68629 14.3137 5 11 5C7.68629 5 5 7.68629 5 11Z" stroke="#9CA3AF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+					</svg>
+					<p>No items found</p>
+				</div>
+			`;
+			return;
+		}
 
 		for(let i=0 ; i<filtered_item_list.length && i<700 ; i++){
 			let item = filtered_item_list[i];
@@ -99,38 +112,28 @@ pos_ar.PointOfSale.pos_item_selector = class {
                 	itemBox.classList.add("C_A_Center");
 
                 	itemBox.addEventListener('click' , event => {
-				const isNotImpty = itemInput.value.length > 0
-				this.on_item_click(item , isNotImpty);
-                	});
+				const isNotImpty = itemInput.value.length > 0;
+				this.on_item_click(item, isNotImpty);
+			});
 
-                	if(item.image){
-                        	const itemImage = document.createElement("img");
-                        	itemImage.classList.add("itemImage");
-                        	itemImage.src = item.image
-                        	itemBox.appendChild(itemImage);
-                	}
-                	else{
-                        	const itemImageHolder = document.createElement("div");
-                        	itemImageHolder.classList.add("itemImage");
-                        	itemImageHolder.classList.add("rowBox");
-                        	itemImageHolder.classList.add("centerItem");
-                        	const firstLatter = document.createElement("h1");
-                        	firstLatter.textContent = item.item_name[0];
-                        	firstLatter.style.color = "#707070";
-                        	itemImageHolder.appendChild(firstLatter);
-                        	itemBox.appendChild(itemImageHolder);
-                	}
-                	const itemName = document.createElement("div");
-                	itemName.textContent = item.item_name ;
-                	itemName.classList.add("itemTitle");
-                	itemBox.appendChild(itemName);
+			const imageUrl = item.image || '/assets/pos_ar/images/no_image.png';
+			const price = this.get_item_price(item, this.selected_price_list.name);
 
-                	const price = document.createElement("div");
-                	price.classList.add("itemPrice");
-                	price.textContent = this.get_item_price(item , this.selected_price_list.name) + " DA";
-                	itemBox.appendChild(price);
+                	itemBox.innerHTML = `
+				<img class="itemImage" src="${imageUrl}" alt="${item.item_name}" onerror="this.src='/assets/pos_ar/images/no_image.png'">
+				<div class="itemTitle">${item.item_name}</div>
+				<div class="itemPrice">${price} DA</div>
+			`;
+
                 	itemsContainer_html.appendChild(itemBox);
+		}
 
+		if (filtered_item_list.length >= 700) {
+			itemsContainer_html.insertAdjacentHTML('beforeend', `
+				<div class="more-items-notice">
+					<p>Showing first 700 items. Please refine your search to see more specific results.</p>
+				</div>
+			`);
 		}
 	}
 
@@ -147,7 +150,7 @@ pos_ar.PointOfSale.pos_item_selector = class {
 	//**************** set listeners method ****************************//
 	setListeners(){
 		const groupItemListInput = document.getElementById("ItemGroupInput");
-                groupItemListInput.addEventListener('input' , (even)=>{
+        	groupItemListInput.addEventListener('input' , (even)=>{
 			this.setItemInFlow(this.getItemByItemGroup(event.target.value))
 		})
 

@@ -81,7 +81,14 @@
     flex-wrap: wrap;
     gap: 12px;
     align-content: flex-start;
-    background: #f9fafb;
+    flex: 1;
+    min-height: 0;
+}
+
+#LeftSection #SelectorBox #itemsContainer:empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 #LeftSection #SelectorBox #itemsContainer .itemBox {
@@ -136,11 +143,24 @@
 }
 
 /* Empty state */
-.no-items-message {
+.no-items-found {
     width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
     padding: 32px 16px;
     text-align: center;
     color: #6b7280;
+}
+
+.no-items-found svg {
+    margin-bottom: 16px;
+}
+
+.no-items-found p {
+    margin: 0;
     font-size: 14px;
 }
 
