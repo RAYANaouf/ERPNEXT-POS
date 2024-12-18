@@ -1,89 +1,162 @@
-#LeftSection #SelectorBox{
-        width       : 100%    ;
-        height      : 100%    ;
-
-        animation     : mymove 1s  ;
-        display       : flex ;
-        overflow-y    : auto ;
-	border        : 4px solid #a0a0a0 ;
-	border-radius : 26px;
-	background    : #ffffff;
+#LeftSection #SelectorBox {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    border: 2px solid #e5e7eb;
+    border-radius: 16px;
+    background: #ffffff;
 }
-
-
-
 
 /*header*/
-#LeftSection #SelectorBox .header{
-        height         : 45px          ;
-	margin-top      : 4px          ;
-        padding        : 0px 16px      ;
-        justify-content: space-between ;
+#LeftSection #SelectorBox .header {
+    height: 60px;
+    padding: 0 16px;
+    background: #ffffff;
+    border-bottom: 1px solid #e5e7eb;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
 }
 
-#LeftSection #SelectorBox .header #ItemInput{
-        width  : 350px;
+#LeftSection #SelectorBox .header .CartTitle {
+    font-size: 18px;
+    font-weight: 600;
+    color: #44A292;
+    margin: 0;
+    white-space: nowrap;
 }
 
-#LeftSection #SelectorBox .header #ItemGroupInput{
-        width  : 150px;
+#LeftSection #SelectorBox .header #inputsBox {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+}
+
+#LeftSection #SelectorBox .header #ItemInput {
+    flex: 1;
+    height: 36px;
+    padding: 0 12px;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 14px;
+    background: #f9fafb;
+    transition: all 0.2s ease;
+}
+
+#LeftSection #SelectorBox .header #ItemGroupInput {
+    width: 160px;
+    height: 36px;
+    padding: 0 12px;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 14px;
+    background: #f9fafb;
+    transition: all 0.2s ease;
+}
+
+#LeftSection #SelectorBox .header input:hover {
+    border-color: #44A292;
+    background: #ffffff;
+}
+
+#LeftSection #SelectorBox .header input:focus {
+    outline: none;
+    border-color: #44A292;
+    background: #ffffff;
+    box-shadow: 0 0 0 3px rgba(68, 162, 146, 0.1);
+}
+
+#LeftSection #SelectorBox .header input::placeholder {
+    color: #9ca3af;
 }
 
 /*item container*/
 #LeftSection #SelectorBox #itemsContainer {
-        padding    : 16px ;
-        border-radius : 0px 0px 16px 16px ;
-
-        flex          : 1      ;
+    padding: 16px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-content: flex-start;
+    background: #f9fafb;
 }
-
 
 #LeftSection #SelectorBox #itemsContainer .itemBox {
-        height     : 155px ;
-        width      : 120px ;
-        margin     : 3px ;
-        position   : relative ;
-
-        cursor: pointer;
-        background : #FFFFFF ;
-        border     : 1px solid #e0e0e0;
-        border-radius : 6px;
-        overflow : hidden ;
+    height: 180px;
+    width: 140px;
+    position: relative;
+    cursor: pointer;
+    background: #FFFFFF;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    overflow: hidden;
+    transition: all 0.2s ease;
 }
-
-
 
 #LeftSection #SelectorBox #itemsContainer .itemBox:hover {
-        border     : 3px solid #2D6B61 ;
+    border-color: #44A292;
+    transform: translateY(-2px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
-#LeftSection #SelectorBox #itemsContainer .itemBox .itemImage{
-        width  : 100%;
-        height : 90px  ;
-        margin : 0px 0px 5px 0px ;
-
-        object-fit : cover ;
-
-        background : #f0f0f0 ;
-        border        : none ;
-        outline       : none ;
-}
-#LeftSection #SelectorBox #itemsContainer .itemBox .itemTitle{
-        padding : 0px 0px 0px 5px ;
-        overflow     : hidden  ;
-
+#LeftSection #SelectorBox #itemsContainer .itemBox .itemImage {
+    width: 100%;
+    height: 120px;
+    object-fit: cover;
+    background: #f3f4f6;
+    border-bottom: 1px solid #e5e7eb;
 }
 
-#LeftSection #SelectorBox #itemsContainer .itemBox .itemPrice{
-        padding : 0px 4px ;
-        background : #44A292  ;
-        color      : white    ;
+#LeftSection #SelectorBox #itemsContainer .itemBox .itemTitle {
+    padding: 8px;
+    font-size: 13px;
+    color: #374151;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    line-height: 1.3;
+}
 
-        font-size  : smaller  ;
+#LeftSection #SelectorBox #itemsContainer .itemBox .itemPrice {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: #44A292;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
 
-        position   : absolute ;
-        top        : 0px      ;
-        right      : 0px      ;
+/* Empty state */
+.no-items-message {
+    width: 100%;
+    padding: 32px 16px;
+    text-align: center;
+    color: #6b7280;
+    font-size: 14px;
+}
 
-        border-radius : 0px 0px 0px 6px ;
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    #LeftSection #SelectorBox .header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    #LeftSection #SelectorBox .header #inputsBox {
+        flex-direction: column;
+    }
+
+    #LeftSection #SelectorBox .header #ItemInput,
+    #LeftSection #SelectorBox .header #ItemGroupInput {
+        width: 100%;
+    }
 }
