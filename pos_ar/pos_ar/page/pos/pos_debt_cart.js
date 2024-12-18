@@ -46,21 +46,40 @@ pos_ar.PointOfSale.pos_debt_cart = class{
 
 		this.customerList = this.rightContainer.find('#debt_customerList')
 
-		const debtListStyle   = "width:100%;height:100%;margin:16px;height:100%;"
-		const inputStyle      = "width:40%;margin: 0px 16px;"
-		//debts part
-		this.leftContainer.append(`<div class="rowBox C_A_Center" style="margin:16px;" ><div> Amount </div><input id="debt_paymentAmount" type="number" style="${inputStyle}"></input><div style="flex-grow:1;" id="total_client_debt" class="rowBox centerItem"> DA</div> <div style="flex-grow:1;"  id="partially_client_debt"  class="rowBox centerItem"> Selected Debt : 0 DA </div>  <div id="pay_selected_invoices_btn" style="background:green;height:35px;width:95px;color:white;cursor:pointer;border-raduis:12px;" class="rowBox centerItem"> Pay </div>  </div>`)
-		this.leftContainer.append(
-				`<script src="https://unpkg.com/@dotlottie/player-component@2.7.12/dist/dotlottie-player.mjs" type="module"></script>`+
-				`<div id="debt_waitingContainer" style="position:absolute;background:#00000050;top:0;left:0;inset: 0;display:none;backdrop-filter: blur(2px);z-index: 10;" class="rowBox centerItem" ><dotlottie-player src="https://lottie.host/d6c76206-aab9-4d5a-af73-c4a6cfc5aaa9/H8vnpKcKj9.lottie" background="transparent" speed="1" style="width: 300px; height: 300px" loop autoplay></dotlottie-player></div>`
-		)
-		this.waiting_cart =  this.leftContainer.find('#debt_waitingContainer')
-		this.total_client_debt         = this.leftContainer.find('#total_client_debt')
-		this.partially_client_debt     = this.leftContainer.find('#partially_client_debt')
+		// Payment section
+		this.leftContainer.append(`
+			<div class="payment-header">
+				<div class="amount-input">
+					<input id="debt_paymentAmount" type="number" placeholder="Enter amount">
+				</div>
+				<div id="total_client_debt">Total: 0 DA</div>
+				<div id="partially_client_debt">Selected: 0 DA</div>
+				<button id="pay_selected_invoices_btn">Pay</button>
+			</div>
+			<div id="debt_debtsList"></div>
+		`)
+
+		// Loading animation
+		this.leftContainer.append(`
+			<script src="https://unpkg.com/@dotlottie/player-component@2.7.12/dist/dotlottie-player.mjs" type="module"></script>
+			<div id="debt_waitingContainer" style="display:none;">
+				<dotlottie-player 
+					src="https://lottie.host/d6c76206-aab9-4d5a-af73-c4a6cfc5aaa9/H8vnpKcKj9.lottie" 
+					background="transparent" 
+					speed="1" 
+					style="width: 300px; height: 300px" 
+					loop 
+					autoplay
+				></dotlottie-player>
+			</div>
+		`)
+
+		// Initialize components
+		this.waiting_cart = this.leftContainer.find('#debt_waitingContainer')
+		this.total_client_debt = this.leftContainer.find('#total_client_debt')
+		this.partially_client_debt = this.leftContainer.find('#partially_client_debt')
 		this.pay_selected_invoices_btn = this.leftContainer.find('#pay_selected_invoices_btn')
-		this.leftContainer.append(`<div id="debt_debtsList"  class="columnBox" style="${debtListStyle}"></div>`)
-		this.debtList              = this.leftContainer.find('#debt_debtsList')
-		this.leftContainer.append('<div id="debt_waitingContainer" ></div>')
+		this.debtList = this.leftContainer.find('#debt_debtsList')
 	}
 
 	add_customer_to_list(customer) {

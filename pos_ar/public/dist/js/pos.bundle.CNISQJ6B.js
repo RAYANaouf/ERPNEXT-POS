@@ -1449,29 +1449,46 @@
       this.setListeners();
     }
     prepare_customer_box() {
-      this.wrapper.append('<div id="ActionsContainerBox" class="rowBox align_center" style="order:1;">');
+      this.wrapper.append('<div id="ActionsContainerBox">');
       this.actionContainer = this.wrapper.find("#ActionsContainerBox");
-      this.actionContainer.append('<div id="SyncBox"     class="rowBox centerItem" >');
-      this.actionContainer.append('<div id="HomeBox"     class="rowBox centerItem" style="display:none;">');
-      this.actionContainer.append('<div id="DebtBox"     class="rowBox centerItem" >');
-      this.actionContainer.append('<div id="exchangeBtn" class="rowBox centerItem" style="margin-right:16px;" >  <img src="/assets/pos_ar/images/exchange.png">  </div>');
-      this.actionContainer.append('<div id="MenuBox"     class="rowBox centerItem" >');
+      this.actionContainer.append(`
+			<div id="SyncBox" class="action-btn">
+				<span id="syncBoxContent">Sync</span>
+			</div>
+		`);
+      this.actionContainer.append(`
+			<div id="HomeBox" class="action-btn" style="display:none;">
+				<img src="/assets/pos_ar/images/home.png" alt="Home">
+			</div>
+		`);
+      this.actionContainer.append(`
+			<div id="DebtBox" class="action-btn">
+				<img src="/assets/pos_ar/images/debt.png" alt="Debt">
+			</div>
+		`);
+      this.actionContainer.append(`
+			<div id="exchangeBtn" class="action-btn">
+				<img src="/assets/pos_ar/images/exchange.png" alt="Exchange">
+			</div>
+		`);
+      this.actionContainer.append(`
+			<div id="MenuBox" class="action-btn">
+				<img src="/assets/pos_ar/images/menu.png" alt="Menu">
+				<div id="menuItemsContainer">
+					<div id="posInvoiceMenuItem" class="menuItem">Recent POS Invoices</div>
+					<div id="checkInOutMenuItem" class="menuItem">Check In/Out</div>
+					<div id="closePosMenuItem"   class="menuItem">Close the POS</div>
+					<div id="settingMenuItem"    class="menuItem">About</div>
+				</div>
+			</div>
+		`);
       this.sync_btn = this.actionContainer.find("#SyncBox");
-      this.sync_btn.append('<div id="syncBoxContent"> Sync </div>');
       this.sync_btn_content = this.sync_btn.find("#syncBoxContent");
-      this.exchange_btn = this.actionContainer.find("#exchangeBtn");
       this.home = this.actionContainer.find("#HomeBox");
-      this.home.append('<img src="/assets/pos_ar/images/home.png" alt="Home" id="homeBoxIcon">');
       this.debt = this.actionContainer.find("#DebtBox");
-      this.debt.append('<img src="/assets/pos_ar/images/debt.png" alt="Debt" id="debtBoxIcon">');
+      this.exchange_btn = this.actionContainer.find("#exchangeBtn");
       this.menu = this.actionContainer.find("#MenuBox");
-      this.menu.append('<img src="/assets/pos_ar/images/menu.png" alt="Menu" id="MenuBtn" >');
-      this.menu.append('<div id="menuItemsContainer"     class="columnBox">');
       this.menuItemsContainer = this.actionContainer.find("#menuItemsContainer");
-      this.menuItemsContainer.append('<div id="posInvoiceMenuItem" class="menuItem">Recent POS Invoices</div>');
-      this.menuItemsContainer.append('<div id="checkInOutMenuItem" class="menuItem">Check In/Out</div>');
-      this.menuItemsContainer.append('<div id="closePosMenuItem"   class="menuItem">Close the POS</div>');
-      this.menuItemsContainer.append('<div id="settingMenuItem"    class="menuItem">About</div>');
       this.pos_invoices = this.menuItemsContainer.find("#posInvoiceMenuItem");
       this.check_in_out = this.menuItemsContainer.find("#checkInOutMenuItem");
       this.close_pos = this.menuItemsContainer.find("#closePosMenuItem");
@@ -4646,19 +4663,35 @@
 			<div id="debt_customerList"></div>
 		`);
       this.customerList = this.rightContainer.find("#debt_customerList");
-      const debtListStyle = "width:100%;height:100%;margin:16px;height:100%;";
-      const inputStyle = "width:40%;margin: 0px 16px;";
-      this.leftContainer.append(`<div class="rowBox C_A_Center" style="margin:16px;" ><div> Amount </div><input id="debt_paymentAmount" type="number" style="${inputStyle}"></input><div style="flex-grow:1;" id="total_client_debt" class="rowBox centerItem"> DA</div> <div style="flex-grow:1;"  id="partially_client_debt"  class="rowBox centerItem"> Selected Debt : 0 DA </div>  <div id="pay_selected_invoices_btn" style="background:green;height:35px;width:95px;color:white;cursor:pointer;border-raduis:12px;" class="rowBox centerItem"> Pay </div>  </div>`);
-      this.leftContainer.append(
-        `<script src="https://unpkg.com/@dotlottie/player-component@2.7.12/dist/dotlottie-player.mjs" type="module"><\/script><div id="debt_waitingContainer" style="position:absolute;background:#00000050;top:0;left:0;inset: 0;display:none;backdrop-filter: blur(2px);z-index: 10;" class="rowBox centerItem" ><dotlottie-player src="https://lottie.host/d6c76206-aab9-4d5a-af73-c4a6cfc5aaa9/H8vnpKcKj9.lottie" background="transparent" speed="1" style="width: 300px; height: 300px" loop autoplay></dotlottie-player></div>`
-      );
+      this.leftContainer.append(`
+			<div class="payment-header">
+				<div class="amount-input">
+					<input id="debt_paymentAmount" type="number" placeholder="Enter amount">
+				</div>
+				<div id="total_client_debt">Total: 0 DA</div>
+				<div id="partially_client_debt">Selected: 0 DA</div>
+				<button id="pay_selected_invoices_btn">Pay</button>
+			</div>
+			<div id="debt_debtsList"></div>
+		`);
+      this.leftContainer.append(`
+			<script src="https://unpkg.com/@dotlottie/player-component@2.7.12/dist/dotlottie-player.mjs" type="module"><\/script>
+			<div id="debt_waitingContainer" style="display:none;">
+				<dotlottie-player 
+					src="https://lottie.host/d6c76206-aab9-4d5a-af73-c4a6cfc5aaa9/H8vnpKcKj9.lottie" 
+					background="transparent" 
+					speed="1" 
+					style="width: 300px; height: 300px" 
+					loop 
+					autoplay
+				></dotlottie-player>
+			</div>
+		`);
       this.waiting_cart = this.leftContainer.find("#debt_waitingContainer");
       this.total_client_debt = this.leftContainer.find("#total_client_debt");
       this.partially_client_debt = this.leftContainer.find("#partially_client_debt");
       this.pay_selected_invoices_btn = this.leftContainer.find("#pay_selected_invoices_btn");
-      this.leftContainer.append(`<div id="debt_debtsList"  class="columnBox" style="${debtListStyle}"></div>`);
       this.debtList = this.leftContainer.find("#debt_debtsList");
-      this.leftContainer.append('<div id="debt_waitingContainer" ></div>');
     }
     add_customer_to_list(customer) {
       const customerElement = document.createElement("div");
@@ -4851,4 +4884,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.JVGCX27F.js.map
+//# sourceMappingURL=pos.bundle.CNISQJ6B.js.map

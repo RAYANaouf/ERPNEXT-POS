@@ -1,313 +1,318 @@
-#ActionsContainerBox{
-	justify-content : end ;
-        margin-bottom   : 5px ;
+#ActionsContainerBox {
+    display: flex;
+    justify-content: flex-end;
+	order: 1;
+    align-items: center;
+    gap: 12px;
+    padding: 16px;
 }
 
+/* Common styles for all action buttons */
 #LeftSection #MenuBox, 
 #LeftSection #HomeBox,
 #LeftSection #DebtBox,
-#LeftSection #exchangeBtn
-{
-        height : 55px  ;
-	width  : 55px  ;
-        background     : #FFFFFF ;
-        border          : 2px solid #c0c0c0 ;
-        border-radius   : 16px   ;
-
-        animation : mymove 1.5s  ;
-        box-shadow: rgba(100, 100, 111, 0.2) 0px 2px 15px 0px;
-
-	position : relative ; 
-	cursor   : pointer  ;
+#LeftSection #exchangeBtn {
+    height: 48px;
+    width: 48px;
+    background: #FFFFFF;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
 }
+
+/* Hover effect for action buttons */
 #LeftSection #MenuBox:hover, 
 #LeftSection #HomeBox:hover,
 #LeftSection #DebtBox:hover,
-#LeftSection #exchangeBtn:hover
-{
-	background     : #f0f0f0 ;
-}
-#SyncBox{
-	height        : 55px              ;
-	padding       : 0px 16px          ;
-	margin-right  : 16px              ;
-        background    : #FFFFFF           ;
-        border        : 2px solid #c0c0c0 ;
-        border-radius : 16px              ;
-
-	font-weight   : 800               ;
-	font-size     : 20px              ;
-	cursor        : pointer           ;
-        animation     : mymove 1.5s       ;
-        box-shadow    : rgba(100, 100, 111, 0.2) 0px 2px 15px 0px;
-
-}
-#SyncBox.NotSynced{
-        border        : 2px solid #2D6B61 ;
-	color         : #2D6B61           ;
-}
-#SyncBox.Synced{
-        border        : 2px solid green   ;
-	color         : green             ;
-}
-#exchangeBtn:hover{
-	background : #F0F0F0;
+#LeftSection #exchangeBtn:hover {
+    background: #f9fafb;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
 
-#exchangeBtn>img{
-	width : 35px ;
-	height : 35px;
-}
-#LeftSection #HomeBox,
-#LeftSection #DebtBox
-{
-	margin-right : 16px ;
+/* Active state for buttons */
+#LeftSection #MenuBox:active, 
+#LeftSection #HomeBox:active,
+#LeftSection #DebtBox:active,
+#LeftSection #exchangeBtn:active {
+    transform: translateY(0);
+    box-shadow: none;
 }
 
+/* Sync button specific styles */
+#SyncBox {
+    height: 48px;
+    padding: 0 20px;
+    background: #FFFFFF;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: #374151;
+}
 
+#SyncBox:hover {
+    background: #f9fafb;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+#SyncBox:active {
+    transform: translateY(0);
+    box-shadow: none;
+}
+
+/* Sync states */
+#SyncBox.NotSynced {
+    border-color: #44A292;
+    color: #44A292;
+    background: #ecfdf5;
+}
+
+#SyncBox.Synced {
+    border-color: #059669;
+    color: #059669;
+    background: #ecfdf5;
+}
+
+/* Icons inside buttons */
+#exchangeBtn > img {
+    width: 24px;
+    height: 24px;
+    opacity: 0.8;
+}
 
 #LeftSection #MenuBox img,
 #LeftSection #HomeBox img,
-#LeftSection #DebtBox img
-{
-	height : 25px ;
-	width  : 25px ;
+#LeftSection #DebtBox img {
+    width: 20px;
+    height: 20px;
+    opacity: 0.8;
 }
 
-
-#LeftSection #MenuBox #menuItemsContainer{
-	width      : max-content ;
-	background : white    ; 
-	border-radius : 12px  ;     
-        border          : 2px solid #c0c0c0 ;
-        box-shadow: rgba(100, 100, 111, 0.2) 0px 2px 15px 0px;
-
-	z-index    : 20       ;
-	cursor     : pointer  ;
-
-	overflow   : hidden   ;
-	visibility : hidden   ;
-	opacity    : 0        ;
-	position   : absolute ; 
-	bottom     : 0 ;
-	right      : 0 ;
-	transform  : translateY(110%);
-	transition : opacity 0.5s  ease ;
+/* Menu dropdown */
+#LeftSection #MenuBox #menuItemsContainer {
+    width: max-content;
+    min-width: 180px;
+    background: white;
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    z-index: 20;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    transform: translateY(110%);
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.2s ease;
+    overflow: hidden;
 }
 
-#LeftSection #MenuBox #menuItemsContainer .menuItem{
-	padding : 8px 6px 8px 6px ;
+#LeftSection #MenuBox #menuItemsContainer .menuItem {
+    padding: 12px 16px;
+    color: #374151;
+    font-size: 14px;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
-#LeftSection #MenuBox #menuItemsContainer .menuItem:hover{
-	background : #f0f0f0 ;
+#LeftSection #MenuBox #menuItemsContainer .menuItem:hover {
+    background: #f9fafb;
+    color: #44A292;
 }
-
 
 #LeftSection #CustomerBox{
-        height : 55px  ;
-	margin-right   : 16px    ;
-        margin-bottom  : 5px     ;
-        background     : #FFFFFF ;
-
-        animation : mymove 1.5s  ;
-        box-shadow: rgba(100, 100, 111, 0.2) 0px 2px 15px 0px;
-
-        border          : 2px solid #c0c0c0 ;
-        border-radius   : 16px   ;
-
-	flex-grow : 1 ;
+    height: 55px;
+    margin-right: 16px;
+    margin-bottom: 5px;
+    background: #FFFFFF;
+    animation: mymove 1.5s;
+    box-shadow: rgba(100, 100, 111, 0.2) 0px 2px 15px 0px;
+    border: 2px solid #c0c0c0;
+    border-radius: 16px;
+    flex-grow: 1;
 }
 
-
 #LeftSection #syncBtn.NotSynced{
-
-	padding : 4px 10px ;
-	margin-right : 16px ;  
-	border  : 2px solid #2D6B61;
-	border-radius : 10px ;
-	
-	cursor : pointer ;	
+    padding: 4px 10px;
+    margin-right: 16px;
+    border: 2px solid #2D6B61;
+    border-radius: 10px;
+    cursor: pointer;
 }
 
 #LeftSection #syncBtn.Synced{
-
-	padding : 4px 10px ;
-	margin-right : 16px ;  
-	border  : 2px solid green;
-	border-radius : 10px ;
-	
-	cursor : pointer ;	
+    padding: 4px 10px;
+    margin-right: 16px;
+    border: 2px solid green;
+    border-radius: 10px;
+    cursor: pointer;
 }
 
 #LeftSection #syncBtn.NotSynced:hover{
-
-	border  : 2px solid #2D6B61;
-	color   : white ;
-	background : #9B5788 ; 
+    border: 2px solid #2D6B61;
+    color: white;
+    background: #9B5788;
 }
 
 #LeftSection #syncBtn.Synced:hover{
-	border  : 4px solid green;
+    border: 4px solid green;
 }
-
-
-
-
 
 /****************************************** check in out dialog ****************************************/
 #checkInOutDialog{
-	max-height : 80vh    ;
-	width      : 70%     ;
-	background : #ffffff ;
-	border     : 3px solid #2D6B61 ;	
-	border-radius : 25px ;
-
-	display   : none     ;
-	overflow  : hidden   ;
-	overflow-y: auto     ;
-	position  : absolute ;
-	top       : 50%      ;
-	left      : 50%      ;
-	z-index   : 50       ;
-	transform : translate(-50% , -50%);
-	animation : mymove 1s ;
+    max-height: 80vh;
+    width: 70%;
+    background: #ffffff;
+    border: 3px solid #2D6B61;
+    border-radius: 25px;
+    display: none;
+    overflow: hidden;
+    overflow-y: auto;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    z-index: 50;
+    transform: translate(-50%, -50%);
+    animation: mymove 1s;
 }
 #darkFloatingBackground{
-	height : 100%;
-	width  : 100vw;
-	background : #000000cc;
-
-	display : none     ;
-	position: absolute ;
-	top     : 0 ;
-	left    : 0 ;
-	z-index : 10 ;
-	animation : mymove 0.2s ;
+    height: 100%;
+    width: 100vw;
+    background: #000000cc;
+    display: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 10;
+    animation: mymove 0.2s;
 }
 
 #checkInOutDialog #checkTypeContainer{
-	width  : calc(100%-16px) ;
-	margin : 55px 16px 16px 16px ;
-
-	display:flex;
+    width: calc(100%-16px);
+    margin: 55px 16px 16px 16px;
+    display: flex;
 }
 
-
 #checkTypeContainer .checkType{
-	height     : 70px    ;
-	background : #fafafa ;
-	border     : 2px solid #f0f0f0;
-	border-radius : 16px ;
-
-	font-size   : 20px ;
-	font-weight : 600  ;
-
-	flex-grow : 1       ;
-	cursor    : pointer ;
+    height: 70px;
+    background: #fafafa;
+    border: 2px solid #f0f0f0;
+    border-radius: 16px;
+    font-size: 20px;
+    font-weight: 600;
+    flex-grow: 1;
+    cursor: pointer;
 }
 
 #checkTypeContainer .checkType.selected{
-	border     : 2px solid #2D6B61;
-	background : #ffffff          ;
+    border: 2px solid #2D6B61;
+    background: #ffffff;
 }
 #checkTypeContainer #checkInType{
-	margin-right : 16px ;
+    margin-right: 16px;
 }
 
 #checkInOutDialog .inputGroup {
-	height     : max-content ;
-	font-family: 'Segoe UI', sans-serif;
-	margin     : 25px 16px;
-	position   : relative;
+    height: max-content;
+    font-family: 'Segoe UI', sans-serif;
+    margin: 25px 16px;
+    position: relative;
 }
 
 /********** amount input ***********/
 #checkInOutDialog .inputGroup input {
- 	width  : 100%;
-	height : 55px;
- 	padding: 0.8em;
- 	background-color: transparent;
- 	border: 2px solid rgb(200, 200, 200);
- 	border-radius: 20px;
- 
-	font-size   : 18px;
-	font-weight : 600 ;
-
- 	outline: none;
+    width: 100%;
+    height: 55px;
+    padding: 0.8em;
+    background-color: transparent;
+    border: 2px solid rgb(200, 200, 200);
+    border-radius: 20px;
+    font-size: 18px;
+    font-weight: 600;
+    outline: none;
 }
 
 #checkInOutDialog .inputGroup label {
-	margin-left: 0.5em;
-	padding    : 0.8em;
-
-	font-weight : 600     ;
-	font-size   : 18px    ;
-	position    : absolute;
-	left: 0;
-	pointer-events: none;
-	transition: all 0.3s ease;
-	color: rgb(100, 100, 100);
+    margin-left: 0.5em;
+    padding: 0.8em;
+    font-weight: 600;
+    font-size: 18px;
+    position: absolute;
+    left: 0;
+    pointer-events: none;
+    transition: all 0.3s ease;
+    color: rgb(100, 100, 100);
 }
 
 #checkInOutDialog .inputGroup :is(input:focus, input:valid)~label {
-  transform: translateY(-50%) scale(.9);
-  margin: 0em;
-  margin-left: 1.3em;
-  padding: 0.4em;
-  background-color: #FFFFFF;
+    transform: translateY(-50%) scale(.9);
+    margin: 0em;
+    margin-left: 1.3em;
+    padding: 0.4em;
+    background-color: #FFFFFF;
 }
 
 #checkInOutDialog .inputGroup :is(input:focus, input:valid) {
-  border-color: rgb(150, 150, 200);
+    border-color: rgb(150, 150, 200);
 }
-
-
 
 /************** note textarea *****************/
 #checkInOutDialog .inputGroup textarea {
- 	width  : 100%;
- 	padding: 0.8em;
- 	background-color: transparent;
- 	border: 2px solid rgb(200, 200, 200);
- 	border-radius: 12px;
- 
-	font-size   : 18px;
-	font-weight : 600 ;
-
- 	outline: none;
+    width: 100%;
+    padding: 0.8em;
+    background-color: transparent;
+    border: 2px solid rgb(200, 200, 200);
+    border-radius: 12px;
+    font-size: 18px;
+    font-weight: 600;
+    outline: none;
 }
+
 #checkInOutDialog .inputGroup :is(textarea:focus, textarea:valid)~label {
-  transform: translateY(-50%) scale(.9);
-  margin: 0em;
-  margin-left: 1.3em;
-  padding: 0.4em;
-  background-color: #FFFFFF;
+    transform: translateY(-50%) scale(.9);
+    margin: 0em;
+    margin-left: 1.3em;
+    padding: 0.4em;
+    background-color: #FFFFFF;
 }
 
 /***************** buttons container ******************/
 #btnsContainers{
-	height     : 75px ;
-	width      : calc(100%-16px) ;
-	margin     : 16px 0px 0px 0px;
-	border-top : 2px solid #2D6B61 ;
+    height: 75px;
+    width: calc(100%-16px);
+    margin: 16px 0px 0px 0px;
+    border-top: 2px solid #2D6B61;
 }
+
 #btnsContainers div.dialogBtn{
-	height : 75px ;
-	width  : 50%  ;
-
-	font-size   : 20px ;
-	font-weight : 600  ;
-
-	cursor    : pointer ;
+    height: 75px;
+    width: 50%;
+    font-size: 20px;
+    font-weight: 600;
+    cursor: pointer;
 }
 
 #confirmBtn{
-	border-left : 2px solid #2D6B61 ;
-	font-weight : 700     ;
-	color       : #9B5788 ;
+    border-left: 2px solid #2D6B61;
+    font-weight: 700;
+    color: #9B5788;
 }
 
 #btnsContainers div.dialogBtn:hover{
-	background : #f0f0f0 ;
+    background: #f0f0f0;
 }

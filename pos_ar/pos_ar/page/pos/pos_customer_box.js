@@ -34,39 +34,58 @@ pos_ar.PointOfSale.pos_customer_box = class{
 
 	prepare_customer_box(){
 
-		this.wrapper.append('<div id="ActionsContainerBox" class="rowBox align_center" style="order:1;">');
-		this.actionContainer = this.wrapper.find('#ActionsContainerBox');
+		this.wrapper.append('<div id="ActionsContainerBox">')
+		this.actionContainer = this.wrapper.find('#ActionsContainerBox')
 
-		this.actionContainer.append('<div id="SyncBox"     class="rowBox centerItem" >');
-		this.actionContainer.append('<div id="HomeBox"     class="rowBox centerItem" style="display:none;">');
-		this.actionContainer.append('<div id="DebtBox"     class="rowBox centerItem" >');
-		this.actionContainer.append('<div id="exchangeBtn" class="rowBox centerItem" style="margin-right:16px;" >  <img src="/assets/pos_ar/images/exchange.png">  </div>');
-		this.actionContainer.append('<div id="MenuBox"     class="rowBox centerItem" >');
+		// Sync button
+		this.actionContainer.append(`
+			<div id="SyncBox" class="action-btn">
+				<span id="syncBoxContent">Sync</span>
+			</div>
+		`)
 
+		// Home button
+		this.actionContainer.append(`
+			<div id="HomeBox" class="action-btn" style="display:none;">
+				<img src="/assets/pos_ar/images/home.png" alt="Home">
+			</div>
+		`)
 
-		//sync btn
+		// Debt button
+		this.actionContainer.append(`
+			<div id="DebtBox" class="action-btn">
+				<img src="/assets/pos_ar/images/debt.png" alt="Debt">
+			</div>
+		`)
+
+		// Exchange button
+		this.actionContainer.append(`
+			<div id="exchangeBtn" class="action-btn">
+				<img src="/assets/pos_ar/images/exchange.png" alt="Exchange">
+			</div>
+		`)
+
+		// Menu button
+		this.actionContainer.append(`
+			<div id="MenuBox" class="action-btn">
+				<img src="/assets/pos_ar/images/menu.png" alt="Menu">
+				<div id="menuItemsContainer">
+					<div id="posInvoiceMenuItem" class="menuItem">Recent POS Invoices</div>
+					<div id="checkInOutMenuItem" class="menuItem">Check In/Out</div>
+					<div id="closePosMenuItem"   class="menuItem">Close the POS</div>
+					<div id="settingMenuItem"    class="menuItem">About</div>
+				</div>
+			</div>
+		`)
+
+		// Initialize button references
 		this.sync_btn = this.actionContainer.find('#SyncBox')
-		this.sync_btn.append('<div id="syncBoxContent"> Sync </div>')
 		this.sync_btn_content = this.sync_btn.find('#syncBoxContent')
-		//exchange btn
-		this.exchange_btn = this.actionContainer.find('#exchangeBtn')
-		//home btn
 		this.home = this.actionContainer.find('#HomeBox')
-		this.home.append('<img src="/assets/pos_ar/images/home.png" alt="Home" id="homeBoxIcon">')
-		//debt btn
 		this.debt = this.actionContainer.find('#DebtBox')
-		this.debt.append('<img src="/assets/pos_ar/images/debt.png" alt="Debt" id="debtBoxIcon">')
-		//menu btn
+		this.exchange_btn = this.actionContainer.find('#exchangeBtn')
 		this.menu = this.actionContainer.find('#MenuBox')
-		this.menu.append('<img src="/assets/pos_ar/images/menu.png" alt="Menu" id="MenuBtn" >')
-		this.menu.append('<div id="menuItemsContainer"     class="columnBox">');
-
 		this.menuItemsContainer = this.actionContainer.find('#menuItemsContainer')
-		this.menuItemsContainer.append('<div id="posInvoiceMenuItem" class="menuItem">Recent POS Invoices</div>')
-		this.menuItemsContainer.append('<div id="checkInOutMenuItem" class="menuItem">Check In/Out</div>')
-		this.menuItemsContainer.append('<div id="closePosMenuItem"   class="menuItem">Close the POS</div>')
-		this.menuItemsContainer.append('<div id="settingMenuItem"    class="menuItem">About</div>')
-
 		this.pos_invoices = this.menuItemsContainer.find('#posInvoiceMenuItem')
 		this.check_in_out = this.menuItemsContainer.find('#checkInOutMenuItem')
 		this.close_pos    = this.menuItemsContainer.find('#closePosMenuItem')

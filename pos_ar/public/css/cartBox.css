@@ -203,36 +203,149 @@ div.tab img{
 /************************************************************************/
 
 #debtLeftContainer{
-
-	width         : 100%     ;
-	height        : 100%     ;
-	background    : white    ;
-	display       : none     ;
-	overflow-y    : auto     ;
-	overflow-x    : hidden   ;
-
-	position      : relative ;
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    display: none;
+    flex-direction: column;
+    flex-grow: 1;
+    overflow: hidden;
+    position: relative;
 }
 
-#debtRightContainer{
 
-	width         : 100%  ;
-	height        : 100%  ;
-	background    : white ;
-	display       : none  ;
-	overflow-y    : auto  ;
-	overflow-x    : hidden;
 
-	position      : relative ;
-
+/* Payment Header */
+.payment-header {
+    padding: 16px;
+    background: #fcfcfc;
+    border-bottom: 1px solid #e5e7eb;
+    display: flex;
+    align-items: center;
+    gap: 16px;
 }
 
-#debt_customerList .customerBox:hover{
-	background : #f0f0f0 !important ;
-	cursor     : pointer ;
+/* Amount Input */
+#debt_paymentAmount {
+    width: 180px;
+    padding: 12px 16px;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 14px;
+    background: #ffffff;
+    transition: all 0.2s ease;
 }
-#debt_customerList .customerBox.selected{
-	background : #c0c0c0 !important ;
+
+#debt_paymentAmount:focus {
+    outline: none;
+    border-color: #44A292;
+    box-shadow: 0 0 0 3px rgba(68, 162, 146, 0.1);
+}
+
+/* Debt Info */
+#total_client_debt,
+#partially_client_debt {
+    padding: 8px 16px;
+    background: #f3f4f6;
+    border-radius: 8px;
+    color: #374151;
+    font-size: 14px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Pay Button */
+#pay_selected_invoices_btn {
+    padding: 8px 16px;
+    background: #44A292;
+    color: white;
+    border-radius: 8px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: none;
+    min-width: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#pay_selected_invoices_btn:hover {
+    background: #2d6b61;
+    transform: translateY(-1px);
+}
+
+#pay_selected_invoices_btn:active {
+    transform: translateY(0);
+}
+
+/* Debts List */
+#debt_debtsList {
+    flex: 1;
+    padding: 16px;
+    overflow-y: auto;
+    background: #ffffff;
+}
+
+.debt-item {
+    padding: 16px;
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    transition: all 0.2s ease;
+}
+
+.debt-item:hover {
+    border-color: #44A292;
+    background: #f9fafb;
+    transform: translateY(-1px);
+}
+
+.debt-checkbox {
+    width: 20px;
+    height: 20px;
+    border: 2px solid #e5e7eb;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.debt-checkbox:checked {
+    background: #44A292;
+    border-color: #44A292;
+}
+
+.debt-info {
+    flex: 1;
+}
+
+.debt-name {
+    font-weight: 500;
+    color: #1f2937;
+    margin-bottom: 4px;
+}
+
+.debt-amount {
+    color: #6b7280;
+    font-size: 13px;
+}
+
+/* Loading State */
+#debt_waitingContainer {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
 }
 
 /* Debt Cart - Customer List Styles */
@@ -240,9 +353,11 @@ div.tab img{
     background: #ffffff;
     border: 1px solid #e5e7eb;
     border-radius: 12px;
-    display: flex;
+    display: none;
     flex-direction: column;
-    overflow: hidden;
+    overflow-y    : auto  ;
+    overflow-x    : hidden;
+    position      : relative ;
 }
 
 /* Search Header */
@@ -330,4 +445,12 @@ div.tab img{
     font-size: 14px;
     text-align: center;
     padding: 32px 16px;
+}
+
+#debt_customerList .customerBox:hover{
+	background : #f0f0f0 !important ;
+	cursor     : pointer ;
+}
+#debt_customerList .customerBox.selected{
+	background : #c0c0c0 !important ;
 }
