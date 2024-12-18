@@ -4632,17 +4632,22 @@
       this.setListener();
     }
     prepare_cart() {
-      this.wrapper.find("#LeftSection").append('<div id="debtLeftContainer" class="columnBox"  ></div>');
+      this.wrapper.find("#LeftSection").append('<div id="debtLeftContainer" class="columnBox"></div>');
       this.wrapper.find("#RightSection").append('<div id="debtRightContainer" class="columnBox"></div>');
       this.leftContainer = this.wrapper.find("#debtLeftContainer");
       this.rightContainer = this.wrapper.find("#debtRightContainer");
-      const headerStyle = "height:55px;padding:0px 16px;";
-      const listStyle = "flex-grow:1;width:100%;margin:0px 16px;";
+      this.rightContainer.append(`
+			<div class="debt-header">
+				<input type="text" 
+					id="debt_filterClientList" 
+					placeholder="Search customers..."
+				>
+			</div>
+			<div id="debt_customerList"></div>
+		`);
+      this.customerList = this.rightContainer.find("#debt_customerList");
       const debtListStyle = "width:100%;height:100%;margin:16px;height:100%;";
       const inputStyle = "width:40%;margin: 0px 16px;";
-      this.rightContainer.append(`<div class="rowBox centerItem"  style="${headerStyle}" ><input type="text" id="debt_filterClientList" placeholder="Search..." style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;"></div>`);
-      this.rightContainer.append(`<div id="debt_customerList" class="columnBox" style="${listStyle}"></div>`);
-      this.customerList = this.rightContainer.find("#debt_customerList");
       this.leftContainer.append(`<div class="rowBox C_A_Center" style="margin:16px;" ><div> Amount </div><input id="debt_paymentAmount" type="number" style="${inputStyle}"></input><div style="flex-grow:1;" id="total_client_debt" class="rowBox centerItem"> DA</div> <div style="flex-grow:1;"  id="partially_client_debt"  class="rowBox centerItem"> Selected Debt : 0 DA </div>  <div id="pay_selected_invoices_btn" style="background:green;height:35px;width:95px;color:white;cursor:pointer;border-raduis:12px;" class="rowBox centerItem"> Pay </div>  </div>`);
       this.leftContainer.append(
         `<script src="https://unpkg.com/@dotlottie/player-component@2.7.12/dist/dotlottie-player.mjs" type="module"><\/script><div id="debt_waitingContainer" style="position:absolute;background:#00000050;top:0;left:0;inset: 0;display:none;backdrop-filter: blur(2px);z-index: 10;" class="rowBox centerItem" ><dotlottie-player src="https://lottie.host/d6c76206-aab9-4d5a-af73-c4a6cfc5aaa9/H8vnpKcKj9.lottie" background="transparent" speed="1" style="width: 300px; height: 300px" loop autoplay></dotlottie-player></div>`
@@ -4654,6 +4659,24 @@
       this.leftContainer.append(`<div id="debt_debtsList"  class="columnBox" style="${debtListStyle}"></div>`);
       this.debtList = this.leftContainer.find("#debt_debtsList");
       this.leftContainer.append('<div id="debt_waitingContainer" ></div>');
+    }
+    add_customer_to_list(customer) {
+      const customerElement = document.createElement("div");
+      customerElement.className = "customer-item";
+      customerElement.innerHTML = `
+			<div class="customer-name">${customer.customer_name}</div>
+			<div class="customer-info">
+				<span>${customer.customer_primary_contact || ""}</span>
+				<span>${customer.mobile_no || ""}</span>
+			</div>
+		`;
+      customerElement.addEventListener("click", () => {
+        this.customerList.find(".customer-item").removeClass("selected");
+        customerElement.classList.add("selected");
+        this.selected_client = structuredClone(customer);
+        this.refreshClientDebtPart(customer);
+      });
+      this.customerList.append(customerElement);
     }
     showCart() {
       this.leftContainer.css("display", "flex");
@@ -4704,17 +4727,9 @@
       });
     }
     refreshClientPart() {
-      const customerStyle = "height:35px;width:calc(100% - 32px);";
       this.customerList.html("");
       this._filtredClientList.forEach((customer) => {
-        const customerBox = $(`<div  style="${customerStyle}" class="rowBox C_A_Center customerBox" > ${customer.name} </div>`);
-        customerBox.on("click", () => {
-          $(".customerBox").removeClass("selected");
-          customerBox.addClass("selected");
-          this.selected_client = structuredClone(customer);
-          this.refreshClientDebtPart(customer);
-        });
-        this.customerList.append(customerBox);
+        this.add_customer_to_list(customer);
       });
     }
     refreshTotal(total_debt) {
@@ -4836,4 +4851,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.E75LQ4WB.js.map
+//# sourceMappingURL=pos.bundle.JVGCX27F.js.map

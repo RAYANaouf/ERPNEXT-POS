@@ -27,22 +27,27 @@ pos_ar.PointOfSale.pos_debt_cart = class{
 	}
 
 	prepare_cart(){
-		this.wrapper.find('#LeftSection').append('<div id="debtLeftContainer" class="columnBox"  ></div>')
+		this.wrapper.find('#LeftSection').append('<div id="debtLeftContainer" class="columnBox"></div>')
 		this.wrapper.find('#RightSection').append('<div id="debtRightContainer" class="columnBox"></div>')
 
 		this.leftContainer  = this.wrapper.find('#debtLeftContainer')
 		this.rightContainer = this.wrapper.find('#debtRightContainer')
 
-		const headerStyle     = "height:55px;padding:0px 16px;"
-		const listStyle       = "flex-grow:1;width:100%;margin:0px 16px;"
-		const debtListStyle   = "width:100%;height:100%;margin:16px;height:100%;"
-		const inputStyle      = "width:40%;margin: 0px 16px;"
-		//customer part
-		this.rightContainer.append(`<div class="rowBox centerItem"  style="${headerStyle}" ><input type="text" id="debt_filterClientList" placeholder="Search..." style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;"></div>`)
-		this.rightContainer.append(`<div id="debt_customerList" class="columnBox" style="${listStyle}"></div>`)
+		// Customer search section
+		this.rightContainer.append(`
+			<div class="debt-header">
+				<input type="text" 
+					id="debt_filterClientList" 
+					placeholder="Search customers..."
+				>
+			</div>
+			<div id="debt_customerList"></div>
+		`)
 
 		this.customerList = this.rightContainer.find('#debt_customerList')
 
+		const debtListStyle   = "width:100%;height:100%;margin:16px;height:100%;"
+		const inputStyle      = "width:40%;margin: 0px 16px;"
 		//debts part
 		this.leftContainer.append(`<div class="rowBox C_A_Center" style="margin:16px;" ><div> Amount </div><input id="debt_paymentAmount" type="number" style="${inputStyle}"></input><div style="flex-grow:1;" id="total_client_debt" class="rowBox centerItem"> DA</div> <div style="flex-grow:1;"  id="partially_client_debt"  class="rowBox centerItem"> Selected Debt : 0 DA </div>  <div id="pay_selected_invoices_btn" style="background:green;height:35px;width:95px;color:white;cursor:pointer;border-raduis:12px;" class="rowBox centerItem"> Pay </div>  </div>`)
 		this.leftContainer.append(
@@ -57,6 +62,30 @@ pos_ar.PointOfSale.pos_debt_cart = class{
 		this.debtList              = this.leftContainer.find('#debt_debtsList')
 		this.leftContainer.append('<div id="debt_waitingContainer" ></div>')
 	}
+
+	add_customer_to_list(customer) {
+		const customerElement = document.createElement('div')
+		customerElement.className = 'customer-item'
+		customerElement.innerHTML = `
+			<div class="customer-name">${customer.customer_name}</div>
+			<div class="customer-info">
+				<span>${customer.customer_primary_contact || ''}</span>
+				<span>${customer.mobile_no || ''}</span>
+			</div>
+		`
+		
+		customerElement.addEventListener('click', () => {
+			this.customerList.find('.customer-item').removeClass('selected')
+			customerElement.classList.add('selected')
+			
+			// Update the selected customer and refresh the debt part
+			this.selected_client = structuredClone(customer)
+			this.refreshClientDebtPart(customer)
+		})
+
+		this.customerList.append(customerElement)
+	}
+
 	showCart(){
 		this.leftContainer.css('display' , 'flex')
 		this.rightContainer.css('display' , 'flex')
@@ -117,22 +146,9 @@ pos_ar.PointOfSale.pos_debt_cart = class{
 
 	refreshClientPart(){
 
-		const customerStyle = "height:35px;width:calc(100% - 32px);"
-
 		this.customerList.html('')
 		this._filtredClientList.forEach(customer=>{
-			const customerBox = $(`<div  style="${customerStyle}" class="rowBox C_A_Center customerBox" > ${customer.name} </div>`)
-		        // Set an onclick listener for the customer box
-        		customerBox.on('click', () => {
-				// Remove the 'selected' class from all customer boxes
-				$('.customerBox').removeClass('selected');
-				// Add the 'selected' class to the clicked customer box
-				customerBox.addClass('selected');
-				// Update the selected customer
-				this.selected_client = structuredClone(customer)
-				this.refreshClientDebtPart(customer)
-        		});
-			this.customerList.append(customerBox)
+			this.add_customer_to_list(customer)
 		})
 	}
 
@@ -337,4 +353,3 @@ pos_ar.PointOfSale.pos_debt_cart = class{
 
 
 }
-
