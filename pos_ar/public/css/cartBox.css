@@ -294,10 +294,59 @@ div.tab img{
 
 /* Debts List */
 #debt_debtsList {
-    flex: 1;
     padding: 16px;
     overflow-y: auto;
+    flex-grow: 1;
+}
+
+.invoiceBox {
+    padding: 16px;
+    margin-bottom: 12px;
     background: #ffffff;
+    border: 1px solid #e5e7eb !important;
+    border-radius: 8px !important;
+    transition: all 0.2s ease;
+    height: auto !important;
+    min-height: auto !important;
+}
+
+.invoiceBox:hover {
+    border-color: #6366f1 !important;
+    box-shadow: 0 2px 4px rgba(99, 102, 241, 0.1);
+}
+
+.invoiceBox div {
+    padding: 0 12px;
+    color: #1f2937;
+}
+
+.invoiceBox .payBtn {
+    background: #10b981 !important;
+    border-radius: 6px !important;
+    padding: 8px 16px;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    height: 36px !important;
+    margin: 0 !important;
+}
+
+.invoiceBox .payBtn:hover {
+    background: #059669 !important;
+    transform: translateY(-1px);
+}
+
+.select_checkbox {
+    width: 16px;
+    height: 16px;
+    border: 2px solid #e5e7eb;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.select_checkbox:checked {
+    background-color: #6366f1;
+    border-color: #6366f1;
 }
 
 .debt-item {
