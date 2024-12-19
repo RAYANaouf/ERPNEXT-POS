@@ -12,7 +12,7 @@ pos_ar.PointOfSale.FetchHandler = class FetchHandler{
 				filter.modified = ['>',since]
 			}*/
 			return await frappe.db.get_list('Customer', {
-                                fields: ['name' , 'customer_name' , 'custom_debt' ],
+                fields: ['name' , 'customer_name' , 'custom_debt' , 'default_price_list' ],
 				filters: filter,
 				limit : 100000,
 				order_by : "customer_name ASC"

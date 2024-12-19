@@ -3,15 +3,15 @@
 pos_ar.PointOfSale.Controller = class {
         constructor(wrapper) {
 		//principales variable
-                this.wrapper = $(wrapper).find(".layout-main-section");
-                this.page    = wrapper.page ;
+        this.wrapper = $(wrapper).find(".layout-main-section");
+        this.page    = wrapper.page ;
 
 
-                this.selectedItemMaps  = new Map()
+        this.selectedItemMaps  = new Map()
 
-                this.selectedItem               = {"name"       : ""   }
-                this.selectedField              = {"field_name" : ""   }
-                this.selectedTab                = {"tabName"    : ""   }
+        this.selectedItem               = {"name"       : ""   }
+        this.selectedField              = {"field_name" : ""   }
+        this.selectedTab                = {"tabName"    : ""   }
 		this.selectedPaymentMethod      = {"methodName" : ""   }
 		this.defaultCustomer            = {"name"       : "" , "customer_name" : ""}
 		this.defaultPriceList           = {"name"       : ""   }
@@ -69,6 +69,13 @@ pos_ar.PointOfSale.Controller = class {
 
 			await this.handleAppData();
 
+
+			let priceList = this.getCustomerDefaultPriceList(this.defaultCustomer.name)
+			if( priceList == "" || priceList  == null || priceList  == undefined){
+				priceList = this.defaultPriceList.name
+			}
+
+
 			let new_pos_invoice               = frappe.model.get_new_doc('POS Invoice');
 			new_pos_invoice.customer          = this.defaultCustomer.name
 			new_pos_invoice.pos_profile       = this.appData.appData.pos_profile.name
@@ -83,7 +90,7 @@ pos_ar.PointOfSale.Controller = class {
 			new_pos_invoice.update_stock      = 1
 			new_pos_invoice.docstatus         = 0
 			new_pos_invoice.status            = 'Draft'
-			new_pos_invoice.priceList         = this.defaultPriceList.name
+			new_pos_invoice.priceList         = priceList
 			new_pos_invoice.opened            = 1
 			//build refNm   posProfile-date-time
 			const date = new Date()
@@ -505,10 +512,15 @@ pos_ar.PointOfSale.Controller = class {
 
 	onSelectedItemClick(item){
 
+
 		this.syncInput = false
 
 		const clonedItem = structuredClone(item)
 		Object.assign(this.selectedItem , clonedItem)
+
+		console.log("item ==> " , item)
+		console.log("selected item ==> " , this.selectedItem)
+		console.log("item maps ==> " , this.selectedItemMaps)
 
 		//show details depend on settings
 		if(this.settings_data.settings.showItemDetails){
@@ -806,9 +818,26 @@ pos_ar.PointOfSale.Controller = class {
 
 			//refresh the data :
 			this.selected_item_cart.refreshTabs()
-                        this.selected_item_cart.refreshSelectedItem()
+            this.selected_item_cart.refreshSelectedItem()
 		}else if(event == 'duplicate'){
 			const tab = this.selected_item_cart.createTabForEditPOS()
+
+			console.log("duplicate message : " , message)
+
+			message.name              = frappe.model.get_new_doc('POS Invoice').name;
+			message.pos_profile       = this.appData.appData.pos_profile.name
+			message.taxes_and_charges = this.appData.appData.pos_profile.taxes_and_charges
+			message.creation_time     = frappe.datetime.now_datetime()
+			message.payments          = this.getPaymentMethods()
+			message.priceList         = this.defaultPriceList.name
+			//build refNm   posProfile-date-time
+			const date = new Date()
+			const [year,month,day] = date.toISOString().split('T')[0].split('-')
+			const hour    = date.getHours()
+			const minutes = date.getMinutes()
+			const seconds = date.getMilliseconds()
+			message.refNum            = this.appData.appData.pos_profile.name+"-"+year+'-'+month+'-'+day+'-'+hour+minutes+seconds
+			message.custom_cach_name  = message.refNum
 
 			this.selectedItemMaps.set(`C${tab}` , message)
 			this.selectedTab.tabName = `C${tab}`
@@ -826,17 +855,16 @@ pos_ar.PointOfSale.Controller = class {
 
 			//refresh the data :
 			this.selected_item_cart.refreshTabs()
-                        this.selected_item_cart.refreshSelectedItem()
+            this.selected_item_cart.refreshSelectedItem()
 		}
 		else if(event == 'return'){
 			const tab = this.selected_item_cart.createTabForEditPOS()
 
-			console.log("see the result : " , message)
-
 			const returnedPosInvoice = this.makePosInvoiceReturn(message)
-			console.log("returned pos invoice : " , returnedPosInvoice)
 			this.selectedItemMaps.set(`C${tab}` , returnedPosInvoice)
 			this.selectedTab.tabName = `C${tab}`
+
+
 
 			//show
 			this.item_selector.showCart();
@@ -1361,6 +1389,17 @@ pos_ar.PointOfSale.Controller = class {
 	}
 
 
+	/***********************************************   tools  *************************************************/
+
+	getCustomerDefaultPriceList(customerId){
+		let priceList = ""
+		this.appData.appData.customers.forEach(customer => {
+			if(customer.name == customerId){
+				priceList = customer.default_price_list
+			}
+		})
+		return priceList
+	}
 	checkIfPaid(pos){
 
 		let netTotal   = 0 ;
@@ -1459,6 +1498,10 @@ pos_ar.PointOfSale.Controller = class {
 
 	makePosInvoiceReturn(posInvoice){
 		let invoice = structuredClone(posInvoice)
+
+		let new_name = frappe.model.get_new_doc('POS Invoice').name;
+
+		invoice.name           = new_name
 		invoice.is_return      = 1;
 		invoice.return_against = posInvoice.real_name
 		invoice.real_name      = ""
@@ -1475,6 +1518,24 @@ pos_ar.PointOfSale.Controller = class {
 			}
 		})
 		invoice.items = newItems
+
+
+		invoice.pos_profile       = this.appData.appData.pos_profile.name
+		invoice.taxes_and_charges = this.appData.appData.pos_profile.taxes_and_charges
+		invoice.creation_time     = frappe.datetime.now_datetime()
+		invoice.payments          = this.getPaymentMethods()
+		invoice.priceList         = this.defaultPriceList.name
+		//build refNm   posProfile-date-time
+		const date = new Date()
+		const [year,month,day] = date.toISOString().split('T')[0].split('-')
+		const hour    = date.getHours()
+		const minutes = date.getMinutes()
+		const seconds = date.getMilliseconds()
+		invoice.refNum            = this.appData.appData.pos_profile.name+"-"+year+'-'+month+'-'+day+'-'+hour+minutes+seconds
+		invoice.custom_cach_name  = invoice.refNum
+
+
+		
 		console.log("result : " , invoice)
 		return invoice
 	}

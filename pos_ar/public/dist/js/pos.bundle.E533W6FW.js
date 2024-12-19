@@ -61,6 +61,10 @@
     async prepare_app_data() {
       try {
         await this.handleAppData();
+        let priceList = this.getCustomerDefaultPriceList(this.defaultCustomer.name);
+        if (priceList == "" || priceList == null || priceList == void 0) {
+          priceList = this.defaultPriceList.name;
+        }
         let new_pos_invoice = frappe.model.get_new_doc("POS Invoice");
         new_pos_invoice.customer = this.defaultCustomer.name;
         new_pos_invoice.pos_profile = this.appData.appData.pos_profile.name;
@@ -75,7 +79,7 @@
         new_pos_invoice.update_stock = 1;
         new_pos_invoice.docstatus = 0;
         new_pos_invoice.status = "Draft";
-        new_pos_invoice.priceList = this.defaultPriceList.name;
+        new_pos_invoice.priceList = priceList;
         new_pos_invoice.opened = 1;
         const date = new Date();
         const [year, month, day] = date.toISOString().split("T")[0].split("-");
@@ -431,6 +435,9 @@
       this.syncInput = false;
       const clonedItem = structuredClone(item);
       Object.assign(this.selectedItem, clonedItem);
+      console.log("item ==> ", item);
+      console.log("selected item ==> ", this.selectedItem);
+      console.log("item maps ==> ", this.selectedItemMaps);
       if (this.settings_data.settings.showItemDetails) {
         this.item_details.show_cart();
         this.item_selector.hideCart();
@@ -645,6 +652,20 @@
         this.selected_item_cart.refreshSelectedItem();
       } else if (event2 == "duplicate") {
         const tab = this.selected_item_cart.createTabForEditPOS();
+        console.log("duplicate message : ", message);
+        message.name = frappe.model.get_new_doc("POS Invoice").name;
+        message.pos_profile = this.appData.appData.pos_profile.name;
+        message.taxes_and_charges = this.appData.appData.pos_profile.taxes_and_charges;
+        message.creation_time = frappe.datetime.now_datetime();
+        message.payments = this.getPaymentMethods();
+        message.priceList = this.defaultPriceList.name;
+        const date = new Date();
+        const [year, month, day] = date.toISOString().split("T")[0].split("-");
+        const hour = date.getHours();
+        const minutes = date.getMinutes();
+        const seconds = date.getMilliseconds();
+        message.refNum = this.appData.appData.pos_profile.name + "-" + year + "-" + month + "-" + day + "-" + hour + minutes + seconds;
+        message.custom_cach_name = message.refNum;
         this.selectedItemMaps.set(`C${tab}`, message);
         this.selectedTab.tabName = `C${tab}`;
         this.item_selector.showCart();
@@ -658,9 +679,7 @@
         this.selected_item_cart.refreshSelectedItem();
       } else if (event2 == "return") {
         const tab = this.selected_item_cart.createTabForEditPOS();
-        console.log("see the result : ", message);
         const returnedPosInvoice = this.makePosInvoiceReturn(message);
-        console.log("returned pos invoice : ", returnedPosInvoice);
         this.selectedItemMaps.set(`C${tab}`, returnedPosInvoice);
         this.selectedTab.tabName = `C${tab}`;
         this.item_selector.showCart();
@@ -992,6 +1011,15 @@
         }
       );
     }
+    getCustomerDefaultPriceList(customerId) {
+      let priceList = "";
+      this.appData.appData.customers.forEach((customer) => {
+        if (customer.name == customerId) {
+          priceList = customer.default_price_list;
+        }
+      });
+      return priceList;
+    }
     checkIfPaid(pos) {
       let netTotal = 0;
       let grandTotal = 0;
@@ -1052,6 +1080,8 @@
     }
     makePosInvoiceReturn(posInvoice) {
       let invoice = structuredClone(posInvoice);
+      let new_name = frappe.model.get_new_doc("POS Invoice").name;
+      invoice.name = new_name;
       invoice.is_return = 1;
       invoice.return_against = posInvoice.real_name;
       invoice.real_name = "";
@@ -1067,6 +1097,18 @@
         }
       });
       invoice.items = newItems;
+      invoice.pos_profile = this.appData.appData.pos_profile.name;
+      invoice.taxes_and_charges = this.appData.appData.pos_profile.taxes_and_charges;
+      invoice.creation_time = frappe.datetime.now_datetime();
+      invoice.payments = this.getPaymentMethods();
+      invoice.priceList = this.defaultPriceList.name;
+      const date = new Date();
+      const [year, month, day] = date.toISOString().split("T")[0].split("-");
+      const hour = date.getHours();
+      const minutes = date.getMinutes();
+      const seconds = date.getMilliseconds();
+      invoice.refNum = this.appData.appData.pos_profile.name + "-" + year + "-" + month + "-" + day + "-" + hour + minutes + seconds;
+      invoice.custom_cach_name = invoice.refNum;
       console.log("result : ", invoice);
       return invoice;
     }
@@ -1709,7 +1751,7 @@
       this.cartHeader.append('<div style="font-size:16px;font-weight:600;"><p>Item</p></div>');
       this.cartHeader.append('<div id="cartHeaderTitles" class="rowBox"></div>');
       this.cartHeaderTitles = this.cartHeader.find("#cartHeaderTitles");
-      this.cartHeaderTitles.append('<div id="quantityTitle" style="font-size:16px;font-weight:600;" >  <p>Quantity</p></div>');
+      this.cartHeaderTitles.append('<div id="quantityTitle" style="font-size:16px;font-weight:600;margin-right:16px;" >  <p>Quantity</p></div>');
       this.cartHeaderTitles.append('<div id="amountTitle"   style="font-size:16px;font-weight:600;" >  <p>Amount  </p></div>');
       this.selectedItemContainer = this.cartBox.find("#selectedItemsContainer");
       this.cartFooter = this.cartBox.find("#cartFooter");
@@ -2059,8 +2101,23 @@
       });
       this.customerInput.on("input", (event2) => {
         this.selected_item_maps.get(this.selected_tab.tabName).customer = event2.target.value;
+        let priceList = this.getCustomerDefaultPriceList(event2.target.value);
+        if (priceList == "" || priceList == null || priceList == void 0) {
+        } else {
+          this.priceListInput.val(priceList);
+          this.selected_item_maps.get(this.selected_tab.tabName).priceList = priceList;
+        }
         this.save_pos_invoice();
       });
+    }
+    getCustomerDefaultPriceList(customerId) {
+      let priceList = "";
+      this.customer_list.forEach((customer) => {
+        if (customer.name == customerId) {
+          priceList = customer.default_price_list;
+        }
+      });
+      return priceList;
     }
     calculateNetTotal() {
       let netTotal = 0;
@@ -4361,7 +4418,7 @@
       try {
         const filter = { disabled: 0 };
         return await frappe.db.get_list("Customer", {
-          fields: ["name", "customer_name", "custom_debt"],
+          fields: ["name", "customer_name", "custom_debt", "default_price_list"],
           filters: filter,
           limit: 1e5,
           order_by: "customer_name ASC"
@@ -4884,4 +4941,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.D7VCOI4I.js.map
+//# sourceMappingURL=pos.bundle.E533W6FW.js.map

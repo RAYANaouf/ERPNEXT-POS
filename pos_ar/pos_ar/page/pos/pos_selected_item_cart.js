@@ -140,7 +140,7 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 		this.cartHeader.append('<div id="cartHeaderTitles" class="rowBox"></div>')
 
 		this.cartHeaderTitles = this.cartHeader.find('#cartHeaderTitles')
-		this.cartHeaderTitles.append('<div id="quantityTitle" style="font-size:16px;font-weight:600;" >  <p>Quantity</p></div>')
+		this.cartHeaderTitles.append('<div id="quantityTitle" style="font-size:16px;font-weight:600;margin-right:16px;" >  <p>Quantity</p></div>')
 		this.cartHeaderTitles.append('<div id="amountTitle"   style="font-size:16px;font-weight:600;" >  <p>Amount  </p></div>')
 
 		this.selectedItemContainer = this.cartBox.find('#selectedItemsContainer')
@@ -656,12 +656,29 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 
 		this.customerInput.on('input' , (event)=>{
 			this.selected_item_maps.get(this.selected_tab.tabName).customer = event.target.value;
+			let priceList = this.getCustomerDefaultPriceList(event.target.value)
+			if( priceList == "" || priceList  == null || priceList  == undefined){
+				
+			}else{
+				this.priceListInput.val(priceList)
+				this.selected_item_maps.get(this.selected_tab.tabName).priceList = priceList 	
+			}
+			
 			this.save_pos_invoice()
 		})
 	}
 
 	/*************************  tools  **********************************/
 
+	getCustomerDefaultPriceList(customerId){
+		let priceList = ""
+		this.customer_list.forEach(customer => {
+			if(customer.name == customerId){
+				priceList = customer.default_price_list
+			}
+		})
+		return priceList
+	}
 
 	calculateNetTotal(){
 
