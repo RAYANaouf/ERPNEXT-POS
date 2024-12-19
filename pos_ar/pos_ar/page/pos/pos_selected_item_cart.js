@@ -664,6 +664,10 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 				this.selected_item_maps.get(this.selected_tab.tabName).priceList = priceList 	
 			}
 			
+			//reset items rate:
+			this.resetItemRateBaseOnPriceList()
+			//update the UI
+			this.refreshSelectedItem()
 			this.save_pos_invoice()
 		})
 	}

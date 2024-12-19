@@ -2107,6 +2107,8 @@
           this.priceListInput.val(priceList);
           this.selected_item_maps.get(this.selected_tab.tabName).priceList = priceList;
         }
+        this.resetItemRateBaseOnPriceList();
+        this.refreshSelectedItem();
         this.save_pos_invoice();
       });
     }
@@ -4941,4 +4943,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.E533W6FW.js.map
+//# sourceMappingURL=pos.bundle.EGPEU5BD.js.map
