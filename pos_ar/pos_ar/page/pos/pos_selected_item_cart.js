@@ -91,13 +91,13 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 			containerBoxStyle   =
 				'width:100%;'
 			containerStyle =
-				'width:100%;border-top:1px solid #a0a0a0;border-bottom:1px solid #a0a0a0;display:grid;grid-template-columns:auto auto auto auto;'
+				'width:100%;display:grid;grid-template-columns:auto auto auto auto;'
 
 			btnStyle = 'height:45px;padding:4px;background:#f5f5f5;border:1px solid #a0a0a0;color:black;font-size:small;text-align:center;display:flex;justify-content:center;align-items:center;'
 			checkoutBtn =
 				'width:100%;height:55px;'+
 				'color:#FFFFFF;font-size:19px;font-weight:600;'+
-				'background:#44A292;border:none;border-top:4px solid #2D6B61;border-radius:0px;outline:none;'
+				'background:#44A292;border:none;outline:none;'
 		}
 
 
