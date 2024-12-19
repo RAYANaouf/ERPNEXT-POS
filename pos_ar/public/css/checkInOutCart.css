@@ -1,94 +1,111 @@
-
-/********************** left section ************************/
+/********************* left section ************************/
 /************************************************************/
 
-#checkInOutLeftContainer{
-	width     : 100% ;
-	height    : 100% ;
-	padding   : 4px 16px 4px 16px ;
-	background    : #FFFFFF ;
-	border        : 4px solid #a0a0a0 ;
-	border-radius : 16px;
-
-	animation : mymove 1s ;
-	display   : none ;
-	overflow-y    : auto ;
+#checkInOutLeftContainer {
+    width: 100%;
+    height: 100%;
+    padding: 4px 16px;
+    background: #f8fafc;
+    border: 2px solid #e5e7eb;
+    border-radius: 16px;
+    animation: mymove 1s;
+    display: none;
+    overflow-y: auto;
 }
 
-#detailsCheckInOutHeader{
-	height : 95px ;
-	width  : 100% ;
-	padding: 0px 0px 4px 0px ;
-	border-bottom : 4px solid #c0c0c0 ;
-
-	font-size : 18px ;
-	font-weight : 600 ;
-	color       : #2D6B61 ;
-}
-#detailsCheckInOutHeader>div{
-	width   : 33.34% ;
-	height  : 100%   ;
-
-	display : flex   ;
-	justify-content : center ;
-	align-items     : center ;
-}
-#detailsCheckInOutHeader>div:nth-child(1),
-#detailsCheckInOutHeader>div:nth-child(2)
-{
-	border-right : 1px solid #c0c0c0 ;
+#detailsCheckInOutHeader {
+    height: auto;
+    width: 100%;
+    padding: 20px;
+    margin-top: 8px;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+    display: flex;
+    gap: 16px;
 }
 
-#TotalCheckInOutValue,#TotalCheckOutValue,#TotalCheckInValue{
-	color : #505050;
+#detailsCheckInOutHeader > div {
+    flex: 1;
+    padding: 16px;
+    background: #f8fafc;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
 }
 
-/****  content  ****/
-
-#detailsCheckInOutContent{
-	width : 100%;
-	flex-grow : 1 ;
+#detailsCheckInOutHeader > div > div:first-child {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1e293b;
 }
 
-#detailsCheckInOutContent span.key{
-	color       : #2D6B61 ;
-	font-size   : 25px    ;
-	font-weight : 700     ;
-}
-#detailsCheckInOutContent span.value{
-	color       : #505050 ;
-	font-size   : 20px    ;
-	font-weight : 600     ;
+#TotalCheckInValue, #TotalCheckOutValue, #TotalCheckInOutValue {
+    font-size: 24px;
+    font-weight: 700;
+    color: #1e293b;
 }
 
+/* Content Section */
+#detailsCheckInOutContent {
+    width: 100%;
+    flex-grow: 1;
+    padding: 20px;
+    margin-top: 16px;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+}
+
+#detailsCheckInOutContent span.key {
+    color: #1e293b;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+#detailsCheckInOutContent span.value {
+    color: #475569;
+    font-size: 14px;
+    font-weight: 500;
+}
 
 #detailsCheckInOutContent div.l1,
 #detailsCheckInOutContent div.l2,
-#detailsCheckInOutContent div.l3{
-	margin : 16px 0px ;
-	justify-content : space-between;
-}
-#detailsCheckInOutContent div.l3 div.title{
-	color       : #2D6B61 ;
-	font-size   : 25px    ;
-	font-weight : 700     ;
-}
-#detailsCheckInOutContent div.l3 textarea#selectedCheckInOutReason{
-	width  : 100% ;
-	padding : 8px 16px;
-	height  : 50px ;
-	border : 3px solid #c0c0c0;
-	border-radius : 16px ;
-
-	font-size   : 18px   ;
-	font-weight : 600    ;
-
-	overflow    : hidden ;
+#detailsCheckInOutContent div.l3 {
+    margin: 16px 0;
+    padding: 16px;
+    background: #f8fafc;
+    border-radius: 12px;
+    justify-content: space-between;
 }
 
+#detailsCheckInOutContent div.l3 div.title {
+    color: #1e293b;
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
 
+#detailsCheckInOutContent div.l3 textarea#selectedCheckInOutReason {
+    width: 100%;
+    padding: 12px;
+    min-height: 80px;
+    border: none;
+    border-radius: 8px;
+    background: white;
+    font-size: 14px;
+    font-weight: 400;
+    color: #475569;
+    resize: none;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
 
-
+#detailsCheckInOutContent div.l3 textarea#selectedCheckInOutReason:disabled {
+    background: #f8fafc;
+    cursor: not-allowed;
+}
 
 /******************* right section *************************/
 /***********************************************************/
@@ -96,8 +113,8 @@
 #checkInOutRightContainer{
         width     : 100% ;
         padding   : 4px 16px 4px 16px ;
-        background    : #FFFFFF ;
-        border        : 4px solid #a0a0a0 ;
+        background    : #f8fafc ;
+        border        : 2px solid #e5e7eb ;
         border-radius : 16px;
 
         flex-grow : 1 ;
@@ -108,69 +125,83 @@
 }
 
 /** tab container **/
-#checkInOutTabContainer{
-	width         : 100% ;
-	height        : 75px ;
-	min-height    : 75px ;
-	border-bottom : 1px solid #f0f0f0 ;
-
+#checkInOutTabContainer {
+    display: flex;
+    gap: 8px;
+    padding: 8px;
+    margin-bottom: 16px;
 }
-#checkInOutTabContainer div.tab{
-	height    : 100% ;
 
-	font-weight : 500  ;
-	font-size   : 14px ;
-	color       : #333 ;
-
-	flex-grow : 1    ;
-	display   : flex ;
-	justify-content : center  ;
-	align-items     : center  ;
-	cursor          : pointer ;
+.tab {
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #64748b;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background: white;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
 }
-#checkInOutTabContainer div.tab:hover{
-	background : #9B578840;
+
+.tab:hover {
+    background: #f1f5f9;
+    color: #1e293b;
 }
-#checkInOutTabContainer div.tab.selected{
-	border-bottom : 3px solid #2D6B61 ;
 
-	font-weight : 600     ;
-	font-size   : 20px    ;
-	color       : #2D6B61 ;
-
+.tab.selected {
+    background: #3b82f6;
+    color: white;
 }
 
 /** checkInOut List **/
-#checkInOutList{
-	width  : 100% ;
-
-	flex-grow  : 1    ;
-	overflow-y : auto ;
+#checkInOutList {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 8px;
+    margin-top: 8px;
 }
 
-#checkInOutList .checkInOutItem{
-	width  : 100% ;
-	height : 70px ;
-	min-height : 70px ;
+.checkInOutItem {
+    padding: 16px;
+    background: white;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
 
-	border-bottom : 2px solid #c0c0c0 ;
-	cursor        : pointer           ;
+.checkInOutItem:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
-#checkInOutList .checkInOutItem:hover{
-	background : #f9f9f9 ;
-}
-#checkInOutList .checkInOutItem div{
-	width : 33.334% ;
 
-	display         : flex   ;
-	justify-content : center ;
-	align-items     : center ;
+.checkInOutItem.selected {
+    border: 2px solid #3b82f6;
 }
-#checkInOutList .checkInOutItem div.type{
-	font-size : 20px ;
-	font-weight : 600 ;
+
+.checkInOutItem .amount {
+    font-size: 18px;
+    font-weight: 600;
+    color: #1e293b;
 }
-#checkInOutList .checkInOutItem div.amount{
-	font-size : 20px ;
-	font-weight : 600 ;
+
+.checkInOutItem .date {
+    font-size: 14px;
+    color: #64748b;
+}
+
+.checkInOutItem .owner {
+    font-size: 14px;
+    color: #64748b;
+    margin-top: 8px;
+}
+
+.checkInOutItem.check-in .type {
+    color: #059669;
+}
+
+.checkInOutItem.check-out .type {
+    color: #dc2626;
 }
