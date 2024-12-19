@@ -28,7 +28,7 @@
 #detailsCheckInOutHeader > div {
     flex: 1;
     padding: 16px;
-    background: #f8fafc;
+    background: #F3F9FF;
     border-radius: 12px;
     display: flex;
     flex-direction: column;
@@ -76,7 +76,7 @@
 #detailsCheckInOutContent div.l3 {
     margin: 16px 0;
     padding: 16px;
-    background: #f8fafc;
+    background: #F3F9FF;
     border-radius: 12px;
     justify-content: space-between;
 }
@@ -103,7 +103,7 @@
 }
 
 #detailsCheckInOutContent div.l3 textarea#selectedCheckInOutReason:disabled {
-    background: #f8fafc;
+    background: #fff;
     cursor: not-allowed;
 }
 
@@ -165,11 +165,15 @@
 
 .checkInOutItem {
     padding: 16px;
-    background: white;
+    background: #FFFFFF;
     border-radius: 12px;
     cursor: pointer;
     transition: all 0.2s ease;
     box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 16px;
+    align-items: center;
 }
 
 .checkInOutItem:hover {
@@ -181,27 +185,54 @@
     border: 2px solid #3b82f6;
 }
 
+.checkInOutItem .type {
+	background: #F3F9FF;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    min-width: 100px;
+}
+
+.checkInOutItem .type img {
+    width: 20px !important;
+    height: 20px !important;
+    opacity: 0.8;
+}
+
+.checkInOutItem .type div {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.checkInOutItem[data-type="In"] .type {
+    color: #059669;
+    background: #ecfdf5;
+}
+
+.checkInOutItem[data-type="Out"] .type {
+    color: #dc2626;
+    background: #fef2f2;
+}
+
+.checkInOutItem[data-type="In"] .type img {
+    transform: rotate(180deg);
+}
+
+.checkInOutItem .creationTime {
+    font-size: 14px;
+    color: #475569;
+    text-align: center;
+}
+
 .checkInOutItem .amount {
-    font-size: 18px;
+    font-size: 16px;
     font-weight: 600;
     color: #1e293b;
-}
-
-.checkInOutItem .date {
-    font-size: 14px;
-    color: #64748b;
-}
-
-.checkInOutItem .owner {
-    font-size: 14px;
-    color: #64748b;
-    margin-top: 8px;
-}
-
-.checkInOutItem.check-in .type {
-    color: #059669;
-}
-
-.checkInOutItem.check-out .type {
-    color: #dc2626;
+    padding: 8px 12px;
+    background: #F3F9FF;
+    border-radius: 8px;
+    min-width: 120px;
+    text-align: right;
 }
