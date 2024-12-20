@@ -13,40 +13,51 @@ def update_customer_debt_on_invoice(doc, method):
 
     Args:
         doc (Document): The document triggering the event.
-        method (str): The trigger method (e.g., 'on_submit', 'on_update').
+        method (str): The trigger method (e.g., 'on_submit', 'on_cancel').
     """
     try:
         customer = None
 
-        # Check if the document is a Payment Entry
+        # Determine the customer based on document type
         if doc.doctype == "Payment Entry" and doc.party_type == "Customer":
             customer = doc.party
         else:
-            # For Sales Invoice and POS Invoice, get the customer directly
             customer = getattr(doc, "customer", None)
 
         if not customer:
             frappe.logger().info(f"No customer found for document {doc.name}. Skipping.")
             return
 
-        # Calculate the total outstanding amount for the customer
-        total_outstanding = frappe.db.sql("""
-            SELECT SUM(outstanding_amount)
-            FROM (
-                SELECT outstanding_amount
+        # Determine the appropriate query based on whether this is a POS invoice
+        if doc.doctype == "Sales Invoice" and getattr(doc, "is_pos", 0) == 1:
+            # POS Sales Invoice
+            total_outstanding = frappe.db.sql("""
+                SELECT SUM(outstanding_amount)
                 FROM `tabSales Invoice`
                 WHERE customer = %s AND docstatus = 1
+            """, (customer,))[0][0] or 0
+        else:
+            # Regular Sales Invoice or other document types
+            total_outstanding = frappe.db.sql("""
+                SELECT SUM(outstanding_amount)
+                FROM (
+                    SELECT outstanding_amount
+                    FROM `tabSales Invoice`
+                    WHERE customer = %s AND docstatus = 1
 
-                UNION ALL
+                    UNION ALL
 
-                SELECT outstanding_amount
-                FROM `tabPOS Invoice`
-                WHERE customer = %s AND docstatus = 1 AND consolidated_invoice IS NULL AND  outstanding_amount > 0
-            ) AS combined
-        """, (customer, customer))[0][0] or 0
+                    SELECT outstanding_amount
+                    FROM `tabPOS Invoice`
+                    WHERE customer = %s AND docstatus = 1 AND consolidated_invoice IS NULL AND outstanding_amount > 0
+                ) AS combined
+            """, (customer, customer))[0][0] or 0
 
         # Update the custom_debt and debt_date fields in the Customer Doctype
-        frappe.db.set_value("Customer", customer, {"custom_debt": total_outstanding , "custom_debt_date" : datetime.now() })
+        frappe.db.set_value("Customer", customer, {
+            "custom_debt": total_outstanding,
+            "custom_debt_date": datetime.now()
+        })
 
         frappe.logger().info(f"Customer {customer}'s debt updated to {total_outstanding} on {datetime.now()}.")
 
