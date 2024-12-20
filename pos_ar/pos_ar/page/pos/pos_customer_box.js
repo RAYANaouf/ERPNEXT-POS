@@ -95,25 +95,48 @@ pos_ar.PointOfSale.pos_customer_box = class{
 		this.wrapper.append('<div id="darkFloatingBackground"></div>')
 		this.dark_floating_background = this.wrapper.find('#darkFloatingBackground');
 
-		this.wrapper.append('<div id="checkInOutDialog"></div>')
+		this.wrapper.append(`
+			<div id="checkInOutDialog">
+				<div class="dialog-header">
+					<h2>Add Transaction</h2>
+				</div>
+				<div id="checkTypeContainer">
+					<div id="checkInType" class="rowBox centerItem checkType selected">
+						<div class="type-icon">
+							<img src="/assets/pos_ar/images/arrow.png" style="transform: rotate(180deg);" alt="In">
+						</div>
+						<div class="type-text">Check In</div>
+					</div>
+					<div id="checkOutType" class="rowBox centerItem checkType">
+						<div class="type-icon">
+							<img src="/assets/pos_ar/images/arrow.png" alt="Out">
+						</div>
+						<div class="type-text">Check Out</div>
+					</div>
+				</div>
+				<div class="inputGroup">
+					<label for="check_in_out_input">Amount</label>
+					<input autocomplete="off" required type="number" id="check_in_out_input" placeholder="Enter amount">
+				</div>
+				<div class="inputGroup">
+					<label for="check_in_out_note_textarea">Reason</label>
+					<textarea id="check_in_out_note_textarea" placeholder="Enter reason for transaction"></textarea>
+				</div>
+				<div id="btnsContainers" class="rowBox">
+					<button id="cancelBtn" class="dialogBtn rowBox centerItem">Cancel</button>
+					<button id="confirmBtn" class="dialogBtn rowBox centerItem">Confirm</button>
+				</div>
+			</div>
+		`)
 		this.check_in_out_dialog = this.wrapper.find('#checkInOutDialog');
 		this.check_in_out_dialog.css('flex-direction','column')
 
-		this.check_in_out_dialog.append('<div id="checkTypeContainer"></div>')
 		this.check_type_container = this.check_in_out_dialog.find('#checkTypeContainer')
-		this.check_type_container.append('<div id="checkInType"  class="rowBox centerItem checkType selected "><div>Check In</div>  <img src=""></div>')
-		this.check_type_container.append('<div id="checkOutType" class="rowBox centerItem checkType">  <div>Check Out</div>  <img src="">  </div>')
-		//check type
 		this.check_in_box  = this.check_type_container.find('#checkInType')
 		this.check_out_box = this.check_type_container.find('#checkOutType')
 		this.check_in_out_type = 'In'
-		//input
-		this.check_in_out_dialog.append('<div class="inputGroup">  <input autocomplete="off" required="" type="number" id="check_in_out_input"><label for="name">Amount</label>   </div>')
-		this.check_in_out_dialog.append('<div class="inputGroup">  <textarea type="text" id="check_in_out_note_textarea"></textarea><label for="name">Reason</label>   </div>')
 		this.check_in_out_input = this.check_in_out_dialog.find('#check_in_out_input');
 		this.check_in_out_note  = this.check_in_out_dialog.find('#check_in_out_note_textarea');
-		//cancel and confirm btn
-		this.check_in_out_dialog.append('<div id="btnsContainers" class="rowBox"> <div id="cancelBtn" class="dialogBtn rowBox centerItem">Cancel</div><div id="confirmBtn" class="dialogBtn rowBox centerItem">Done</div> </div>')
 		this.cancel_dialog_btn = this.check_in_out_dialog.find('#cancelBtn')
 		this.confirm_dialog_btn = this.check_in_out_dialog.find('#confirmBtn')
 	}
@@ -209,20 +232,16 @@ pos_ar.PointOfSale.pos_customer_box = class{
 			this.hideCheckInOutDialog();
 		})
 
-		this.check_in_box.on('click' , (event)=>{
+		this.check_in_box.on('click', (event) => {
 			this.check_in_out_type = 'In';
-			this.check_in_box.css('border' , '3px solid #9B5788')
-			this.check_in_box.css('background' , '#ffffff')
-			this.check_out_box.css('border' , '2px solid #e0e0e0')
-			this.check_out_box.css('background' , '#fafafa')
+			this.check_in_box.addClass('selected');
+			this.check_out_box.removeClass('selected');
 		})
 
-		this.check_out_box.on('click' , (event)=>{
+		this.check_out_box.on('click', (event) => {
 			this.check_in_out_type = 'Out';
-			this.check_out_box.css('border' , '3px solid #9B5788')
-			this.check_out_box.css('background' , '#ffffff')
-			this.check_in_box.css('border' , '2px solid #e0e0e0')
-			this.check_in_box.css('background' , '#fafafa')
+			this.check_out_box.addClass('selected');
+			this.check_in_box.removeClass('selected');
 		})
 
 		this.check_in_out_input.on('input' , (event)=>{

@@ -112,7 +112,7 @@
 
 #checkInOutRightContainer{
         width     : 100% ;
-        padding   : 4px 16px 4px 16px ;
+        padding   : 4px 0px ;
         background    : #f8fafc ;
         border        : 2px solid #e5e7eb ;
         border-radius : 16px;
@@ -161,6 +161,7 @@
     gap: 12px;
     padding: 8px;
     margin-top: 8px;
+	overflow-y: auto;
 }
 
 .checkInOutItem {

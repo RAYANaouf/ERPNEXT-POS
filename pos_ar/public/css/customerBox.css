@@ -174,145 +174,177 @@
 }
 
 /****************************************** check in out dialog ****************************************/
-#checkInOutDialog{
-    max-height: 80vh;
-    width: 70%;
-    background: #ffffff;
-    border: 3px solid #2D6B61;
-    border-radius: 25px;
-    display: none;
-    overflow: hidden;
-    overflow-y: auto;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    z-index: 50;
-    transform: translate(-50%, -50%);
-    animation: mymove 1s;
-}
-#darkFloatingBackground{
+#darkFloatingBackground {
     height: 100%;
     width: 100vw;
-    background: #000000cc;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
     display: none;
-    position: absolute;
+    position: fixed;
     top: 0;
     left: 0;
-    z-index: 10;
-    animation: mymove 0.2s;
+    z-index: 999;
 }
 
-#checkInOutDialog #checkTypeContainer{
-    width: calc(100%-16px);
-    margin: 55px 16px 16px 16px;
-    display: flex;
-}
-
-#checkTypeContainer .checkType{
-    height: 70px;
-    background: #fafafa;
-    border: 2px solid #f0f0f0;
-    border-radius: 16px;
-    font-size: 20px;
-    font-weight: 600;
-    flex-grow: 1;
-    cursor: pointer;
-}
-
-#checkTypeContainer .checkType.selected{
-    border: 2px solid #2D6B61;
+#checkInOutDialog {
+    max-height: 90vh;
+    width: 450px;
     background: #ffffff;
-}
-#checkTypeContainer #checkInType{
-    margin-right: 16px;
+    border-radius: 16px;
+    display: none;
+    flex-direction: column;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    z-index: 1000;
+    transform: translate(-50%, -50%);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    animation: slideUp 0.3s ease-out;
 }
 
-#checkInOutDialog .inputGroup {
-    height: max-content;
-    font-family: 'Segoe UI', sans-serif;
-    margin: 25px 16px;
-    position: relative;
+.dialog-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid #e5e7eb;
 }
 
-/********** amount input ***********/
-#checkInOutDialog .inputGroup input {
-    width: 100%;
-    height: 55px;
-    padding: 0.8em;
-    background-color: transparent;
-    border: 2px solid rgb(200, 200, 200);
-    border-radius: 20px;
+.dialog-header h2 {
+    margin: 0;
+    color: #1e293b;
     font-size: 18px;
     font-weight: 600;
-    outline: none;
 }
 
-#checkInOutDialog .inputGroup label {
-    margin-left: 0.5em;
-    padding: 0.8em;
-    font-weight: 600;
-    font-size: 18px;
-    position: absolute;
-    left: 0;
-    pointer-events: none;
-    transition: all 0.3s ease;
-    color: rgb(100, 100, 100);
+#checkTypeContainer {
+    display: flex;
+    gap: 12px;
+    padding: 24px;
 }
 
-#checkInOutDialog .inputGroup :is(input:focus, input:valid)~label {
-    transform: translateY(-50%) scale(.9);
-    margin: 0em;
-    margin-left: 1.3em;
-    padding: 0.4em;
-    background-color: #FFFFFF;
-}
-
-#checkInOutDialog .inputGroup :is(input:focus, input:valid) {
-    border-color: rgb(150, 150, 200);
-}
-
-/************** note textarea *****************/
-#checkInOutDialog .inputGroup textarea {
-    width: 100%;
-    padding: 0.8em;
-    background-color: transparent;
-    border: 2px solid rgb(200, 200, 200);
+.checkType {
+    flex: 1;
+    padding: 16px;
+    background: #F3F9FF;
     border-radius: 12px;
-    font-size: 18px;
-    font-weight: 600;
-    outline: none;
-}
-
-#checkInOutDialog .inputGroup :is(textarea:focus, textarea:valid)~label {
-    transform: translateY(-50%) scale(.9);
-    margin: 0em;
-    margin-left: 1.3em;
-    padding: 0.4em;
-    background-color: #FFFFFF;
-}
-
-/***************** buttons container ******************/
-#btnsContainers{
-    height: 75px;
-    width: calc(100%-16px);
-    margin: 16px 0px 0px 0px;
-    border-top: 2px solid #2D6B61;
-}
-
-#btnsContainers div.dialogBtn{
-    height: 75px;
-    width: 50%;
-    font-size: 20px;
-    font-weight: 600;
     cursor: pointer;
+    transition: all 0.2s ease;
+    border: 2px solid transparent;
 }
 
-#confirmBtn{
-    border-left: 2px solid #2D6B61;
-    font-weight: 700;
-    color: #9B5788;
+.checkType:hover {
+    background: #EEF7FF;
+    transform: translateY(-1px);
 }
 
-#btnsContainers div.dialogBtn:hover{
-    background: #f0f0f0;
+.checkType.selected {
+    background: #EEF7FF;
+    border-color: #3b82f6;
+}
+
+.type-icon {
+    margin-bottom: 8px;
+}
+
+.type-icon img {
+    width: 24px;
+    height: 24px;
+    opacity: 0.7;
+}
+
+.type-text {
+    color: #475569;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.checkType.selected .type-text {
+    color: #1e293b;
+}
+
+.inputGroup {
+    padding: 0 24px;
+    margin-bottom: 20px;
+}
+
+.inputGroup label {
+    display: block;
+    margin-bottom: 6px;
+    color: #64748b;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.inputGroup input,
+.inputGroup textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    background: #F8FAFC;
+    font-size: 14px;
+    color: #1e293b;
+    transition: all 0.2s ease;
+}
+
+.inputGroup textarea {
+    height: 100px;
+    resize: vertical;
+}
+
+.inputGroup input:focus,
+.inputGroup textarea:focus {
+    outline: none;
+    border-color: #3b82f6;
+    background: #fff;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.inputGroup input::placeholder,
+.inputGroup textarea::placeholder {
+    color: #94a3b8;
+}
+
+#btnsContainers {
+    padding: 20px 24px;
+    border-top: 1px solid #e5e7eb;
+    gap: 12px;
+}
+
+.dialogBtn {
+    flex: 1;
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+#cancelBtn {
+    background: #f1f5f9;
+    color: #64748b;
+}
+
+#cancelBtn:hover {
+    background: #e2e8f0;
+}
+
+#confirmBtn {
+    background: #3b82f6;
+    color: white;
+}
+
+#confirmBtn:hover {
+    background: #2563eb;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -40%);
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, -50%);
+    }
 }

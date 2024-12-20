@@ -100,6 +100,8 @@ pos_ar.PointOfSale.pos_check_in_out = class {
 	refreshCheckInOutList(){
 		this.check_in_out_list.empty();
 
+		console.log("this.checkList : " , this.checkList)
+
 		const filteredList = this.checkList.filter( item => item.check_type == this.filter || this.filter == 'All')
 
 		filteredList.forEach(checkInOut =>{
@@ -110,11 +112,14 @@ pos_ar.PointOfSale.pos_check_in_out = class {
 			const type_div = document.createElement('div')
 			type_div.classList.add('type')
 			//type img image
-			const type_img = document.createElement('img')
-			type_img.src = '/assets/pos_ar/images/arrow.png'
-			type_img.style.width  = '35px'
-			type_img.style.height = '35px'
-			type_img.transform    = checkInOut.check_type === 'In' ? 'rotate(180deg);' : ''
+			const type_img           = document.createElement('img')
+			type_img.src             = '/assets/pos_ar/images/arrow.png'
+			type_img.style.width     = '35px'
+			type_img.style.height    = '35px'
+			type_img.style.transform = checkInOut.check_type === 'In' ? 'rotate(180deg)' : ''
+
+			console.log("checkInOut.check_type : " , checkInOut.check_type === 'In' ? 'rotate(180deg);' : '')
+
 			//type div value
 			const type_value_div       = document.createElement('div')
 			type_value_div.textContent = checkInOut.check_type
