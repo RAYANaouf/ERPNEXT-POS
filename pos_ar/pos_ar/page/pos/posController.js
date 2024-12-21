@@ -1,5 +1,3 @@
-
-
 pos_ar.PointOfSale.Controller = class {
         constructor(wrapper) {
 		//principales variable
@@ -27,7 +25,7 @@ pos_ar.PointOfSale.Controller = class {
 
 		this.syncInput = false
 
-                this.start_app();
+        this.start_app();
         }
 
 	 async start_app(){
@@ -199,13 +197,13 @@ pos_ar.PointOfSale.Controller = class {
 				args: { user , posProfile}
 			});
 			const r = response.message;
-			console.log("debuging is here")
 			if(r.length === 0 ){
 				this.create_opening_voucher()
 				return false;
 			}
 			//copy data
 			Object.assign(this.POSOpeningEntry ,  r[0])
+			this.db.updateCheckInOutSync(this.POSOpeningEntry.period_start_date)
 			return true
 		} catch (error) {
 			console.error('error occured : ' , error);
@@ -249,7 +247,6 @@ pos_ar.PointOfSale.Controller = class {
 
 		const fetch_pos_payment_methods = () => {
 			const pos_profile = dialog.fields_dict.pos_profile.get_value();
-			console.log("pos debuging ===> " , pos_profile)
 
 			if (!pos_profile) return;
 			frappe.db.get_doc("POS Profile", pos_profile).then(({ payments }) => {
@@ -315,7 +312,8 @@ pos_ar.PointOfSale.Controller = class {
 				!res.exc && me.prepare_app_data(res.message);
 
 				Object.assign(me.POSOpeningEntry    ,  {'name' : res.message.name , 'pos_profile' : res.message.pos_profile ,  'period_start_date' : res.message.period_start_date , 'company' : res.message.company } )
-
+				me.db.updateCheckInOutSync(me.POSOpeningEntry.period_start_date)
+				me.check_in_out_cart.getAllCheckInOut();
 				dialog.hide();
 
 			},
@@ -544,6 +542,7 @@ pos_ar.PointOfSale.Controller = class {
 
 
 	saveCheckInOut(checkInOut){
+		checkInOut.is_sync = 0 ;
 		this.appData.saveCheckInOut(
 			checkInOut,
 			(res)=>{
@@ -1033,26 +1032,33 @@ pos_ar.PointOfSale.Controller = class {
 					let persont = this.selectedItem.discount_percentage
 					let montant = oldRate * (persont / 100)
 
+					this.selectedItem.discount_percentage = persont;
 					this.selectedItem.discount_amount     = montant;
+
+					this.editPosItemDiscountAmount(this.selectedItem.name , this.selectedItem.discount_amount);
+					this.editPosItemRate(this.selectedItem.name , this.selectedItem.rate);
+
+				}
+				else if(this.selectedField.field_name == "discount_percentage"){
+					//recalculate the rate
+					let oldRate        = this.selectedItem.rate;
+					let old_percentage = this.selectedItem.discount_percentage ?? 0;
+					let input          = `${old_percentage}` + key ;
+					let discount_percentage = parseFloat(input);
+					if(discount_percentage > 100){
+						discount_percentage = 100;
+					}
+					let montant = oldRate * ( discount_percentage / 100)
+					let newRate = oldRate - montant
+
+
+					this.selectedItem.discount_percentage = (discount_percentage);
+					this.selectedItem.discount_amount     = montant;
+
 				}
 
-
-				//update the posInvoice
-				this.editPosItemDiscountAmount(this.selectedItem.name , this.selectedItem.discount_amount);
-				this.editPosItemRate(this.selectedItem.name , this.selectedItem.rate);
-				this.editPosItemQty(this.selectedItem.name , this.selectedItem.qty);
-
-				//update the ui
-				this.selected_item_cart.refreshSelectedItem()
-				this.item_details.refreshDate(this.selectedItem);
-
-				this.savePosInvoice(true)
-
-
-				//return to prevent the remaining code
-				return
-
 			}
+
 
 			let newValue =  parseFloat(this.item_details.deleteCharacter())
 
@@ -1197,8 +1203,8 @@ pos_ar.PointOfSale.Controller = class {
 		let is_return = 1;
 
 		this.selectedItemMaps.get(this.selectedTab.tabName).items.forEach(  item  =>{
-			// we still didnt implement the price_list_rate and base_price_list_rate
-			// same thing with actual_qty refering to the stock quantity
+			// we still didnt implement the  base_paid_amount and amount_eligible_for_commissionseen
+			// value in deafault pos ==>  ["Administrator"]. i think it is an array.
 			let newItem = {
 				'item_name'               : item.item_name,
 				'item_code'               : item.item_code,
@@ -1356,6 +1362,15 @@ pos_ar.PointOfSale.Controller = class {
 			(allUnsyncedPos) =>{
 				//create progress bar
 				frappe.show_progress('Syncing Invoices...' , 0 , allUnsyncedPos.length , 'syncing')
+				const unsyncedChecks = this.check_in_out_cart.checkList.filter(check => check.is_sync === 0);
+				unsyncedChecks.forEach(check => {
+					let child = frappe.model.add_child(voucher, 'check_in_out', 'custom_check_in_out')
+					child.check_type = check.check_type
+					child.creation_time = check.creation_time
+					child.amount = check.amount
+					child.reason = check.reason
+					child.user = check.owner
+				})
 				allUnsyncedPos.forEach(pos=>{
 					// we still didnt implement the  base_paid_amount and amount_eligible_for_commissionseen
 					// value in deafault pos ==>  ["Administrator"]. i think it is an array.
@@ -1453,14 +1468,14 @@ pos_ar.PointOfSale.Controller = class {
 		voucher.posting_date      = frappe.datetime.now_date();
 		voucher.posting_time      = frappe.datetime.now_time();
 
-
-		this.check_in_out_cart.checkList.forEach(check =>{
-			let child = frappe.model.add_child(voucher , 'check_in_out' , 'custom_check_in_out' )
-			child.check_type    = check.check_type
+		const unsyncedChecks = this.check_in_out_cart.checkList.filter(check => check.is_sync === 0);
+		unsyncedChecks.forEach(check => {
+			let child = frappe.model.add_child(voucher, 'check_in_out', 'custom_check_in_out')
+			child.check_type = check.check_type
 			child.creation_time = check.creation_time
-			child.amount        = check.amount
-			child.reason        = check.reason
-			child.user          = check.owner
+			child.amount = check.amount
+			child.reason = check.reason
+			child.user = check.owner
 		})
 
 		//frappe.set_route("Form", "POS Closing Entry", voucher.name);
@@ -1545,7 +1560,6 @@ pos_ar.PointOfSale.Controller = class {
 
 		if(active){
 			document.addEventListener('keydown', event =>{
-				console.log(event.key)
 				// Check if the user is typing in an input or textarea
 				const activeElement = document.activeElement;
 				const isInputFocused =

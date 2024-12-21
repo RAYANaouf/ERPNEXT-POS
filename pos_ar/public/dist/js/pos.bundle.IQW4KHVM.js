@@ -168,12 +168,12 @@
           args: { user, posProfile }
         });
         const r = response.message;
-        console.log("debuging is here");
         if (r.length === 0) {
           this.create_opening_voucher();
           return false;
         }
         Object.assign(this.POSOpeningEntry, r[0]);
+        this.db.updateCheckInOutSync(this.POSOpeningEntry.period_start_date);
         return true;
       } catch (error) {
         console.error("error occured : ", error);
@@ -211,7 +211,6 @@
       ];
       const fetch_pos_payment_methods = () => {
         const pos_profile = dialog.fields_dict.pos_profile.get_value();
-        console.log("pos debuging ===> ", pos_profile);
         if (!pos_profile)
           return;
         frappe.db.get_doc("POS Profile", pos_profile).then(({ payments }) => {
@@ -273,6 +272,8 @@
           });
           !res.exc && me.prepare_app_data(res.message);
           Object.assign(me.POSOpeningEntry, { "name": res.message.name, "pos_profile": res.message.pos_profile, "period_start_date": res.message.period_start_date, "company": res.message.company });
+          me.db.updateCheckInOutSync(me.POSOpeningEntry.period_start_date);
+          me.check_in_out_cart.getAllCheckInOut();
           dialog.hide();
         },
         primary_action_label: __("Submit")
@@ -451,6 +452,7 @@
       this.item_details.refreshDate(item);
     }
     saveCheckInOut(checkInOut) {
+      checkInOut.is_sync = 0;
       this.appData.saveCheckInOut(
         checkInOut,
         (res) => {
@@ -747,7 +749,7 @@
       this.savePosInvoice(true);
     }
     onKeyPressed(action, key) {
-      var _a;
+      var _a, _b;
       if (action == "quantity") {
         this.selectedField.field_name = "quantity";
         this.selected_item_cart.makeSelectedButtonHighlighted();
@@ -778,15 +780,23 @@
             let oldRate = this.selectedItem.rate;
             let persont = this.selectedItem.discount_percentage;
             let montant = oldRate * (persont / 100);
+            this.selectedItem.discount_percentage = persont;
+            this.selectedItem.discount_amount = montant;
+            this.editPosItemDiscountAmount(this.selectedItem.name, this.selectedItem.discount_amount);
+            this.editPosItemRate(this.selectedItem.name, this.selectedItem.rate);
+          } else if (this.selectedField.field_name == "discount_percentage") {
+            let oldRate = this.selectedItem.rate;
+            let old_percentage = (_a = this.selectedItem.discount_percentage) != null ? _a : 0;
+            let input = `${old_percentage}` + key;
+            let discount_percentage = parseFloat(input);
+            if (discount_percentage > 100) {
+              discount_percentage = 100;
+            }
+            let montant = oldRate * (discount_percentage / 100);
+            let newRate = oldRate - montant;
+            this.selectedItem.discount_percentage = discount_percentage;
             this.selectedItem.discount_amount = montant;
           }
-          this.editPosItemDiscountAmount(this.selectedItem.name, this.selectedItem.discount_amount);
-          this.editPosItemRate(this.selectedItem.name, this.selectedItem.rate);
-          this.editPosItemQty(this.selectedItem.name, this.selectedItem.qty);
-          this.selected_item_cart.refreshSelectedItem();
-          this.item_details.refreshDate(this.selectedItem);
-          this.savePosInvoice(true);
-          return;
         }
         let newValue = parseFloat(this.item_details.deleteCharacter());
         if (this.selectedField.field_name == "quantity") {
@@ -843,7 +853,7 @@
             this.editPosItemRate(this.selectedItem.name, this.selectedItem.rate);
           } else if (this.selectedField.field_name == "discount_percentage") {
             let oldRate = this.selectedItem.rate;
-            let old_percentage = (_a = this.selectedItem.discount_percentage) != null ? _a : 0;
+            let old_percentage = (_b = this.selectedItem.discount_percentage) != null ? _b : 0;
             let input = `${old_percentage}` + key;
             let discount_percentage = parseFloat(input);
             if (discount_percentage > 100) {
@@ -985,6 +995,15 @@
       this.appData.getNotSyncedPos(
         (allUnsyncedPos) => {
           frappe.show_progress("Syncing Invoices...", 0, allUnsyncedPos.length, "syncing");
+          const unsyncedChecks = this.check_in_out_cart.checkList.filter((check) => check.is_sync === 0);
+          unsyncedChecks.forEach((check) => {
+            let child = frappe.model.add_child(voucher, "check_in_out", "custom_check_in_out");
+            child.check_type = check.check_type;
+            child.creation_time = check.creation_time;
+            child.amount = check.amount;
+            child.reason = check.reason;
+            child.user = check.owner;
+          });
           allUnsyncedPos.forEach((pos) => {
             frappe.db.insert(
               pos
@@ -1048,24 +1067,25 @@
       if (this.unsyncedPos > 0) {
         frappe.throw(__(`you have ${all_tabs.length} invoice to sync first.`));
       }
-      let voucher = frappe.model.get_new_doc("POS Closing Entry");
-      voucher.pos_opening_entry = this.POSOpeningEntry.name;
-      voucher.pos_profile = this.POSOpeningEntry.pos_profile;
-      voucher.company = this.POSOpeningEntry.company;
-      voucher.user = frappe.session.user;
-      voucher.posting_date = frappe.datetime.now_date();
-      voucher.posting_time = frappe.datetime.now_time();
-      this.check_in_out_cart.checkList.forEach((check) => {
-        let child = frappe.model.add_child(voucher, "check_in_out", "custom_check_in_out");
+      let voucher2 = frappe.model.get_new_doc("POS Closing Entry");
+      voucher2.pos_opening_entry = this.POSOpeningEntry.name;
+      voucher2.pos_profile = this.POSOpeningEntry.pos_profile;
+      voucher2.company = this.POSOpeningEntry.company;
+      voucher2.user = frappe.session.user;
+      voucher2.posting_date = frappe.datetime.now_date();
+      voucher2.posting_time = frappe.datetime.now_time();
+      const unsyncedChecks = this.check_in_out_cart.checkList.filter((check) => check.is_sync === 0);
+      unsyncedChecks.forEach((check) => {
+        let child = frappe.model.add_child(voucher2, "check_in_out", "custom_check_in_out");
         child.check_type = check.check_type;
         child.creation_time = check.creation_time;
         child.amount = check.amount;
         child.reason = check.reason;
         child.user = check.owner;
       });
-      frappe.set_route("Form", "POS Closing Entry", voucher.name).then(() => {
+      frappe.set_route("Form", "POS Closing Entry", voucher2.name).then(() => {
         window.addEventListener("popstate", (event2) => {
-          frappe.set_route("Form", "POS Closing Entry", voucher.name);
+          frappe.set_route("Form", "POS Closing Entry", voucher2.name);
         });
       });
       this.POSOpeningEntry.name = "";
@@ -1115,7 +1135,6 @@
     toggleKeyboardMode(active) {
       if (active) {
         document.addEventListener("keydown", (event2) => {
-          console.log(event2.key);
           const activeElement = document.activeElement;
           const isInputFocused = activeElement.tagName === "INPUT" || activeElement.tagName === "TEXTAREA" || activeElement.isContentEditable;
           if (isInputFocused)
@@ -3661,6 +3680,20 @@
         };
       });
     }
+    getAllCheckInOut() {
+      return new Promise((resolve, reject) => {
+        const transaction = this.db.transaction(["check_in_out"], "readwrite");
+        const store = transaction.objectStore("check_in_out");
+        const result = store.getAll();
+        result.onsuccess = (event2) => {
+          const value = event2.target.result;
+          resolve(value);
+        };
+        result.onerror = (err) => {
+          reject(err);
+        };
+      });
+    }
     getAllCheckInOut_callback(onSuccess, onFailure) {
       const transaction = this.db.transaction(["check_in_out"], "readwrite");
       const store = transaction.objectStore("check_in_out");
@@ -3685,6 +3718,66 @@
           reject(err);
         };
       });
+    }
+    updateCheckInOutSync(date) {
+      return new Promise((resolve, reject) => {
+        const transaction = this.db.transaction(["check_in_out"], "readwrite");
+        const store = transaction.objectStore("check_in_out");
+        const request = store.getAll();
+        request.onsuccess = (event2) => {
+          const records = event2.target.result;
+          const updatePromises = [];
+          records.forEach((record) => {
+            console.log("date : ", new Date(record.creation_time), "the dat ", new Date(date), "record :  ", record);
+            if (!record.is_sync && new Date(record.creation_time) <= new Date(date)) {
+              console.log("======>we are hereeee record :  ", record);
+              record.is_sync = 1;
+              updatePromises.push(new Promise((resolveUpdate, rejectUpdate) => {
+                const updateRequest = store.put(record);
+                updateRequest.onsuccess = () => resolveUpdate();
+                updateRequest.onerror = (err) => rejectUpdate(err);
+              }));
+            }
+          });
+          Promise.all(updatePromises).then(() => resolve()).catch((err) => reject(err));
+        };
+        request.onerror = (err) => reject(err);
+      });
+    }
+    updateCheckInOutSync_callback(date, onSuccess, onFailure) {
+      const transaction = this.db.transaction(["check_in_out"], "readwrite");
+      const store = transaction.objectStore("check_in_out");
+      const request = store.getAll();
+      request.onsuccess = (event2) => {
+        const records = event2.target.result;
+        let updatedCount = 0;
+        let totalToUpdate = 0;
+        records.forEach((record) => {
+          if (!record.is_sync && new Date(record.creation) <= new Date(date)) {
+            totalToUpdate++;
+          }
+        });
+        if (totalToUpdate === 0) {
+          onSuccess();
+          return;
+        }
+        records.forEach((record) => {
+          if (!record.is_sync && new Date(record.creation) <= new Date(date)) {
+            record.is_sync = 1;
+            const updateRequest = store.put(record);
+            updateRequest.onsuccess = () => {
+              updatedCount++;
+              if (updatedCount === totalToUpdate) {
+                onSuccess();
+              }
+            };
+            updateRequest.onerror = (err) => {
+              onFailure(err);
+            };
+          }
+        });
+      };
+      request.onerror = (err) => onFailure(err);
     }
     updateSettings(settings) {
       return new Promise((resolve, reject) => {
@@ -4967,4 +5060,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.72I2M3JU.js.map
+//# sourceMappingURL=pos.bundle.IQW4KHVM.js.map

@@ -692,6 +692,23 @@ pos_ar.PointOfSale.pos_db  = class POSDatabase {
 		};
 	}
 
+	
+
+	getAllCheckInOut(){
+		return new Promise((resolve,reject)=>{
+			const transaction = this.db.transaction(['check_in_out'] , "readwrite");
+			const store       = transaction.objectStore('check_in_out');
+			const result      = store.getAll()
+			result.onsuccess = (event) => {
+				const value = event.target.result
+				resolve(value);
+			}
+			result.onerror = (err)=>{
+				reject(err)
+			}
+		})
+	}
+
 	getAllCheckInOut(){
 		return new Promise((resolve,reject)=>{
 			const transaction = this.db.transaction(['check_in_out'] , "readwrite");
@@ -732,6 +749,82 @@ pos_ar.PointOfSale.pos_db  = class POSDatabase {
 				reject(err);
 			};
 		})
+	}
+
+	updateCheckInOutSync(date) {
+		return new Promise((resolve, reject) => {
+			const transaction = this.db.transaction(['check_in_out'], 'readwrite');
+			const store = transaction.objectStore('check_in_out');
+			const request = store.getAll();
+			
+			request.onsuccess = (event) => {
+				const records = event.target.result;
+				const updatePromises = []; // Define the array here
+				
+				records.forEach(record => {
+					console.log("date : " , new Date(record.creation_time) , "the dat " , new Date(date) ,"record :  ",record)
+					if (!record.is_sync && new Date(record.creation_time) <= new Date(date)) {
+						console.log("======>we are hereeee record :  ",record)
+						record.is_sync = 1;
+						updatePromises.push(new Promise((resolveUpdate, rejectUpdate) => {
+							const updateRequest = store.put(record);
+							updateRequest.onsuccess = () => resolveUpdate();
+							updateRequest.onerror = (err) => rejectUpdate(err);
+						}));
+					}
+				});
+				
+				Promise.all(updatePromises)
+					.then(() => resolve())
+					.catch(err => reject(err));
+			};
+			
+			request.onerror = (err) => reject(err);
+		});
+	}
+
+	updateCheckInOutSync_callback(date, onSuccess, onFailure) {
+		const transaction = this.db.transaction(['check_in_out'], 'readwrite');
+		const store = transaction.objectStore('check_in_out');
+		const request = store.getAll();
+		
+		request.onsuccess = (event) => {
+			const records = event.target.result;
+			let updatedCount = 0;
+			let totalToUpdate = 0;
+			
+			// First count how many records need updating
+			records.forEach(record => {
+				if (!record.is_sync && new Date(record.creation) <= new Date(date)) {
+					totalToUpdate++;
+				}
+			});
+			
+			if (totalToUpdate === 0) {
+				onSuccess();
+				return;
+			}
+			
+			records.forEach(record => {
+				if (!record.is_sync && new Date(record.creation) <= new Date(date)) {
+					record.is_sync = 1;
+					const updateRequest = store.put(record);
+					
+					updateRequest.onsuccess = () => {
+						updatedCount++;
+						if (updatedCount === totalToUpdate) {
+							onSuccess();
+						}
+					};
+					
+					updateRequest.onerror = (err) => {
+						onFailure(err);
+					};
+				}
+			});
+		};
+		
+		request.onerror = (err) => onFailure(err);
 	}
 
 	/****************************** pos settings *********************************/
