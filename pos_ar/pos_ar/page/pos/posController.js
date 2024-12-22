@@ -417,7 +417,7 @@ pos_ar.PointOfSale.Controller = class {
 	}
 
 
-        init_paymentCart(){
+    init_paymentCart(){
 		this.payment_cart = new pos_ar.PointOfSale.pos_payment_cart(
 									this.$leftSection,
 									this.selectedItemMaps,
@@ -432,9 +432,9 @@ pos_ar.PointOfSale.Controller = class {
 										this.onInput(event , field , value);
 									},
 								)
-        }
+    }
 
-        init_historyCart(){
+    init_historyCart(){
 		this.history_cart = new pos_ar.PointOfSale.pos_history(
 									this.wrapper,
 									this.db,
@@ -445,16 +445,16 @@ pos_ar.PointOfSale.Controller = class {
 									this.taxes_and_charges,
 									this.historyCartClick.bind(this)
 								)
-        }
+    }
 
-        init_checkInOutCart(){
+    init_checkInOutCart(){
 		this.check_in_out_cart = new pos_ar.PointOfSale.pos_check_in_out(
 									this.wrapper,
 									this.db
 								)
-        }
+    }
 
-        init_debtCart(){
+    init_debtCart(){
 		this.debt_cart = new pos_ar.PointOfSale.pos_debt_cart(
 									this.wrapper,
 									this.appData
@@ -462,18 +462,18 @@ pos_ar.PointOfSale.Controller = class {
 	}
 
 
-        init_settingsCart(){
+    init_settingsCart(){
 		this.settings_cart = new pos_ar.PointOfSale.pos_settings(
 									this.wrapper,
 									this.settings_data,
 									this.appData.appData.pos_profile,
 									this.onSettingsChange.bind(this)
 								)
-        }
+    }
 
 
 
-        /*********************  callbacks functions ******************************/
+    /*********************  callbacks functions ******************************/
 
 
 	itemClick_selector(item , refresh){
@@ -1362,15 +1362,7 @@ pos_ar.PointOfSale.Controller = class {
 			(allUnsyncedPos) =>{
 				//create progress bar
 				frappe.show_progress('Syncing Invoices...' , 0 , allUnsyncedPos.length , 'syncing')
-				const unsyncedChecks = this.check_in_out_cart.checkList.filter(check => check.is_sync === 0);
-				unsyncedChecks.forEach(check => {
-					let child = frappe.model.add_child(voucher, 'check_in_out', 'custom_check_in_out')
-					child.check_type = check.check_type
-					child.creation_time = check.creation_time
-					child.amount = check.amount
-					child.reason = check.reason
-					child.user = check.owner
-				})
+
 				allUnsyncedPos.forEach(pos=>{
 					// we still didnt implement the  base_paid_amount and amount_eligible_for_commissionseen
 					// value in deafault pos ==>  ["Administrator"]. i think it is an array.
@@ -1457,7 +1449,7 @@ pos_ar.PointOfSale.Controller = class {
 	onClosePOS(){
 		//check if you still have an invoice to sync
 		if(this.unsyncedPos > 0){
-			frappe.throw(__(`you have ${all_tabs.length} invoice to sync first.`))
+			frappe.throw(__(`you have  some invoices to sync first.`))
 		}
 		//otherwise you can close the voucher
 		let voucher               = frappe.model.get_new_doc("POS Closing Entry");

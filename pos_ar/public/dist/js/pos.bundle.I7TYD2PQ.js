@@ -995,15 +995,6 @@
       this.appData.getNotSyncedPos(
         (allUnsyncedPos) => {
           frappe.show_progress("Syncing Invoices...", 0, allUnsyncedPos.length, "syncing");
-          const unsyncedChecks = this.check_in_out_cart.checkList.filter((check) => check.is_sync === 0);
-          unsyncedChecks.forEach((check) => {
-            let child = frappe.model.add_child(voucher, "check_in_out", "custom_check_in_out");
-            child.check_type = check.check_type;
-            child.creation_time = check.creation_time;
-            child.amount = check.amount;
-            child.reason = check.reason;
-            child.user = check.owner;
-          });
           allUnsyncedPos.forEach((pos) => {
             frappe.db.insert(
               pos
@@ -1065,27 +1056,27 @@
     }
     onClosePOS() {
       if (this.unsyncedPos > 0) {
-        frappe.throw(__(`you have ${all_tabs.length} invoice to sync first.`));
+        frappe.throw(__(`you have  some invoices to sync first.`));
       }
-      let voucher2 = frappe.model.get_new_doc("POS Closing Entry");
-      voucher2.pos_opening_entry = this.POSOpeningEntry.name;
-      voucher2.pos_profile = this.POSOpeningEntry.pos_profile;
-      voucher2.company = this.POSOpeningEntry.company;
-      voucher2.user = frappe.session.user;
-      voucher2.posting_date = frappe.datetime.now_date();
-      voucher2.posting_time = frappe.datetime.now_time();
+      let voucher = frappe.model.get_new_doc("POS Closing Entry");
+      voucher.pos_opening_entry = this.POSOpeningEntry.name;
+      voucher.pos_profile = this.POSOpeningEntry.pos_profile;
+      voucher.company = this.POSOpeningEntry.company;
+      voucher.user = frappe.session.user;
+      voucher.posting_date = frappe.datetime.now_date();
+      voucher.posting_time = frappe.datetime.now_time();
       const unsyncedChecks = this.check_in_out_cart.checkList.filter((check) => check.is_sync === 0);
       unsyncedChecks.forEach((check) => {
-        let child = frappe.model.add_child(voucher2, "check_in_out", "custom_check_in_out");
+        let child = frappe.model.add_child(voucher, "check_in_out", "custom_check_in_out");
         child.check_type = check.check_type;
         child.creation_time = check.creation_time;
         child.amount = check.amount;
         child.reason = check.reason;
         child.user = check.owner;
       });
-      frappe.set_route("Form", "POS Closing Entry", voucher2.name).then(() => {
+      frappe.set_route("Form", "POS Closing Entry", voucher.name).then(() => {
         window.addEventListener("popstate", (event2) => {
-          frappe.set_route("Form", "POS Closing Entry", voucher2.name);
+          frappe.set_route("Form", "POS Closing Entry", voucher.name);
         });
       });
       this.POSOpeningEntry.name = "";
@@ -5060,4 +5051,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.IQW4KHVM.js.map
+//# sourceMappingURL=pos.bundle.I7TYD2PQ.js.map
