@@ -3721,7 +3721,6 @@
           records.forEach((record) => {
             console.log("date : ", new Date(record.creation_time), "the dat ", new Date(date), "record :  ", record);
             if (!record.is_sync && new Date(record.creation_time) <= new Date(date)) {
-              console.log("======>we are hereeee record :  ", record);
               record.is_sync = 1;
               updatePromises.push(new Promise((resolveUpdate, rejectUpdate) => {
                 const updateRequest = store.put(record);
@@ -5051,4 +5050,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.I7TYD2PQ.js.map
+//# sourceMappingURL=pos.bundle.DCUG2DZG.js.map

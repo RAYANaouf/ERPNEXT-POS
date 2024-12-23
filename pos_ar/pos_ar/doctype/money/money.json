@@ -6,19 +6,42 @@
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
-  "5_da"
+  "money",
+  "qty",
+  "total"
  ],
  "fields": [
   {
-   "fieldname": "5_da",
+   "fieldname": "money",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "money",
+   "options": "5 DA\n10 DA\n20 DA\n50 DA\n100 DA\n200 DA\n500 DA\n1000 DA\n2000 DA",
+   "reqd": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "qty",
    "fieldtype": "Int",
-   "label": "5 DA"
+   "in_list_view": 1,
+   "label": "qty",
+   "options": "0",
+   "reqd": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "total",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "total",
+   "non_negative": 1,
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2024-12-09 23:28:47.168049",
+ "modified": "2024-12-22 19:54:11.800424",
  "modified_by": "Administrator",
  "module": "POS AR",
  "name": "money",
