@@ -230,11 +230,11 @@ app_include_js = ["/assets/pos_ar/js/pos.bundle.js","/assets/pos_ar/js/sw.js"]
 fixtures = [
     {
         'dt': 'DocType',
-        'filters': [['name', 'in', ['check_in_out']]]
+        'filters': [['name', 'in', ['check_in_out' , 'money']]]
     },
     {
         'dt': 'Custom Field',
-        'filters': [['dt', 'in', ['POS Invoice', 'Customer']]]
+        'filters': [['dt', 'in', ['POS Invoice', 'Customer' , 'POS Closing Entry']]]
     },
     {
         'dt': 'Client Script',
