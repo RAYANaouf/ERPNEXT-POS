@@ -39,6 +39,9 @@ pos_ar.PointOfSale.Controller = class {
 			//local app data
 			this.appData       = new pos_ar.PointOfSale.posAppData(this.db , this.dataHandler)
 			await this.appData.getAllData()
+			
+			//init screen manager
+			this.screenManager = new pos_ar.PointOfSale.ScreenManager(this.settings_data);
 
 			this.toggleKeyboardMode(!this.settings_data.settings.showItemDetails);
 
@@ -159,21 +162,21 @@ pos_ar.PointOfSale.Controller = class {
 		}
 	}
 
-        /***********************  ui ******************************************/
+    /***********************  ui ******************************************/
 
-        prepare_container(){
-                //append css styles
-                this.wrapper.append('<link rel="stylesheet" type="text/css" href="/assets/pos_ar/css/selectorBox.css">')
-                this.wrapper.append('<link rel="stylesheet" type="text/css" href="/assets/pos_ar/css/checkInOutCart.css">')
-                this.wrapper.append('<link rel="stylesheet" type="text/css" href="/assets/pos_ar/css/itemDetailsCart.css">')
-                this.wrapper.append('<link rel="stylesheet" type="text/css" href="/assets/pos_ar/css/paymentMethodCart.css">')
-                this.wrapper.append('<link rel="stylesheet" type="text/css" href="/assets/pos_ar/css/customerBox.css">')
-                this.wrapper.append('<link rel="stylesheet" type="text/css" href="/assets/pos_ar/css/cartBox.css">')
-                this.wrapper.append('<link rel="stylesheet" type="text/css" href="/assets/pos_ar/css/historyCarts.css">')
+    prepare_container(){
+            //append css styles
+            this.wrapper.append('<link rel="stylesheet" type="text/css" href="/assets/pos_ar/css/selectorBox.css">')
+            this.wrapper.append('<link rel="stylesheet" type="text/css" href="/assets/pos_ar/css/checkInOutCart.css">')
+            this.wrapper.append('<link rel="stylesheet" type="text/css" href="/assets/pos_ar/css/itemDetailsCart.css">')
+            this.wrapper.append('<link rel="stylesheet" type="text/css" href="/assets/pos_ar/css/paymentMethodCart.css">')
+            this.wrapper.append('<link rel="stylesheet" type="text/css" href="/assets/pos_ar/css/customerBox.css">')
+            this.wrapper.append('<link rel="stylesheet" type="text/css" href="/assets/pos_ar/css/cartBox.css">')
+            this.wrapper.append('<link rel="stylesheet" type="text/css" href="/assets/pos_ar/css/historyCarts.css">')
 
-                this.wrapper.append('<div id="MainContainer" class="rowBoxReverse"></div>');
-                this.$components_wrapper = this.wrapper.find("#MainContainer");
-        }
+            this.wrapper.append('<div id="MainContainer" class="rowBoxReverse"></div>');
+            this.$components_wrapper = this.wrapper.find("#MainContainer");
+    }
 
 	prepare_components(){
 		this.set_right_and_left_sections();
@@ -330,14 +333,14 @@ pos_ar.PointOfSale.Controller = class {
 
 
 
-        set_right_and_left_sections(){
-                this.$components_wrapper.append('<div id="LeftSection" class="columnBoxReverse"></div>')
-                this.$components_wrapper.append('<div id="RightSection" class="columnBox"></div>')
+    set_right_and_left_sections(){
+        this.$components_wrapper.append('<div id="LeftSection" class="columnBoxReverse"></div>')
+        this.$components_wrapper.append('<div id="RightSection" class="columnBox"></div>')
 
 		this.$rightSection = this.$components_wrapper.find("#RightSection")
 		this.$leftSection  = this.$components_wrapper.find("#LeftSection")
 
-        }
+    }
 
 
 	init_customer_box(){
@@ -351,26 +354,32 @@ pos_ar.PointOfSale.Controller = class {
 									this.onMenuClick.bind(this),
 									this.onDebtClick.bind(this)
 								)
+
+		this.screenManager.registerScreen("customer_box" , this.customer_box);
+		this.screenManager.customer_box = this.customer_box ; 
 	}
 
 
-        init_item_selector(){
+    init_item_selector(){
 
-                this.item_selector = new pos_ar.PointOfSale.pos_item_selector(
-						this.$leftSection                  ,
-						this.appData.appData.items         ,
-						this.appData.appData.item_barcodes ,
-						this.appData.appData.item_groups   ,
-						this.appData.appData.item_prices   ,
-						this.settings_data.settings        ,
-						this.defaultPriceList              ,
-						this.getItemPrice.bind(this)       ,
-						this.auto_select.bind(this)        ,
-						item => { this.itemClick_selector(item)  }
-					)
+        this.item_selector = new pos_ar.PointOfSale.pos_item_selector(
+				this.$leftSection                  ,
+				this.appData.appData.items         ,
+				this.appData.appData.item_barcodes ,
+				this.appData.appData.item_groups   ,
+				this.appData.appData.item_prices   ,
+				this.settings_data.settings        ,
+				this.defaultPriceList              ,
+				this.getItemPrice.bind(this)       ,
+				this.auto_select.bind(this)        ,
+				item => { this.itemClick_selector(item)  }
+		)
+		
+		this.screenManager.registerScreen("item_selector" , this.item_selector);
+		this.screenManager.item_selector = this.item_selector ; 
 	}
 
-        init_selected_item(){
+    init_selected_item(){
 		this.selected_item_cart  = new pos_ar.PointOfSale.pos_selected_item_cart(
 									this.$rightSection    ,
 									this.settings_data    ,
@@ -398,6 +407,8 @@ pos_ar.PointOfSale.Controller = class {
 									this.savePosInvoice.bind(this),
 									this.db
 								)
+		this.screenManager.registerScreen("selected_item_cart" , this.selected_item_cart);
+		this.screenManager.selected_item_cart = this.selected_item_cart ; 
 	}
 
 	init_item_details(){
@@ -414,6 +425,8 @@ pos_ar.PointOfSale.Controller = class {
 									},
 									this.onClose_details.bind(this)
 								)
+		this.screenManager.registerScreen("item_details" , this.item_details);
+		this.screenManager.item_details = this.item_details ; 
 	}
 
 
@@ -432,6 +445,8 @@ pos_ar.PointOfSale.Controller = class {
 										this.onInput(event , field , value);
 									},
 								)
+		this.screenManager.registerScreen("payment_cart" , this.payment_cart);
+		this.screenManager.payment_cart = this.payment_cart ; 
     }
 
     init_historyCart(){
@@ -445,6 +460,8 @@ pos_ar.PointOfSale.Controller = class {
 									this.taxes_and_charges,
 									this.historyCartClick.bind(this)
 								)
+		this.screenManager.registerScreen("history_cart" , this.history_cart);
+		this.screenManager.history_cart = this.history_cart ; 
     }
 
     init_checkInOutCart(){
@@ -452,6 +469,8 @@ pos_ar.PointOfSale.Controller = class {
 									this.wrapper,
 									this.db
 								)
+		this.screenManager.registerScreen("check_in_out_cart" , this.check_in_out_cart);
+		this.screenManager.check_in_out_cart = this.check_in_out_cart ; 
     }
 
     init_debtCart(){
@@ -459,6 +478,8 @@ pos_ar.PointOfSale.Controller = class {
 									this.wrapper,
 									this.appData
 								)
+		this.screenManager.registerScreen("debt_cart" , this.debt_cart);
+		this.screenManager.debt_cart = this.debt_cart ; 
 	}
 
 
@@ -469,6 +490,8 @@ pos_ar.PointOfSale.Controller = class {
 									this.appData.appData.pos_profile,
 									this.onSettingsChange.bind(this)
 								)
+		this.screenManager.registerScreen("settings_cart" , this.settings_cart);
+		this.screenManager.settings_cart = this.settings_cart ; 
     }
 
 
@@ -593,35 +616,15 @@ pos_ar.PointOfSale.Controller = class {
 	}
 
 	onClose_details(){
-		//show
-		this.item_selector.showCart();
-		//hide
-		this.payment_cart.hideCart() ;
-		this.item_details.hide_cart();
-		if(this.settings_data.settings.showItemDetails){
-			this.selected_item_cart.hideKeyboard();
-		}
-		this.debt_cart.hideCart();
-		this.settings_cart.hideCart();
-		//change display
-		this.selected_item_cart.setKeyboardOrientation("portrait");
-		this.selected_item_cart.cleanHeighlight();
+		this.screenManager.navigate("home");
+	}
+	onClose_payment_cart(){
+		this.screenManager.navigate("home");
 	}
 
 
-
 	onDebtClick(){
-		//show
-		this.debt_cart.showCart();
-		this.customer_box.showHomeBar();
-
-		//hide
-		this.item_selector.hideCart();
-		this.selected_item_cart.hideCart();
-		this.item_details.hide_cart();
-		this.settings_cart.hideCart();
-		this.payment_cart.hideCart();
-		this.check_in_out_cart.hideCart();
+		this.screenManager.navigate("debt_cart");
 	}
 
 	auto_select(item){
@@ -629,87 +632,25 @@ pos_ar.PointOfSale.Controller = class {
 		this.item_selector.refresh()
 	}
 
-	onClose_payment_cart(){
-		//show
-		this.item_selector.showCart();
-		//hide
-		this.item_details.hide_cart();
-		this.payment_cart.hideCart();
-		if(this.settings_data.settings.showItemDetails){
-			this.selected_item_cart.hideKeyboard();
-		}
-		this.settings_cart.hideCart();
-		//update ui
-		this.selected_item_cart.setKeyboardOrientation("portrait");
-		this.selected_item_cart.cleanHeighlight();
-	}
+
 
 	onMenuClick(menu){
 		if(menu == 'recent_pos'){
-			//show
-			this.history_cart.show_cart()
-			this.customer_box.showHomeBar();
-			//hide
-			this.payment_cart.hideCart();
-			this.item_details.hide_cart();
-			this.item_selector.hideCart();
-			this.selected_item_cart.hideCart();
-			this.customer_box.hideSyncBar();
-			this.settings_cart.hideCart();
-			this.check_in_out_cart.hideCart();
-			this.debt_cart.hideCart();
+			this.screenManager.navigate("history_cart");
 		}
 		else if(menu == 'close_pos'){
 			this.onClosePOS()
 		}
 		else if(menu == 'settings'){
-			//show settings
-			this.settings_cart.showCart()
-			this.customer_box.showHomeBar();
-			//hide
-			this.item_selector.hideCart();
-			this.selected_item_cart.hideCart();
-			this.item_details.hide_cart() ;
-			this.payment_cart.hideCart()  ;
-			this.history_cart.hide_cart() ;
-			this.check_in_out_cart.hideCart();
-			this.debt_cart.hideCart();
-			//hide section
-			this.customer_box.hideSyncBar();
+			this.screenManager.navigate("settings_cart");
 		}
 		else if(menu == 'checkInOut'){
-			//show
-			this.check_in_out_cart.showCart();
-			this.customer_box.showHomeBar();
-
-			//hide
-			this.item_selector.hideCart();
-			this.selected_item_cart.hideCart();
-			this.item_details.hide_cart() ;
-			this.payment_cart.hideCart()  ;
-			this.history_cart.hide_cart() ;
-			this.settings_cart.hideCart() ;
-			this.debt_cart.hideCart();
-
-			//hide section
-			this.customer_box.hideSyncBar();
+			this.screenManager.navigate("check_in_out_cart");
 		}
 	}
 
 	backHome(){
-		//show
-		this.item_selector.showCart()      ;
-		this.customer_box.showSyncBar()    ;
-		this.selected_item_cart.showCart() ;
-
-		//hide
-		this.payment_cart.hideCart()   ;
-		this.customer_box.hideHomeBar();
-		this.item_details.hide_cart()  ;
-		this.history_cart.hide_cart()  ;
-		this.settings_cart.hideCart()  ;
-		this.debt_cart.hideCart();
-		this.check_in_out_cart.hideCart();
+		this.screenManager.navigate("home");
 	}
 
 	getDefaultPaymentMethod(){

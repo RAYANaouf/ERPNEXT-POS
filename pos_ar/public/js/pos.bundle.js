@@ -8,6 +8,8 @@ import "../../pos_ar/page/pos/pos_history.js"
 import "../../pos_ar/page/pos/pos_db.js"
 import "../../pos_ar/page/pos/pos_settings.js"
 import "../../pos_ar/page/pos/pos_check_in_out.js"
+import "../../pos_ar/page/pos/pos_debt_cart.js"
+
 
 //data classes
 import "../../pos_ar/page/pos/data/posSettingsData.js"
@@ -17,4 +19,7 @@ import "../../pos_ar/page/pos/data/posAppData.js"
 import "../../pos_ar/page/pos/remoteApi/FetchHandler.js"
 
 
-import "../../pos_ar/page/pos/pos_debt_cart.js"
+
+
+//screen manager
+import "../../pos_ar/page/pos/manager/ScreenManager.js"

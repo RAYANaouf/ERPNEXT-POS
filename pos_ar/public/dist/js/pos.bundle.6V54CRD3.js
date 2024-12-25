@@ -44,6 +44,7 @@
         this.dataHandler = new pos_ar.PointOfSale.FetchHandler();
         this.appData = new pos_ar.PointOfSale.posAppData(this.db, this.dataHandler);
         await this.appData.getAllData();
+        this.screenManager = new pos_ar.PointOfSale.ScreenManager(this.settings_data);
         this.toggleKeyboardMode(!this.settings_data.settings.showItemDetails);
         console.log("see app data : ", this.appData.appData, "opened pos : ", await this.appData.getAllOpenedPosInvoice());
         this.prepare_container();
@@ -303,6 +304,8 @@
         this.onMenuClick.bind(this),
         this.onDebtClick.bind(this)
       );
+      this.screenManager.registerScreen("customer_box", this.customer_box);
+      this.screenManager.customer_box = this.customer_box;
     }
     init_item_selector() {
       this.item_selector = new pos_ar.PointOfSale.pos_item_selector(
@@ -319,6 +322,8 @@
           this.itemClick_selector(item);
         }
       );
+      this.screenManager.registerScreen("item_selector", this.item_selector);
+      this.screenManager.item_selector = this.item_selector;
     }
     init_selected_item() {
       this.selected_item_cart = new pos_ar.PointOfSale.pos_selected_item_cart(
@@ -348,6 +353,8 @@
         this.savePosInvoice.bind(this),
         this.db
       );
+      this.screenManager.registerScreen("selected_item_cart", this.selected_item_cart);
+      this.screenManager.selected_item_cart = this.selected_item_cart;
     }
     init_item_details() {
       this.item_details = new pos_ar.PointOfSale.pos_item_details(
@@ -363,6 +370,8 @@
         },
         this.onClose_details.bind(this)
       );
+      this.screenManager.registerScreen("item_details", this.item_details);
+      this.screenManager.item_details = this.item_details;
     }
     init_paymentCart() {
       this.payment_cart = new pos_ar.PointOfSale.pos_payment_cart(
@@ -379,6 +388,8 @@
           this.onInput(event2, field, value);
         }
       );
+      this.screenManager.registerScreen("payment_cart", this.payment_cart);
+      this.screenManager.payment_cart = this.payment_cart;
     }
     init_historyCart() {
       this.history_cart = new pos_ar.PointOfSale.pos_history(
@@ -391,18 +402,24 @@
         this.taxes_and_charges,
         this.historyCartClick.bind(this)
       );
+      this.screenManager.registerScreen("history_cart", this.history_cart);
+      this.screenManager.history_cart = this.history_cart;
     }
     init_checkInOutCart() {
       this.check_in_out_cart = new pos_ar.PointOfSale.pos_check_in_out(
         this.wrapper,
         this.db
       );
+      this.screenManager.registerScreen("check_in_out_cart", this.check_in_out_cart);
+      this.screenManager.check_in_out_cart = this.check_in_out_cart;
     }
     init_debtCart() {
       this.debt_cart = new pos_ar.PointOfSale.pos_debt_cart(
         this.wrapper,
         this.appData
       );
+      this.screenManager.registerScreen("debt_cart", this.debt_cart);
+      this.screenManager.debt_cart = this.debt_cart;
     }
     init_settingsCart() {
       this.settings_cart = new pos_ar.PointOfSale.pos_settings(
@@ -411,6 +428,8 @@
         this.appData.appData.pos_profile,
         this.onSettingsChange.bind(this)
       );
+      this.screenManager.registerScreen("settings_cart", this.settings_cart);
+      this.screenManager.settings_cart = this.settings_cart;
     }
     itemClick_selector(item, refresh) {
       this.syncInput = false;
@@ -491,91 +510,31 @@
       this.selected_item_cart.showKeyboard();
     }
     onClose_details() {
-      this.item_selector.showCart();
-      this.payment_cart.hideCart();
-      this.item_details.hide_cart();
-      if (this.settings_data.settings.showItemDetails) {
-        this.selected_item_cart.hideKeyboard();
-      }
-      this.debt_cart.hideCart();
-      this.settings_cart.hideCart();
-      this.selected_item_cart.setKeyboardOrientation("portrait");
-      this.selected_item_cart.cleanHeighlight();
+      this.screenManager.navigate("home");
+    }
+    onClose_payment_cart() {
+      this.screenManager.navigate("home");
     }
     onDebtClick() {
-      this.debt_cart.showCart();
-      this.customer_box.showHomeBar();
-      this.item_selector.hideCart();
-      this.selected_item_cart.hideCart();
-      this.item_details.hide_cart();
-      this.settings_cart.hideCart();
-      this.payment_cart.hideCart();
-      this.check_in_out_cart.hideCart();
+      this.screenManager.navigate("debt_cart");
     }
     auto_select(item) {
       this.itemClick_selector(item);
       this.item_selector.refresh();
     }
-    onClose_payment_cart() {
-      this.item_selector.showCart();
-      this.item_details.hide_cart();
-      this.payment_cart.hideCart();
-      if (this.settings_data.settings.showItemDetails) {
-        this.selected_item_cart.hideKeyboard();
-      }
-      this.settings_cart.hideCart();
-      this.selected_item_cart.setKeyboardOrientation("portrait");
-      this.selected_item_cart.cleanHeighlight();
-    }
     onMenuClick(menu) {
       if (menu == "recent_pos") {
-        this.history_cart.show_cart();
-        this.customer_box.showHomeBar();
-        this.payment_cart.hideCart();
-        this.item_details.hide_cart();
-        this.item_selector.hideCart();
-        this.selected_item_cart.hideCart();
-        this.customer_box.hideSyncBar();
-        this.settings_cart.hideCart();
-        this.check_in_out_cart.hideCart();
-        this.debt_cart.hideCart();
+        this.screenManager.navigate("history_cart");
       } else if (menu == "close_pos") {
         this.onClosePOS();
       } else if (menu == "settings") {
-        this.settings_cart.showCart();
-        this.customer_box.showHomeBar();
-        this.item_selector.hideCart();
-        this.selected_item_cart.hideCart();
-        this.item_details.hide_cart();
-        this.payment_cart.hideCart();
-        this.history_cart.hide_cart();
-        this.check_in_out_cart.hideCart();
-        this.debt_cart.hideCart();
-        this.customer_box.hideSyncBar();
+        this.screenManager.navigate("settings_cart");
       } else if (menu == "checkInOut") {
-        this.check_in_out_cart.showCart();
-        this.customer_box.showHomeBar();
-        this.item_selector.hideCart();
-        this.selected_item_cart.hideCart();
-        this.item_details.hide_cart();
-        this.payment_cart.hideCart();
-        this.history_cart.hide_cart();
-        this.settings_cart.hideCart();
-        this.debt_cart.hideCart();
-        this.customer_box.hideSyncBar();
+        this.screenManager.navigate("check_in_out_cart");
       }
     }
     backHome() {
-      this.item_selector.showCart();
-      this.customer_box.showSyncBar();
-      this.selected_item_cart.showCart();
-      this.payment_cart.hideCart();
-      this.customer_box.hideHomeBar();
-      this.item_details.hide_cart();
-      this.history_cart.hide_cart();
-      this.settings_cart.hideCart();
-      this.debt_cart.hideCart();
-      this.check_in_out_cart.hideCart();
+      this.screenManager.navigate("home");
     }
     getDefaultPaymentMethod() {
       let result = null;
@@ -4214,6 +4173,260 @@
     }
   };
 
+  // ../pos_ar/pos_ar/pos_ar/page/pos/pos_debt_cart.js
+  pos_ar.PointOfSale.pos_debt_cart = class {
+    constructor(wrapper, appData) {
+      this.wrapper = wrapper;
+      this.app_data = appData;
+      this._filtredClientList = this.app_data.appData.customers;
+      this.selected_client = {};
+      this.payment_amount = 0;
+      this._pos_invoice = [];
+      this._sales_invoice = [];
+      this._selected_invoice = [];
+      this.start_work();
+    }
+    start_work() {
+      this.prepare_cart();
+      this.refreshClientPart();
+      this.setListener();
+    }
+    prepare_cart() {
+      this.wrapper.find("#LeftSection").append('<div id="debtLeftContainer" class="columnBox"></div>');
+      this.wrapper.find("#RightSection").append('<div id="debtRightContainer" class="columnBox"></div>');
+      this.leftContainer = this.wrapper.find("#debtLeftContainer");
+      this.rightContainer = this.wrapper.find("#debtRightContainer");
+      this.rightContainer.append(`
+			<div class="debt-header">
+				<input type="text" 
+					id="debt_filterClientList" 
+					placeholder="Search customers..."
+				>
+			</div>
+			<div id="debt_customerList"></div>
+		`);
+      this.customerList = this.rightContainer.find("#debt_customerList");
+      this.leftContainer.append(`
+			<div class="payment-header">
+				<div class="amount-input">
+					<input id="debt_paymentAmount" type="number" placeholder="Enter amount">
+				</div>
+				<div id="total_client_debt">Total: 0 DA</div>
+				<div id="partially_client_debt">Selected: 0 DA</div>
+				<button id="pay_selected_invoices_btn">Pay</button>
+			</div>
+			<div id="debt_debtsList"></div>
+		`);
+      this.leftContainer.append(`
+			<script src="https://unpkg.com/@dotlottie/player-component@2.7.12/dist/dotlottie-player.mjs" type="module"><\/script>
+			<div id="debt_waitingContainer" style="display:none;">
+				<dotlottie-player 
+					src="https://lottie.host/d6c76206-aab9-4d5a-af73-c4a6cfc5aaa9/H8vnpKcKj9.lottie" 
+					background="transparent" 
+					speed="1" 
+					style="width: 300px; height: 300px" 
+					loop 
+					autoplay
+				></dotlottie-player>
+			</div>
+		`);
+      this.waiting_cart = this.leftContainer.find("#debt_waitingContainer");
+      this.total_client_debt = this.leftContainer.find("#total_client_debt");
+      this.partially_client_debt = this.leftContainer.find("#partially_client_debt");
+      this.pay_selected_invoices_btn = this.leftContainer.find("#pay_selected_invoices_btn");
+      this.debtList = this.leftContainer.find("#debt_debtsList");
+    }
+    add_customer_to_list(customer) {
+      const customerElement = document.createElement("div");
+      customerElement.className = "customer-item";
+      customerElement.innerHTML = `
+			<div class="customer-name">${customer.customer_name}</div>
+			<div class="customer-info">
+				<span>${customer.customer_primary_contact || ""}</span>
+				<span>${customer.mobile_no || ""}</span>
+			</div>
+		`;
+      customerElement.addEventListener("click", () => {
+        this.customerList.find(".customer-item").removeClass("selected");
+        customerElement.classList.add("selected");
+        this.selected_client = structuredClone(customer);
+        this.refreshClientDebtPart(customer);
+      });
+      this.customerList.append(customerElement);
+    }
+    showCart() {
+      this.leftContainer.css("display", "flex");
+      this.rightContainer.css("display", "flex");
+    }
+    hideCart() {
+      this.leftContainer.css("display", "none");
+      this.rightContainer.css("display", "none");
+    }
+    show_waiting() {
+      this.waiting_cart.css("display", "flex");
+    }
+    hide_waiting() {
+      this.waiting_cart.css("display", "none");
+    }
+    setListener() {
+      this.rightContainer.find("#debt_filterClientList").on("input", (event2) => {
+        const value = this.rightContainer.find("#debt_filterClientList").val().trim().toLowerCase();
+        this._filtredClientList = this.app_data.appData.customers.filter(
+          (customer) => customer.customer_name.toLowerCase().includes(value)
+        );
+        this.refreshClientPart();
+      });
+      this.leftContainer.find("#debt_paymentAmount").on("input", (event2) => {
+        this.payment_amount = parseFloat(this.leftContainer.find("#debt_paymentAmount").val());
+      });
+      this.pay_selected_invoices_btn.on("click", async () => {
+        console.log("check the list ==> ", this._selected_invoice);
+        this.paySelectedInvoice();
+      });
+      this.debtList.on("click", '.invoiceBox input[type="checkbox"]', (event2) => {
+        const checkbox = $(event2.target);
+        const invoiceName = checkbox.data("invoice-name");
+        const invoiceOutstandingAmount = checkbox.data("outstanding-amount");
+        const invoiceType = checkbox.data("invoice-type");
+        const invoice_data = { "name": invoiceName, "outstanding_amount": invoiceOutstandingAmount, "type": invoiceType };
+        if (checkbox.is(":checked")) {
+          if (!this._selected_invoice.some((invoice) => invoice.name == invoiceName)) {
+            this._selected_invoice.push(invoice_data);
+          }
+        } else {
+          const index = this._selected_invoice.findIndex((invoice) => invoice.name == invoiceName);
+          if (index > -1) {
+            this._selected_invoice.splice(index, 1);
+          }
+        }
+        this.refresh_partially_paid();
+      });
+    }
+    refreshClientPart() {
+      this.customerList.html("");
+      this._filtredClientList.forEach((customer) => {
+        this.add_customer_to_list(customer);
+      });
+    }
+    refreshTotal(total_debt) {
+      this.total_client_debt.text(`Total Debt : ${total_debt} DA`);
+    }
+    refresh_partially_paid() {
+      let partially_paid = 0;
+      this._selected_invoice.forEach((invoice) => {
+        partially_paid += invoice.outstanding_amount;
+        console.log("see invoice ==> ", invoice);
+      });
+      this.partially_client_debt.text(`Selected Debt : ${partially_paid} DA`);
+    }
+    async refreshClientDebtPart(customer) {
+      this.refreshTotal("Loading ...");
+      this._selected_invoice = [];
+      this.refresh_partially_paid();
+      const invoiceStyle = "width:calc(100% - 40px);height:60px;min-height:60px;border-bottom:2px solid #505050;";
+      const payBtnStyle = "width:80px;height:35px;color:white;background:green;border-radius:12px;margin:0px 20px;cursor:pointer;";
+      let total_debt = 0;
+      this.debtList.html("");
+      const result = await this.app_data.fetchDebts(customer.name);
+      const result2 = await this.app_data.fetchDebtsSalesInvoices(customer.name);
+      result.forEach((invoice) => {
+        total_debt += invoice.outstanding_amount;
+        const customerBox = $(
+          `<div  style="${invoiceStyle}" class="rowBox C_A_Center invoiceBox" data-invoice-name="${invoice.name}"></div>`
+        );
+        const checkbox = $(`<input type="checkbox" class="select_checkbox" style="margin:0px 16px;" data-invoice-type="POS Invoice" data-invoice-name="${invoice.name}" data-outstanding-amount="${invoice.outstanding_amount}" ></input>`);
+        customerBox.append(`<div style="flex-grow:1;">${invoice.name}</div>`);
+        customerBox.append(`<div style="flex-grow:1;">${invoice.outstanding_amount} DA</div>`);
+        customerBox.append(`<div style="flex-grow:1;">${invoice.posting_date}</div>`);
+        customerBox.append(`<div style="flex-grow:1;">POS Invoice</div>`);
+        customerBox.append(`<div class="rowBox centerItem payBtn" style="${payBtnStyle}">Pay</div>`);
+        customerBox.find(".payBtn").on("click", async () => {
+          await this.payPosInvoice(invoice);
+        });
+        this.debtList.append(customerBox);
+      });
+      result2.forEach((invoice) => {
+        total_debt += invoice.outstanding_amount;
+        const customerBox = $(
+          `<div  style="${invoiceStyle}" class="rowBox C_A_Center invoiceBox" data-invoice-name="${invoice.name}"></div>`
+        );
+        customerBox.append(`<input type="checkbox" style="margin:0px 16px;" data-invoice-type="Sales Invoice" data-invoice-name="${invoice.name}" data-outstanding-amount="${invoice.outstanding_amount}" ></input>`);
+        customerBox.append(`<div style="flex-grow:1;">${invoice.name}</div>`);
+        customerBox.append(`<div style="flex-grow:1;">${invoice.outstanding_amount} DA</div>`);
+        customerBox.append(`<div style="flex-grow:1;">${invoice.posting_date}</div>`);
+        customerBox.append(`<div style="flex-grow:1;">Sales Invoice</div>`);
+        customerBox.append(`<div class="rowBox centerItem payBtn" style="${payBtnStyle}">Pay</div>`);
+        customerBox.find(".payBtn").on("click", async () => {
+          await this.paySalesInvoice(invoice);
+        });
+        this.debtList.append(customerBox);
+      });
+      this.refreshTotal(total_debt);
+    }
+    async payPosInvoice(invoice) {
+      const paymentAmount = parseFloat(this.payment_amount) || 0;
+      if (this.paymentAmount <= 0) {
+        frappe.msgprint(__("The paid amount should be grant than 0"));
+        return;
+      }
+      try {
+        this.show_waiting();
+        const result = await this.app_data.update_invoice_payment(invoice.name, this.payment_amount);
+        this.payment_amount = result.remaining;
+        this.leftContainer.find("#debt_paymentAmount").val(result.remaining);
+        await this.refreshClientDebtPart(this.selected_client);
+      } catch (error) {
+        console.error("Error processing payment:", error);
+        alert("An error occurred while processing the payment. Please try again.");
+      } finally {
+        this.hide_waiting();
+      }
+    }
+    async paySalesInvoice(invoice) {
+      try {
+        this.show_waiting();
+        const paymentAmount = parseFloat(this.payment_amount) || 0;
+        if (paymentAmount <= 0) {
+          frappe.msgprint(__("The paid amount should be grant than 0"));
+          return;
+        }
+        const result = await this.app_data.update_sales_invoice_payment(invoice.name, paymentAmount);
+        if (result && typeof result.remaining === "number") {
+          this.payment_amount = result.remaining;
+          this.leftContainer.find("#debt_paymentAmount").val(result.remaining);
+          await this.refreshClientDebtPart(this.selected_client);
+        } else {
+          throw new Error("Unexpected server response. Please try again.");
+        }
+      } catch (error) {
+        console.error("Error processing sales invoice payment:", error);
+        alert("An error occurred while processing the payment. Please try again later.");
+      } finally {
+        this.hide_waiting();
+      }
+    }
+    async paySelectedInvoice() {
+      console.log("we are here");
+      try {
+        this.show_waiting();
+        const paymentAmount = parseFloat(this.payment_amount) || 0;
+        const result = await this.app_data.paySelectedInvoice(this._selected_invoice, paymentAmount);
+        if (result && typeof result.remaining === "number") {
+          this.payment_amount = result.remaining;
+          this.leftContainer.find("#debt_paymentAmount").val(result.remaining);
+          await this.refreshClientDebtPart(this.selected_client);
+        } else {
+          throw new Error("Unexpected server response. Please try again.");
+        }
+      } catch (error) {
+        console.error("Error processing sales invoice payment:", error);
+        alert("An error occurred while processing the payment. Please try again later.");
+      } finally {
+        this.hide_waiting();
+      }
+    }
+  };
+
   // ../pos_ar/pos_ar/pos_ar/page/pos/data/posSettingsData.js
   pos_ar.PointOfSale.posSettingsData = class {
     constructor(db) {
@@ -4796,258 +5009,86 @@
     }
   };
 
-  // ../pos_ar/pos_ar/pos_ar/page/pos/pos_debt_cart.js
-  pos_ar.PointOfSale.pos_debt_cart = class {
-    constructor(wrapper, appData) {
-      this.wrapper = wrapper;
-      this.app_data = appData;
-      this._filtredClientList = this.app_data.appData.customers;
-      this.selected_client = {};
-      this.payment_amount = 0;
-      this._pos_invoice = [];
-      this._sales_invoice = [];
-      this._selected_invoice = [];
-      this.start_work();
+  // ../pos_ar/pos_ar/pos_ar/page/pos/manager/ScreenManager.js
+  pos_ar.PointOfSale.ScreenManager = class {
+    constructor(settings_data) {
+      this.settings_data = settings_data;
+      this.screens = /* @__PURE__ */ new Map();
+      this.activeScreen = null;
     }
-    start_work() {
-      this.prepare_cart();
-      this.refreshClientPart();
-      this.setListener();
+    registerScreen(screenId, screenComponent) {
+      this.screens.set(screenId, screenComponent);
     }
-    prepare_cart() {
-      this.wrapper.find("#LeftSection").append('<div id="debtLeftContainer" class="columnBox"></div>');
-      this.wrapper.find("#RightSection").append('<div id="debtRightContainer" class="columnBox"></div>');
-      this.leftContainer = this.wrapper.find("#debtLeftContainer");
-      this.rightContainer = this.wrapper.find("#debtRightContainer");
-      this.rightContainer.append(`
-			<div class="debt-header">
-				<input type="text" 
-					id="debt_filterClientList" 
-					placeholder="Search customers..."
-				>
-			</div>
-			<div id="debt_customerList"></div>
-		`);
-      this.customerList = this.rightContainer.find("#debt_customerList");
-      this.leftContainer.append(`
-			<div class="payment-header">
-				<div class="amount-input">
-					<input id="debt_paymentAmount" type="number" placeholder="Enter amount">
-				</div>
-				<div id="total_client_debt">Total: 0 DA</div>
-				<div id="partially_client_debt">Selected: 0 DA</div>
-				<button id="pay_selected_invoices_btn">Pay</button>
-			</div>
-			<div id="debt_debtsList"></div>
-		`);
-      this.leftContainer.append(`
-			<script src="https://unpkg.com/@dotlottie/player-component@2.7.12/dist/dotlottie-player.mjs" type="module"><\/script>
-			<div id="debt_waitingContainer" style="display:none;">
-				<dotlottie-player 
-					src="https://lottie.host/d6c76206-aab9-4d5a-af73-c4a6cfc5aaa9/H8vnpKcKj9.lottie" 
-					background="transparent" 
-					speed="1" 
-					style="width: 300px; height: 300px" 
-					loop 
-					autoplay
-				></dotlottie-player>
-			</div>
-		`);
-      this.waiting_cart = this.leftContainer.find("#debt_waitingContainer");
-      this.total_client_debt = this.leftContainer.find("#total_client_debt");
-      this.partially_client_debt = this.leftContainer.find("#partially_client_debt");
-      this.pay_selected_invoices_btn = this.leftContainer.find("#pay_selected_invoices_btn");
-      this.debtList = this.leftContainer.find("#debt_debtsList");
-    }
-    add_customer_to_list(customer) {
-      const customerElement = document.createElement("div");
-      customerElement.className = "customer-item";
-      customerElement.innerHTML = `
-			<div class="customer-name">${customer.customer_name}</div>
-			<div class="customer-info">
-				<span>${customer.customer_primary_contact || ""}</span>
-				<span>${customer.mobile_no || ""}</span>
-			</div>
-		`;
-      customerElement.addEventListener("click", () => {
-        this.customerList.find(".customer-item").removeClass("selected");
-        customerElement.classList.add("selected");
-        this.selected_client = structuredClone(customer);
-        this.refreshClientDebtPart(customer);
-      });
-      this.customerList.append(customerElement);
-    }
-    showCart() {
-      this.leftContainer.css("display", "flex");
-      this.rightContainer.css("display", "flex");
-    }
-    hideCart() {
-      this.leftContainer.css("display", "none");
-      this.rightContainer.css("display", "none");
-    }
-    show_waiting() {
-      this.waiting_cart.css("display", "flex");
-    }
-    hide_waiting() {
-      this.waiting_cart.css("display", "none");
-    }
-    setListener() {
-      this.rightContainer.find("#debt_filterClientList").on("input", (event2) => {
-        const value = this.rightContainer.find("#debt_filterClientList").val().trim().toLowerCase();
-        this._filtredClientList = this.app_data.appData.customers.filter(
-          (customer) => customer.customer_name.toLowerCase().includes(value)
-        );
-        this.refreshClientPart();
-      });
-      this.leftContainer.find("#debt_paymentAmount").on("input", (event2) => {
-        this.payment_amount = parseFloat(this.leftContainer.find("#debt_paymentAmount").val());
-      });
-      this.pay_selected_invoices_btn.on("click", async () => {
-        console.log("check the list ==> ", this._selected_invoice);
-        this.paySelectedInvoice();
-      });
-      this.debtList.on("click", '.invoiceBox input[type="checkbox"]', (event2) => {
-        const checkbox = $(event2.target);
-        const invoiceName = checkbox.data("invoice-name");
-        const invoiceOutstandingAmount = checkbox.data("outstanding-amount");
-        const invoiceType = checkbox.data("invoice-type");
-        const invoice_data = { "name": invoiceName, "outstanding_amount": invoiceOutstandingAmount, "type": invoiceType };
-        if (checkbox.is(":checked")) {
-          if (!this._selected_invoice.some((invoice) => invoice.name == invoiceName)) {
-            this._selected_invoice.push(invoice_data);
+    navigate(screenId) {
+      switch (screenId) {
+        case "history_cart":
+          console.log("history_cart");
+          this.history_cart.show_cart();
+          this.customer_box.showHomeBar();
+          this.payment_cart.hideCart();
+          this.item_details.hide_cart();
+          this.item_selector.hideCart();
+          this.selected_item_cart.hideCart();
+          this.customer_box.hideSyncBar();
+          this.settings_cart.hideCart();
+          this.check_in_out_cart.hideCart();
+          this.debt_cart.hideCart();
+          break;
+        case "settings_cart":
+          this.settings_cart.showCart();
+          this.customer_box.showHomeBar();
+          this.item_selector.hideCart();
+          this.selected_item_cart.hideCart();
+          this.item_details.hide_cart();
+          this.payment_cart.hideCart();
+          this.history_cart.hide_cart();
+          this.check_in_out_cart.hideCart();
+          this.debt_cart.hideCart();
+          this.customer_box.hideSyncBar();
+          break;
+        case "check_in_out_cart":
+          this.check_in_out_cart.showCart();
+          this.customer_box.showHomeBar();
+          this.item_selector.hideCart();
+          this.selected_item_cart.hideCart();
+          this.item_details.hide_cart();
+          this.payment_cart.hideCart();
+          this.history_cart.hide_cart();
+          this.settings_cart.hideCart();
+          this.debt_cart.hideCart();
+          this.customer_box.hideSyncBar();
+          break;
+        case "home":
+          this.item_selector.showCart();
+          this.customer_box.showSyncBar();
+          this.selected_item_cart.showCart();
+          this.payment_cart.hideCart();
+          this.customer_box.hideHomeBar();
+          this.item_details.hide_cart();
+          this.history_cart.hide_cart();
+          this.settings_cart.hideCart();
+          this.debt_cart.hideCart();
+          this.check_in_out_cart.hideCart();
+          if (this.settings_data.settings.showItemDetails) {
+            this.selected_item_cart.hideKeyboard();
           }
-        } else {
-          const index = this._selected_invoice.findIndex((invoice) => invoice.name == invoiceName);
-          if (index > -1) {
-            this._selected_invoice.splice(index, 1);
-          }
-        }
-        this.refresh_partially_paid();
-      });
-    }
-    refreshClientPart() {
-      this.customerList.html("");
-      this._filtredClientList.forEach((customer) => {
-        this.add_customer_to_list(customer);
-      });
-    }
-    refreshTotal(total_debt) {
-      this.total_client_debt.text(`Total Debt : ${total_debt} DA`);
-    }
-    refresh_partially_paid() {
-      let partially_paid = 0;
-      this._selected_invoice.forEach((invoice) => {
-        partially_paid += invoice.outstanding_amount;
-        console.log("see invoice ==> ", invoice);
-      });
-      this.partially_client_debt.text(`Selected Debt : ${partially_paid} DA`);
-    }
-    async refreshClientDebtPart(customer) {
-      this.refreshTotal("Loading ...");
-      this._selected_invoice = [];
-      this.refresh_partially_paid();
-      const invoiceStyle = "width:calc(100% - 40px);height:60px;min-height:60px;border-bottom:2px solid #505050;";
-      const payBtnStyle = "width:80px;height:35px;color:white;background:green;border-radius:12px;margin:0px 20px;cursor:pointer;";
-      let total_debt = 0;
-      this.debtList.html("");
-      const result = await this.app_data.fetchDebts(customer.name);
-      const result2 = await this.app_data.fetchDebtsSalesInvoices(customer.name);
-      result.forEach((invoice) => {
-        total_debt += invoice.outstanding_amount;
-        const customerBox = $(
-          `<div  style="${invoiceStyle}" class="rowBox C_A_Center invoiceBox" data-invoice-name="${invoice.name}"></div>`
-        );
-        const checkbox = $(`<input type="checkbox" class="select_checkbox" style="margin:0px 16px;" data-invoice-type="POS Invoice" data-invoice-name="${invoice.name}" data-outstanding-amount="${invoice.outstanding_amount}" ></input>`);
-        customerBox.append(`<div style="flex-grow:1;">${invoice.name}</div>`);
-        customerBox.append(`<div style="flex-grow:1;">${invoice.outstanding_amount} DA</div>`);
-        customerBox.append(`<div style="flex-grow:1;">${invoice.posting_date}</div>`);
-        customerBox.append(`<div style="flex-grow:1;">POS Invoice</div>`);
-        customerBox.append(`<div class="rowBox centerItem payBtn" style="${payBtnStyle}">Pay</div>`);
-        customerBox.find(".payBtn").on("click", async () => {
-          await this.payPosInvoice(invoice);
-        });
-        this.debtList.append(customerBox);
-      });
-      result2.forEach((invoice) => {
-        total_debt += invoice.outstanding_amount;
-        const customerBox = $(
-          `<div  style="${invoiceStyle}" class="rowBox C_A_Center invoiceBox" data-invoice-name="${invoice.name}"></div>`
-        );
-        customerBox.append(`<input type="checkbox" style="margin:0px 16px;" data-invoice-type="Sales Invoice" data-invoice-name="${invoice.name}" data-outstanding-amount="${invoice.outstanding_amount}" ></input>`);
-        customerBox.append(`<div style="flex-grow:1;">${invoice.name}</div>`);
-        customerBox.append(`<div style="flex-grow:1;">${invoice.outstanding_amount} DA</div>`);
-        customerBox.append(`<div style="flex-grow:1;">${invoice.posting_date}</div>`);
-        customerBox.append(`<div style="flex-grow:1;">Sales Invoice</div>`);
-        customerBox.append(`<div class="rowBox centerItem payBtn" style="${payBtnStyle}">Pay</div>`);
-        customerBox.find(".payBtn").on("click", async () => {
-          await this.paySalesInvoice(invoice);
-        });
-        this.debtList.append(customerBox);
-      });
-      this.refreshTotal(total_debt);
-    }
-    async payPosInvoice(invoice) {
-      const paymentAmount = parseFloat(this.payment_amount) || 0;
-      if (this.paymentAmount <= 0) {
-        frappe.msgprint(__("The paid amount should be grant than 0"));
-        return;
-      }
-      try {
-        this.show_waiting();
-        const result = await this.app_data.update_invoice_payment(invoice.name, this.payment_amount);
-        this.payment_amount = result.remaining;
-        this.leftContainer.find("#debt_paymentAmount").val(result.remaining);
-        await this.refreshClientDebtPart(this.selected_client);
-      } catch (error) {
-        console.error("Error processing payment:", error);
-        alert("An error occurred while processing the payment. Please try again.");
-      } finally {
-        this.hide_waiting();
-      }
-    }
-    async paySalesInvoice(invoice) {
-      try {
-        this.show_waiting();
-        const paymentAmount = parseFloat(this.payment_amount) || 0;
-        if (paymentAmount <= 0) {
-          frappe.msgprint(__("The paid amount should be grant than 0"));
-          return;
-        }
-        const result = await this.app_data.update_sales_invoice_payment(invoice.name, paymentAmount);
-        if (result && typeof result.remaining === "number") {
-          this.payment_amount = result.remaining;
-          this.leftContainer.find("#debt_paymentAmount").val(result.remaining);
-          await this.refreshClientDebtPart(this.selected_client);
-        } else {
-          throw new Error("Unexpected server response. Please try again.");
-        }
-      } catch (error) {
-        console.error("Error processing sales invoice payment:", error);
-        alert("An error occurred while processing the payment. Please try again later.");
-      } finally {
-        this.hide_waiting();
-      }
-    }
-    async paySelectedInvoice() {
-      console.log("we are here");
-      try {
-        this.show_waiting();
-        const paymentAmount = parseFloat(this.payment_amount) || 0;
-        const result = await this.app_data.paySelectedInvoice(this._selected_invoice, paymentAmount);
-        if (result && typeof result.remaining === "number") {
-          this.payment_amount = result.remaining;
-          this.leftContainer.find("#debt_paymentAmount").val(result.remaining);
-          await this.refreshClientDebtPart(this.selected_client);
-        } else {
-          throw new Error("Unexpected server response. Please try again.");
-        }
-      } catch (error) {
-        console.error("Error processing sales invoice payment:", error);
-        alert("An error occurred while processing the payment. Please try again later.");
-      } finally {
-        this.hide_waiting();
+          this.selected_item_cart.setKeyboardOrientation("portrait");
+          this.selected_item_cart.cleanHeighlight();
+          break;
+        case "debt_cart":
+          this.debt_cart.showCart();
+          this.customer_box.showHomeBar();
+          this.item_selector.hideCart();
+          this.selected_item_cart.hideCart();
+          this.item_details.hide_cart();
+          this.settings_cart.hideCart();
+          this.payment_cart.hideCart();
+          this.check_in_out_cart.hideCart();
+          break;
+        default:
+          break;
       }
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.DCUG2DZG.js.map
+//# sourceMappingURL=pos.bundle.6V54CRD3.js.map

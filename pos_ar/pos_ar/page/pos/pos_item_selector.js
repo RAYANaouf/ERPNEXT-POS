@@ -25,7 +25,7 @@ pos_ar.PointOfSale.pos_item_selector = class {
 
 		//class functions invocation
 		this.start_item_selector();
-        }
+    }
 
 
 	start_item_selector(){
