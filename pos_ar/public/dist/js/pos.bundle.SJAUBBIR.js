@@ -46,7 +46,6 @@
         await this.appData.getAllData();
         this.screenManager = new pos_ar.PointOfSale.ScreenManager(this.settings_data);
         this.toggleKeyboardMode(!this.settings_data.settings.showItemDetails);
-        console.log("see app data : ", this.appData.appData, "opened pos : ", await this.appData.getAllOpenedPosInvoice());
         this.prepare_container();
         await this.prepare_app_data();
         await this.checkForPOSEntry();
@@ -159,6 +158,7 @@
       this.init_checkInOutCart();
       this.init_debtCart();
       this.init_settingsCart();
+      this.init_unsyncedPosCart();
     }
     async checkForPOSEntry() {
       const user = frappe.session.user;
@@ -298,11 +298,15 @@
         this.$leftSection,
         this.appData.appData.customers,
         this.defaultCustomer,
-        this.backHome.bind(this),
+        () => {
+          this.screenManager.navigate("home");
+        },
         this.onSync.bind(this),
         this.saveCheckInOut.bind(this),
         this.onMenuClick.bind(this),
-        this.onDebtClick.bind(this)
+        () => {
+          this.screenManager.navigate("debt_cart");
+        }
       );
       this.screenManager.registerScreen("customer_box", this.customer_box);
       this.screenManager.customer_box = this.customer_box;
@@ -343,13 +347,16 @@
           this.onSelectedItemClick(item);
         },
         (tab) => {
-          this.onClose_details();
+          this.screenManager.navigate("home");
         },
         (action, key) => {
           this.onKeyPressed(action, key);
         },
         this.createNewTab.bind(this),
-        this.onCheckout.bind(this),
+        () => {
+          this.savePosInvoice();
+          this.screenManager.navigate("payment_cart");
+        },
         this.savePosInvoice.bind(this),
         this.db
       );
@@ -368,7 +375,9 @@
         (event2, field, value) => {
           this.onInput(event2, field, value);
         },
-        this.onClose_details.bind(this)
+        () => {
+          this.screenManager.navigate("home");
+        }
       );
       this.screenManager.registerScreen("item_details", this.item_details);
       this.screenManager.item_details = this.item_details;
@@ -382,7 +391,9 @@
         this.appData.appData.pos_profile.payments,
         this.selectedPaymentMethod,
         this.invoiceData,
-        this.onClose_payment_cart.bind(this),
+        () => {
+          this.screenManager.navigate("home");
+        },
         this.onCompleteOrder.bind(this),
         (event2, field, value) => {
           this.onInput(event2, field, value);
@@ -431,6 +442,14 @@
       this.screenManager.registerScreen("settings_cart", this.settings_cart);
       this.screenManager.settings_cart = this.settings_cart;
     }
+    init_unsyncedPosCart() {
+      this.unsynced_pos_cart = new pos_ar.PointOfSale.pos_unsynced_cart(
+        this.wrapper,
+        this.db
+      );
+      this.screenManager.registerScreen("unsynced_pos_cart", this.unsynced_pos_cart);
+      this.screenManager.unsynced_pos_cart = this.unsynced_pos_cart;
+    }
     itemClick_selector(item, refresh) {
       this.syncInput = false;
       const itemCloned = structuredClone(item);
@@ -449,25 +468,15 @@
       this.selectedField.field_name = "quantity";
       this.selected_item_cart.makeSelectedButtonHighlighted();
       this.selected_item_cart.scrollToBottom();
-      this.savePosInvoice(true);
+      this.savePosInvoice();
     }
     onSelectedItemClick(item) {
       this.syncInput = false;
       const clonedItem = structuredClone(item);
       Object.assign(this.selectedItem, clonedItem);
-      console.log("item ==> ", item);
-      console.log("selected item ==> ", this.selectedItem);
-      console.log("item maps ==> ", this.selectedItemMaps);
-      if (this.settings_data.settings.showItemDetails) {
-        this.item_details.show_cart();
-        this.item_selector.hideCart();
-        this.selected_item_cart.showKeyboard();
-        this.payment_cart.hideCart();
-        this.settings_cart.hideCart();
-        this.selected_item_cart.setKeyboardOrientation("landscape");
-      }
       this.selectedField.field_name = "quantity";
       this.selected_item_cart.makeSelectedButtonHighlighted();
+      this.screenManager.navigate("item_details");
       this.item_details.refreshDate(item);
     }
     saveCheckInOut(checkInOut) {
@@ -490,33 +499,8 @@
       }
     }
     savePosInvoice(saveWithZeroRate) {
-      if (this.checkIfRateZero(this.selectedItemMaps.get(this.selectedTab.tabName)) && !saveWithZeroRate) {
-        frappe.throw("Item with rate equal 0");
-        return;
-      }
       this.selectedItemMaps.get(this.selectedTab.tabName).synced = false;
       this.appData.savePosInvoice(this.selectedItemMaps.get(this.selectedTab.tabName));
-    }
-    onCheckout() {
-      this.savePosInvoice(true);
-      this.payment_cart.showCart();
-      this.item_selector.hideCart();
-      this.item_details.hide_cart();
-      this.settings_cart.hideCart();
-      this.debt_cart.hideCart();
-      this.payment_cart.calculateGrandTotal();
-      this.selected_item_cart.setKeyboardOrientation("landscape");
-      this.selected_item_cart.cleanHeighlight();
-      this.selected_item_cart.showKeyboard();
-    }
-    onClose_details() {
-      this.screenManager.navigate("home");
-    }
-    onClose_payment_cart() {
-      this.screenManager.navigate("home");
-    }
-    onDebtClick() {
-      this.screenManager.navigate("debt_cart");
     }
     auto_select(item) {
       this.itemClick_selector(item);
@@ -527,14 +511,13 @@
         this.screenManager.navigate("history_cart");
       } else if (menu == "close_pos") {
         this.onClosePOS();
+      } else if (menu == "unsenced_invoices") {
+        this.screenManager.navigate("unsynced_pos_cart");
       } else if (menu == "settings") {
         this.screenManager.navigate("settings_cart");
       } else if (menu == "checkInOut") {
         this.screenManager.navigate("check_in_out_cart");
       }
-    }
-    backHome() {
-      this.screenManager.navigate("home");
     }
     getDefaultPaymentMethod() {
       let result = null;
@@ -557,16 +540,8 @@
         const tab = this.selected_item_cart.createTabForEditPOS();
         this.selectedItemMaps.set(`C${tab}`, pos);
         this.selectedTab.tabName = `C${tab}`;
-        this.item_selector.showCart();
-        this.customer_box.showHomeBar();
-        this.selected_item_cart.showCart();
-        this.item_details.hide_cart();
-        this.payment_cart.hideCart();
-        this.history_cart.hide_cart();
-        this.settings_cart.hideCart();
-        this.selected_item_cart.refreshTabs();
-        this.selected_item_cart.refreshSelectedItem();
       });
+      this.screenManager.navigate("home");
     }
     createNewTab(counter) {
       let new_pos_invoice = frappe.model.get_new_doc("POS Invoice");
@@ -595,25 +570,16 @@
       new_pos_invoice.custom_cach_name = new_pos_invoice.refNum;
       this.selectedItemMaps.set(`C${counter}`, new_pos_invoice);
       this.selectedTab.tabName = `C${counter}`;
-      this.item_details.hide_cart();
+      this.screenManager.navigate("home");
     }
     historyCartClick(event2, message) {
       if (event2 == "edit") {
         const tab = this.selected_item_cart.createTabForEditPOS();
         this.selectedItemMaps.set(`C${tab}`, message);
         this.selectedTab.tabName = `C${tab}`;
-        this.item_selector.showCart();
-        this.customer_box.showHomeBar();
-        this.selected_item_cart.showCart();
-        this.item_details.hide_cart();
-        this.payment_cart.hideCart();
-        this.history_cart.hide_cart();
-        this.settings_cart.hideCart();
-        this.selected_item_cart.refreshTabs();
-        this.selected_item_cart.refreshSelectedItem();
+        this.screenManager.navigate("home");
       } else if (event2 == "duplicate") {
         const tab = this.selected_item_cart.createTabForEditPOS();
-        console.log("duplicate message : ", message);
         message.name = frappe.model.get_new_doc("POS Invoice").name;
         message.pos_profile = this.appData.appData.pos_profile.name;
         message.taxes_and_charges = this.appData.appData.pos_profile.taxes_and_charges;
@@ -629,29 +595,13 @@
         message.custom_cach_name = message.refNum;
         this.selectedItemMaps.set(`C${tab}`, message);
         this.selectedTab.tabName = `C${tab}`;
-        this.item_selector.showCart();
-        this.customer_box.showHomeBar();
-        this.selected_item_cart.showCart();
-        this.item_details.hide_cart();
-        this.payment_cart.hideCart();
-        this.history_cart.hide_cart();
-        this.settings_cart.hideCart();
-        this.selected_item_cart.refreshTabs();
-        this.selected_item_cart.refreshSelectedItem();
+        this.screenManager.navigate("home");
       } else if (event2 == "return") {
         const tab = this.selected_item_cart.createTabForEditPOS();
         const returnedPosInvoice = this.makePosInvoiceReturn(message);
         this.selectedItemMaps.set(`C${tab}`, returnedPosInvoice);
         this.selectedTab.tabName = `C${tab}`;
-        this.item_selector.showCart();
-        this.customer_box.showHomeBar();
-        this.selected_item_cart.showCart();
-        this.item_details.hide_cart();
-        this.payment_cart.hideCart();
-        this.history_cart.hide_cart();
-        this.settings_cart.hideCart();
-        this.selected_item_cart.refreshTabs();
-        this.selected_item_cart.refreshSelectedItem();
+        this.screenManager.navigate("home");
       }
     }
     onInput(event2, field, value) {
@@ -705,7 +655,7 @@
         this.selected_item_cart.refreshSelectedItem();
         this.item_details.refreshDate(this.selectedItem);
       }
-      this.savePosInvoice(true);
+      this.savePosInvoice();
     }
     onKeyPressed(action, key) {
       var _a, _b;
@@ -830,11 +780,11 @@
       this.editPosItemQty(this.selectedItem.name, this.selectedItem.qty);
       this.selected_item_cart.refreshSelectedItem();
       this.item_details.refreshDate(this.selectedItem);
-      this.savePosInvoice(true);
+      this.savePosInvoice();
     }
     onCompleteOrder() {
       this.payment_cart.show_waiting();
-      this.savePosInvoice(true);
+      this.savePosInvoice();
       if (this.defaultCustomer.name == "") {
         frappe.warn(
           "Customer didnt selected!",
@@ -909,7 +859,7 @@
           } else {
             this.selected_item_cart.createNewTab();
           }
-          this.onClose_payment_cart();
+          this.screenManager.navigate("home");
         }).catch((err) => {
           this.payment_cart.hide_waiting();
           console.log("cant push pos invoice : ", err);
@@ -926,7 +876,7 @@
         } else {
           this.selected_item_cart.createNewTab();
         }
-        this.onClose_payment_cart();
+        this.screenManager.navigate("home");
         pos.synced = false;
         pos.opened = 0;
         console.log("head debug : ", pos);
@@ -1079,7 +1029,6 @@
       const seconds = date.getMilliseconds();
       invoice.refNum = this.appData.appData.pos_profile.name + "-" + year + "-" + month + "-" + day + "-" + hour + minutes + seconds;
       invoice.custom_cach_name = invoice.refNum;
-      console.log("result : ", invoice);
       return invoice;
     }
     toggleKeyboardMode(active) {
@@ -1098,7 +1047,7 @@
           } else if (event2.key == "Delete") {
             this.deleteItemFromPOsInvoice(this.selectedItem.name);
             this.selected_item_cart.refreshSelectedItem();
-            this.onClose_details();
+            this.screenManager.navigate("home");
           } else if (event2.key == "Backspace") {
             if (this.selectedField.field_name == "quantity") {
               const lastValue = parseFloat(this.selectedItem.qty);
@@ -1231,7 +1180,6 @@
         const clone = structuredClone(clonedItem);
         Object.assign(this.selectedItem, clone);
       }
-      console.log("added ?? : ", posInvoice);
     }
     deleteItemFromPOsInvoice(itemId) {
       const posInvoice = this.selectedItemMaps.get(this.selectedTab.tabName);
@@ -1486,10 +1434,11 @@
 			<div id="MenuBox" class="action-btn">
 				<img src="/assets/pos_ar/images/menu.png" alt="Menu">
 				<div id="menuItemsContainer">
-					<div id="posInvoiceMenuItem" class="menuItem">Recent POS Invoices</div>
-					<div id="checkInOutMenuItem" class="menuItem">Check In/Out</div>
-					<div id="closePosMenuItem"   class="menuItem">Close the POS</div>
-					<div id="settingMenuItem"    class="menuItem">About</div>
+					<div id="posInvoiceMenuItem"       class="menuItem">Recent POS Invoices</div>
+					<div id="checkInOutMenuItem"       class="menuItem">Check In/Out</div>
+					<div id="unsencedInvoicesMenuItem" class="menuItem">Unsenced invoices</div>
+					<div id="closePosMenuItem"         class="menuItem">Close the POS</div>
+					<div id="settingMenuItem"          class="menuItem">About</div>
 				</div>
 			</div>
 		`);
@@ -1503,6 +1452,7 @@
       this.pos_invoices = this.menuItemsContainer.find("#posInvoiceMenuItem");
       this.check_in_out = this.menuItemsContainer.find("#checkInOutMenuItem");
       this.close_pos = this.menuItemsContainer.find("#closePosMenuItem");
+      this.unsenced_invoices = this.menuItemsContainer.find("#unsencedInvoicesMenuItem");
       this.setting = this.menuItemsContainer.find("#settingMenuItem");
       this.wrapper.append('<div id="darkFloatingBackground"></div>');
       this.dark_floating_background = this.wrapper.find("#darkFloatingBackground");
@@ -1589,6 +1539,9 @@
       });
       this.close_pos.on("click", (event2) => {
         this.on_menu_click("close_pos");
+      });
+      this.unsenced_invoices.on("click", (event2) => {
+        this.on_menu_click("unsenced_invoices");
       });
       this.pos_invoices.on("click", (event2) => {
         this.on_menu_click("recent_pos");
@@ -4427,6 +4380,242 @@
     }
   };
 
+  // ../pos_ar/pos_ar/pos_ar/page/pos/pos_unsynced_cart.js
+  pos_ar.PointOfSale.pos_unsynced_cart = class {
+    constructor(wrapper, db) {
+      this.wrapper = wrapper;
+      this.db = db;
+      this.invoices = [];
+      this.filter = "All";
+      this.selectedInvoice = null;
+      this.search_value = "";
+      this.start_work();
+    }
+    async start_work() {
+      this.prepare_unsynced_pos_cart();
+      await this.getAllUnsyncedInvoices();
+      this.setListeners();
+    }
+    prepare_unsynced_pos_cart() {
+      this.wrapper.find("#LeftSection").append('<div id="unsyncedPosLeftContainer" class="columnBox" style="display:none;"></div>');
+      this.wrapper.find("#RightSection").append('<div id="unsyncedPosRightContainer" class="columnBox" style="display:none;"></div>');
+      this.left_container = this.wrapper.find("#unsyncedPosLeftContainer");
+      this.right_container = this.wrapper.find("#unsyncedPosRightContainer");
+      this.right_container.append(`<div id="unsyncedRightContainerHeader" class="rowBox align_center"><h4 class="CartTitle">Unsynced Invoices</h4></div>`);
+      this.right_container.append('<div id="unsyncedRightSearchContainer" class="rowBox align_center"></div>');
+      this.search_container = this.right_container.find("#unsyncedRightSearchContainer");
+      this.search_container.append('<select id="unsyncedFilterInput" placeholder="Filter Status">');
+      this.filter_input = this.search_container.find("#unsyncedFilterInput");
+      this.filter_input.append('<option value="All" selected>All</option><option value="Not Synced">Not Synced</option><option value="Failed">Failed</option>');
+      this.search_container.append('<input type="text" id="unsyncedSearchInput" placeholder="Search by invoice number">');
+      this.search_field = this.search_container.find("#unsyncedSearchInput");
+      this.right_container.append('<div id="unsyncedInvoiceList" class="columnBox"></div>');
+      this.unsynced_invoice_list = this.right_container.find("#unsyncedInvoiceList");
+      const header = '<div id="detailsUnsyncedHeader" class="rowBox"><div class="c1 columnBox"><div id="unsyncedCustomer">Customer</div><div id="unsyncedSoldBy"></div><div id="unsyncedStatus" class="status"></div></div><div class="c2 columnBox"><div id="unsyncedCost">0,0000 DA</div><div id="unsyncedId">ACC-PSINV-2024-ID</div><div id="unsyncedRealId">POS realI</div></div></div>';
+      this.left_container.append(header);
+      this.details_unsynced_header = this.left_container.find("#detailsUnsyncedHeader");
+      this.left_container.append('<div id="unsyncedContent" class="columnBox"></div>');
+      this.unsyncedContent = this.left_container.find("#unsyncedContent");
+      this.unsyncedContent.append('<div id="unsyncedItemContainer"><div class="posSectionTitle">Items</div><div id="unsyncedItemList"></div></div>');
+      this.itemContainer = this.unsyncedContent.find("#unsyncedItemContainer");
+      this.itemList = this.itemContainer.find("#unsyncedItemList");
+      this.unsyncedContent.append('<div id="unsyncedTotalsContainer"><div class="posSectionTitle">Totals</div><div id="unsyncedTotalList"></div></div>');
+      this.totalsContainer = this.unsyncedContent.find("#unsyncedTotalsContainer");
+      this.totalList = this.unsyncedContent.find("#unsyncedTotalList");
+      this.unsyncedContent.append('<div id="unsyncedPaymentsContainer"><div class="posSectionTitle">Payments</div><div id="unsyncedMethodList"></div></div>');
+      this.paymentsContainer = this.unsyncedContent.find("#unsyncedPaymentsContainer");
+      this.methodList = this.unsyncedContent.find("#unsyncedMethodList");
+      this.left_container.append('<div id="unsyncedActionsContainer" class="rowBox align_content"><div id="unsyncedRetryBtn" class="actionBtn rowBox centerItem">Retry Sync</div><div id="unsyncedViewBtn" class="actionBtn rowBox centerItem">View Details</div></div>');
+      this.actionButtonsContainer = this.left_container.find("#unsyncedActionsContainer");
+      this.retryButton = this.actionButtonsContainer.find("#unsyncedRetryBtn");
+      this.viewButton = this.actionButtonsContainer.find("#unsyncedViewBtn");
+    }
+    refreshData() {
+      this.unsynced_invoice_list.empty();
+      console.log("refreshing unsynced invoice list", this.invoices, "unsynced ", this.invoices.filter((invoice) => !invoice.synced));
+      const filteredList = this.invoices.filter((invoice) => !invoice.synced);
+      if (!filteredList.length) {
+        this.unsynced_invoice_list.append('<div class="empty-state">No unsynced invoices found</div>');
+        return;
+      }
+      console.log("filteredList : ", filteredList);
+      filteredList.forEach((invoice) => {
+        console.log("invoice : ", invoice);
+        const invoiceContainer = document.createElement("div");
+        invoiceContainer.classList.add("posInvoiceContainer");
+        invoiceContainer.classList.add("columnBox");
+        invoiceContainer.classList.add("align_content");
+        const l1 = document.createElement("div");
+        l1.classList.add("l1");
+        l1.classList.add("rowBox");
+        l1.classList.add("align_content");
+        const posName = document.createElement("div");
+        posName.classList.add("posName");
+        posName.textContent = invoice.name;
+        const posCost = document.createElement("div");
+        posCost.classList.add("posCost");
+        posCost.textContent = format_currency(invoice.grand_total, invoice.currency);
+        l1.appendChild(posName);
+        l1.appendChild(posCost);
+        const l2 = document.createElement("div");
+        l2.classList.add("l2");
+        l2.classList.add("rowBox");
+        l2.classList.add("align_content");
+        const customer = document.createElement("div");
+        customer.classList.add("customer");
+        customer.classList.add("rowBox");
+        customer.classList.add("align_content");
+        const customerLogo = document.createElement("img");
+        customerLogo.src = "/assets/pos_ar/images/customer.png";
+        customerLogo.width = 16;
+        customerLogo.height = 16;
+        customerLogo.classList.add("customerLogo");
+        const customerName = document.createElement("div");
+        customerName.textContent = invoice.customer || "Guest";
+        customerName.classList.add("customerName");
+        customer.appendChild(customerLogo);
+        customer.appendChild(customerName);
+        l2.appendChild(customer);
+        const status = document.createElement("div");
+        status.classList.add("status");
+        status.classList.add(invoice.status.toLowerCase().replace(" ", "-"));
+        status.textContent = invoice.status;
+        l2.appendChild(status);
+        invoiceContainer.appendChild(l1);
+        invoiceContainer.appendChild(l2);
+        invoiceContainer.addEventListener("click", () => {
+          this.selectedInvoice = invoice;
+          this.refreshInvoiceDetails();
+          this.unsynced_invoice_list.find(".posInvoiceContainer").removeClass("selected");
+          $(invoiceContainer).addClass("selected");
+        });
+        this.unsynced_invoice_list.append(invoiceContainer);
+      });
+      if (this.selectedInvoice) {
+        this.refreshInvoiceDetails();
+      }
+    }
+    refreshInvoiceDetails() {
+      if (!this.selectedInvoice) {
+        this.unsyncedContent.addClass("d-none");
+        return;
+      }
+      this.unsyncedContent.removeClass("d-none");
+      const header = this.details_unsynced_header;
+      header.find("#unsyncedCustomer").text(this.selectedInvoice.customer || "Guest");
+      header.find("#unsyncedSoldBy").text(this.selectedInvoice.owner);
+      header.find("#unsyncedStatus").text(this.selectedInvoice.status).removeClass("not-synced failed").addClass(this.selectedInvoice.status.toLowerCase().replace(" ", "-"));
+      header.find("#unsyncedCost").text(format_currency(this.selectedInvoice.grand_total, this.selectedInvoice.currency));
+      header.find("#unsyncedId").text(this.selectedInvoice.name);
+      header.find("#unsyncedRealId").text(this.selectedInvoice.pos_profile);
+      this.itemList.empty();
+      this.selectedInvoice.items.forEach((item) => {
+        const itemRow = document.createElement("div");
+        itemRow.classList.add("itemRow", "rowBox");
+        const itemName = document.createElement("div");
+        itemName.classList.add("itemName");
+        itemName.textContent = item.item_name;
+        const itemQty = document.createElement("div");
+        itemQty.classList.add("itemQty");
+        itemQty.textContent = item.qty;
+        const itemRate = document.createElement("div");
+        itemRate.classList.add("itemRate");
+        itemRate.textContent = format_currency(item.rate, this.selectedInvoice.currency);
+        const itemAmount = document.createElement("div");
+        itemAmount.classList.add("itemAmount");
+        itemAmount.textContent = format_currency(item.amount, this.selectedInvoice.currency);
+        itemRow.appendChild(itemName);
+        itemRow.appendChild(itemQty);
+        itemRow.appendChild(itemRate);
+        itemRow.appendChild(itemAmount);
+        this.itemList.append(itemRow);
+      });
+      this.totalList.empty();
+      const totalRow = document.createElement("div");
+      totalRow.classList.add("totalRow", "rowBox");
+      const totalLabel = document.createElement("div");
+      totalLabel.classList.add("totalLabel");
+      totalLabel.textContent = "Grand Total";
+      const totalAmount = document.createElement("div");
+      totalAmount.classList.add("totalAmount");
+      totalAmount.textContent = format_currency(this.selectedInvoice.grand_total, this.selectedInvoice.currency);
+      totalRow.appendChild(totalLabel);
+      totalRow.appendChild(totalAmount);
+      this.totalList.append(totalRow);
+      this.methodList.empty();
+      this.selectedInvoice.payments.forEach((payment) => {
+        const paymentRow = document.createElement("div");
+        paymentRow.classList.add("paymentRow", "rowBox");
+        const paymentMode = document.createElement("div");
+        paymentMode.classList.add("paymentMode");
+        paymentMode.textContent = payment.mode_of_payment;
+        const paymentAmount = document.createElement("div");
+        paymentAmount.classList.add("paymentAmount");
+        paymentAmount.textContent = format_currency(payment.amount, this.selectedInvoice.currency);
+        paymentRow.appendChild(paymentMode);
+        paymentRow.appendChild(paymentAmount);
+        this.methodList.append(paymentRow);
+      });
+    }
+    show_cart() {
+      this.left_container.css("display", "flex");
+      this.right_container.css("display", "flex");
+      this.getAllUnsyncedInvoices();
+    }
+    hide_cart() {
+      this.left_container.css("display", "none");
+      this.right_container.css("display", "none");
+    }
+    async getAllUnsyncedInvoices() {
+      this.invoices = await this.db.getAllPosInvoice();
+      this.refreshData();
+    }
+    async retrySync(invoice_name) {
+      try {
+        const result = await frappe.call({
+          method: "pos_ar.pos_ar.page.pos.pos.retry_sync_invoice",
+          args: {
+            invoice_name
+          }
+        });
+        if (result.message) {
+          frappe.show_alert({
+            message: __("Invoice synced successfully"),
+            indicator: "green"
+          });
+          this.getAllUnsyncedInvoices();
+        }
+      } catch (error) {
+        console.error("Error retrying sync:", error);
+        frappe.msgprint({
+          title: __("Error"),
+          indicator: "red",
+          message: __("Failed to sync invoice")
+        });
+      }
+    }
+    setListeners() {
+      this.filter_input.on("change", () => {
+        this.filter = this.filter_input.val();
+        this.refreshData();
+      });
+      this.search_field.on("input", () => {
+        this.search_value = this.search_field.val();
+        this.refreshData();
+      });
+      this.retryButton.on("click", () => {
+        if (this.selectedInvoice) {
+          this.retrySync(this.selectedInvoice.name);
+        }
+      });
+      this.viewButton.on("click", () => {
+        if (this.selectedInvoice) {
+          frappe.set_route("Form", "POS Invoice", this.selectedInvoice.name);
+        }
+      });
+    }
+  };
+
   // ../pos_ar/pos_ar/pos_ar/page/pos/data/posSettingsData.js
   pos_ar.PointOfSale.posSettingsData = class {
     constructor(db) {
@@ -5020,6 +5209,7 @@
       this.screens.set(screenId, screenComponent);
     }
     navigate(screenId) {
+      console.log("debuging 1 ", screenId);
       switch (screenId) {
         case "history_cart":
           console.log("history_cart");
@@ -5033,6 +5223,7 @@
           this.settings_cart.hideCart();
           this.check_in_out_cart.hideCart();
           this.debt_cart.hideCart();
+          this.unsynced_pos_cart.hide_cart();
           break;
         case "settings_cart":
           this.settings_cart.showCart();
@@ -5044,6 +5235,7 @@
           this.history_cart.hide_cart();
           this.check_in_out_cart.hideCart();
           this.debt_cart.hideCart();
+          this.unsynced_pos_cart.hide_cart();
           this.customer_box.hideSyncBar();
           break;
         case "check_in_out_cart":
@@ -5056,6 +5248,7 @@
           this.history_cart.hide_cart();
           this.settings_cart.hideCart();
           this.debt_cart.hideCart();
+          this.unsynced_pos_cart.hide_cart();
           this.customer_box.hideSyncBar();
           break;
         case "home":
@@ -5072,8 +5265,11 @@
           if (this.settings_data.settings.showItemDetails) {
             this.selected_item_cart.hideKeyboard();
           }
+          this.unsynced_pos_cart.hide_cart();
           this.selected_item_cart.setKeyboardOrientation("portrait");
           this.selected_item_cart.cleanHeighlight();
+          this.selected_item_cart.refreshTabs();
+          this.selected_item_cart.refreshSelectedItem();
           break;
         case "debt_cart":
           this.debt_cart.showCart();
@@ -5084,6 +5280,47 @@
           this.settings_cart.hideCart();
           this.payment_cart.hideCart();
           this.check_in_out_cart.hideCart();
+          this.unsynced_pos_cart.hide_cart();
+          break;
+        case "payment_cart":
+          this.payment_cart.showCart();
+          this.item_selector.hideCart();
+          this.item_details.hide_cart();
+          this.settings_cart.hideCart();
+          this.debt_cart.hideCart();
+          this.payment_cart.calculateGrandTotal();
+          this.selected_item_cart.setKeyboardOrientation("landscape");
+          this.selected_item_cart.cleanHeighlight();
+          this.selected_item_cart.showKeyboard();
+          this.unsynced_pos_cart.hide_cart();
+          break;
+        case "item_details":
+          if (this.settings_data.settings.showItemDetails) {
+            this.item_details.show_cart();
+            this.item_selector.hideCart();
+            this.selected_item_cart.showKeyboard();
+            this.payment_cart.hideCart();
+            this.settings_cart.hideCart();
+            this.unsynced_pos_cart.hide_cart();
+            this.selected_item_cart.setKeyboardOrientation("landscape");
+          }
+          this.selected_item_cart.makeSelectedButtonHighlighted();
+          break;
+        case "unsynced_pos_cart":
+          this.unsynced_pos_cart.show_cart();
+          this.customer_box.showHomeBar();
+          this.item_selector.hideCart();
+          this.customer_box.hideSyncBar();
+          this.selected_item_cart.hideCart();
+          this.payment_cart.hideCart();
+          this.item_selector.hideCart();
+          this.item_details.hide_cart();
+          this.settings_cart.hideCart();
+          this.debt_cart.hideCart();
+          this.payment_cart.calculateGrandTotal();
+          this.selected_item_cart.setKeyboardOrientation("landscape");
+          this.selected_item_cart.cleanHeighlight();
+          this.selected_item_cart.showKeyboard();
           break;
         default:
           break;
@@ -5091,4 +5328,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.6V54CRD3.js.map
+//# sourceMappingURL=pos.bundle.SJAUBBIR.js.map

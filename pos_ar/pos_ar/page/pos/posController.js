@@ -45,8 +45,6 @@ pos_ar.PointOfSale.Controller = class {
 
 			this.toggleKeyboardMode(!this.settings_data.settings.showItemDetails);
 
-			console.log("see app data : " , this.appData.appData , "opened pos : " , await this.appData.getAllOpenedPosInvoice())
-
 			this.prepare_container();
 			//prepare app data
 			await  this.prepare_app_data();
@@ -110,7 +108,7 @@ pos_ar.PointOfSale.Controller = class {
 			throw err;
 		}
 
-        }
+    }
 
 
 	async handleAppData(){
@@ -189,6 +187,7 @@ pos_ar.PointOfSale.Controller = class {
 		this.init_checkInOutCart();
 		this.init_debtCart();
 		this.init_settingsCart();
+		this.init_unsyncedPosCart();
 	}
 
 	async checkForPOSEntry(){
@@ -348,11 +347,15 @@ pos_ar.PointOfSale.Controller = class {
 									this.$leftSection ,
 									this.appData.appData.customers,
 									this.defaultCustomer ,
-									this.backHome.bind(this),
+									()=>{
+										this.screenManager.navigate("home");
+									},
 									this.onSync.bind(this),
 									this.saveCheckInOut.bind(this),
 									this.onMenuClick.bind(this),
-									this.onDebtClick.bind(this)
+									()=>{
+										this.screenManager.navigate("debt_cart");
+									}
 								)
 
 		this.screenManager.registerScreen("customer_box" , this.customer_box);
@@ -397,13 +400,16 @@ pos_ar.PointOfSale.Controller = class {
 										this.onSelectedItemClick(item)
 									},
 									tab =>{
-										this.onClose_details();
+										this.screenManager.navigate('home')
 									},
 									(action , key) =>{
 										this.onKeyPressed(action , key)
 									},
 									this.createNewTab.bind(this),
-									this.onCheckout.bind(this),
+									()=>{
+										this.savePosInvoice()
+										this.screenManager.navigate("payment_cart");
+									},
 									this.savePosInvoice.bind(this),
 									this.db
 								)
@@ -423,7 +429,9 @@ pos_ar.PointOfSale.Controller = class {
 									(event , field , value) =>{
 										this.onInput(event , field , value);
 									},
-									this.onClose_details.bind(this)
+									()=>{
+										this.screenManager.navigate('home');
+									}
 								)
 		this.screenManager.registerScreen("item_details" , this.item_details);
 		this.screenManager.item_details = this.item_details ; 
@@ -439,7 +447,9 @@ pos_ar.PointOfSale.Controller = class {
 									this.appData.appData.pos_profile.payments,
 									this.selectedPaymentMethod,
 									this.invoiceData,
-									this.onClose_payment_cart.bind(this),
+									()=>{
+										this.screenManager.navigate('home');
+									},
 									this.onCompleteOrder.bind(this),
 									(event , field , value) =>{
 										this.onInput(event , field , value);
@@ -494,9 +504,18 @@ pos_ar.PointOfSale.Controller = class {
 		this.screenManager.settings_cart = this.settings_cart ; 
     }
 
+	init_unsyncedPosCart(){
+		this.unsynced_pos_cart = new pos_ar.PointOfSale.pos_unsynced_cart(
+									this.wrapper,
+									this.db
+								)
+		this.screenManager.registerScreen("unsynced_pos_cart" , this.unsynced_pos_cart);
+		this.screenManager.unsynced_pos_cart = this.unsynced_pos_cart ; 
+    }
 
 
-    /*********************  callbacks functions ******************************/
+
+    /**************************  callbacks functions ******************************/
 
 
 	itemClick_selector(item , refresh){
@@ -527,37 +546,19 @@ pos_ar.PointOfSale.Controller = class {
 
 		this.selected_item_cart.scrollToBottom()
 
-		this.savePosInvoice(true)
+		this.savePosInvoice()
 	}
 
 
 	onSelectedItemClick(item){
-
-
 		this.syncInput = false
-
 		const clonedItem = structuredClone(item)
 		Object.assign(this.selectedItem , clonedItem)
 
-		console.log("item ==> " , item)
-		console.log("selected item ==> " , this.selectedItem)
-		console.log("item maps ==> " , this.selectedItemMaps)
-
-		//show details depend on settings
-		if(this.settings_data.settings.showItemDetails){
-			this.item_details.show_cart();
-			this.item_selector.hideCart();
-			this.selected_item_cart.showKeyboard();
-			//close
-			this.payment_cart.hideCart();
-			this.settings_cart.hideCart();
-			//change display
-			this.selected_item_cart.setKeyboardOrientation("landscape");
-
-		}
-
 		this.selectedField.field_name = "quantity"
 		this.selected_item_cart.makeSelectedButtonHighlighted();
+
+		this.screenManager.navigate("item_details");
 
 		//refresh data
 		this.item_details.refreshDate(item);
@@ -590,42 +591,11 @@ pos_ar.PointOfSale.Controller = class {
 
 
 	savePosInvoice(saveWithZeroRate){
-		if(this.checkIfRateZero(this.selectedItemMaps.get(this.selectedTab.tabName)) && !saveWithZeroRate){
-			frappe.throw("Item with rate equal 0")
-			return ;
-		}
 		this.selectedItemMaps.get(this.selectedTab.tabName).synced = false ;
 		this.appData.savePosInvoice(this.selectedItemMaps.get(this.selectedTab.tabName))
 
 	}
-	onCheckout(){
-		this.savePosInvoice(true)
-		//show
-		this.payment_cart.showCart();
-		//hide
-		this.item_selector.hideCart();
-		this.item_details.hide_cart();
-		this.settings_cart.hideCart();
-		this.debt_cart.hideCart();
-		//change displayk
-		this.payment_cart.calculateGrandTotal()
-		this.selected_item_cart.setKeyboardOrientation("landscape");
-		this.selected_item_cart.cleanHeighlight();
-		this.selected_item_cart.showKeyboard();
 
-	}
-
-	onClose_details(){
-		this.screenManager.navigate("home");
-	}
-	onClose_payment_cart(){
-		this.screenManager.navigate("home");
-	}
-
-
-	onDebtClick(){
-		this.screenManager.navigate("debt_cart");
-	}
 
 	auto_select(item){
 		this.itemClick_selector(item)
@@ -641,16 +611,15 @@ pos_ar.PointOfSale.Controller = class {
 		else if(menu == 'close_pos'){
 			this.onClosePOS()
 		}
+		else if(menu == 'unsenced_invoices'){
+			this.screenManager.navigate("unsynced_pos_cart");
+		}
 		else if(menu == 'settings'){
 			this.screenManager.navigate("settings_cart");
 		}
 		else if(menu == 'checkInOut'){
 			this.screenManager.navigate("check_in_out_cart");
 		}
-	}
-
-	backHome(){
-		this.screenManager.navigate("home");
 	}
 
 	getDefaultPaymentMethod(){
@@ -673,32 +642,12 @@ pos_ar.PointOfSale.Controller = class {
 	}
 
 	restorePosInvoices(posInvoices){
-
 		posInvoices.forEach((pos)=>{
 			const tab = this.selected_item_cart.createTabForEditPOS()
-
 			this.selectedItemMaps.set(`C${tab}` , pos)
 			this.selectedTab.tabName = `C${tab}`
-
-			//show
-			this.item_selector.showCart();
-			this.customer_box.showHomeBar();
-			this.selected_item_cart.showCart()
-
-			//hide
-			this.item_details.hide_cart() ;
-			this.payment_cart.hideCart()  ;
-			this.history_cart.hide_cart() ;
-			this.settings_cart.hideCart();
-
-			//refresh the data :
-			this.selected_item_cart.refreshTabs()
-                        this.selected_item_cart.refreshSelectedItem()
-
-
 		})
-
-
+		this.screenManager.navigate('home')
 	}
 
 	createNewTab(counter){
@@ -732,8 +681,8 @@ pos_ar.PointOfSale.Controller = class {
 		this.selectedItemMaps.set(`C${counter}` , new_pos_invoice)
 		this.selectedTab.tabName = `C${counter}`
 
-		//hide item details
-		this.item_details.hide_cart() ;
+		
+		this.screenManager.navigate('home')
 	}
 
 
@@ -745,24 +694,9 @@ pos_ar.PointOfSale.Controller = class {
 			this.selectedItemMaps.set(`C${tab}` , message)
 			this.selectedTab.tabName = `C${tab}`
 
-			//show
-			this.item_selector.showCart();
-			this.customer_box.showHomeBar();
-			this.selected_item_cart.showCart()
-
-			//hide
-			this.item_details.hide_cart() ;
-			this.payment_cart.hideCart()  ;
-			this.history_cart.hide_cart() ;
-			this.settings_cart.hideCart();
-
-			//refresh the data :
-			this.selected_item_cart.refreshTabs()
-            this.selected_item_cart.refreshSelectedItem()
+			this.screenManager.navigate('home')
 		}else if(event == 'duplicate'){
 			const tab = this.selected_item_cart.createTabForEditPOS()
-
-			console.log("duplicate message : " , message)
 
 			message.name              = frappe.model.get_new_doc('POS Invoice').name;
 			message.pos_profile       = this.appData.appData.pos_profile.name
@@ -782,20 +716,7 @@ pos_ar.PointOfSale.Controller = class {
 			this.selectedItemMaps.set(`C${tab}` , message)
 			this.selectedTab.tabName = `C${tab}`
 
-			//show
-			this.item_selector.showCart();
-			this.customer_box.showHomeBar();
-			this.selected_item_cart.showCart()
-
-			//hide
-			this.item_details.hide_cart() ;
-			this.payment_cart.hideCart()  ;
-			this.history_cart.hide_cart() ;
-			this.settings_cart.hideCart();
-
-			//refresh the data :
-			this.selected_item_cart.refreshTabs()
-            this.selected_item_cart.refreshSelectedItem()
+			this.screenManager.navigate('home')
 		}
 		else if(event == 'return'){
 			const tab = this.selected_item_cart.createTabForEditPOS()
@@ -804,23 +725,7 @@ pos_ar.PointOfSale.Controller = class {
 			this.selectedItemMaps.set(`C${tab}` , returnedPosInvoice)
 			this.selectedTab.tabName = `C${tab}`
 
-
-
-			//show
-			this.item_selector.showCart();
-			this.customer_box.showHomeBar();
-			this.selected_item_cart.showCart()
-
-			//hide
-			this.item_details.hide_cart() ;
-			this.payment_cart.hideCart()  ;
-			this.history_cart.hide_cart() ;
-			this.settings_cart.hideCart();
-
-			//refresh the data :
-			this.selected_item_cart.refreshTabs()
-                        this.selected_item_cart.refreshSelectedItem()
-
+			this.screenManager.navigate('home')
 		}
 	}
 
@@ -907,7 +812,7 @@ pos_ar.PointOfSale.Controller = class {
 
 		}
 
-		this.savePosInvoice(true)
+		this.savePosInvoice()
 	}
 
 
@@ -939,17 +844,6 @@ pos_ar.PointOfSale.Controller = class {
 			this.syncInput = false;
 
 			this.deleteItemFromPOsInvoice(this.selectedItem.name);
-
-			/*const index = this.selectedItemMaps.get(this.selectedTab.tabName).items.findIndex(item => item.name === this.selectedItem.name);
-
-			if(this.selectedItemMaps.get(this.selectedTab.tabName).items.length > 1){
-				this.deleteItemFromPOsInvoice(this.selectedItem.name);
-				const cloned = structuredClone(this.selectedItemMaps.get(this.selectedTab.tabName).items[index-1])
-				Object.assign(this.selectedItem , cloned)
-			}else{
-				this.deleteItemFromPOsInvoice(this.selectedItem.name);
-				Object.assign(this.selectedItem , {})
-			}*/
 
 		}
 		else if(action == "delete"){
@@ -1118,7 +1012,7 @@ pos_ar.PointOfSale.Controller = class {
 		this.selected_item_cart.refreshSelectedItem()
 		this.item_details.refreshDate(this.selectedItem);
 
-		this.savePosInvoice(true)
+		this.savePosInvoice()
 	}
 
 
@@ -1126,7 +1020,7 @@ pos_ar.PointOfSale.Controller = class {
 
 		this.payment_cart.show_waiting()
 
-		this.savePosInvoice(true)
+		this.savePosInvoice()
 
 		//check if they set a customer
 		if(this.defaultCustomer.name == ""){
@@ -1233,7 +1127,7 @@ pos_ar.PointOfSale.Controller = class {
 				else{
 					this.selected_item_cart.createNewTab();
 				}
-				this.onClose_payment_cart()
+				this.screenManager.navigate('home')
 				/*** END   : deleting pos when finishing **/
 
 
@@ -1263,7 +1157,7 @@ pos_ar.PointOfSale.Controller = class {
 			else{
 				this.selected_item_cart.createNewTab();
 			}
-			this.onClose_payment_cart()
+			this.screenManager.navigate('home')
 			/*** END : deleting pos when finishing **/
 
 
@@ -1482,9 +1376,6 @@ pos_ar.PointOfSale.Controller = class {
 		invoice.refNum            = this.appData.appData.pos_profile.name+"-"+year+'-'+month+'-'+day+'-'+hour+minutes+seconds
 		invoice.custom_cach_name  = invoice.refNum
 
-
-		
-		console.log("result : " , invoice)
 		return invoice
 	}
 
@@ -1512,7 +1403,7 @@ pos_ar.PointOfSale.Controller = class {
 				}else if(event.key == "Delete"){
 					this.deleteItemFromPOsInvoice(this.selectedItem.name)
 					this.selected_item_cart.refreshSelectedItem();
-					this.onClose_details()
+					this.screenManager.navigate('home')
 
 				}else if(event.key == "Backspace"){
 					if(this.selectedField.field_name == "quantity"){
@@ -1626,7 +1517,6 @@ pos_ar.PointOfSale.Controller = class {
 			return;
 		}
 
-
 		// Register the service worker on window load
  		window.addEventListener('DOMContentLoaded', () => {
 		navigator.serviceWorker
@@ -1695,9 +1585,6 @@ pos_ar.PointOfSale.Controller = class {
 			Object.assign(this.selectedItem , clone)
 
 		}
-
-
-		console.log("added ?? : " , posInvoice)
 
 	}
 

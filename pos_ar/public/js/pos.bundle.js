@@ -9,6 +9,7 @@ import "../../pos_ar/page/pos/pos_db.js"
 import "../../pos_ar/page/pos/pos_settings.js"
 import "../../pos_ar/page/pos/pos_check_in_out.js"
 import "../../pos_ar/page/pos/pos_debt_cart.js"
+import "../../pos_ar/page/pos/pos_unsynced_cart.js"
 
 
 //data classes

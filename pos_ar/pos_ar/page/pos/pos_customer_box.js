@@ -70,10 +70,11 @@ pos_ar.PointOfSale.pos_customer_box = class{
 			<div id="MenuBox" class="action-btn">
 				<img src="/assets/pos_ar/images/menu.png" alt="Menu">
 				<div id="menuItemsContainer">
-					<div id="posInvoiceMenuItem" class="menuItem">Recent POS Invoices</div>
-					<div id="checkInOutMenuItem" class="menuItem">Check In/Out</div>
-					<div id="closePosMenuItem"   class="menuItem">Close the POS</div>
-					<div id="settingMenuItem"    class="menuItem">About</div>
+					<div id="posInvoiceMenuItem"       class="menuItem">Recent POS Invoices</div>
+					<div id="checkInOutMenuItem"       class="menuItem">Check In/Out</div>
+					<div id="unsencedInvoicesMenuItem" class="menuItem">Unsenced invoices</div>
+					<div id="closePosMenuItem"         class="menuItem">Close the POS</div>
+					<div id="settingMenuItem"          class="menuItem">About</div>
 				</div>
 			</div>
 		`)
@@ -86,10 +87,11 @@ pos_ar.PointOfSale.pos_customer_box = class{
 		this.exchange_btn = this.actionContainer.find('#exchangeBtn')
 		this.menu = this.actionContainer.find('#MenuBox')
 		this.menuItemsContainer = this.actionContainer.find('#menuItemsContainer')
-		this.pos_invoices = this.menuItemsContainer.find('#posInvoiceMenuItem')
-		this.check_in_out = this.menuItemsContainer.find('#checkInOutMenuItem')
-		this.close_pos    = this.menuItemsContainer.find('#closePosMenuItem')
-		this.setting      = this.menuItemsContainer.find('#settingMenuItem')
+		this.pos_invoices       = this.menuItemsContainer.find('#posInvoiceMenuItem')
+		this.check_in_out       = this.menuItemsContainer.find('#checkInOutMenuItem')
+		this.close_pos          = this.menuItemsContainer.find('#closePosMenuItem')
+		this.unsenced_invoices  = this.menuItemsContainer.find('#unsencedInvoicesMenuItem')
+		this.setting            = this.menuItemsContainer.find('#settingMenuItem')
 
 		//check in out dialog
 		this.wrapper.append('<div id="darkFloatingBackground"></div>')
@@ -186,6 +188,10 @@ pos_ar.PointOfSale.pos_customer_box = class{
 
 		this.close_pos.on('click' , (event)=>{
 			this.on_menu_click('close_pos');
+		})
+
+		this.unsenced_invoices.on('click' , (event)=>{
+			this.on_menu_click('unsenced_invoices');
 		})
 
 		this.pos_invoices.on('click' , (event)=>{
