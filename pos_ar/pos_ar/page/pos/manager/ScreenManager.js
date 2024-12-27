@@ -102,6 +102,7 @@ pos_ar.PointOfSale.ScreenManager  = class {
                 this.item_selector.hideCart();
                 this.selected_item_cart.hideCart();
                 this.item_details.hide_cart();
+                this.history_cart.hide_cart();
                 this.settings_cart.hideCart();
 				this.payment_cart.hideCart();
                 this.check_in_out_cart.hideCart();
@@ -145,6 +146,8 @@ pos_ar.PointOfSale.ScreenManager  = class {
                 this.unsynced_pos_cart.show_cart();
     			this.customer_box.showHomeBar();
                 //hide
+                this.history_cart.hide_cart()      ;
+                this.check_in_out_cart.hideCart()  ;
 				this.item_selector.hideCart()      ;
 		        this.customer_box.hideSyncBar()    ;
         		this.selected_item_cart.hideCart() ;

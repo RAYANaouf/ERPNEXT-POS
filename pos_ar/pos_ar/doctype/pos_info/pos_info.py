@@ -208,6 +208,7 @@ def update_invoice_payment(invoice_name, payment_amount):
 			new_pos_invoice.submit()  # Resubmit the invoice
 			return {
 				'real_name'          : new_pos_invoice.name,
+				'paid_amount'        : outstanding_amount,
 				'outstanding_amount' : new_pos_invoice.outstanding_amount,
 				'remaining'          : rest,
 				'paid'               : new_pos_invoice.status
@@ -222,6 +223,7 @@ def update_invoice_payment(invoice_name, payment_amount):
 			new_pos_invoice.submit()  # Resubmit the invoice
 		return {
 			'real_name'          : new_pos_invoice.name,
+			'paid_amount'        : client_payment_amount,
 			'outstanding_amount' : new_pos_invoice.outstanding_amount,
 			'remaining'          : 0,
 			'paid'               : new_pos_invoice.status

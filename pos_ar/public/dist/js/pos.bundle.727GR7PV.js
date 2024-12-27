@@ -176,8 +176,8 @@
         Object.assign(this.POSOpeningEntry, r[0]);
         this.db.updateCheckInOutSync(this.POSOpeningEntry.period_start_date);
         return true;
-      } catch (error) {
-        console.error("error occured : ", error);
+      } catch (error2) {
+        console.error("error occured : ", error2);
         frappe.throw("Error checking for POS Opening Entry.");
         return false;
       }
@@ -445,7 +445,13 @@
     init_unsyncedPosCart() {
       this.unsynced_pos_cart = new pos_ar.PointOfSale.pos_unsynced_cart(
         this.wrapper,
-        this.db
+        this.db,
+        (invoice) => {
+          const tab = this.selected_item_cart.createTabForEditPOS();
+          this.selectedItemMaps.set(`C${tab}`, invoice);
+          this.selectedTab.tabName = `C${tab}`;
+          this.screenManager.navigate("home");
+        }
       );
       this.screenManager.registerScreen("unsynced_pos_cart", this.unsynced_pos_cart);
       this.screenManager.unsynced_pos_cart = this.unsynced_pos_cart;
@@ -2812,7 +2818,6 @@
     refreshData() {
       this.right_data_container.html("");
       this.filtered_pos_list.forEach((record) => {
-        var _a;
         const posContainer = document.createElement("div");
         posContainer.classList.add("posInvoiceContainer");
         posContainer.classList.add("columnBox");
@@ -2826,7 +2831,7 @@
         posName.textContent = record.refNum;
         const posCost = document.createElement("div");
         posCost.classList.add("posCost");
-        posCost.textContent = (_a = record.paid_amount) != null ? _a : 0 + " DA";
+        posCost.textContent = record.paid_amount + " DA";
         l1.appendChild(posName);
         l1.appendChild(posCost);
         const l2 = document.createElement("div");
@@ -2863,7 +2868,7 @@
       this.refreshPosDetailsData();
     }
     refreshPosDetailsData() {
-      var _a, _b, _c, _d;
+      var _a, _b, _c;
       if (this.selected_pos == null) {
         this.setEmpty();
         return;
@@ -2871,9 +2876,9 @@
         this.setData();
       }
       this.pos_header.find("#posCustomer").text((_a = this.selected_pos.customer) != null ? _a : "CustomerName");
-      this.pos_header.find("#posCost").text((_b = this.selected_pos.paid_amount) != null ? _b : 0 + "DA");
-      this.pos_header.find("#posId").text((_c = this.selected_pos.refNum) != null ? _c : "POS Invoice CachId");
-      this.pos_header.find("#posRealId").text((_d = this.selected_pos.real_name) != null ? _d : "");
+      this.pos_header.find("#posCost").text(this.selected_pos.paid_amount + " DA");
+      this.pos_header.find("#posId").text((_b = this.selected_pos.refNum) != null ? _b : "POS Invoice CachId");
+      this.pos_header.find("#posRealId").text((_c = this.selected_pos.real_name) != null ? _c : "");
       this.pos_header.find("#posStatus").text(this.selected_pos.status);
       this.pos_header.find("#posStatus").removeClass().addClass(`${this.selected_pos.status}`);
       if (this.selected_pos.status == "Draft") {
@@ -2934,8 +2939,8 @@
           }
           this.refreshData();
         },
-        (error) => {
-          console.log(error);
+        (error2) => {
+          console.log(error2);
         }
       );
     }
@@ -2974,8 +2979,8 @@
             }
             this.refreshData();
           },
-          (error) => {
-            console.log("error on deleting the pos : ", error);
+          (error2) => {
+            console.log("error on deleting the pos : ", error2);
           }
         );
       });
@@ -4328,8 +4333,8 @@
         this.payment_amount = result.remaining;
         this.leftContainer.find("#debt_paymentAmount").val(result.remaining);
         await this.refreshClientDebtPart(this.selected_client);
-      } catch (error) {
-        console.error("Error processing payment:", error);
+      } catch (error2) {
+        console.error("Error processing payment:", error2);
         alert("An error occurred while processing the payment. Please try again.");
       } finally {
         this.hide_waiting();
@@ -4351,8 +4356,8 @@
         } else {
           throw new Error("Unexpected server response. Please try again.");
         }
-      } catch (error) {
-        console.error("Error processing sales invoice payment:", error);
+      } catch (error2) {
+        console.error("Error processing sales invoice payment:", error2);
         alert("An error occurred while processing the payment. Please try again later.");
       } finally {
         this.hide_waiting();
@@ -4371,8 +4376,8 @@
         } else {
           throw new Error("Unexpected server response. Please try again.");
         }
-      } catch (error) {
-        console.error("Error processing sales invoice payment:", error);
+      } catch (error2) {
+        console.error("Error processing sales invoice payment:", error2);
         alert("An error occurred while processing the payment. Please try again later.");
       } finally {
         this.hide_waiting();
@@ -4382,9 +4387,10 @@
 
   // ../pos_ar/pos_ar/pos_ar/page/pos/pos_unsynced_cart.js
   pos_ar.PointOfSale.pos_unsynced_cart = class {
-    constructor(wrapper, db) {
+    constructor(wrapper, db, viewDetailsCallback) {
       this.wrapper = wrapper;
       this.db = db;
+      this.view_details_callback = viewDetailsCallback;
       this.invoices = [];
       this.filter = "All";
       this.selectedInvoice = null;
@@ -4481,11 +4487,20 @@
         status.classList.add(invoice.status.toLowerCase().replace(" ", "-"));
         status.textContent = invoice.status;
         l2.appendChild(status);
+        const deleteBtn = document.createElement("button");
+        deleteBtn.classList.add("invoice-delete-btn");
+        deleteBtn.innerHTML = `<i class="fa fa-trash fa-lg"></i>`;
+        l2.appendChild(deleteBtn);
+        deleteBtn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          this.deleteInvoice(invoice.name);
+        });
         invoiceContainer.appendChild(l1);
         invoiceContainer.appendChild(l2);
         invoiceContainer.addEventListener("click", () => {
           this.selectedInvoice = invoice;
           this.refreshInvoiceDetails();
+          console.log("selected invoice : ", this.selectedInvoice);
           this.unsynced_invoice_list.find(".posInvoiceContainer").removeClass("selected");
           $(invoiceContainer).addClass("selected");
         });
@@ -4570,27 +4585,44 @@
       this.invoices = await this.db.getAllPosInvoice();
       this.refreshData();
     }
-    async retrySync(invoice_name) {
-      try {
-        const result = await frappe.call({
-          method: "pos_ar.pos_ar.page.pos.pos.retry_sync_invoice",
-          args: {
-            invoice_name
-          }
-        });
-        if (result.message) {
-          frappe.show_alert({
-            message: __("Invoice synced successfully"),
-            indicator: "green"
-          });
-          this.getAllUnsyncedInvoices();
-        }
-      } catch (error) {
+    async retrySync(invoice) {
+      frappe.db.insert(
+        invoice
+      ).then((r) => {
+        const updatedPos = structuredClone(invoice);
+        updatedPos.synced = true;
+        updatedPos.real_name = r.name;
+        this.appData.updatePosInvoice(updatedPos);
+      }).catch((err) => {
         console.error("Error retrying sync:", error);
         frappe.msgprint({
           title: __("Error"),
           indicator: "red",
           message: __("Failed to sync invoice")
+        });
+      });
+    }
+    async deleteInvoice(invoice_name) {
+      if (!confirm("Are you sure you want to delete this unsynced invoice?")) {
+        return;
+      }
+      try {
+        await frappe.call({
+          method: "pos_ar.pos_ar.page.pos.pos_controller.delete_unsynced_invoice",
+          args: {
+            invoice_name
+          }
+        });
+        this.invoices = this.invoices.filter((inv) => inv.name !== invoice_name);
+        this.refreshData();
+        frappe.show_alert({
+          message: __("Invoice deleted successfully"),
+          indicator: "green"
+        });
+      } catch (error2) {
+        frappe.show_alert({
+          message: __("Failed to delete invoice"),
+          indicator: "red"
         });
       }
     }
@@ -4605,12 +4637,12 @@
       });
       this.retryButton.on("click", () => {
         if (this.selectedInvoice) {
-          this.retrySync(this.selectedInvoice.name);
+          this.retrySync(this.selectedInvoice);
         }
       });
       this.viewButton.on("click", () => {
         if (this.selectedInvoice) {
-          frappe.set_route("Form", "POS Invoice", this.selectedInvoice.name);
+          this.view_details_callback(this.selectedInvoice);
         }
       });
     }
@@ -4934,8 +4966,8 @@
           limit: 1e5,
           order_by: "customer_name ASC"
         });
-      } catch (error) {
-        console.error("Error fetching customers:", error);
+      } catch (error2) {
+        console.error("Error fetching customers:", error2);
         return [];
       }
     }
@@ -4947,8 +4979,8 @@
           filters: filter,
           limit: 1e5
         });
-      } catch (error) {
-        console.error("Error fetching customers:", error);
+      } catch (error2) {
+        console.error("Error fetching customers:", error2);
         return [];
       }
     }
@@ -4961,8 +4993,8 @@
           limit: 1e5,
           order_by: "item_group_name ASC"
         });
-      } catch (error) {
-        console.error("Error fetching Item Group :", error);
+      } catch (error2) {
+        console.error("Error fetching Item Group :", error2);
         return [];
       }
     }
@@ -4975,8 +5007,8 @@
           limit: 1e5,
           order_by: "item_name ASC"
         });
-      } catch (error) {
-        console.error("Error fetching Item Group :", error);
+      } catch (error2) {
+        console.error("Error fetching Item Group :", error2);
         return [];
       }
     }
@@ -4987,8 +5019,8 @@
           args: {}
         });
         return response.message;
-      } catch (error) {
-        console.error("Error fetching Item Barcodes:", error);
+      } catch (error2) {
+        console.error("Error fetching Item Barcodes:", error2);
         return [];
       }
     }
@@ -4999,8 +5031,8 @@
           args: { name }
         });
         return response.message;
-      } catch (error) {
-        console.error("Error fetching Item Barcodes:", error);
+      } catch (error2) {
+        console.error("Error fetching Item Barcodes:", error2);
         return [];
       }
     }
@@ -5012,8 +5044,8 @@
           filters: filter,
           limit: 1e5
         });
-      } catch (error) {
-        console.error("Error fetching Item Group :", error);
+      } catch (error2) {
+        console.error("Error fetching Item Group :", error2);
         return [];
       }
     }
@@ -5025,8 +5057,8 @@
           filters: filter,
           limit: 1e5
         });
-      } catch (error) {
-        console.error("Error fetching Item Group :", error);
+      } catch (error2) {
+        console.error("Error fetching Item Group :", error2);
         return [];
       }
     }
@@ -5038,8 +5070,8 @@
           filters: filter,
           limit: 1e5
         });
-      } catch (error) {
-        console.error("Error fetching Warehouse list : ", error);
+      } catch (error2) {
+        console.error("Error fetching Warehouse list : ", error2);
         return [];
       }
     }
@@ -5053,8 +5085,8 @@
         });
         const r = await frappe.db.get_doc("POS Profile", pos[0].name);
         return r;
-      } catch (error) {
-        console.error("Error fetching pos profile list : ", error);
+      } catch (error2) {
+        console.error("Error fetching pos profile list : ", error2);
         return null;
       }
     }
@@ -5065,24 +5097,24 @@
           args: {}
         });
         return response.message;
-      } catch (error) {
-        console.error("Error fetching mode_of_payments", error);
+      } catch (error2) {
+        console.error("Error fetching mode_of_payments", error2);
         return [];
       }
     }
     async fetchCompany(companyId) {
       try {
         return await frappe.db.get_doc("Company", companyId);
-      } catch (error) {
-        console.error("Error fetching company by companyId from the profile list : ", error);
+      } catch (error2) {
+        console.error("Error fetching company by companyId from the profile list : ", error2);
         return [];
       }
     }
     async fetchSalesTaxesAndChargesTemplate(templateId) {
       try {
         return await frappe.db.get_doc("Sales Taxes and Charges Template", templateId);
-      } catch (error) {
-        console.error("Error fetching Warehouse list : ", error);
+      } catch (error2) {
+        console.error("Error fetching Warehouse list : ", error2);
         return [];
       }
     }
@@ -5094,8 +5126,8 @@
           filters: filter,
           limit: 1
         });
-      } catch (error) {
-        console.error("Error fetching Bin list : ", error);
+      } catch (error2) {
+        console.error("Error fetching Bin list : ", error2);
         return [];
       }
     }
@@ -5110,8 +5142,8 @@
           filters: filter,
           limit: 1e5
         });
-      } catch (error) {
-        console.error("Error fetching deleted documents :", error);
+      } catch (error2) {
+        console.error("Error fetching deleted documents :", error2);
         return [];
       }
       return [];
@@ -5127,8 +5159,8 @@
         } else {
           return [];
         }
-      } catch (error) {
-        console.error("Error fetching debts:", error);
+      } catch (error2) {
+        console.error("Error fetching debts:", error2);
         frappe.msgprint(__("Error fetching debts."));
       }
     }
@@ -5143,8 +5175,8 @@
         } else {
           return [];
         }
-      } catch (error) {
-        console.error("Error fetching debts:", error);
+      } catch (error2) {
+        console.error("Error fetching debts:", error2);
         frappe.msgprint(__("Error fetching debts."));
       }
     }
@@ -5159,8 +5191,8 @@
         } else {
           return [];
         }
-      } catch (error) {
-        console.error("Error fetching debts:", error);
+      } catch (error2) {
+        console.error("Error fetching debts:", error2);
         frappe.msgprint(__("Error fetching debts."));
       }
     }
@@ -5175,8 +5207,8 @@
         } else {
           return [];
         }
-      } catch (error) {
-        console.error("Error fetching debts:", error);
+      } catch (error2) {
+        console.error("Error fetching debts:", error2);
         frappe.msgprint(__("Error fetching debts."));
       }
     }
@@ -5191,8 +5223,8 @@
         } else {
           return [];
         }
-      } catch (error) {
-        console.error("Error fetching debts:", error);
+      } catch (error2) {
+        console.error("Error fetching debts:", error2);
         frappe.msgprint(__("Error fetching debts."));
       }
     }
@@ -5277,6 +5309,7 @@
           this.item_selector.hideCart();
           this.selected_item_cart.hideCart();
           this.item_details.hide_cart();
+          this.history_cart.hide_cart();
           this.settings_cart.hideCart();
           this.payment_cart.hideCart();
           this.check_in_out_cart.hideCart();
@@ -5309,6 +5342,8 @@
         case "unsynced_pos_cart":
           this.unsynced_pos_cart.show_cart();
           this.customer_box.showHomeBar();
+          this.history_cart.hide_cart();
+          this.check_in_out_cart.hideCart();
           this.item_selector.hideCart();
           this.customer_box.hideSyncBar();
           this.selected_item_cart.hideCart();
@@ -5328,4 +5363,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.SJAUBBIR.js.map
+//# sourceMappingURL=pos.bundle.727GR7PV.js.map

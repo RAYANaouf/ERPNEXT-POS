@@ -2,10 +2,12 @@ pos_ar.PointOfSale.pos_unsynced_cart = class {
 
     constructor(
         wrapper,
-        db
+        db,
+        viewDetailsCallback
     ){
         this.wrapper   = wrapper;
         this.db        = db;
+        this.view_details_callback = viewDetailsCallback ;
 
         //local data
         this.invoices = [];
@@ -166,6 +168,18 @@ pos_ar.PointOfSale.pos_unsynced_cart = class {
             status.textContent = invoice.status
             l2.appendChild(status)
 
+            // Add delete button
+            const deleteBtn = document.createElement('button');
+            deleteBtn.classList.add('invoice-delete-btn');
+            deleteBtn.innerHTML = `<i class="fa fa-trash fa-lg"></i>`;
+            l2.appendChild(deleteBtn);
+
+            // Add click event for delete button
+            deleteBtn.addEventListener('click', (e) => {
+                e.stopPropagation();  // Prevent invoice selection when clicking delete
+                this.deleteInvoice(invoice.name);
+            });
+
             //add all to container
             invoiceContainer.appendChild(l1)
             invoiceContainer.appendChild(l2)
@@ -173,6 +187,7 @@ pos_ar.PointOfSale.pos_unsynced_cart = class {
             invoiceContainer.addEventListener('click', () => {
                 this.selectedInvoice = invoice;
                 this.refreshInvoiceDetails();
+                console.log("selected invoice : " , this.selectedInvoice)
                 this.unsynced_invoice_list.find('.posInvoiceContainer').removeClass('selected');
                 $(invoiceContainer).addClass('selected');
             })
@@ -289,28 +304,53 @@ pos_ar.PointOfSale.pos_unsynced_cart = class {
         this.refreshData();
     }
 
-    async retrySync(invoice_name) {
-        try {
-            const result = await frappe.call({
-                method: 'pos_ar.pos_ar.page.pos.pos.retry_sync_invoice',
-                args: {
-                    invoice_name: invoice_name
-                }
-            });
+    async retrySync(invoice) {
 
-            if (result.message) {
-                frappe.show_alert({
-                    message: __('Invoice synced successfully'),
-                    indicator: 'green'
-                });
-                this.getAllUnsyncedInvoices();
-            }
-        } catch (error) {
+        frappe.db.insert(
+            invoice
+        ).then(r =>{
+            const updatedPos = structuredClone(invoice)
+            updatedPos.synced = true;
+            updatedPos.real_name = r.name
+            this.appData.updatePosInvoice(updatedPos)
+            
+            //this.customer_box.setSynced();
+            //this.unsyncedPos = 0;
+            
+        }).catch(err =>{
             console.error('Error retrying sync:', error);
             frappe.msgprint({
                 title: __('Error'),
                 indicator: 'red',
                 message: __('Failed to sync invoice')
+            });
+        })
+    }
+
+    async deleteInvoice(invoice_name) {
+        if (!confirm('Are you sure you want to delete this unsynced invoice?')) {
+            return;
+        }
+        
+        try {
+            await frappe.call({
+                method: 'pos_ar.pos_ar.page.pos.pos_controller.delete_unsynced_invoice',
+                args: {
+                    invoice_name: invoice_name
+                }
+            });
+            
+            // Remove from local list
+            this.invoices = this.invoices.filter(inv => inv.name !== invoice_name);
+            this.refreshData();
+            frappe.show_alert({
+                message: __('Invoice deleted successfully'),
+                indicator: 'green'
+            });
+        } catch (error) {
+            frappe.show_alert({
+                message: __('Failed to delete invoice'),
+                indicator: 'red'
             });
         }
     }
@@ -328,13 +368,13 @@ pos_ar.PointOfSale.pos_unsynced_cart = class {
 
         this.retryButton.on('click', () => {
             if (this.selectedInvoice) {
-                this.retrySync(this.selectedInvoice.name);
+                this.retrySync(this.selectedInvoice);
             }
         });
 
         this.viewButton.on('click', () => {
             if (this.selectedInvoice) {
-                frappe.set_route('Form', 'POS Invoice', this.selectedInvoice.name);
+                this.view_details_callback(this.selectedInvoice)
             }
         });
     }

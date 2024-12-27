@@ -724,12 +724,54 @@
 }
 
 #detailsUnsyncedHeader {
-    padding: 20px;
-    margin-top: 8px;
     background: white;
-    border-radius: 16px;
-    margin-bottom: 16px;
-    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e2e8f0;
+}
+
+div#detailsUnsyncedHeader>div {
+    flex-grow: 1;
+}
+
+#detailsUnsyncedHeader .c1 {
+    gap: 8px;
+}
+
+#detailsUnsyncedHeader .c2 {
+    gap: 8px;
+    align-items: flex-end;
+}
+
+#unsyncedCustomer {
+    font-size: 18px;
+    font-weight: 600;
+    color: #1e293b;
+}
+
+#unsyncedSoldBy {
+    font-size: 14px;
+    color: #64748b;
+}
+
+#unsyncedStatus {
+    font-size: 14px;
+    padding: 4px 12px;
+    border-radius: 20px;
+    display: inline-block;
+}
+
+#unsyncedCost {
+    font-size: 20px;
+    font-weight: 600;
+    color: #1e293b;
+}
+
+#unsyncedId, #unsyncedRealId {
+    font-size: 14px;
+    color: #64748b;
 }
 
 #unsyncedContent {
@@ -835,4 +877,47 @@
     color: #64748b;
     font-size: 15px;
     font-weight: 500;
+}
+
+.invoice-delete-btn {
+    height: 40px !important;
+    width: 80px;
+    background: none;
+    border: none;
+    color: #94a3b8;
+    padding: 0px;
+    margin: 0px;
+    border-radius: 25px;
+    border:1px solid;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 16px;
+}
+
+.invoice-delete-btn i {
+    font-size: 18px;
+}
+
+.invoice-delete-btn:hover {
+    color: #ef4444;
+    background-color: #fef2f2;
+}
+
+.invoice-delete-btn:active {
+    background-color: #fecaca;
+    transform: scale(0.95);
+}
+
+.invoice-delete-btn svg {
+    color: #94a3b8;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.posInvoiceContainer:hover .invoice-delete-btn {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.invoice-delete-btn:hover svg {
+    color: #dc2626;
 }

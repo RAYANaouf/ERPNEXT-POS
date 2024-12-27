@@ -507,7 +507,15 @@ pos_ar.PointOfSale.Controller = class {
 	init_unsyncedPosCart(){
 		this.unsynced_pos_cart = new pos_ar.PointOfSale.pos_unsynced_cart(
 									this.wrapper,
-									this.db
+									this.db,
+									(invoice)=>{
+										const tab = this.selected_item_cart.createTabForEditPOS()
+
+										this.selectedItemMaps.set(`C${tab}` , invoice)
+										this.selectedTab.tabName = `C${tab}`
+							
+										this.screenManager.navigate('home')
+									}
 								)
 		this.screenManager.registerScreen("unsynced_pos_cart" , this.unsynced_pos_cart);
 		this.screenManager.unsynced_pos_cart = this.unsynced_pos_cart ; 

@@ -142,7 +142,7 @@ pos_ar.PointOfSale.pos_history = class {
 			posName.textContent = record.refNum
 			const posCost      = document.createElement('div')
 			posCost.classList.add('posCost')
-			posCost.textContent = record.paid_amount ?? 0 + " DA"
+			posCost.textContent = record.paid_amount + " DA" ?? 0 + " DA"
 
 			l1.appendChild(posName)
 			l1.appendChild(posCost)
@@ -214,7 +214,7 @@ pos_ar.PointOfSale.pos_history = class {
 		this.pos_header.find('#posCustomer').text(this.selected_pos.customer?? "CustomerName")
 		//this.pos_header.find('#posSoldBy').text('Sold By : ' + this.selected_pos.owner?? "saler")
 		//it is not the paid amount it should be the total invoice amount
-		this.pos_header.find('#posCost').text(this.selected_pos.paid_amount??0 + "DA")
+		this.pos_header.find('#posCost').text(this.selected_pos.paid_amount +" DA" ??0 + " DA")
 		this.pos_header.find('#posId').text(this.selected_pos.refNum?? "POS Invoice CachId")
 
 		this.pos_header.find('#posRealId').text(this.selected_pos.real_name ?? "")
