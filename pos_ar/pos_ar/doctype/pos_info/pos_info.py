@@ -267,6 +267,7 @@ def update_sales_invoice_payment(invoice_name, payment_amount):
 		payment_entry.paid_amount     = float(payment_amount)
 
 
+
 		# Link the Payment Entry to the Sales Invoice
 		# Add a row to the references table
 		reference_row = payment_entry.append('references', {})
@@ -286,6 +287,15 @@ def update_sales_invoice_payment(invoice_name, payment_amount):
 		payment_entry.paid_to = default_bank_account
 		payment_entry.paid_to_account_currency = frappe.db.get_value('Account', default_bank_account, 'account_currency')
 
+		#payment_entry.paid_to_account_currency = frappe.db.get_value('POS Invoice', default_bank_account, 'account_currency')
+
+		invoices = frappe.db.get_list('POS Invoice',
+			filters={
+				'consolidated_invoice' : sales_invoice.name
+			},
+			fields=['name','total'],
+		)
+
 
 		#exchange rate is required
 		if payment_entry.company_currency != payment_entry.paid_to_account_currency:
@@ -293,7 +303,7 @@ def update_sales_invoice_payment(invoice_name, payment_amount):
 			payment_entry.source_exchange_rate = 1  # Default to 1 or fetch the correct rate
 
  		# Set Reference No and Reference Date
-		payment_entry.reference_no = "AUTO-GEN"  # Replace with actual reference number
+		payment_entry.reference_no = "AUTO-GEN"  # rayan note : you can replace with actual reference number
 		payment_entry.reference_date = frappe.utils.nowdate()  # Set the current date
 
 
@@ -301,9 +311,20 @@ def update_sales_invoice_payment(invoice_name, payment_amount):
 		payment_entry.save()
 		payment_entry.submit()
 
-		return {
-			'remaining': rest,
-		}
+		if(float(payment_amount) == float(sales_invoice.outstanding_amount)):
+			return {
+				'remaining' : rest     ,
+				'status'    : 'Paid'   , 
+				'invoices'  : invoices ,
+			}
+		else:
+			return {
+				'remaining' : rest     ,
+				'status'    : 'Partly Paid',
+				'invoices'  : invoices ,
+			}
+
+
 	else:
 		return {'error': 'This invoice is already fully paid or has no outstanding amount.'}
 

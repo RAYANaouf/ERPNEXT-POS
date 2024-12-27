@@ -4924,6 +4924,23 @@
     }
     async update_sales_invoice_payment(invoiceName, amount) {
       const rest = await this.api_handler.update_sales_invoice_payment(invoiceName, amount);
+      console.log("rest ::: ", rest);
+      rest.invoices.forEach((invoice) => {
+        this.appData.pos_invoices.forEach((posInvoice) => {
+          console.log("condition : posInvoice.real_name ::: ", posInvoice.real_name, " == invoice ", invoice);
+          if (posInvoice.real_name == invoice.name) {
+            posInvoice.consolidated_invoice = invoiceName;
+            posInvoice.start_paying = true;
+            if (rest.status == "Paid") {
+              posInvoice.outstanding_amount = 0;
+              posInvoice.paid_amount = invoice.total;
+              posInvoice.grand_paid_amount = invoice.total;
+              posInvoice.status = "Paid";
+            }
+            this.db.updatePosInvoice(posInvoice);
+          }
+        });
+      });
       await this.getPosInvoices();
       return rest;
     }
@@ -5363,4 +5380,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.727GR7PV.js.map
+//# sourceMappingURL=pos.bundle.JBUIQTWF.js.map
