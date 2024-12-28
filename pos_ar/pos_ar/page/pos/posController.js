@@ -1235,6 +1235,14 @@ pos_ar.PointOfSale.Controller = class {
 					}).catch(err =>{
 						counter += 1 ;
 						failure += 1 ;
+
+						//if the last pos save seccessfully then hide the progress bar
+						if(counter == allUnsyncedPos.length){
+							frappe.hide_progress();
+							this.customer_box.setSynced();
+							this.unsyncedPos = 0;
+						}
+						
 					})
 				})
 			},

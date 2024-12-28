@@ -937,6 +937,11 @@
             }).catch((err) => {
               counter += 1;
               failure += 1;
+              if (counter == allUnsyncedPos.length) {
+                frappe.hide_progress();
+                this.customer_box.setSynced();
+                this.unsyncedPos = 0;
+              }
             });
           });
         },
@@ -5440,4 +5445,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.7E6JDTOS.js.map
+//# sourceMappingURL=pos.bundle.OOWZB3NY.js.map
