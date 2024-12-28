@@ -127,6 +127,7 @@ pos_ar.PointOfSale.pos_unsynced_cart = class {
             const posName = document.createElement('div')
             posName.classList.add('posName')
             posName.textContent = invoice.name
+
             const posCost = document.createElement('div')
             posCost.classList.add('posCost')
             posCost.textContent = format_currency(invoice.grand_total, invoice.currency)

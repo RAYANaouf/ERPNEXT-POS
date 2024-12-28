@@ -2829,26 +2829,16 @@
         const posName = document.createElement("div");
         posName.classList.add("posName");
         posName.textContent = record.refNum;
-        if (record.consolidated_invoice) {
-          const consolidatedFlag = document.createElement("div");
-          consolidatedFlag.style.display = "inline-flex";
-          consolidatedFlag.style.alignItems = "center";
-          consolidatedFlag.style.padding = "3px 10px";
-          consolidatedFlag.style.marginLeft = "8px";
-          consolidatedFlag.style.background = "linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)";
-          consolidatedFlag.style.color = "white";
-          consolidatedFlag.style.borderRadius = "4px";
-          consolidatedFlag.style.fontSize = "11px";
-          consolidatedFlag.style.fontWeight = "600";
-          consolidatedFlag.style.boxShadow = "0 2px 4px rgba(99, 102, 241, 0.2)";
-          consolidatedFlag.innerHTML = '<i class="fa fa-link" style="margin-right: 5px;"></i> Consolidated';
-          consolidatedFlag.title = "Consolidated Invoice";
-          posName.appendChild(consolidatedFlag);
-        }
         const posCost = document.createElement("div");
         posCost.classList.add("posCost");
         posCost.textContent = record.paid_amount + " DA";
         l1.appendChild(posName);
+        if (record.consolidated_invoice) {
+          const consolidatedFlag = document.createElement("div");
+          consolidatedFlag.classList.add("consolidated-flag");
+          consolidatedFlag.textContent = "Consolidated";
+          l1.appendChild(consolidatedFlag);
+        }
         l1.appendChild(posCost);
         const l2 = document.createElement("div");
         l2.classList.add("l2");
@@ -5396,4 +5386,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.NCMZSQA6.js.map
+//# sourceMappingURL=pos.bundle.SZGRH7C4.js.map
