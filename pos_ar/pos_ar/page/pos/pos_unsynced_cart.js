@@ -2,12 +2,16 @@ pos_ar.PointOfSale.pos_unsynced_cart = class {
 
     constructor(
         wrapper,
+        appData,
         db,
-        viewDetailsCallback
+        viewDetailsCallback,
+        onDeleteCallback
     ){
         this.wrapper   = wrapper;
+        this.app_data  = appData;
         this.db        = db;
         this.view_details_callback = viewDetailsCallback ;
+        this.on_delete_callback = onDeleteCallback;
 
         //local data
         this.invoices = [];
@@ -109,10 +113,7 @@ pos_ar.PointOfSale.pos_unsynced_cart = class {
             return;
         }
 
-        console.log("filteredList : " , filteredList)
-
         filteredList.forEach(invoice => {
-            console.log("invoice : " , invoice)
             const invoiceContainer = document.createElement('div');
             invoiceContainer.classList.add('posInvoiceContainer')
             invoiceContainer.classList.add('columnBox')
@@ -178,7 +179,21 @@ pos_ar.PointOfSale.pos_unsynced_cart = class {
             // Add click event for delete button
             deleteBtn.addEventListener('click', (e) => {
                 e.stopPropagation();  // Prevent invoice selection when clicking delete
-                this.deleteInvoice(invoice.name);
+                this.app_data.deletePosInvoice_callback(
+                    invoice.name,
+                    ()=>{
+                        this.getAllUnsyncedInvoices()
+                        this.on_delete_callback()
+                        //this.refreshInvoiceDetails()
+                    },(err)=>{
+                        console.error('Error deleting invoice:', err);
+                        frappe.msgprint({
+                            title: __('Error'),
+                            indicator: 'red',
+                            message: __('Failed to delete invoice')
+                        });
+                    }
+                );
             });
 
             //add all to container
@@ -203,8 +218,21 @@ pos_ar.PointOfSale.pos_unsynced_cart = class {
     }
 
     refreshInvoiceDetails() {
-        if (!this.selectedInvoice) {
+        // Check if selected invoice exists and is still in the invoices list
+        if (!this.selectedInvoice || !this.invoices.find(inv => inv.name === this.selectedInvoice.name)) {
+            this.selectedInvoice = null;
             this.unsyncedContent.addClass('d-none');
+            // Clear all data
+            const header = this.details_unsynced_header;
+            header.find('#unsyncedCustomer').text('');
+            header.find('#unsyncedSoldBy').text('');
+            header.find('#unsyncedStatus').text('').removeClass();
+            header.find('#unsyncedCost').text('');
+            header.find('#unsyncedId').text('');
+            header.find('#unsyncedRealId').text('');
+            this.itemList.empty();
+            this.totalList.empty();
+            this.methodList.empty();
             return;
         }
 
@@ -303,6 +331,7 @@ pos_ar.PointOfSale.pos_unsynced_cart = class {
     async getAllUnsyncedInvoices() {
         this.invoices = await this.db.getAllPosInvoice()
         this.refreshData();
+        this.refreshInvoiceDetails();
     }
 
     async retrySync(invoice) {
@@ -319,7 +348,7 @@ pos_ar.PointOfSale.pos_unsynced_cart = class {
             //this.unsyncedPos = 0;
             
         }).catch(err =>{
-            console.error('Error retrying sync:', error);
+            console.error('Error retrying sync:', err);
             frappe.msgprint({
                 title: __('Error'),
                 indicator: 'red',
@@ -334,15 +363,9 @@ pos_ar.PointOfSale.pos_unsynced_cart = class {
         }
         
         try {
-            await frappe.call({
-                method: 'pos_ar.pos_ar.page.pos.pos_controller.delete_unsynced_invoice',
-                args: {
-                    invoice_name: invoice_name
-                }
-            });
             
             // Remove from local list
-            this.invoices = this.invoices.filter(inv => inv.name !== invoice_name);
+            //this.invoices = this.invoices.filter(inv => inv.name !== invoice_name);
             this.refreshData();
             frappe.show_alert({
                 message: __('Invoice deleted successfully'),

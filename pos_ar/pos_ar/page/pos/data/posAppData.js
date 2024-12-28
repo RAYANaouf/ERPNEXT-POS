@@ -240,7 +240,6 @@ pos_ar.PointOfSale.posAppData = class {
 		const rest = await this.api_handler.update_sales_invoice_payment( invoiceName , amount)
 
 
-		console.log("rest ::: " , rest);
 		rest.invoices.forEach(invoice=>{
 			this.appData.pos_invoices.forEach(posInvoice=>{
 				if(posInvoice.real_name == invoice.name){
