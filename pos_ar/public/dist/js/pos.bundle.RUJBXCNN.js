@@ -2863,12 +2863,8 @@
           l3.classList.add("align_content");
           const consolidatedFlag = document.createElement("div");
           consolidatedFlag.classList.add("consolidated-flag");
-          consolidatedFlag.textContent = "Consolidated";
+          consolidatedFlag.innerHTML = `<span style="font-weight: 800; font-size: 14px; letter-spacing: 0.5px; text-transform: uppercase;margin-right:8px;">Consolidated : </span> ${record.consolidated_invoice}`;
           l3.appendChild(consolidatedFlag);
-          const salesInvoice = document.createElement("div");
-          salesInvoice.classList.add("sales-invoice");
-          salesInvoice.textContent = record.consolidated_sales_invoice;
-          l3.appendChild(salesInvoice);
           posContainer.appendChild(l1);
           posContainer.appendChild(l3);
           posContainer.appendChild(l2);
@@ -5398,4 +5394,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.NOGNBXXB.js.map
+//# sourceMappingURL=pos.bundle.RUJBXCNN.js.map
