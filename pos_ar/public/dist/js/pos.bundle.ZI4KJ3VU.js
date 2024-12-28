@@ -4962,6 +4962,23 @@
     }
     async paySelectedInvoice(invoices, amount) {
       const rest = await this.api_handler.pay_selected_invoice(invoices, amount);
+      rest.invoices_state_collection.forEach((invoices_status) => {
+        invoices_status.invoices.forEach((invoice) => {
+          this.appData.pos_invoices.forEach((posInvoice) => {
+            if (posInvoice.real_name == invoice.name) {
+              posInvoice.consolidated_invoice = invoices_status.sales_invoice_name;
+              posInvoice.start_paying = true;
+              if (invoices_status.status == "Paid") {
+                posInvoice.outstanding_amount = 0;
+                posInvoice.paid_amount = invoice.total;
+                posInvoice.grand_paid_amount = invoice.total;
+                posInvoice.status = "Paid";
+              }
+              this.db.updatePosInvoice(posInvoice);
+            }
+          });
+        });
+      });
       return rest;
     }
     async getAllOpenedPosInvoice() {
@@ -5396,4 +5413,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.YODPM2DV.js.map
+//# sourceMappingURL=pos.bundle.ZI4KJ3VU.js.map

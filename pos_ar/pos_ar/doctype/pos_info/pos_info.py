@@ -1,6 +1,7 @@
 # Copyright (c) 2024, rayan aouf and contributors
 # For license information, please see license.txt
 
+from ast import If
 import frappe
 from frappe.model.document import Document
 import json
@@ -311,7 +312,7 @@ def update_sales_invoice_payment(invoice_name, payment_amount):
 		payment_entry.save()
 		payment_entry.submit()
 
-		if(float(payment_amount) == float(sales_invoice.outstanding_amount)):
+		if(float(payment_amount) >= float(sales_invoice.outstanding_amount)):
 			return {
 				'remaining' : rest     ,
 				'status'    : 'Paid'   , 
@@ -334,9 +335,11 @@ def update_sales_invoice_payment(invoice_name, payment_amount):
 
 
 @frappe.whitelist()
-def pay_selected_invoice(invoices , payment_amount):
+def pay_selected_invoice(invoices, payment_amount):
 	selected_invoices = json.loads(invoices)
 	remaining_amount = float(payment_amount)
+
+	invoices_state_collection = []
 
 	for invoice in selected_invoices:
 		if remaining_amount <= 0:
@@ -346,6 +349,14 @@ def pay_selected_invoice(invoices , payment_amount):
 		invoice_type = invoice.get('type')  # 'Sales Invoice' or 'POS Invoice'
 		if invoice_type == "Sales Invoice":
 			result = update_sales_invoice_payment(invoice_name, remaining_amount)
+			invoices_state_collection.append({
+				'invoices': result.get('invoices'),
+				'status': result.get('status'),
+				'sales_invoice_name': invoice_name
+			})
 			remaining_amount = result.get('remaining')
 
-	return {'remaining': remaining_amount}
+	return {
+		'remaining': remaining_amount,
+		'invoices_state_collection': invoices_state_collection
+	}
