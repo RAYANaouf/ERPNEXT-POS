@@ -1,6 +1,5 @@
 .consolidated-flag {
     background-color: #4CAF50;
-    width: 100%;
     height: 35px;
     color: white;
     padding: 4px 16px;
@@ -342,13 +341,14 @@
 
 #historyRecentInvoicesContainer .posInvoiceContainer .l1 {
     width: 100%;
+    margin-bottom: 16px;
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 
 #historyRecentInvoicesContainer .posInvoiceContainer .posName {
-    font-size: 16px;
+    font-size: 14px;
     font-weight: 600;
     color: #0f172a;
     flex-grow: 1;
@@ -878,4 +878,25 @@ div#detailsUnsyncedHeader>div {
 .l3 .sales-invoice {
     color: #1e293b;
     margin-left: 4px;
+}
+
+#posConsolidated {
+    margin-top: 12px;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+#posConsolidated span:first-child {
+    color: #4CAF50;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    font-size: 15px;
+}
+
+#posConsolidated span:last-child {
+    color: #64748b;
+    font-weight: 500;
+    font-size: 14px;
 }

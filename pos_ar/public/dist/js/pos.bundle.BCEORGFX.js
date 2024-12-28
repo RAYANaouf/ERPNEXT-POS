@@ -2833,6 +2833,13 @@
         posCost.classList.add("posCost");
         posCost.textContent = record.paid_amount + " DA";
         l1.appendChild(posName);
+        if (record.consolidated_invoice) {
+          const consolidatedFlag = document.createElement("div");
+          consolidatedFlag.classList.add("consolidated-flag");
+          consolidatedFlag.style.margin = "0 8px 0 8px";
+          consolidatedFlag.innerHTML = `Consolidated`;
+          l1.appendChild(consolidatedFlag);
+        }
         l1.appendChild(posCost);
         const l2 = document.createElement("div");
         l2.classList.add("l2");
@@ -2856,22 +2863,8 @@
         const creationTime = document.createElement("div");
         creationTime.textContent = record.creation_time;
         l2.appendChild(creationTime);
-        if (record.consolidated_invoice) {
-          const l3 = document.createElement("div");
-          l3.classList.add("l3");
-          l3.classList.add("rowBox");
-          l3.classList.add("align_content");
-          const consolidatedFlag = document.createElement("div");
-          consolidatedFlag.classList.add("consolidated-flag");
-          consolidatedFlag.innerHTML = `<span style="font-weight: 800; font-size: 14px; letter-spacing: 0.5px; text-transform: uppercase;margin-right:8px;">Consolidated : </span> ${record.consolidated_invoice}`;
-          l3.appendChild(consolidatedFlag);
-          posContainer.appendChild(l1);
-          posContainer.appendChild(l3);
-          posContainer.appendChild(l2);
-        } else {
-          posContainer.appendChild(l1);
-          posContainer.appendChild(l2);
-        }
+        posContainer.appendChild(l1);
+        posContainer.appendChild(l2);
         posContainer.addEventListener("click", () => {
           console.log("click", record);
           this.selected_pos = record;
@@ -2895,6 +2888,17 @@
       this.pos_header.find("#posRealId").text((_c = this.selected_pos.real_name) != null ? _c : "");
       this.pos_header.find("#posStatus").text(this.selected_pos.status);
       this.pos_header.find("#posStatus").removeClass().addClass(`${this.selected_pos.status}`);
+      if (this.selected_pos.consolidated_invoice) {
+        if (!this.pos_header.find("#posConsolidated").length) {
+          this.pos_header.find(".c1").append('<div id="posConsolidated" class="consolidated-info"></div>');
+        }
+        this.pos_header.find("#posConsolidated").html(`
+                <span class="consolidated-label">Consolidated:</span>
+                <span class="consolidated-value">${this.selected_pos.consolidated_invoice}</span>
+            `);
+      } else {
+        this.pos_header.find("#posConsolidated").remove();
+      }
       if (this.selected_pos.status == "Draft") {
         this.draftActionButtonsContainer.css("display", "flex");
         this.actionButtonsContainer.css("display", "none");
@@ -5394,4 +5398,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.RUJBXCNN.js.map
+//# sourceMappingURL=pos.bundle.BCEORGFX.js.map
