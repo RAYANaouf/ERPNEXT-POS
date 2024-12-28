@@ -4382,7 +4382,6 @@
       }
     }
     async paySelectedInvoice() {
-      console.log("we are here");
       try {
         this.show_waiting();
         const paymentAmount = parseFloat(this.payment_amount) || 0;
@@ -4945,7 +4944,6 @@
       console.log("rest ::: ", rest);
       rest.invoices.forEach((invoice) => {
         this.appData.pos_invoices.forEach((posInvoice) => {
-          console.log("condition : posInvoice.real_name ::: ", posInvoice.real_name, " == invoice ", invoice);
           if (posInvoice.real_name == invoice.name) {
             posInvoice.consolidated_invoice = invoiceName;
             posInvoice.start_paying = true;
@@ -5398,4 +5396,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.BCEORGFX.js.map
+//# sourceMappingURL=pos.bundle.YODPM2DV.js.map

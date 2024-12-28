@@ -335,17 +335,17 @@ def update_sales_invoice_payment(invoice_name, payment_amount):
 
 @frappe.whitelist()
 def pay_selected_invoice(invoices , payment_amount):
-	selected_invoices = json.loads( invoices )
+	selected_invoices = json.loads(invoices)
 	remaining_amount = float(payment_amount)
 
 	for invoice in selected_invoices:
+		if remaining_amount <= 0:
+			break
+			
 		invoice_name = invoice.get('name')
 		invoice_type = invoice.get('type')  # 'Sales Invoice' or 'POS Invoice'
 		if invoice_type == "Sales Invoice":
-			result = update_sales_invoice_payment(invoice_name , remaining_amount)
+			result = update_sales_invoice_payment(invoice_name, remaining_amount)
 			remaining_amount = result.get('remaining')
 
-	return {'remaining':remaining_amount}
-
-
-
+	return {'remaining': remaining_amount}

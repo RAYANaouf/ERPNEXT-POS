@@ -334,7 +334,6 @@ pos_ar.PointOfSale.pos_debt_cart = class{
 
 
 	async paySelectedInvoice() {
-		console.log("we are here")
 		try {
 			this.show_waiting();
 
