@@ -2833,12 +2833,6 @@
         posCost.classList.add("posCost");
         posCost.textContent = record.paid_amount + " DA";
         l1.appendChild(posName);
-        if (record.consolidated_invoice) {
-          const consolidatedFlag = document.createElement("div");
-          consolidatedFlag.classList.add("consolidated-flag");
-          consolidatedFlag.textContent = "Consolidated";
-          l1.appendChild(consolidatedFlag);
-        }
         l1.appendChild(posCost);
         const l2 = document.createElement("div");
         l2.classList.add("l2");
@@ -2862,8 +2856,26 @@
         const creationTime = document.createElement("div");
         creationTime.textContent = record.creation_time;
         l2.appendChild(creationTime);
-        posContainer.appendChild(l1);
-        posContainer.appendChild(l2);
+        if (record.consolidated_invoice) {
+          const l3 = document.createElement("div");
+          l3.classList.add("l3");
+          l3.classList.add("rowBox");
+          l3.classList.add("align_content");
+          const consolidatedFlag = document.createElement("div");
+          consolidatedFlag.classList.add("consolidated-flag");
+          consolidatedFlag.textContent = "Consolidated";
+          l3.appendChild(consolidatedFlag);
+          const salesInvoice = document.createElement("div");
+          salesInvoice.classList.add("sales-invoice");
+          salesInvoice.textContent = record.consolidated_sales_invoice;
+          l3.appendChild(salesInvoice);
+          posContainer.appendChild(l1);
+          posContainer.appendChild(l3);
+          posContainer.appendChild(l2);
+        } else {
+          posContainer.appendChild(l1);
+          posContainer.appendChild(l2);
+        }
         posContainer.addEventListener("click", () => {
           console.log("click", record);
           this.selected_pos = record;
@@ -5386,4 +5398,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.SZGRH7C4.js.map
+//# sourceMappingURL=pos.bundle.NOGNBXXB.js.map
