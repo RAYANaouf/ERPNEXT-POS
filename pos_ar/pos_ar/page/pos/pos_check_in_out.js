@@ -185,7 +185,7 @@ pos_ar.PointOfSale.pos_check_in_out = class {
 		this.checkType.append(this.selectedCheckInOut.check_type)
 		this.checkCreationTime.append(this.selectedCheckInOut.creation_time)
 		this.checkAmount.append(this.selectedCheckInOut.amount + ' DA')
-		this.checkReason.append(this.selectedCheckInOut.reason)
+		this.checkReason.append(this.selectedCheckInOut.reason || this.selectedCheckInOut.reason_note)
 		this.checkOwner.append(this.selectedCheckInOut.owner)
 
 		console.log("this.checkReason.scrollHeight : " , this.checkReason.get(0).scrollHeight)

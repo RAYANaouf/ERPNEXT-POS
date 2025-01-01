@@ -2,10 +2,12 @@ pos_ar.PointOfSale.pos_debt_cart = class{
 
 	constructor(
 		wrapper,
-		appData
+		appData,
+		refreshCheckInOut
 	){
-		this.wrapper           = wrapper
-		this.app_data          = appData
+		this.wrapper              = wrapper
+		this.app_data             = appData
+		this.refresh_check_in_out = refreshCheckInOut 
 
 		//local vars
 		this._filtredClientList = this.app_data.appData.customers
@@ -179,7 +181,6 @@ pos_ar.PointOfSale.pos_debt_cart = class{
 		let partially_paid = 0 ;
 		this._selected_invoice.forEach(invoice=>{
 			partially_paid += invoice.outstanding_amount
-			console.log("see invoice ==> " , invoice)
 		})
 
 		this.partially_client_debt.text(`Selected Debt : ${partially_paid} DA`)
@@ -268,12 +269,31 @@ pos_ar.PointOfSale.pos_debt_cart = class{
 			return;
 		}
 
-
 		try {
 			this.show_waiting();
 
 			// Call the server method to update the invoice payment
 			const result = await this.app_data.update_invoice_payment(invoice.name, this.payment_amount);
+
+			// add check in to the voucher.
+			const check_in_amount  = this.payment_amount - result.remaining;
+			const checkInOut         = frappe.model.get_new_doc('check_in_out')
+			checkInOut.creation_time = frappe.datetime.now_datetime();
+			checkInOut.user          = frappe.session.user;
+			checkInOut.check_type    = 'In';
+			checkInOut.is_sync       = 0 ;
+			checkInOut.amount        = parseFloat(check_in_amount);
+			checkInOut.reason_note   = 'Debt payment.';
+
+
+			this.app_data.saveCheckInOut(
+				checkInOut,
+				(res)=>{
+					this.refresh_check_in_out()
+				},(err)=>{
+					console.log('err to save checkInOut : ' , err)
+				}
+			)
 
 			// Update the payment amount and UI
 			this.payment_amount = result.remaining;
@@ -307,6 +327,26 @@ pos_ar.PointOfSale.pos_debt_cart = class{
 
 			// Call the server method to update the invoice payment
 			const result = await this.app_data.update_sales_invoice_payment(invoice.name, paymentAmount);
+
+			// add check in to the voucher.
+			const check_in_amount  = this.payment_amount - result.remaining;
+			const checkInOut         = frappe.model.get_new_doc('check_in_out')
+			checkInOut.creation_time = frappe.datetime.now_datetime();
+			checkInOut.user          = frappe.session.user;
+			checkInOut.check_type    = 'In';
+			checkInOut.is_sync       = 0 ;
+			checkInOut.amount        = parseFloat(check_in_amount);
+			checkInOut.reason_note   = 'Debt payment.';
+			
+			
+			this.app_data.saveCheckInOut(
+				checkInOut,
+				(res)=>{
+					this.refresh_check_in_out()
+				},(err)=>{
+					console.log('err to save checkInOut : ' , err)
+				}
+			)
 
 			// Ensure result is valid and contains the `remaining` field
 			if (result && typeof result.remaining === "number") {
@@ -342,6 +382,26 @@ pos_ar.PointOfSale.pos_debt_cart = class{
 
 			// Call the server method to update the invoice payment
 			const result = await this.app_data.paySelectedInvoice(this._selected_invoice , paymentAmount);
+
+			// add check in to the voucher.
+			const check_in_amount    = paymentAmount - result.remaining;
+			const checkInOut         = frappe.model.get_new_doc('check_in_out')
+			checkInOut.creation_time = frappe.datetime.now_datetime();
+			checkInOut.user          = frappe.session.user;
+			checkInOut.check_type    = 'In';
+			checkInOut.is_sync       = 0   ;
+			checkInOut.amount        = parseFloat(check_in_amount);
+			checkInOut.reason_note   = 'Debt payment.';
+						
+						
+			this.app_data.saveCheckInOut(
+				checkInOut,
+				(res)=>{
+					this.refresh_check_in_out()
+				},(err)=>{
+					console.log('err to save checkInOut : ' , err)
+				}
+			)
 
 			// Ensure result is valid and contains the `remaining` field
 			if (result && typeof result.remaining === "number") {

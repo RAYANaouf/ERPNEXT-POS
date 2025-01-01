@@ -1,15 +1,15 @@
 pos_ar.PointOfSale.Controller = class {
         constructor(wrapper) {
 		//principales variable
-        this.wrapper = $(wrapper).find(".layout-main-section");
-        this.page    = wrapper.page ;
+	        this.wrapper = $(wrapper).find(".layout-main-section");
+	        this.page    = wrapper.page ;
 
 
-        this.selectedItemMaps  = new Map()
+	        this.selectedItemMaps  = new Map()
 
-        this.selectedItem               = {"name"       : ""   }
-        this.selectedField              = {"field_name" : ""   }
-        this.selectedTab                = {"tabName"    : ""   }
+	        this.selectedItem               = {"name"       : ""   }
+        	this.selectedField              = {"field_name" : ""   }
+  		this.selectedTab                = {"tabName"    : ""   }
 		this.selectedPaymentMethod      = {"methodName" : ""   }
 		this.defaultCustomer            = {"name"       : "" , "customer_name" : ""}
 		this.defaultPriceList           = {"name"       : ""   }
@@ -25,7 +25,7 @@ pos_ar.PointOfSale.Controller = class {
 
 		this.syncInput = false
 
-        this.start_app();
+        	this.start_app();
         }
 
 	 async start_app(){
@@ -486,7 +486,10 @@ pos_ar.PointOfSale.Controller = class {
     init_debtCart(){
 		this.debt_cart = new pos_ar.PointOfSale.pos_debt_cart(
 									this.wrapper,
-									this.appData
+									this.appData,
+									()=>{
+										this.check_in_out_cart.getAllCheckInOut();
+									}
 								)
 		this.screenManager.registerScreen("debt_cart" , this.debt_cart);
 		this.screenManager.debt_cart = this.debt_cart ; 
@@ -1322,11 +1325,11 @@ pos_ar.PointOfSale.Controller = class {
 		const unsyncedChecks = this.check_in_out_cart.checkList.filter(check => check.is_sync === 0);
 		unsyncedChecks.forEach(check => {
 			let child = frappe.model.add_child(voucher, 'check_in_out', 'custom_check_in_out')
-			child.check_type = check.check_type
+			child.check_type    = check.check_type
 			child.creation_time = check.creation_time
-			child.amount = check.amount
-			child.reason = check.reason
-			child.user = check.owner
+			child.amount        = check.amount
+			child.reason_note   = check.reason_note
+			child.user          = check.owner
 		})
 
 		//frappe.set_route("Form", "POS Closing Entry", voucher.name);

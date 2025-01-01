@@ -427,7 +427,10 @@
     init_debtCart() {
       this.debt_cart = new pos_ar.PointOfSale.pos_debt_cart(
         this.wrapper,
-        this.appData
+        this.appData,
+        () => {
+          this.check_in_out_cart.getAllCheckInOut();
+        }
       );
       this.screenManager.registerScreen("debt_cart", this.debt_cart);
       this.screenManager.debt_cart = this.debt_cart;
@@ -1000,7 +1003,7 @@
         child.check_type = check.check_type;
         child.creation_time = check.creation_time;
         child.amount = check.amount;
-        child.reason = check.reason;
+        child.reason_note = check.reason_note;
         child.user = check.owner;
       });
       frappe.set_route("Form", "POS Closing Entry", voucher.name).then(() => {
@@ -1617,7 +1620,7 @@
         checkInOut.user = frappe.session.user;
         checkInOut.check_type = this.check_in_out_type;
         checkInOut.amount = parseFloat(this.check_in_out_input.val());
-        checkInOut.reason = this.check_in_out_note.val();
+        checkInOut.reason_note = this.check_in_out_note.val();
         if (parseFloat(this.check_in_out_input.val()) <= 0 || this.check_in_out_note.val() == "") {
           frappe.msgprint("you should fulfilled fileds.");
           return;
@@ -4107,7 +4110,7 @@
       this.checkType.append(this.selectedCheckInOut.check_type);
       this.checkCreationTime.append(this.selectedCheckInOut.creation_time);
       this.checkAmount.append(this.selectedCheckInOut.amount + " DA");
-      this.checkReason.append(this.selectedCheckInOut.reason);
+      this.checkReason.append(this.selectedCheckInOut.reason || this.selectedCheckInOut.reason_note);
       this.checkOwner.append(this.selectedCheckInOut.owner);
       console.log("this.checkReason.scrollHeight : ", this.checkReason.get(0).scrollHeight);
       this.checkReason.get(0).style.height = "auto";
@@ -4165,9 +4168,10 @@
 
   // ../pos_ar/pos_ar/pos_ar/page/pos/pos_debt_cart.js
   pos_ar.PointOfSale.pos_debt_cart = class {
-    constructor(wrapper, appData) {
+    constructor(wrapper, appData, refreshCheckInOut) {
       this.wrapper = wrapper;
       this.app_data = appData;
+      this.refresh_check_in_out = refreshCheckInOut;
       this._filtredClientList = this.app_data.appData.customers;
       this.selected_client = {};
       this.payment_amount = 0;
@@ -4305,7 +4309,6 @@
       let partially_paid = 0;
       this._selected_invoice.forEach((invoice) => {
         partially_paid += invoice.outstanding_amount;
-        console.log("see invoice ==> ", invoice);
       });
       this.partially_client_debt.text(`Selected Debt : ${partially_paid} DA`);
     }
@@ -4362,6 +4365,23 @@
       try {
         this.show_waiting();
         const result = await this.app_data.update_invoice_payment(invoice.name, this.payment_amount);
+        const check_in_amount = this.payment_amount - result.remaining;
+        const checkInOut = frappe.model.get_new_doc("check_in_out");
+        checkInOut.creation_time = frappe.datetime.now_datetime();
+        checkInOut.user = frappe.session.user;
+        checkInOut.check_type = "In";
+        checkInOut.is_sync = 0;
+        checkInOut.amount = parseFloat(check_in_amount);
+        checkInOut.reason_note = "Debt payment.";
+        this.app_data.saveCheckInOut(
+          checkInOut,
+          (res) => {
+            this.refresh_check_in_out();
+          },
+          (err) => {
+            console.log("err to save checkInOut : ", err);
+          }
+        );
         this.payment_amount = result.remaining;
         this.leftContainer.find("#debt_paymentAmount").val(result.remaining);
         await this.refreshClientDebtPart(this.selected_client);
@@ -4381,6 +4401,23 @@
           return;
         }
         const result = await this.app_data.update_sales_invoice_payment(invoice.name, paymentAmount);
+        const check_in_amount = this.payment_amount - result.remaining;
+        const checkInOut = frappe.model.get_new_doc("check_in_out");
+        checkInOut.creation_time = frappe.datetime.now_datetime();
+        checkInOut.user = frappe.session.user;
+        checkInOut.check_type = "In";
+        checkInOut.is_sync = 0;
+        checkInOut.amount = parseFloat(check_in_amount);
+        checkInOut.reason_note = "Debt payment.";
+        this.app_data.saveCheckInOut(
+          checkInOut,
+          (res) => {
+            this.refresh_check_in_out();
+          },
+          (err) => {
+            console.log("err to save checkInOut : ", err);
+          }
+        );
         if (result && typeof result.remaining === "number") {
           this.payment_amount = result.remaining;
           this.leftContainer.find("#debt_paymentAmount").val(result.remaining);
@@ -4400,6 +4437,23 @@
         this.show_waiting();
         const paymentAmount = parseFloat(this.payment_amount) || 0;
         const result = await this.app_data.paySelectedInvoice(this._selected_invoice, paymentAmount);
+        const check_in_amount = paymentAmount - result.remaining;
+        const checkInOut = frappe.model.get_new_doc("check_in_out");
+        checkInOut.creation_time = frappe.datetime.now_datetime();
+        checkInOut.user = frappe.session.user;
+        checkInOut.check_type = "In";
+        checkInOut.is_sync = 0;
+        checkInOut.amount = parseFloat(check_in_amount);
+        checkInOut.reason_note = "Debt payment.";
+        this.app_data.saveCheckInOut(
+          checkInOut,
+          (res) => {
+            this.refresh_check_in_out();
+          },
+          (err) => {
+            console.log("err to save checkInOut : ", err);
+          }
+        );
         if (result && typeof result.remaining === "number") {
           this.payment_amount = result.remaining;
           this.leftContainer.find("#debt_paymentAmount").val(result.remaining);
@@ -5445,4 +5499,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.OOWZB3NY.js.map
+//# sourceMappingURL=pos.bundle.LSXXNXW3.js.map

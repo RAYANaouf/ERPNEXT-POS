@@ -263,7 +263,7 @@ pos_ar.PointOfSale.pos_customer_box = class{
 			checkInOut.user          = frappe.session.user;
 			checkInOut.check_type    = this.check_in_out_type;
 			checkInOut.amount        = parseFloat(this.check_in_out_input.val());
-			checkInOut.reason        = this.check_in_out_note.val()
+			checkInOut.reason_note   = this.check_in_out_note.val()
 			//valid inputs
 			if(parseFloat(this.check_in_out_input.val()) <= 0 || this.check_in_out_note.val() == ''){
 				frappe.msgprint('you should fulfilled fileds.')

@@ -129,6 +129,24 @@ app_include_js = ["/assets/pos_ar/js/pos.bundle.js","/assets/pos_ar/js/sw.js"]
 # 	}
 # }
 
+
+
+doc_events = {
+    "Sales Invoice": {
+        "on_submit": "pos_ar.api.update_customer_debt_on_invoice",
+        "on_cancel": "pos_ar.api.update_customer_debt_on_invoice",
+    },
+    "POS Invoice": {
+        "on_submit": "pos_ar.api.update_customer_debt_on_invoice",
+        "on_cancel": "pos_ar.api.update_customer_debt_on_invoice",
+    },
+    "Payment Entry": {
+        "on_submit": "pos_ar.api.update_customer_debt_on_invoice",
+        "on_cancel": "pos_ar.api.update_customer_debt_on_invoice",
+    }
+}
+
+
 # Scheduled Tasks
 # ---------------
 
@@ -243,17 +261,3 @@ fixtures = [
 ]
 
 
-doc_events = {
-    "Sales Invoice": {
-        "on_submit": "pos_ar.api.update_customer_debt_on_invoice",
-        "on_cancel": "pos_ar.api.update_customer_debt_on_invoice",
-    },
-    "POS Invoice": {
-        "on_submit": "pos_ar.api.update_customer_debt_on_invoice",
-        "on_cancel": "pos_ar.api.update_customer_debt_on_invoice",
-    },
-    "Payment Entry": {
-        "on_submit": "pos_ar.api.update_customer_debt_on_invoice",
-        "on_cancel": "pos_ar.api.update_customer_debt_on_invoice",
-    }
-}
