@@ -4365,23 +4365,6 @@
       try {
         this.show_waiting();
         const result = await this.app_data.update_invoice_payment(invoice.name, this.payment_amount);
-        const check_in_amount = this.payment_amount - result.remaining;
-        const checkInOut = frappe.model.get_new_doc("check_in_out");
-        checkInOut.creation_time = frappe.datetime.now_datetime();
-        checkInOut.user = frappe.session.user;
-        checkInOut.check_type = "In";
-        checkInOut.is_sync = 0;
-        checkInOut.amount = parseFloat(check_in_amount);
-        checkInOut.reason_note = "Debt payment.";
-        this.app_data.saveCheckInOut(
-          checkInOut,
-          (res) => {
-            this.refresh_check_in_out();
-          },
-          (err) => {
-            console.log("err to save checkInOut : ", err);
-          }
-        );
         this.payment_amount = result.remaining;
         this.leftContainer.find("#debt_paymentAmount").val(result.remaining);
         await this.refreshClientDebtPart(this.selected_client);
@@ -5500,4 +5483,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.FLPZMCFN.js.map
+//# sourceMappingURL=pos.bundle.PZVZATHY.js.map
