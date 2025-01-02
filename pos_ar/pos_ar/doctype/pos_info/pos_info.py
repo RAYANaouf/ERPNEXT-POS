@@ -265,8 +265,8 @@ def update_sales_invoice_payment(invoice_name, payment_amount):
 		payment_entry.payment_type    = 'Receive'
 		payment_entry.party_type      = 'Customer'
 		payment_entry.party           = sales_invoice.customer
-		payment_entry.received_amount = float(payment_amount)
-		payment_entry.paid_amount     = float(payment_amount)
+		payment_entry.received_amount = float(payAmount)
+		payment_entry.paid_amount     = float(payAmount)
 
 
 
