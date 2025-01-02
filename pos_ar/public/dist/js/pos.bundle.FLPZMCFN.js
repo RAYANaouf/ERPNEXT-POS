@@ -5307,6 +5307,7 @@
           args: { customer_name }
         });
         if (response.message && !response.message.error) {
+          console.log("customer debts : ", response.message);
           return response.message;
         } else {
           return [];
@@ -5499,4 +5500,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.LSXXNXW3.js.map
+//# sourceMappingURL=pos.bundle.FLPZMCFN.js.map

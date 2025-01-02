@@ -107,8 +107,8 @@ def get_customer_debts_sales_invoices(customer_name):
         AND outstanding_amount > 0
         AND docstatus = 1
     """
-	#make sure to set the cach to false.
-    invoices = frappe.db.sql(query, (customer_name,), as_dict=True, cache=False)
+	#use sql to avoid the cache because it cause problem like get old version of sales invoice
+    invoices = frappe.db.sql(query, (customer_name,), as_dict=True)
     return invoices
 
 
