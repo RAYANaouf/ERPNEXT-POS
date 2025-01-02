@@ -2,6 +2,8 @@
 # For license information, please see license.txt
 
 from ast import If
+from functools import cache
+from pickle import FALSE
 import frappe
 from frappe.model.document import Document
 import json
@@ -96,20 +98,19 @@ def get_customer_debts(customer_name):
 	return invoices
 
 
-
 @frappe.whitelist()
 def get_customer_debts_sales_invoices(customer_name):
-	invoices = frappe.get_all(
-		'Sales Invoice',  # DocType
-		fields=['name' , 'outstanding_amount' , 'posting_date'],  # Required fields
-                filters={
-			'customer'           : customer_name ,  # Filter by customer name
-			'outstanding_amount' : ['>', 0]      ,  # Only unpaid invoices
-			'docstatus'          : 1                # not the canceled ones
-		}, # Apply filters
-		limit_page_length=100000  # Adjust as needed
-	)
-	return invoices
+    query = """
+        SELECT name, outstanding_amount, posting_date
+        FROM `tabSales Invoice`
+        WHERE customer = %s
+        AND outstanding_amount > 0
+        AND docstatus = 1
+    """
+	#make sure to set the cach to false.
+    invoices = frappe.db.sql(query, (customer_name,), as_dict=True, cache=False)
+    return invoices
+
 
 
 

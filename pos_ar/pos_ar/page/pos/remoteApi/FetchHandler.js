@@ -285,6 +285,7 @@ pos_ar.PointOfSale.FetchHandler = class FetchHandler{
 			});
 
 			if (response.message && !response.message.error) {
+				console.log("customer debts : " , response.message)
 				return response.message
 			} else {
 				return []
