@@ -35,6 +35,12 @@
       this.invoiceData = { netTotal: 0, grandTotal: 0, paidAmount: 0, toChange: 0, discount: 0 };
       this.db = null;
       this.syncInput = false;
+      frappe.db.get_list("Customer", {
+        filters: { custom_company: "Optilens BISKRA" },
+        fields: ["name"]
+      }).then((record) => {
+        console.log(" customers ::: ", record);
+      });
       this.start_app();
     }
     async start_app() {
@@ -5075,6 +5081,12 @@
   // ../pos_ar/pos_ar/pos_ar/page/pos/remoteApi/FetchHandler.js
   pos_ar.PointOfSale.FetchHandler = class FetchHandler {
     constructor() {
+      frappe.call({
+        method: "pos_ar.pos_ar.doctype.pos_info.pos_info.paySalesInvoices",
+        args: {}
+      }).then((r) => {
+        console.log("payment done : ", r.message);
+      });
     }
     async fetchCustomers(since) {
       try {
@@ -5483,4 +5495,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.PZVZATHY.js.map
+//# sourceMappingURL=pos.bundle.LQZVVUY2.js.map

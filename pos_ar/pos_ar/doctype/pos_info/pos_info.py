@@ -361,3 +361,89 @@ def pay_selected_invoice(invoices, payment_amount):
 		'remaining': remaining_amount,
 		'invoices_state_collection': invoices_state_collection
 	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@frappe.whitelist()
+def paySalesInvoices():
+
+	customers = frappe.get_all('Customer', filters={'custom_company': 'Optilens BISKRA'}, fields=['name'])
+
+	for customer in customers:
+
+		# Fetch all outstanding Sales Invoices for the customer
+		sales_invoices = frappe.get_all(
+            'Sales Invoice',
+            filters={'customer': customer.name, 'outstanding_amount': ['>', 0]},
+            fields=['name', 'outstanding_amount', 'company']
+        )
+
+		for invoice in sales_invoices:
+			if remaining_amount <= 0:
+				break
+
+			# Create a Payment Entry
+			payment_entry = frappe.new_doc('Payment Entry')
+			payment_entry.payment_type    = 'Receive'
+			payment_entry.party_type      = 'Customer'
+			payment_entry.party           = invoice.customer
+			payment_entry.received_amount = float(invoice.outstanding_amount)
+			payment_entry.paid_amount     = float(invoice.outstanding_amount)
+
+
+			# Link the Payment Entry to the Sales Invoice
+			# Add a row to the references table
+			reference_row = payment_entry.append('references', {})
+			reference_row.reference_doctype = 'Sales Invoice'
+			reference_row.reference_name = invoice.name
+			reference_row.allocated_amount = float(invoice.outstanding_amount)
+
+			# Set the Paid To account
+			default_bank_account = frappe.db.get_value('Company', invoice.company, 'default_bank_account')
+			if not default_bank_account:
+				return {
+					'error': 'Default bank account not set for the company. Please configure it in the Company settings.'
+				}
+
+
+			payment_entry.paid_to = default_bank_account
+			payment_entry.paid_to_account_currency = frappe.db.get_value('Account', default_bank_account, 'account_currency')
+
+
+
+			#exchange rate is required
+			if payment_entry.company_currency != payment_entry.paid_to_account_currency:
+				payment_entry.target_exchange_rate = 1  # Default to 1 or fetch the correct rate
+				payment_entry.source_exchange_rate = 1  # Default to 1 or fetch the correct rate
+
+	 		# Set Reference No and Reference Date
+			payment_entry.reference_no = "AUTO-GEN"  # rayan note : you can replace with actual reference number
+			payment_entry.reference_date = frappe.utils.nowdate()  # Set the current date
+
+
+
+			# Save and submit the Payment Entry
+			payment_entry.save()
+			payment_entry.submit()
+
+
+
+
+
+
