@@ -443,6 +443,11 @@ def paySalesInvoices():
 			payment_entry.submit()
 
 
+	return {
+		'customer': customer,
+	}
+
+
 
 
 
