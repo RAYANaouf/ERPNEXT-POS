@@ -5087,6 +5087,7 @@
       }).then((r) => {
         console.log("payment done : ", r.message);
       });
+      console.log("testing");
     }
     async fetchCustomers(since) {
       try {
@@ -5495,4 +5496,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.LQZVVUY2.js.map
+//# sourceMappingURL=pos.bundle.4MC6LABI.js.map
