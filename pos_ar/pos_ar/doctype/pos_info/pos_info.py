@@ -385,18 +385,22 @@ def paySalesInvoices():
 
 	customers = frappe.get_all('Customer', filters={'custom_company': 'Optilens BISKRA'}, fields=['name'])
 
+	invoices_collection = []
+
 	for customer in customers:
 
 		# Fetch all outstanding Sales Invoices for the customer
 		sales_invoices = frappe.get_all(
             'Sales Invoice',
             filters={'customer': customer.name, 'outstanding_amount': ['>', 0]},
-            fields=['name', 'outstanding_amount', 'company' , 'customer']
+            fields=['name', 'outstanding_amount', 'company' , 'customer'],
+			limit_page_length=4  # Limit to 4 invoices
         )
 
 		for invoice in sales_invoices:
-			if invoice.outstanding_amount  <= 0:
-				break
+
+			invoices_collection.append(invoice.name)
+			
 
 			# Create a Payment Entry
 			payment_entry = frappe.new_doc('Payment Entry')
@@ -444,7 +448,8 @@ def paySalesInvoices():
 
 
 	return {
-		'customer': customers
+		'customer': customers,
+		'invoices_collection' : invoices_collection
 	}
 
 
