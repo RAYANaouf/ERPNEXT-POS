@@ -444,7 +444,7 @@ def paySalesInvoices():
 
 
 	return {
-		'customer': customer,
+		'customer': customers
 	}
 
 
