@@ -5086,8 +5086,10 @@
         args: {}
       }).then((r) => {
         console.log("payment done : ", r.message);
+      }).catch((err) => {
+        console.log("pay error : ", err);
       });
-      console.log("testing");
+      console.log("testing2");
     }
     async fetchCustomers(since) {
       try {
@@ -5496,4 +5498,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.4MC6LABI.js.map
+//# sourceMappingURL=pos.bundle.JSEEP3PX.js.map
