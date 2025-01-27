@@ -391,7 +391,7 @@ def paySalesInvoices():
 		sales_invoices = frappe.get_all(
             'Sales Invoice',
             filters={'customer': customer.name, 'outstanding_amount': ['>', 0]},
-            fields=['name', 'outstanding_amount', 'company']
+            fields=['name', 'outstanding_amount', 'company' , 'customer']
         )
 
 		for invoice in sales_invoices:
