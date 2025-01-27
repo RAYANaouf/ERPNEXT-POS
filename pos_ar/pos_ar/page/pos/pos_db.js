@@ -10,7 +10,7 @@ pos_ar.PointOfSale.pos_db  = class POSDatabase {
 		return new Promise((resolve , reject) => {
 
 			// Let us open our database
-			const request = window.indexedDB.open( 'POSDB_test33' , 6);
+			const request = window.indexedDB.open( 'POSDB_test33' , 8);
 
 			request.onerror = (event) => {
 				// Do something with request.error!
@@ -26,7 +26,8 @@ pos_ar.PointOfSale.pos_db  = class POSDatabase {
 			 	const db = event.target.result;
 
 
-				let posInvoiceStore;
+				 let posInvoiceStore;
+				 let checkInOutStore;
 
 				// Create object stores (tables)
 				if (!db.objectStoreNames.contains('Customer')) {
@@ -74,9 +75,18 @@ pos_ar.PointOfSale.pos_db  = class POSDatabase {
 				}
 
 
+
 				if (!db.objectStoreNames.contains('check_in_out')) {
-					db.createObjectStore('check_in_out', { keyPath : 'name' });
+					checkInOutStore = db.createObjectStore('check_in_out', { keyPath : 'name' });
+				}else{
+					checkInOutStore = event.target.transaction.objectStore('check_in_out');
 				}
+				// Check and create indexes if they do not already exist
+				if (!checkInOutStore.indexNames.contains('creation_time')) {
+					checkInOutStore.createIndex('creation_time', 'creation_time', { unique: false });
+				}
+
+
 				if (!db.objectStoreNames.contains('POS Settings')) {
 					db.createObjectStore('POS Settings', { keyPath : 'id' });
 				}
@@ -680,7 +690,9 @@ pos_ar.PointOfSale.pos_db  = class POSDatabase {
 
 
 	/********************************* check_in_out ***********************************************/
+
 	saveCheckInOut(checkInOut,onSuccess,onFailure){
+		console.log("saveCheckInOut : " , checkInOut)
 		const transaction = this.db.transaction(['check_in_out'] , "readwrite");
 		const store       = transaction.objectStore('check_in_out')
 		const request     = store.put(checkInOut)
@@ -698,43 +710,51 @@ pos_ar.PointOfSale.pos_db  = class POSDatabase {
 		return new Promise((resolve,reject)=>{
 			const transaction = this.db.transaction(['check_in_out'] , "readwrite");
 			const store       = transaction.objectStore('check_in_out');
-			const result      = store.getAll()
-			result.onsuccess = (event) => {
-				const value = event.target.result
-				resolve(value);
-			}
-			result.onerror = (err)=>{
+			const dateIndex   = store.index('creation_time');
+			const checks      = []
+			const request     = dateIndex.openCursor(null , 'prev') //use prev for descenfing order
+
+
+			request.onsuccess = (event) =>{
+				const cursor = event.target.result;
+				if(cursor){
+					checks.push(cursor.value);
+					cursor.continue() //Move to the next record
+				}else{
+					console.log('check the response : ' , checks)
+					resolve(checks);
+				}
+			};
+			request.onerror = (err)=>{
 				reject(err)
 			}
 		})
 	}
 
-	getAllCheckInOut(){
-		return new Promise((resolve,reject)=>{
-			const transaction = this.db.transaction(['check_in_out'] , "readwrite");
-			const store       = transaction.objectStore('check_in_out');
-			const result      = store.getAll()
-			result.onsuccess = (event) => {
-				const value = event.target.result
-				resolve(value);
-			}
-			result.onerror = (err)=>{
-				reject(err)
-			}
-		})
-	}
 
 	getAllCheckInOut_callback(onSuccess,onFailure){
 		const transaction = this.db.transaction(['check_in_out'] , "readwrite");
 		const store       = transaction.objectStore('check_in_out');
-		const result      = store.getAll()
-		result.onsuccess = (event) => {
-			const value = event.target.result
-			onSuccess(value);
-		}
-		result.onerror = (err)=>{
+
+		const dateIndex   = store.index('creation_time');
+		const checks      = []
+		const request     = dateIndex.openCursor(null , 'prev') //use prev for descenfing order
+
+
+		request.onsuccess = (event) =>{
+			const cursor = event.target.result;
+			if(cursor){
+				checks.push(cursor.value);
+				cursor.continue() //Move to the next record
+			}else{
+				console.log('check the response : ' , checks)
+				onSuccess(checks);
+			}
+		};
+		request.onerror = (err)=>{
 			onFailure(err)
 		}
+
 	}
 
 	deleteAllCheckInOut() {

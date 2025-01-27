@@ -622,6 +622,7 @@ pos_ar.PointOfSale.Controller = class {
 
 	savePosInvoice(saveWithZeroRate){
 		this.selectedItemMaps.get(this.selectedTab.tabName).synced = false ;
+		console.log("savePosInvoice : " , this.selectedItemMaps.get(this.selectedTab.tabName))
 		this.appData.savePosInvoice(this.selectedItemMaps.get(this.selectedTab.tabName))
 
 	}

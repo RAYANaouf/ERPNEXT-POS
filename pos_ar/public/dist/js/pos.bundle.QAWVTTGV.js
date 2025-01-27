@@ -525,6 +525,7 @@
     }
     savePosInvoice(saveWithZeroRate) {
       this.selectedItemMaps.get(this.selectedTab.tabName).synced = false;
+      console.log("savePosInvoice : ", this.selectedItemMaps.get(this.selectedTab.tabName));
       this.appData.savePosInvoice(this.selectedItemMaps.get(this.selectedTab.tabName));
     }
     auto_select(item) {
@@ -3102,7 +3103,7 @@
     }
     static async openDatabase() {
       return new Promise((resolve, reject) => {
-        const request = window.indexedDB.open("POSDB_test33", 6);
+        const request = window.indexedDB.open("POSDB_test33", 8);
         request.onerror = (event2) => {
           reject(request.error);
         };
@@ -3112,6 +3113,7 @@
         request.onupgradeneeded = (event2) => {
           const db = event2.target.result;
           let posInvoiceStore;
+          let checkInOutStore;
           if (!db.objectStoreNames.contains("Customer")) {
             db.createObjectStore("Customer", { keyPath: "name" });
           }
@@ -3151,7 +3153,12 @@
             posInvoiceStore.createIndex("creation_time", "creation_time", { unique: false });
           }
           if (!db.objectStoreNames.contains("check_in_out")) {
-            db.createObjectStore("check_in_out", { keyPath: "name" });
+            checkInOutStore = db.createObjectStore("check_in_out", { keyPath: "name" });
+          } else {
+            checkInOutStore = event2.target.transaction.objectStore("check_in_out");
+          }
+          if (!checkInOutStore.indexNames.contains("creation_time")) {
+            checkInOutStore.createIndex("creation_time", "creation_time", { unique: false });
           }
           if (!db.objectStoreNames.contains("POS Settings")) {
             db.createObjectStore("POS Settings", { keyPath: "id" });
@@ -3605,6 +3612,7 @@
       });
     }
     saveCheckInOut(checkInOut, onSuccess, onFailure) {
+      console.log("saveCheckInOut : ", checkInOut);
       const transaction = this.db.transaction(["check_in_out"], "readwrite");
       const store = transaction.objectStore("check_in_out");
       const request = store.put(checkInOut);
@@ -3619,26 +3627,20 @@
       return new Promise((resolve, reject) => {
         const transaction = this.db.transaction(["check_in_out"], "readwrite");
         const store = transaction.objectStore("check_in_out");
-        const result = store.getAll();
-        result.onsuccess = (event2) => {
-          const value = event2.target.result;
-          resolve(value);
+        const dateIndex = store.index("creation_time");
+        const checks = [];
+        const request = dateIndex.openCursor(null, "prev");
+        request.onsuccess = (event2) => {
+          const cursor = event2.target.result;
+          if (cursor) {
+            checks.push(cursor.value);
+            cursor.continue();
+          } else {
+            console.log("check the response : ", checks);
+            resolve(checks);
+          }
         };
-        result.onerror = (err) => {
-          reject(err);
-        };
-      });
-    }
-    getAllCheckInOut() {
-      return new Promise((resolve, reject) => {
-        const transaction = this.db.transaction(["check_in_out"], "readwrite");
-        const store = transaction.objectStore("check_in_out");
-        const result = store.getAll();
-        result.onsuccess = (event2) => {
-          const value = event2.target.result;
-          resolve(value);
-        };
-        result.onerror = (err) => {
+        request.onerror = (err) => {
           reject(err);
         };
       });
@@ -3646,12 +3648,20 @@
     getAllCheckInOut_callback(onSuccess, onFailure) {
       const transaction = this.db.transaction(["check_in_out"], "readwrite");
       const store = transaction.objectStore("check_in_out");
-      const result = store.getAll();
-      result.onsuccess = (event2) => {
-        const value = event2.target.result;
-        onSuccess(value);
+      const dateIndex = store.index("creation_time");
+      const checks = [];
+      const request = dateIndex.openCursor(null, "prev");
+      request.onsuccess = (event2) => {
+        const cursor = event2.target.result;
+        if (cursor) {
+          checks.push(cursor.value);
+          cursor.continue();
+        } else {
+          console.log("check the response : ", checks);
+          onSuccess(checks);
+        }
       };
-      result.onerror = (err) => {
+      request.onerror = (err) => {
         onFailure(err);
       };
     }
@@ -5498,4 +5508,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.ICHXDPIG.js.map
+//# sourceMappingURL=pos.bundle.QAWVTTGV.js.map
