@@ -395,7 +395,7 @@ def paySalesInvoices():
         )
 
 		for invoice in sales_invoices:
-			if remaining_amount <= 0:
+			if invoice.outstanding_amount  <= 0:
 				break
 
 			# Create a Payment Entry

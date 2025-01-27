@@ -5081,15 +5081,7 @@
   // ../pos_ar/pos_ar/pos_ar/page/pos/remoteApi/FetchHandler.js
   pos_ar.PointOfSale.FetchHandler = class FetchHandler {
     constructor() {
-      frappe.call({
-        method: "pos_ar.pos_ar.doctype.pos_info.pos_info.paySalesInvoices",
-        args: {}
-      }).then((r) => {
-        console.log("payment done : ", r.message);
-      }).catch((err) => {
-        console.log("pay error : ", err);
-      });
-      console.log("testing2");
+      console.log("testing3");
     }
     async fetchCustomers(since) {
       try {
@@ -5498,4 +5490,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.JSEEP3PX.js.map
+//# sourceMappingURL=pos.bundle.4UCJQFQ2.js.map
