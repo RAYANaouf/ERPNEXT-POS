@@ -2,16 +2,16 @@ pos_ar.PointOfSale.FetchHandler = class FetchHandler{
 
 	constructor(){
 		
-		frappe.call({
+		/*frappe.call({
 			method: 'pos_ar.pos_ar.doctype.pos_info.pos_info.paySalesInvoices',
 			args: { }
 		}).then((r) => {
 			console.log('payment done : ' , r.message)
 		}).catch((err) => {
 			console.log("pay error : " , err)
-		});
+		});*/
 
-		console.log("testing2")
+		console.log("testing3")
 	}
 
 
