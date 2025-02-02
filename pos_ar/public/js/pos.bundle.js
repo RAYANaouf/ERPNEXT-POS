@@ -24,3 +24,10 @@ import "../../pos_ar/page/pos/remoteApi/FetchHandler.js"
 
 //screen manager
 import "../../pos_ar/page/pos/manager/ScreenManager.js"
+
+
+
+
+
+/********************************  Pricing page    **********************************/
+import "../../pos_ar/page/pricing/PricingController.js"
