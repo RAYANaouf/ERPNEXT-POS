@@ -1,3 +1,11 @@
+
+
+
+/********************************  Pricing page    **********************************/
+import "../../pos_ar/page/pricing/PricingController.js"
+
+/********************************  Pos page    ***************************************/
+
 import "../../pos_ar/page/pos/posController.js"
 import "../../pos_ar/page/pos/pos_item_selector.js"
 import "../../pos_ar/page/pos/pos_customer_box.js"
@@ -28,6 +36,3 @@ import "../../pos_ar/page/pos/manager/ScreenManager.js"
 
 
 
-
-/********************************  Pricing page    **********************************/
-import "../../pos_ar/page/pricing/PricingController.js"

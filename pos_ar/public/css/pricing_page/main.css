@@ -1,0 +1,50 @@
+/*****************  erpnext page style  **************************/
+
+/*make the body width biger*/
+[data-route = "pricing"] .container.page-body{
+	width : 100vw  ; 
+	max-width : 100vw  ; 
+    background-color: #B5DAD4;
+}
+
+[data-route = "pricing"] .container.page-body .page-content .layout-main-section{
+		background: #B5DAD4;
+}
+
+/*hide the top bar of the page*/
+[data-route = "pricing"] .sticky-top{
+	display : none ;
+}
+
+/*hide the top bar of the page*/
+[data-route = "pricing"] .page-head{
+	display : none;
+}
+
+[data-route = "pricing"] .content{
+	background : #44A29265 ;
+}
+
+
+[data-route = "pricing"] .layout-main-section{
+	background-color: #B5DAD4;
+}
+
+/****************       generals       *****************/
+
+/* Pricing Matrix Styles */
+
+.pricing-matrix {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.pricing-matrix th, .pricing-matrix td {
+    border: 1px solid #ddd;
+    padding: 8px;
+}
+
+.pricing-matrix th {
+    background-color: #f2f2f2;
+    text-align: left;
+}
