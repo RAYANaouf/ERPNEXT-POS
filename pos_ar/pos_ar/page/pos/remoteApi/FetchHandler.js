@@ -130,7 +130,7 @@ pos_ar.PointOfSale.FetchHandler = class FetchHandler{
 
 	async fetchPriceList(since) {
 		try {
-			const filter = {selling : 1}
+			const filter = {selling : 1 , enabled : 1}
 			/*if(since){
 				filter.modified = ['>',since]
 			}*/

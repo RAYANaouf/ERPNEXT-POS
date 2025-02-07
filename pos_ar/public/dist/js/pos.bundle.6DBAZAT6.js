@@ -1870,7 +1870,6 @@
       });
     }
     refreshSelectedItem() {
-      console.log("so refreshing with : ", this.selected_item.name);
       this.priceListInput.val(this.selected_item_maps.get(this.selected_tab.tabName).priceList);
       this.customerInput.val(this.selected_item_maps.get(this.selected_tab.tabName).customer);
       const selectedItemsContainer = document.getElementById("selectedItemsContainer");
@@ -3093,7 +3092,6 @@
       });
       invoiceHTML += `<tr style="height:23px;font-size:12px;font-weight:700;" > <td colspan="3" ><div >      </div></td>   <td><div> ${netTotal + netTotal * (taxes / 100) - pos.additional_discount_percentage * netTotal} DA </div></td></tr>`;
       invoiceHTML += `<tr style="height:23px;font-size:12px;font-weight:700;" > <td colspan="3" ><div >Ancien Sold        </div></td>   <td><div> ${ancien_sold} DA </div></td></tr>`;
-      invoiceHTML += `<tr style="height:23px;font-size:12px;font-weight:700;" > <td colspan="3" ><div >Versement   </div></td>   <td><div> ${pos.total_customer_payment} DA </div></td></tr>`;
       invoiceHTML += "</table>";
       invoiceHTML += '<div id="footer_message" style="width:100%; display:flex; align-items:center; margin-top:30px;"><div style="flex-grow:1;"></div><div style="margin:30px 25px;"> Thank You, Come Again</div><div style="flex-grow:1;"></div></div>';
       invoiceHTML += "</div>";
@@ -5514,4 +5512,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.VBO6Z4EL.js.map
+//# sourceMappingURL=pos.bundle.6DBAZAT6.js.map
