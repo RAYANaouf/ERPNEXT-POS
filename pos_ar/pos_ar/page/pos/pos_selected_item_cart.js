@@ -324,8 +324,6 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 
 	refreshSelectedItem(){
 
-		console.log("so refreshing with : " , this.selected_item.name )
-
 		//refresh price list:
 		this.priceListInput.val(this.selected_item_maps.get(this.selected_tab.tabName).priceList)
 		//refresh customer list:
