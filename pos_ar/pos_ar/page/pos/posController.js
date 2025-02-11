@@ -530,9 +530,9 @@ pos_ar.PointOfSale.Controller = class {
 							
 										this.screenManager.navigate('home')
 									},()=>{
-										if(this.unsyncedPos == 1){
+										if(this.unsyncedPos >= 1){
 											this.customer_box.setSynced();
-											this.unsyncedPos == 0
+											this.unsyncedPos = 0
 										}else{
 											this.unsyncedPos -= 1 ;
 											this.customer_box.setNotSynced(this.unsyncedPos);
