@@ -23,6 +23,12 @@ pos_ar.PointOfSale.pos_item_selector = class {
 		this.auto_select         = autoSelect        ;
 		this.on_item_click       = onItemClick       ;
 
+		// Create barcode lookup map for O(1) access
+		this.barcode_map = {};
+		this.item_barcodes.forEach(barcode => {
+			this.barcode_map[barcode.barcode] = barcode.parent;
+		});
+
 		//class functions invocation
 		this.start_item_selector();
     }
@@ -163,22 +169,24 @@ pos_ar.PointOfSale.pos_item_selector = class {
 	//**************** tools method ****************************//
 
 	//filter list by item code or barcode
-	filterListByItemData( value ){
-
-		// Filter barcodes that match the value
-		const filteredBarcodes = this.item_barcodes.filter(BarCode=> BarCode.barcode == value)
-
-		// Extract the parent item IDs from the filtered barcodes
-		const barcodeItemIds   = filteredBarcodes.map(cod => cod.parent)
-		if(barcodeItemIds.length == 1){
-			//auto fill
-			this.auto_select(this.item_list.find(item => item.name==barcodeItemIds[0] ) )
-			const itemInput = document.getElementById("ItemInput");
-			itemInput.value = ''
-			return this.item_list
+	filterListByItemData(value){
+		// Direct O(1) lookup from barcode map
+		const itemId = this.barcode_map[value];
+		if(itemId) {
+			// Found exact barcode match
+			const item = this.item_list.find(item => item.name === itemId);
+			if(item) {
+				this.auto_select(item);
+				const itemInput = document.getElementById("ItemInput");
+				itemInput.value = '';
+				return this.item_list;
+			}
 		}
 
-		return this.item_list.filter(item =>  barcodeItemIds.includes(item.name)  || item.item_name.toLowerCase().includes(value.toLowerCase()))
+		// If no barcode match, search by item name
+		return this.item_list.filter(item => 
+			item.item_name.toLowerCase().includes(value.toLowerCase())
+		);
 	}
 
 
