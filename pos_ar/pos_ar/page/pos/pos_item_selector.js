@@ -23,10 +23,13 @@ pos_ar.PointOfSale.pos_item_selector = class {
 		this.auto_select         = autoSelect        ;
 		this.on_item_click       = onItemClick       ;
 
-		// Create barcode lookup map for O(1) access
+		// Create barcode lookup map for O(1) access, storing arrays of parent IDs
 		this.barcode_map = {};
 		this.item_barcodes.forEach(barcode => {
-			this.barcode_map[barcode.barcode] = barcode.parent;
+			if (!this.barcode_map[barcode.barcode]) {
+				this.barcode_map[barcode.barcode] = [];
+			}
+			this.barcode_map[barcode.barcode].push(barcode.parent);
 		});
 
 		//class functions invocation
@@ -171,19 +174,23 @@ pos_ar.PointOfSale.pos_item_selector = class {
 	//filter list by item code or barcode
 	filterListByItemData(value){
 		// Direct O(1) lookup from barcode map
-		const itemId = this.barcode_map[value];
-		if(itemId) {
-			// Found exact barcode match
-			const item = this.item_list.find(item => item.name === itemId);
-			if(item) {
-				this.auto_select(item);
+		const itemIds = this.barcode_map[value];
+		if(itemIds && itemIds.length > 0) {
+			// Found barcode match(es)
+			const items = this.item_list.filter(item => itemIds.includes(item.name));
+			if(items.length === 1) {
+				// If only one item, auto-select it
+				this.auto_select(items[0]);
 				const itemInput = document.getElementById("ItemInput");
 				itemInput.value = '';
 				return this.item_list;
+			} else if(items.length > 1) {
+				// If multiple items with same barcode, show only those items
+				return items;
 			}
 		}
 
-		// If no barcode match, search by item name
+		// If no barcode match or no items found, search by item name
 		return this.item_list.filter(item => 
 			item.item_name.toLowerCase().includes(value.toLowerCase())
 		);

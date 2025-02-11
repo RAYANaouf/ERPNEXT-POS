@@ -1285,6 +1285,13 @@
       this.get_item_price = getItemPrice;
       this.auto_select = autoSelect;
       this.on_item_click = onItemClick;
+      this.barcode_map = {};
+      this.item_barcodes.forEach((barcode) => {
+        if (!this.barcode_map[barcode.barcode]) {
+          this.barcode_map[barcode.barcode] = [];
+        }
+        this.barcode_map[barcode.barcode].push(barcode.parent);
+      });
       this.start_item_selector();
     }
     start_item_selector() {
@@ -1348,7 +1355,7 @@
 			`;
         return;
       }
-      for (let i = 0; i < filtered_item_list.length && i < 700; i++) {
+      for (let i = 0; i < filtered_item_list.length && i < 300; i++) {
         let item = filtered_item_list[i];
         const itemBox = document.createElement("div");
         itemBox.classList.add("itemBox");
@@ -1392,15 +1399,21 @@
       });
     }
     filterListByItemData(value) {
-      const filteredBarcodes = this.item_barcodes.filter((BarCode) => BarCode.barcode == value);
-      const barcodeItemIds = filteredBarcodes.map((cod) => cod.parent);
-      if (barcodeItemIds.length == 1) {
-        this.auto_select(this.item_list.find((item) => item.name == barcodeItemIds[0]));
-        const itemInput = document.getElementById("ItemInput");
-        itemInput.value = "";
-        return this.item_list;
+      const itemIds = this.barcode_map[value];
+      if (itemIds && itemIds.length > 0) {
+        const items = this.item_list.filter((item) => itemIds.includes(item.name));
+        if (items.length === 1) {
+          this.auto_select(items[0]);
+          const itemInput = document.getElementById("ItemInput");
+          itemInput.value = "";
+          return this.item_list;
+        } else if (items.length > 1) {
+          return items;
+        }
       }
-      return this.item_list.filter((item) => barcodeItemIds.includes(item.name) || item.item_name.toLowerCase().includes(value.toLowerCase()));
+      return this.item_list.filter(
+        (item) => item.item_name.toLowerCase().includes(value.toLowerCase())
+      );
     }
     getItemByItemGroup(item_group) {
       let groups = [];
@@ -5512,4 +5525,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.SL65X3NZ.js.map
+//# sourceMappingURL=pos.bundle.WS52Q34Y.js.map
