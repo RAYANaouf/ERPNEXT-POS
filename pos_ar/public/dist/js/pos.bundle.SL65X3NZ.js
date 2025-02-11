@@ -5199,7 +5199,7 @@
     }
     async fetchPriceList(since) {
       try {
-        const filter = { selling: 1 };
+        const filter = { selling: 1, enabled: 1 };
         return await frappe.db.get_list("Price List", {
           fields: ["name", "price_list_name", "currency"],
           filters: filter,
@@ -5512,4 +5512,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.6DBAZAT6.js.map
+//# sourceMappingURL=pos.bundle.SL65X3NZ.js.map
