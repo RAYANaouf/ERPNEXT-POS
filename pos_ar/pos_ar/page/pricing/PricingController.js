@@ -15,10 +15,10 @@ pos_ar.Pricing.PricingController = class {
         this.page_content = $(`
             <div class="pricing-container">
                 <!-- Loading Popover -->
-                <div id="loadingPopover" popover>
+                <div id="loadingPopover" popover="manual">
                     <div class="loading-content">
                         <div class="loading-spinner"></div>
-                        <div class="loading-text">Loading prices...</div>
+                        <div class="loading-text">Loading Prices</div>
                     </div>
                 </div>
 
@@ -68,6 +68,9 @@ pos_ar.Pricing.PricingController = class {
                 </div>
             </div>
         `).appendTo(this.wrapper);
+
+        // Initialize the popover
+        this.loadingPopover = document.getElementById('loadingPopover');
     }
 
     setup_events() {
@@ -145,9 +148,20 @@ pos_ar.Pricing.PricingController = class {
         if (!company) return;
         
         try {
-            // Show loading popover
-            const loadingPopover = document.getElementById('loadingPopover');
-            loadingPopover.showPopover();
+            // Get or initialize loading popover
+            if (!this.loadingPopover) {
+                this.loadingPopover = document.getElementById('loadingPopover');
+            }
+
+            // Close any existing popover
+            if (this.loadingPopover.matches(':popover-open')) {
+                this.loadingPopover.hidePopover();
+            }
+
+            // Show the popover
+            requestAnimationFrame(() => {
+                this.loadingPopover.showPopover();
+            });
             
             const result = await this.fetcher.fetchItemPrices(company);
             const data = result.prices;
@@ -155,12 +169,14 @@ pos_ar.Pricing.PricingController = class {
             const brands = result.brands;
             
             // Hide loading popover
-            loadingPopover.hidePopover();
+            this.loadingPopover.hidePopover();
             
             this.render_pricing_data(data, price_lists, brands);
         } catch (error) {
             // Hide loading popover in case of error
-            document.getElementById('loadingPopover').hidePopover();
+            if (this.loadingPopover) {
+                this.loadingPopover.hidePopover();
+            }
             
             frappe.msgprint({
                 title: __('Error'),

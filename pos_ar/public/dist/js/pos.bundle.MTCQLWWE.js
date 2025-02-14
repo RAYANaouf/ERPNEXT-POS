@@ -32,10 +32,10 @@
       this.page_content = $(`
             <div class="pricing-container">
                 <!-- Loading Popover -->
-                <div id="loadingPopover" popover>
+                <div id="loadingPopover" popover="manual">
                     <div class="loading-content">
                         <div class="loading-spinner"></div>
-                        <div class="loading-text">Loading prices...</div>
+                        <div class="loading-text">Loading Prices</div>
                     </div>
                 </div>
 
@@ -85,6 +85,7 @@
                 </div>
             </div>
         `).appendTo(this.wrapper);
+      this.loadingPopover = document.getElementById("loadingPopover");
     }
     setup_events() {
       this.wrapper.find(".nav-item").on("click", (e) => {
@@ -144,16 +145,25 @@
       if (!company)
         return;
       try {
-        const loadingPopover = document.getElementById("loadingPopover");
-        loadingPopover.showPopover();
+        if (!this.loadingPopover) {
+          this.loadingPopover = document.getElementById("loadingPopover");
+        }
+        if (this.loadingPopover.matches(":popover-open")) {
+          this.loadingPopover.hidePopover();
+        }
+        requestAnimationFrame(() => {
+          this.loadingPopover.showPopover();
+        });
         const result = await this.fetcher.fetchItemPrices(company);
         const data = result.prices;
         const price_lists = result.price_lists;
         const brands = result.brands;
-        loadingPopover.hidePopover();
+        this.loadingPopover.hidePopover();
         this.render_pricing_data(data, price_lists, brands);
       } catch (error) {
-        document.getElementById("loadingPopover").hidePopover();
+        if (this.loadingPopover) {
+          this.loadingPopover.hidePopover();
+        }
         frappe.msgprint({
           title: __("Error"),
           indicator: "red",
@@ -6200,4 +6210,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.IFUFDFAH.js.map
+//# sourceMappingURL=pos.bundle.MTCQLWWE.js.map
