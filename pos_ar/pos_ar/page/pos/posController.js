@@ -868,7 +868,8 @@ pos_ar.PointOfSale.Controller = class {
 			this.selected_item_cart.refreshSelectedItem();
 		}
 		else if(action == "print"){
-			this.history_cart.print_receipt( this.selectedItemMaps.get(this.selectedTab.tabName) )
+			console.log("1.1..the map is " , structuredClone(this.selectedItemMaps.get(this.selectedTab.tabName))	)
+			this.history_cart.print_receipt( structuredClone(this.selectedItemMaps.get(this.selectedTab.tabName)) )
 			//this.item_details.requestFocus("discount_percentage")
 		}
 		else if(action == "remove"){
@@ -1032,6 +1033,8 @@ pos_ar.PointOfSale.Controller = class {
 
 
 		}
+
+		
 
 
 		//update the posInvoice

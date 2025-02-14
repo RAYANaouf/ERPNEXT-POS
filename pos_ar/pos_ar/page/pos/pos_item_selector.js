@@ -114,6 +114,7 @@ pos_ar.PointOfSale.pos_item_selector = class {
 		}
 
 		for(let i=0 ; i<filtered_item_list.length && i<300 ; i++){
+
 			let item = filtered_item_list[i];
                 	const itemBox = document.createElement("div");
                 	itemBox.classList.add("itemBox");
@@ -128,7 +129,7 @@ pos_ar.PointOfSale.pos_item_selector = class {
 			const imageUrl = item.image || '/assets/pos_ar/images/no_image.png';
 			const price = this.get_item_price(item, this.selected_price_list.name);
 
-                	itemBox.innerHTML = `
+            itemBox.innerHTML = `
 				<img class="itemImage" src="${imageUrl}" alt="${item.item_name}" onerror="this.src='/assets/pos_ar/images/no_image.png'">
 				<div class="itemTitle">${item.item_name}</div>
 				<div class="itemPrice">${price} DA</div>

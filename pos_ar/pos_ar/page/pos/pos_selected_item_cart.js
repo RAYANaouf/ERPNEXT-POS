@@ -229,7 +229,9 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 			this.on_checkout_click();
 		})
 		this.mainBtnContainer.find("#printBtn").on('mousedown' , event =>{
+			console.log("1..the map : " , structuredClone(this.selected_item_maps.get(this.selected_tab.tabName)))
 			this.on_key_pressed( "print" , null);
+			console.log("2..the map : " , structuredClone(this.selected_item_maps.get(this.selected_tab.tabName)))
 		})
 
 	}
