@@ -111,6 +111,8 @@ pos_ar.Pricing.PricingController = class {
                     if (frappe.defaults.get_default('company')) {
                         $companyFilter.val(frappe.defaults.get_default('company'));
                         this.filter_by_company(frappe.defaults.get_default('company'));
+                    }else{
+                        this.filter_by_company(companies[0].name);
                     }
 
                     // Initialize select2 with placeholder
