@@ -133,8 +133,11 @@
       if (!company)
         return;
       try {
-        const itemPrices = await this.fetcher.fetchItemPrices(company);
-        this.render_pricing_data(itemPrices);
+        const result = await this.fetcher.fetchItemPrices(company);
+        const data = result.prices;
+        const price_lists = result.price_lists;
+        const brands = result.brands;
+        this.render_pricing_data(data, price_lists, brands);
       } catch (error) {
         frappe.msgprint({
           title: __("Error"),
@@ -144,7 +147,7 @@
         console.error("Error loading item prices:", error);
       }
     }
-    render_pricing_data(data) {
+    render_pricing_data(data, price_lists, brands) {
       const $pricingScreen = this.wrapper.find(".pricing-screen");
       $pricingScreen.empty();
       if (!data || data.length === 0) {
@@ -160,8 +163,6 @@
             `);
         return;
       }
-      const uniquePriceLists = [...new Set(data.map((item) => item.price_list))];
-      const uniqueBrands = [...new Set(data.map((item) => item.brand || "No Brand"))];
       const priceMap = {};
       data.forEach((item) => {
         const key = `${item.brand || "No Brand"}_${item.price_list}`;
@@ -177,17 +178,17 @@
                         <thead>
                             <tr>
                                 <th>Brand</th>
-                                ${uniquePriceLists.map((priceList) => `
-                                    <th>${priceList}</th>
+                                ${price_lists.map((pl) => `
+                                    <th>${pl.name}</th>
                                 `).join("")}
                             </tr>
                         </thead>
                         <tbody>
-                            ${uniqueBrands.map((brand) => `
+                            ${brands.map((brand) => `
                                 <tr>
-                                    <td>${brand}</td>
-                                    ${uniquePriceLists.map((priceList) => {
-        const priceData = priceMap[`${brand}_${priceList}`] || {};
+                                    <td>${brand.name}</td>
+                                    ${price_lists.map((pl) => {
+        const priceData = priceMap[`${brand.name}_${pl.name}`] || {};
         return `
                                             <td>
                                                 ${priceData.price ? `<div>
@@ -348,8 +349,8 @@
                 }
 
                 .filter-item .select2-container .select2-selection--single:hover {
-                    border-color: var(--primary-color);
-                    box-shadow: 0 4px 6px rgba(79, 70, 229, 0.06);
+                    border-color: var(--text-secondary);
+                    transform: translateY(-1px);
                 }
 
                 .filter-item .select2-container.select2-container--focus .select2-selection--single {
@@ -629,6 +630,7 @@
           method: "pos_ar.pos_ar.doctype.pos_info.pos_info.get_item_prices",
           args: { company }
         });
+        console.log("fetched item prices", response.message);
         return response.message || [];
       } catch (error) {
         console.error("Error fetching item prices:", error);
@@ -6135,4 +6137,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.FACBFJQR.js.map
+//# sourceMappingURL=pos.bundle.OXWV6C75.js.map

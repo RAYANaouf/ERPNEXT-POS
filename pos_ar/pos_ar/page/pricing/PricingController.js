@@ -134,8 +134,11 @@ pos_ar.Pricing.PricingController = class {
         if (!company) return;
         
         try {
-            const itemPrices = await this.fetcher.fetchItemPrices(company);
-            this.render_pricing_data(itemPrices);
+            const result = await this.fetcher.fetchItemPrices(company);
+            const data = result.prices;
+            const price_lists = result.price_lists;
+            const brands = result.brands;
+            this.render_pricing_data(data, price_lists, brands);
         } catch (error) {
             frappe.msgprint({
                 title: __('Error'),
@@ -146,7 +149,7 @@ pos_ar.Pricing.PricingController = class {
         }
     }
 
-    render_pricing_data(data) {
+    render_pricing_data(data, price_lists, brands) {
         const $pricingScreen = this.wrapper.find('.pricing-screen');
         $pricingScreen.empty();
 
@@ -163,10 +166,6 @@ pos_ar.Pricing.PricingController = class {
             `);
             return;
         }
-
-        // First, organize data into a matrix structure
-        const uniquePriceLists = [...new Set(data.map(item => item.price_list))];
-        const uniqueBrands = [...new Set(data.map(item => item.brand || 'No Brand'))];
         
         // Create a map for quick price lookup
         const priceMap = {};
@@ -185,17 +184,17 @@ pos_ar.Pricing.PricingController = class {
                         <thead>
                             <tr>
                                 <th>Brand</th>
-                                ${uniquePriceLists.map(priceList => `
-                                    <th>${priceList}</th>
+                                ${price_lists.map(pl => `
+                                    <th>${pl.name}</th>
                                 `).join('')}
                             </tr>
                         </thead>
                         <tbody>
-                            ${uniqueBrands.map(brand => `
+                            ${brands.map(brand => `
                                 <tr>
-                                    <td>${brand}</td>
-                                    ${uniquePriceLists.map(priceList => {
-                                        const priceData = priceMap[`${brand}_${priceList}`] || {};
+                                    <td>${brand.name}</td>
+                                    ${price_lists.map(pl => {
+                                        const priceData = priceMap[`${brand.name}_${pl.name}`] || {};
                                         return `
                                             <td>
                                                 ${priceData.price ? 
@@ -371,8 +370,8 @@ pos_ar.Pricing.PricingController = class {
                 }
 
                 .filter-item .select2-container .select2-selection--single:hover {
-                    border-color: var(--primary-color);
-                    box-shadow: 0 4px 6px rgba(79, 70, 229, 0.06);
+                    border-color: var(--text-secondary);
+                    transform: translateY(-1px);
                 }
 
                 .filter-item .select2-container.select2-container--focus .select2-selection--single {

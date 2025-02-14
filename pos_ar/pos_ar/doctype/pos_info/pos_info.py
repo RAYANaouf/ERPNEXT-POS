@@ -378,8 +378,8 @@ def pay_selected_invoice(invoices, payment_amount):
 @frappe.whitelist()
 def get_item_prices(company=None):
     """
-    Fetches item prices for the specified company.
-    Returns a list of items with their prices and other relevant details.
+    Fetches price lists and item prices for the specified company.
+    Returns both price lists and item prices for easier rendering.
     """
     try:
         # Get all item prices without filters
@@ -395,8 +395,30 @@ def get_item_prices(company=None):
             ]
         )
 
-        return item_prices
+        # Get all price lists
+        price_lists = frappe.get_all(
+            "Price List",
+            fields=[
+                "name"
+            ]
+        )
+
+        # Get unique brands
+        brands = frappe.get_all(
+            "Brand",
+            fields=["name"]
+        )
+
+        return {
+            "price_lists": price_lists,
+            "brands": brands,
+            "prices": item_prices
+        }
 
     except Exception as e:
         frappe.log_error(f"Error fetching item prices: {str(e)}")
-        return []
+        return {
+            "price_lists": [],
+            "brands": [],
+            "prices": []
+        }
