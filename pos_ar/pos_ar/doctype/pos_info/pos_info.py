@@ -390,14 +390,10 @@ def get_item_prices(company=None):
                 "price_list_rate",
                 "currency",
                 "price_list",
+                "brand",
                 "modified"
             ]
         )
-        
-        # Add brand information for each item
-        for price in item_prices:
-            brand = frappe.get_value("Item", price.item_code, "brand")
-            price["brand"] = brand or ""
 
         return item_prices
 

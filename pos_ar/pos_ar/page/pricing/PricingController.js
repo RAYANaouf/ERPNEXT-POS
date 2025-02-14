@@ -164,39 +164,87 @@ pos_ar.Pricing.PricingController = class {
             return;
         }
 
-        // Render the items table
+        // First, organize data into a matrix structure
+        const uniquePriceLists = [...new Set(data.map(item => item.price_list))];
+        const uniqueBrands = [...new Set(data.map(item => item.brand || 'No Brand'))];
+        
+        // Create a map for quick price lookup
+        const priceMap = {};
+        data.forEach(item => {
+            const key = `${item.brand || 'No Brand'}_${item.price_list}`;
+            priceMap[key] = {
+                price: item.price_list_rate,
+                item_code: item.item_code
+            };
+        });
+
         const $content = $(`
             <div class="pricing-data">
                 <div class="pricing-table">
-                    <table class="table">
+                    <table class="table table-bordered">
                         <thead>
                             <tr>
-                                <th>Item Code</th>
                                 <th>Brand</th>
-                                <th>Price List</th>
-                                <th>Rate</th>
-                                <th>Actions</th>
+                                ${uniquePriceLists.map(priceList => `
+                                    <th>${priceList}</th>
+                                `).join('')}
                             </tr>
                         </thead>
                         <tbody>
-                            ${data.map(item => `
+                            ${uniqueBrands.map(brand => `
                                 <tr>
-                                    <td>${item.item_code}</td>
-                                    <td>${item.brand || ''}</td>
-                                    <td>${item.price_list}</td>
-                                    <td>${frappe.format(item.price_list_rate, {fieldtype: 'Currency'})}</td>
-                                    <td>
-                                        <button class="btn btn-xs btn-default edit-price" 
-                                                data-item="${item.item_code}">
-                                            Edit
-                                        </button>
-                                    </td>
+                                    <td>${brand}</td>
+                                    ${uniquePriceLists.map(priceList => {
+                                        const priceData = priceMap[`${brand}_${priceList}`] || {};
+                                        return `
+                                            <td>
+                                                ${priceData.price ? 
+                                                    `<div>
+                                                        ${frappe.format(priceData.price, {fieldtype: 'Currency'})}
+                                                        <button class="btn btn-xs btn-default edit-price ml-2" 
+                                                                data-item="${priceData.item_code}">
+                                                            <i class="fa fa-pencil"></i>
+                                                        </button>
+                                                    </div>`
+                                                    : '-'
+                                                }
+                                            </td>
+                                        `;
+                                    }).join('')}
                                 </tr>
                             `).join('')}
                         </tbody>
                     </table>
                 </div>
             </div>
+        `);
+
+        // Add some custom styles for the matrix layout
+        const style = $(`
+            <style>
+                .pricing-table table {
+                    width: 100%;
+                    border-collapse: collapse;
+                }
+                .pricing-table th, .pricing-table td {
+                    text-align: center;
+                    padding: 8px;
+                }
+                .pricing-table th:first-child, 
+                .pricing-table td:first-child {
+                    text-align: left;
+                    font-weight: bold;
+                }
+                .pricing-table td div {
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 8px;
+                }
+                .edit-price {
+                    padding: 2px 6px;
+                }
+            </style>
         `);
 
         // Add event handlers for the edit buttons
@@ -206,6 +254,7 @@ pos_ar.Pricing.PricingController = class {
         });
 
         $pricingScreen.html($content);
+        $pricingScreen.append(style);
     }
 
     show_price_editor(itemCode) {
