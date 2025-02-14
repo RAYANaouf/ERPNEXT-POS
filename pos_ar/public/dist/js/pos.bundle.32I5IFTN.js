@@ -136,12 +136,15 @@
       if (!company)
         return;
       try {
+        frappe.show_progress("Loading Prices", 0, 100, "Please wait");
         const result = await this.fetcher.fetchItemPrices(company);
         const data = result.prices;
         const price_lists = result.price_lists;
         const brands = result.brands;
+        frappe.hide_progress();
         this.render_pricing_data(data, price_lists, brands);
       } catch (error) {
+        frappe.hide_progress();
         frappe.msgprint({
           title: __("Error"),
           indicator: "red",
@@ -6140,4 +6143,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.OEYTAHEJ.js.map
+//# sourceMappingURL=pos.bundle.32I5IFTN.js.map

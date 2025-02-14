@@ -147,10 +147,23 @@ pos_ar.Pricing.PricingController = class {
             
             // Hide loading indicator
             frappe.hide_progress();
+            frappe.hide_progress();
+            frappe.hide_progress();
+            frappe.hide_progress();
+            frappe.hide_progress();
+            frappe.hide_progress();
+            frappe.hide_progress();
+            frappe.hide_progress();
             
             this.render_pricing_data(data, price_lists, brands);
         } catch (error) {
             // Hide loading indicator in case of error
+            frappe.hide_progress();
+            frappe.hide_progress();
+            frappe.hide_progress();
+            frappe.hide_progress();
+            frappe.hide_progress();
+            frappe.hide_progress();
             frappe.hide_progress();
             
             frappe.msgprint({
@@ -649,7 +662,7 @@ pos_ar.Pricing.PricingController = class {
                     background: var(--text-secondary);
                 }
             </style>
-        `);
+        `;
         this.wrapper.append(style);
     }
 };
