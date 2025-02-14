@@ -407,7 +407,7 @@ def get_item_prices(company=None):
         # Get unique brands
         brands = frappe.get_all(
             "Brand",
-            fields=["name"]
+            fields=["name" , "brand"]
         )
 
         return {
