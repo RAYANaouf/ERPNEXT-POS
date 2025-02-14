@@ -3,6 +3,7 @@
 
 /********************************  Pricing page    **********************************/
 import "../../pos_ar/page/pricing/PricingController.js"
+import "../../pos_ar/page/pricing/remote/fetcher.js"
 
 /********************************  Pos page    ***************************************/
 

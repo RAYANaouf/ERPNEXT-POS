@@ -22,6 +22,7 @@
     constructor(wrapper) {
       this.wrapper = $(wrapper).find(".layout-main-section");
       this.current_screen = "pricing";
+      this.fetcher = new pos_ar.Pricing.PricingFetcher();
       this.setup_page();
       this.add_style();
       this.setup_events();
@@ -128,8 +129,94 @@
         this.load_fixing_data(company);
       }
     }
-    load_pricing_data(company) {
-      console.log("Loading pricing data for company:", company);
+    async load_pricing_data(company) {
+      if (!company)
+        return;
+      try {
+        const itemPrices = await this.fetcher.fetchItemPrices(company);
+        this.render_pricing_data(itemPrices);
+      } catch (error) {
+        frappe.msgprint({
+          title: __("Error"),
+          indicator: "red",
+          message: __("Failed to load item prices")
+        });
+        console.error("Error loading item prices:", error);
+      }
+    }
+    render_pricing_data(data) {
+      const $pricingScreen = this.wrapper.find(".pricing-screen");
+      $pricingScreen.empty();
+      if (!data || data.length === 0) {
+        $pricingScreen.html(`
+                <div class="no-data-state">
+                    <div class="no-data-icon">
+                        <i class="fa fa-tag"></i>
+                    </div>
+                    <div class="no-data-message">
+                        No items found for this company
+                    </div>
+                </div>
+            `);
+        return;
+      }
+      const $content = $(`
+            <div class="pricing-data">
+                <div class="pricing-table">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Item Code</th>
+                                <th>Item Name</th>
+                                <th>Group</th>
+                                <th>UOM</th>
+                                <th>Price List</th>
+                                <th>Rate</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${data.map((item) => `
+                                <tr>
+                                    <td>${item.item_code}</td>
+                                    <td>${item.item_name}</td>
+                                    <td>${item.item_group}</td>
+                                    <td>${item.stock_uom}</td>
+                                    <td>${item.price_list}</td>
+                                    <td>${frappe.format(item.price_list_rate, { fieldtype: "Currency" })}</td>
+                                    <td>
+                                        <button class="btn btn-xs btn-default edit-price" 
+                                                data-item="${item.item_code}">
+                                            Edit
+                                        </button>
+                                    </td>
+                                </tr>
+                            `).join("")}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        `);
+      $content.find(".edit-price").on("click", (e) => {
+        const itemCode = $(e.currentTarget).data("item");
+        this.show_price_editor(itemCode);
+      });
+      $pricingScreen.html($content);
+    }
+    show_price_editor(itemCode) {
+      frappe.prompt([
+        {
+          label: "New Price",
+          fieldname: "price",
+          fieldtype: "Currency",
+          reqd: 1
+        }
+      ], (values) => {
+        frappe.show_alert({
+          message: __("Price updated successfully"),
+          indicator: "green"
+        });
+      }, __("Update Price"), __("Update"));
     }
     load_fixing_data(company) {
       console.log("Loading fixing data for company:", company);
@@ -491,6 +578,25 @@
             </style>
         `;
       this.wrapper.append(style);
+    }
+  };
+
+  // ../pos_ar/pos_ar/pos_ar/page/pricing/remote/fetcher.js
+  pos_ar.Pricing.PricingFetcher = class {
+    constructor() {
+      console.log("PricingFetcher initialized");
+    }
+    async fetchItemPrices(company) {
+      try {
+        const response = await frappe.call({
+          method: "pos_ar.pos_ar.doctype.pos_info.pos_info.get_item_prices",
+          args: { company }
+        });
+        return response.message || [];
+      } catch (error) {
+        console.error("Error fetching item prices:", error);
+        return [];
+      }
     }
   };
 
@@ -5992,4 +6098,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.DQQE6YCZ.js.map
+//# sourceMappingURL=pos.bundle.3KTSWODD.js.map

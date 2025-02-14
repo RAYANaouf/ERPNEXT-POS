@@ -4,6 +4,7 @@ pos_ar.Pricing.PricingController = class {
     constructor(wrapper) {
         this.wrapper = $(wrapper).find(".layout-main-section");
         this.current_screen = 'pricing'; // Default screen
+        this.fetcher = new pos_ar.Pricing.PricingFetcher();
         this.setup_page();
         this.add_style();
         this.setup_events();
@@ -122,19 +123,111 @@ pos_ar.Pricing.PricingController = class {
     }
 
     filter_by_company(company) {
-        // This method will be implemented based on the specific needs of each screen
         if (this.current_screen === 'pricing') {
-            // Handle pricing screen filtering
             this.load_pricing_data(company);
         } else if (this.current_screen === 'fixing') {
-            // Handle fixing screen filtering
             this.load_fixing_data(company);
         }
     }
 
-    load_pricing_data(company) {
-        // To be implemented based on your specific requirements
-        console.log('Loading pricing data for company:', company);
+    async load_pricing_data(company) {
+        if (!company) return;
+        
+        try {
+            const itemPrices = await this.fetcher.fetchItemPrices(company);
+            this.render_pricing_data(itemPrices);
+        } catch (error) {
+            frappe.msgprint({
+                title: __('Error'),
+                indicator: 'red',
+                message: __('Failed to load item prices')
+            });
+            console.error('Error loading item prices:', error);
+        }
+    }
+
+    render_pricing_data(data) {
+        const $pricingScreen = this.wrapper.find('.pricing-screen');
+        $pricingScreen.empty();
+
+        if (!data || data.length === 0) {
+            $pricingScreen.html(`
+                <div class="no-data-state">
+                    <div class="no-data-icon">
+                        <i class="fa fa-tag"></i>
+                    </div>
+                    <div class="no-data-message">
+                        No items found for this company
+                    </div>
+                </div>
+            `);
+            return;
+        }
+
+        // Render the items table
+        const $content = $(`
+            <div class="pricing-data">
+                <div class="pricing-table">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Item Code</th>
+                                <th>Item Name</th>
+                                <th>Group</th>
+                                <th>UOM</th>
+                                <th>Price List</th>
+                                <th>Rate</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${data.map(item => `
+                                <tr>
+                                    <td>${item.item_code}</td>
+                                    <td>${item.item_name}</td>
+                                    <td>${item.item_group}</td>
+                                    <td>${item.stock_uom}</td>
+                                    <td>${item.price_list}</td>
+                                    <td>${frappe.format(item.price_list_rate, {fieldtype: 'Currency'})}</td>
+                                    <td>
+                                        <button class="btn btn-xs btn-default edit-price" 
+                                                data-item="${item.item_code}">
+                                            Edit
+                                        </button>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        `);
+
+        // Add event handlers for the edit buttons
+        $content.find('.edit-price').on('click', (e) => {
+            const itemCode = $(e.currentTarget).data('item');
+            this.show_price_editor(itemCode);
+        });
+
+        $pricingScreen.html($content);
+    }
+
+    show_price_editor(itemCode) {
+        // Implementation for price editor dialog
+        frappe.prompt([
+            {
+                label: 'New Price',
+                fieldname: 'price',
+                fieldtype: 'Currency',
+                reqd: 1
+            }
+        ], (values) => {
+            // Here you would implement the price update logic
+            frappe.show_alert({
+                message: __('Price updated successfully'),
+                indicator: 'green'
+            });
+        }, __('Update Price'), __('Update'));
     }
 
     load_fixing_data(company) {
