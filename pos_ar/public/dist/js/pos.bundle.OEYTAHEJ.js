@@ -114,6 +114,8 @@
             if (frappe.defaults.get_default("company")) {
               $companyFilter.val(frappe.defaults.get_default("company"));
               this.filter_by_company(frappe.defaults.get_default("company"));
+            } else {
+              this.filter_by_company(companies[0].name);
             }
             $companyFilter.select2({
               placeholder: "Company",
@@ -6138,4 +6140,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.IJD6NB47.js.map
+//# sourceMappingURL=pos.bundle.OEYTAHEJ.js.map
