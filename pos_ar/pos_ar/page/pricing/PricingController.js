@@ -172,9 +172,6 @@ pos_ar.Pricing.PricingController = class {
                         <thead>
                             <tr>
                                 <th>Item Code</th>
-                                <th>Item Name</th>
-                                <th>Group</th>
-                                <th>UOM</th>
                                 <th>Price List</th>
                                 <th>Rate</th>
                                 <th>Actions</th>
@@ -184,9 +181,6 @@ pos_ar.Pricing.PricingController = class {
                             ${data.map(item => `
                                 <tr>
                                     <td>${item.item_code}</td>
-                                    <td>${item.item_name}</td>
-                                    <td>${item.item_group}</td>
-                                    <td>${item.stock_uom}</td>
                                     <td>${item.price_list}</td>
                                     <td>${frappe.format(item.price_list_rate, {fieldtype: 'Currency'})}</td>
                                     <td>

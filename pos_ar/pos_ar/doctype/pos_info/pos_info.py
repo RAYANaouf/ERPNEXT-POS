@@ -378,47 +378,24 @@ def pay_selected_invoice(invoices, payment_amount):
 @frappe.whitelist()
 def get_item_prices(company=None):
     """
-    Fetches items with their prices and other relevant details.
+    Fetches item prices for the specified company.
+    Returns a list of items with their prices and other relevant details.
     """
     try:
-        # Get all items first
-        items = frappe.get_all(
-            "Item",
+        # Get all item prices without filters
+        item_prices = frappe.get_all(
+            "Item Price",
             fields=[
-                "name as item_code",
-                "item_name",
-                "item_group",
-                "description",
-                "stock_uom as uom",
+                "item_code",
+                "price_list_rate",
+                "currency",
+                "price_list",
                 "modified"
             ]
         )
-        
-        # Get price for each item
-        for item in items:
-            price_list_rate = frappe.get_value(
-                "Item Price",
-                {
-                    "item_code": item.item_code,
-                    "selling": 1
-                },
-                ["price_list_rate", "currency", "price_list"]
-            )
-            if price_list_rate:
-                item.update({
-                    "price_list_rate": price_list_rate[0],
-                    "currency": price_list_rate[1],
-                    "price_list": price_list_rate[2]
-                })
-            else:
-                item.update({
-                    "price_list_rate": 0,
-                    "currency": frappe.defaults.get_global_default('currency'),
-                    "price_list": ""
-                })
 
-        return items
+        return item_prices	
 
     except Exception as e:
-        frappe.log_error(f"Error fetching items with prices: {str(e)}")
+        frappe.log_error(f"Error fetching item prices: {str(e)}")
         return []
