@@ -154,7 +154,7 @@
                         <i class="fa fa-tag"></i>
                     </div>
                     <div class="no-data-message">
-                        No items found for this company
+                        No item prices found for this company
                     </div>
                 </div>
             `);
@@ -6098,4 +6098,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.3KTSWODD.js.map
+//# sourceMappingURL=pos.bundle.RBP6S3TA.js.map

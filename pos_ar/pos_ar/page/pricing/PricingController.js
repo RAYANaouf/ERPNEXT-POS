@@ -157,7 +157,7 @@ pos_ar.Pricing.PricingController = class {
                         <i class="fa fa-tag"></i>
                     </div>
                     <div class="no-data-message">
-                        No items found for this company
+                        No item prices found for this company
                     </div>
                 </div>
             `);
