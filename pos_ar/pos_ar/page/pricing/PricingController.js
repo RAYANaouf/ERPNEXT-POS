@@ -110,6 +110,7 @@ pos_ar.Pricing.PricingController = class {
                     // Set default company if available
                     if (frappe.defaults.get_default('company')) {
                         $companyFilter.val(frappe.defaults.get_default('company'));
+                        this.filter_by_company(frappe.defaults.get_default('company'));
                     }
 
                     // Initialize select2 with placeholder
@@ -166,6 +167,7 @@ pos_ar.Pricing.PricingController = class {
             `);
             return;
         }
+        
         
         // Create a map for quick price lookup
         const priceMap = {};

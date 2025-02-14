@@ -113,6 +113,7 @@
             });
             if (frappe.defaults.get_default("company")) {
               $companyFilter.val(frappe.defaults.get_default("company"));
+              this.filter_by_company(frappe.defaults.get_default("company"));
             }
             $companyFilter.select2({
               placeholder: "Company",
@@ -6137,4 +6138,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.OXWV6C75.js.map
+//# sourceMappingURL=pos.bundle.IJD6NB47.js.map
