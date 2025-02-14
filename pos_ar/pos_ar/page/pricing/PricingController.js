@@ -14,6 +14,14 @@ pos_ar.Pricing.PricingController = class {
     setup_page() {
         this.page_content = $(`
             <div class="pricing-container">
+                <!-- Loading Popover -->
+                <div id="loadingPopover" popover>
+                    <div class="loading-content">
+                        <div class="loading-spinner"></div>
+                        <div class="loading-text">Loading prices...</div>
+                    </div>
+                </div>
+
                 <!-- Top App Bar -->
                 <div class="pricing-top-bar">
                     <div class="top-bar-left">
@@ -137,34 +145,22 @@ pos_ar.Pricing.PricingController = class {
         if (!company) return;
         
         try {
-            // Show loading indicator
-            frappe.show_progress('Loading Prices', 0, 100, 'Please wait');
+            // Show loading popover
+            const loadingPopover = document.getElementById('loadingPopover');
+            loadingPopover.showPopover();
             
             const result = await this.fetcher.fetchItemPrices(company);
             const data = result.prices;
             const price_lists = result.price_lists;
             const brands = result.brands;
             
-            // Hide loading indicator
-            frappe.hide_progress();
-            frappe.hide_progress();
-            frappe.hide_progress();
-            frappe.hide_progress();
-            frappe.hide_progress();
-            frappe.hide_progress();
-            frappe.hide_progress();
-            frappe.hide_progress();
+            // Hide loading popover
+            loadingPopover.hidePopover();
             
             this.render_pricing_data(data, price_lists, brands);
         } catch (error) {
-            // Hide loading indicator in case of error
-            frappe.hide_progress();
-            frappe.hide_progress();
-            frappe.hide_progress();
-            frappe.hide_progress();
-            frappe.hide_progress();
-            frappe.hide_progress();
-            frappe.hide_progress();
+            // Hide loading popover in case of error
+            document.getElementById('loadingPopover').hidePopover();
             
             frappe.msgprint({
                 title: __('Error'),
@@ -660,6 +656,54 @@ pos_ar.Pricing.PricingController = class {
 
                 .pricing-content::-webkit-scrollbar-thumb:hover {
                     background: var(--text-secondary);
+                }
+
+                /* Loading Popover Styles */
+                #loadingPopover {
+                    position: fixed;
+                    inset: 0;
+                    margin: auto;
+                    width: max-content;
+                    height: max-content;
+                    background: rgba(255, 255, 255, 0.98);
+                    padding: 2.5rem 3rem;
+                    border-radius: 1.2rem;
+                    box-shadow: 0 8px 16px -1px rgba(0, 0, 0, 0.1), 
+                               0 4px 8px -1px rgba(0, 0, 0, 0.06);
+                    border: none;
+                    z-index: 1000;
+                }
+
+                #loadingPopover::backdrop {
+                    background: rgba(0, 0, 0, 0.25);
+                    backdrop-filter: blur(6px);
+                }
+
+                .loading-content {
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    gap: 1.25rem;
+                }
+
+                .loading-spinner {
+                    width: 48px;
+                    height: 48px;
+                    border: 3px solid var(--border-color);
+                    border-top-color: var(--primary-color);
+                    border-radius: 50%;
+                    animation: spin 0.8s linear infinite;
+                }
+
+                .loading-text {
+                    color: var(--text-primary);
+                    font-weight: 500;
+                    font-size: 1.1rem;
+                    letter-spacing: -0.01em;
+                }
+
+                @keyframes spin {
+                    to { transform: rotate(360deg); }
                 }
             </style>
         `;
