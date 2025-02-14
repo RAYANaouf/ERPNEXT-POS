@@ -400,14 +400,14 @@ def get_item_prices(company=None):
         # Get price lists that are linked to the specified company
         price_lists = frappe.get_all(
             "Price List",
-            filters = filters,
+            filters=filters,
             fields=["name"]
         )
 
-        # Get unique brands
+        # Get all fields from brands
         brands = frappe.get_all(
             "Brand",
-            fields=["name" , "brand"]
+            fields=["*"]  # Get all fields
         )
 
         return {
