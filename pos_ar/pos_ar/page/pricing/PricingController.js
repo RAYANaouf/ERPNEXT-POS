@@ -232,7 +232,7 @@ pos_ar.Pricing.PricingController = class {
                                 <tr>
                                     <td>${brand.brand || brand.name}</td>
                                     ${price_lists.map(pl => {
-                                        const priceData = priceMap[`${brand.brand || brand.name}_${pl.name}`] || {};
+                                        const priceData = priceMap[`${brand.name}_${pl.name}`] || {};
                                         return `
                                             <td>
                                                 ${priceData.price ? 

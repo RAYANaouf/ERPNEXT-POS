@@ -213,7 +213,7 @@
                                 <tr>
                                     <td>${brand.brand || brand.name}</td>
                                     ${price_lists.map((pl) => {
-        const priceData = priceMap[`${brand.brand || brand.name}_${pl.name}`] || {};
+        const priceData = priceMap[`${brand.name}_${pl.name}`] || {};
         return `
                                             <td>
                                                 ${priceData.price ? `<div>
@@ -6120,4 +6120,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.Q3GCN6YL.js.map
+//# sourceMappingURL=pos.bundle.DR6VCXPM.js.map
