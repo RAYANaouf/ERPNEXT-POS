@@ -137,12 +137,22 @@ pos_ar.Pricing.PricingController = class {
         if (!company) return;
         
         try {
+            // Show loading indicator
+            frappe.show_progress('Loading Prices', 0, 100, 'Please wait');
+            
             const result = await this.fetcher.fetchItemPrices(company);
             const data = result.prices;
             const price_lists = result.price_lists;
             const brands = result.brands;
+            
+            // Hide loading indicator
+            frappe.hide_progress();
+            
             this.render_pricing_data(data, price_lists, brands);
         } catch (error) {
+            // Hide loading indicator in case of error
+            frappe.hide_progress();
+            
             frappe.msgprint({
                 title: __('Error'),
                 indicator: 'red',
@@ -639,7 +649,7 @@ pos_ar.Pricing.PricingController = class {
                     background: var(--text-secondary);
                 }
             </style>
-        `;
+        `);
         this.wrapper.append(style);
     }
 };
