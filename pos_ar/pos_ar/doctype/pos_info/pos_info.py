@@ -393,8 +393,13 @@ def get_item_prices(company=None):
                 "modified"
             ]
         )
+        
+        # Add brand information for each item
+        for price in item_prices:
+            brand = frappe.get_value("Item", price.item_code, "brand")
+            price["brand"] = brand or ""
 
-        return item_prices	
+        return item_prices
 
     except Exception as e:
         frappe.log_error(f"Error fetching item prices: {str(e)}")
