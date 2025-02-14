@@ -373,8 +373,6 @@ def pay_selected_invoice(invoices, payment_amount):
 
 
 
-
-
 @frappe.whitelist()
 def get_item_prices(company=None):
     """
@@ -382,37 +380,29 @@ def get_item_prices(company=None):
     Returns both price lists and item prices for easier rendering.
     """
     try:
-        # Get price lists for the company
-        price_list_filters = {"enabled": 1}
+        # Filter item prices by company if provided
+        filters = {"enabled": 1}
         if company:
-            price_list_filters["company"] = company
-            
+            filters["custom_company"] = company
+        
+        item_prices = frappe.get_all(
+            "Item Price",
+            fields=[
+                "item_code",
+                "price_list_rate",
+                "currency",
+                "price_list",
+                "brand",
+                "modified"
+            ]
+        )
+
+        # Get price lists that are linked to the specified company
         price_lists = frappe.get_all(
             "Price List",
-            filters=price_list_filters,
+            filters = filters,
             fields=["name"]
         )
-        
-        # Get price list names for filtering item prices
-        price_list_names = [pl.name for pl in price_lists]
-        
-        # Get item prices filtered by company's price lists
-        item_prices = []
-        if price_list_names:
-            item_prices = frappe.get_all(
-                "Item Price",
-                filters={
-                    "price_list": ["in", price_list_names]
-                },
-                fields=[
-                    "item_code",
-                    "price_list_rate",
-                    "currency",
-                    "price_list",
-                    "brand",
-                    "modified"
-                ]
-            )
 
         # Get unique brands
         brands = frappe.get_all(
