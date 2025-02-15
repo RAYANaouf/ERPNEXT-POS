@@ -210,21 +210,55 @@ pos_ar.Pricing.PricingController = class {
         data.forEach(item => {
             const key = `${item.brand || 'No Brand'}_${item.price_list}`;
             priceMap[key] = {
-                name      : item.name,
-                price     : item.price_list_rate,
-                item_code : item.item_code
+                name: item.name,
+                price: item.price_list_rate,
+                item_code: item.item_code,
+                modified: item.modified,
+                modified_by: item.modified_by
             };
         });
 
         const $content = $(`
             <div class="pricing-data">
+                <div class="pricing-controls mb-3">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fa fa-search"></i></span>
+                                <input type="text" class="form-control global-search" placeholder="Search across all columns...">
+                            </div>
+                        </div>
+                        <div class="col-md-6 text-right">
+                            <button class="btn btn-default toggle-filters">
+                                <i class="fa fa-filter"></i> Toggle Filters
+                            </button>
+                            <button class="btn btn-default clear-filters">
+                                <i class="fa fa-times"></i> Clear Filters
+                            </button>
+                        </div>
+                    </div>
+                </div>
                 <div class="pricing-table">
-                    <table class="table table-bordered">
+                    <table class="table table-bordered table-hover">
                         <thead>
-                            <tr>
-                                <th>Brand</th>
+                            <tr class="headers">
+                                <th class="sortable" data-sort="brand">
+                                    Brand <i class="fa fa-sort"></i>
+                                </th>
                                 ${price_lists.map(pl => `
-                                    <th>${pl.name}</th>
+                                    <th class="sortable" data-sort="price" data-price-list="${pl.name}">
+                                        ${pl.name} <i class="fa fa-sort"></i>
+                                    </th>
+                                `).join('')}
+                            </tr>
+                            <tr class="filters" style="display: none;">
+                                <td>
+                                    <input type="text" class="form-control brand-filter" placeholder="Filter Brand...">
+                                </td>
+                                ${price_lists.map(() => `
+                                    <td>
+                                        <input type="text" class="form-control price-filter" placeholder="Filter Price...">
+                                    </td>
                                 `).join('')}
                             </tr>
                         </thead>
@@ -237,14 +271,25 @@ pos_ar.Pricing.PricingController = class {
                                         return `
                                             <td>
                                                 ${priceData.price ? 
-                                                    `<div>
-                                                        ${frappe.format(priceData.price, {fieldtype: 'Currency'})}
-                                                        <button class="btn btn-xs btn-default edit-price ml-2" 
-                                                                data-item="${priceData.name}">
-                                                            <i class="fa fa-pencil"></i>
-                                                        </button>
+                                                    `<div class="price-cell">
+                                                        <div class="price-info">
+                                                            <span class="price-value">
+                                                                ${frappe.format(priceData.price, {fieldtype: 'Currency'})}
+                                                            </span>
+                                                            <button class="btn btn-xs btn-default edit-price" 
+                                                                    data-item="${priceData.name}"
+                                                                    title="Edit Price">
+                                                                <i class="fa fa-pencil"></i>
+                                                            </button>
+                                                        </div>
+                                                        <div class="price-metadata text-muted">
+                                                            <small>
+                                                                Last updated: ${frappe.datetime.prettyDate(priceData.modified)}
+                                                                by ${priceData.modified_by}
+                                                            </small>
+                                                        </div>
                                                     </div>`
-                                                    : '-'
+                                                    : '<div class="no-price">-</div>'
                                                 }
                                             </td>
                                         `;
@@ -257,42 +302,177 @@ pos_ar.Pricing.PricingController = class {
             </div>
         `);
 
+        // Add event handlers
+        this.setupTableEvents($content);
+
         // Add some custom styles for the matrix layout
         const style = $(`
             <style>
+                .pricing-table {
+                    overflow-x: auto;
+                }
                 .pricing-table table {
                     width: 100%;
                     border-collapse: collapse;
+                    margin-bottom: 0;
                 }
                 .pricing-table th, .pricing-table td {
                     text-align: center;
-                    padding: 8px;
+                    padding: 12px;
+                    vertical-align: middle;
                 }
                 .pricing-table th:first-child, 
                 .pricing-table td:first-child {
                     text-align: left;
                     font-weight: bold;
+                    position: sticky;
+                    left: 0;
+                    background: var(--bg-color);
+                    z-index: 1;
                 }
-                .pricing-table td div {
+                .pricing-table .headers th {
+                    background-color: var(--bg-gray);
+                    position: sticky;
+                    top: 0;
+                    z-index: 2;
+                }
+                .pricing-table .headers th:first-child {
+                    z-index: 3;
+                }
+                .pricing-table .sortable {
+                    cursor: pointer;
+                }
+                .pricing-table .sortable:hover {
+                    background-color: var(--bg-light-gray);
+                }
+                .pricing-table .filters input {
+                    width: 100%;
+                    padding: 4px 8px;
+                    border-radius: 4px;
+                }
+                .price-cell {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 4px;
+                }
+                .price-info {
                     display: flex;
                     align-items: center;
                     justify-content: center;
                     gap: 8px;
                 }
+                .price-metadata {
+                    font-size: 0.8em;
+                    opacity: 0.7;
+                }
+                .price-cell:hover .price-metadata {
+                    opacity: 1;
+                }
+                .no-price {
+                    color: var(--text-muted);
+                }
                 .edit-price {
-                    padding: 2px 6px;
+                    visibility: hidden;
+                }
+                .price-cell:hover .edit-price {
+                    visibility: visible;
+                }
+                .pricing-controls {
+                    background: var(--bg-light-gray);
+                    padding: 15px;
+                    border-radius: 6px;
+                    margin-bottom: 15px;
                 }
             </style>
         `);
 
-        // Add event handlers for the edit buttons
-        $content.find('.edit-price').on('click', (e) => {
-            const itemCode = $(e.currentTarget).data('item');
-            this.show_price_editor(itemCode);
+        $pricingScreen.append(style).append($content);
+    }
+
+    setupTableEvents($content) {
+        const self = this;
+        
+        // Toggle filters
+        $content.find('.toggle-filters').on('click', function() {
+            $content.find('.filters').toggle();
         });
 
-        $pricingScreen.html($content);
-        $pricingScreen.append(style);
+        // Clear filters
+        $content.find('.clear-filters').on('click', function() {
+            $content.find('.filters input, .global-search').val('');
+            $content.find('tbody tr').show();
+        });
+
+        // Global search
+        $content.find('.global-search').on('input', function() {
+            const searchTerm = $(this).val().toLowerCase();
+            $content.find('tbody tr').each(function() {
+                const $row = $(this);
+                const text = $row.text().toLowerCase();
+                $row.toggle(text.includes(searchTerm));
+            });
+        });
+
+        // Column filters
+        $content.find('.brand-filter, .price-filter').on('input', function() {
+            const $filters = $content.find('.filters input');
+            const filterValues = $filters.map(function() {
+                return {
+                    column: $(this).closest('td').index(),
+                    value: $(this).val().toLowerCase()
+                };
+            }).get();
+
+            $content.find('tbody tr').each(function() {
+                const $row = $(this);
+                const visible = filterValues.every(filter => {
+                    const cellText = $row.find(`td:eq(${filter.column})`).text().toLowerCase();
+                    return !filter.value || cellText.includes(filter.value);
+                });
+                $row.toggle(visible);
+            });
+        });
+
+        // Sorting
+        let currentSort = { column: null, direction: 'asc' };
+        
+        $content.find('.sortable').on('click', function() {
+            const column = $(this).data('sort');
+            const priceList = $(this).data('price-list');
+            const columnIndex = $(this).index();
+            
+            // Update sort direction
+            if (currentSort.column === columnIndex) {
+                currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
+            } else {
+                currentSort = { column: columnIndex, direction: 'asc' };
+            }
+
+            // Update sort icons
+            $content.find('.sortable i').attr('class', 'fa fa-sort');
+            $(this).find('i').attr('class', `fa fa-sort-${currentSort.direction}`);
+
+            // Sort rows
+            const rows = $content.find('tbody tr').get();
+            rows.sort((a, b) => {
+                let aVal = $(a).find(`td:eq(${columnIndex})`).text();
+                let bVal = $(b).find(`td:eq(${columnIndex})`).text();
+                
+                if (column === 'price') {
+                    // Extract numeric values for price sorting
+                    aVal = parseFloat(aVal.replace(/[^0-9.-]+/g, '')) || 0;
+                    bVal = parseFloat(bVal.replace(/[^0-9.-]+/g, '')) || 0;
+                }
+                
+                if (currentSort.direction === 'asc') {
+                    return aVal > bVal ? 1 : -1;
+                } else {
+                    return aVal < bVal ? 1 : -1;
+                }
+            });
+
+            $content.find('tbody').html(rows);
+        });
     }
 
     show_price_editor(itemCode) {
