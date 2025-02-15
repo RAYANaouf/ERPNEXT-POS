@@ -210,8 +210,9 @@ pos_ar.Pricing.PricingController = class {
         data.forEach(item => {
             const key = `${item.brand || 'No Brand'}_${item.price_list}`;
             priceMap[key] = {
-                price: item.price_list_rate,
-                item_code: item.item_code
+                name      : item.name,
+                price     : item.price_list_rate,
+                item_code : item.item_code
             };
         });
 
@@ -239,7 +240,7 @@ pos_ar.Pricing.PricingController = class {
                                                     `<div>
                                                         ${frappe.format(priceData.price, {fieldtype: 'Currency'})}
                                                         <button class="btn btn-xs btn-default edit-price ml-2" 
-                                                                data-item="${priceData.item_code}">
+                                                                data-item="${priceData.name}">
                                                             <i class="fa fa-pencil"></i>
                                                         </button>
                                                     </div>`
