@@ -194,9 +194,7 @@
         priceMap[key] = {
           name: item.name,
           price: item.price_list_rate,
-          item_code: item.item_code,
-          modified: item.modified,
-          modified_by: item.modified_by
+          item_code: item.item_code
         };
       });
       const $content = $(`
@@ -264,12 +262,6 @@
                                                                     title="Edit Price">
                                                                 <i class="fa fa-pencil"></i>
                                                             </button>
-                                                        </div>
-                                                        <div class="price-metadata text-muted">
-                                                            <small>
-                                                                Last updated: ${frappe.datetime.prettyDate(priceData.modified)}
-                                                                by ${priceData.modified_by}
-                                                            </small>
                                                         </div>
                                                     </div>` : '<div class="no-price">-</div>'}
                                             </td>
@@ -340,15 +332,6 @@
                     font-weight: 500;
                     color: var(--text-color);
                 }
-                .price-metadata {
-                    font-size: var(--text-xs);
-                    color: var(--text-muted);
-                    transition: opacity 0.2s;
-                    text-align: center;
-                }
-                .price-cell:hover .price-metadata {
-                    opacity: 1;
-                }
                 .no-price {
                     color: var(--text-muted);
                     font-style: italic;
@@ -363,6 +346,9 @@
                     color: var(--text-color);
                     border-radius: var(--border-radius-sm);
                     transition: all 0.2s;
+                }
+                .price-cell:hover .edit-price {
+                    visibility: visible;
                 }
                 .pricing-controls {
                     padding: var(--padding-md);
@@ -6340,4 +6326,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.HTPZACVQ.js.map
+//# sourceMappingURL=pos.bundle.QS5WRDCE.js.map
