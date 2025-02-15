@@ -277,10 +277,8 @@ pos_ar.Pricing.PricingController = class {
                                             <td>
                                                 ${priceData.price ? 
                                                     `<div class="price-cell">
-                                                        <div class="price-info">
-                                                            <span class="price-value">
-                                                                ${frappe.format(priceData.price, {fieldtype: 'Currency'})}
-                                                            </span>
+                                                        <div class="price-value">
+                                                            ${frappe.format(priceData.price, {fieldtype: 'Currency'})}
                                                             <button class="btn btn-xs btn-default edit-price" 
                                                                     data-item="${priceData.name}"
                                                                     title="Edit Price">
@@ -358,29 +356,39 @@ pos_ar.Pricing.PricingController = class {
                 .price-cell {
                     display: flex;
                     flex-direction: column;
-                    gap: 4px;
+                    gap: var(--margin-xs);
+                    align-items: center;
                 }
-                .price-info {
+                .price-value {
                     display: flex;
                     align-items: center;
-                    justify-content: center;
-                    gap: 8px;
+                    gap: var(--margin-xs);
+                    font-weight: 500;
+                    color: var(--text-color);
                 }
                 .price-metadata {
-                    font-size: 0.8em;
-                    opacity: 0.7;
+                    font-size: var(--text-xs);
+                    color: var(--text-muted);
+                    transition: opacity 0.2s;
+                    text-align: center;
                 }
                 .price-cell:hover .price-metadata {
                     opacity: 1;
                 }
                 .no-price {
                     color: var(--text-muted);
+                    font-style: italic;
                 }
                 .edit-price {
                     visibility: hidden;
-                }
-                .price-cell:hover .edit-price {
-                    visibility: visible;
+                    padding: var(--padding-xs) !important;
+                    min-width: 28px;
+                    min-height: 28px;
+                    border: 1px solid var(--border-color);
+                    background: var(--control-bg);
+                    color: var(--text-color);
+                    border-radius: var(--border-radius-sm);
+                    transition: all 0.2s;
                 }
                 .pricing-controls {
                     padding: var(--padding-md);
