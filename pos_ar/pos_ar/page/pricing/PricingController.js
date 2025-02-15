@@ -220,20 +220,25 @@ pos_ar.Pricing.PricingController = class {
 
         const $content = $(`
             <div class="pricing-data">
-                <div class="pricing-controls mb-3">
-                    <div class="row">
+                <div class="pricing-controls">
+                    <div class="row align-items-center">
                         <div class="col-md-6">
-                            <div class="input-group">
-                                <span class="input-group-text"><i class="fa fa-search"></i></span>
-                                <input type="text" class="form-control global-search" placeholder="Search across all columns...">
+                            <div class="search-wrapper">
+                                <div class="search-field">
+                                    <i class="fa fa-search search-icon"></i>
+                                    <input type="text" class="form-control global-search" placeholder="Search across all columns...">
+                                    <button class="btn btn-link btn-clear-search" style="display: none;">
+                                        <i class="fa fa-times"></i>
+                                    </button>
+                                </div>
                             </div>
                         </div>
                         <div class="col-md-6 text-right">
                             <button class="btn btn-default toggle-filters">
-                                <i class="fa fa-filter"></i> Toggle Filters
+                                <i class="fa fa-filter"></i> Filters
                             </button>
                             <button class="btn btn-default clear-filters">
-                                <i class="fa fa-times"></i> Clear Filters
+                                <i class="fa fa-times"></i> Clear
                             </button>
                         </div>
                     </div>
@@ -378,10 +383,59 @@ pos_ar.Pricing.PricingController = class {
                     visibility: visible;
                 }
                 .pricing-controls {
-                    background: var(--bg-light-gray);
-                    padding: 15px;
-                    border-radius: 6px;
-                    margin-bottom: 15px;
+                    padding: var(--padding-md);
+                    margin-bottom: var(--margin-lg);
+                }
+                .search-wrapper {
+                    max-width: 500px;
+                }
+                .search-field {
+                    position: relative;
+                    display: flex;
+                    align-items: center;
+                    background: var(--control-bg);
+                    border: 1px solid var(--border-color);
+                    border-radius: var(--border-radius-lg);
+                    transition: all 0.2s;
+                }
+                .search-field:focus-within {
+                    border-color: var(--primary-color);
+                    box-shadow: 0 0 0 3px var(--primary-color-light);
+                }
+                .search-icon {
+                    color: var(--text-muted);
+                    padding: 0 var(--padding-sm);
+                    font-size: 14px;
+                }
+                .search-field .form-control {
+                    border: none;
+                    box-shadow: none;
+                    padding: var(--padding-sm) var(--padding-xs);
+                    background: transparent;
+                    height: 40px;
+                    font-size: var(--text-base);
+                }
+                .search-field .form-control:focus {
+                    outline: none;
+                }
+                .btn-clear-search {
+                    color: var(--text-muted);
+                    padding: var(--padding-xs) var(--padding-sm);
+                    margin-right: 2px;
+                }
+                .btn-clear-search:hover {
+                    color: var(--text-color);
+                }
+                .toggle-filters, .clear-filters {
+                    padding: var(--padding-sm) var(--padding-md);
+                    font-weight: 500;
+                    border-radius: var(--border-radius-lg);
+                    margin-left: var(--margin-sm);
+                    transition: all 0.2s ease;
+                }
+                .toggle-filters:hover, .clear-filters:hover {
+                    background-color: var(--fg-hover-color);
+                    border-color: var(--gray-600);
                 }
             </style>
         `);
@@ -813,6 +867,7 @@ pos_ar.Pricing.PricingController = class {
                 }
             </style>
         `;
+
         this.wrapper.append(style);
     }
 };
