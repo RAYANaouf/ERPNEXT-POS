@@ -85,6 +85,11 @@ pos_ar.Pricing.PricingController = class {
             const company = $(e.currentTarget).val();
             this.filter_by_company(company);
         });
+
+        // Handle new price list button click
+        this.wrapper.find('.btn-primary').on('click', () => {
+            this.create_new_price_list();
+        });
     }
 
     switch_screen(screen) {
@@ -531,6 +536,70 @@ pos_ar.Pricing.PricingController = class {
         });
     }
 
+    create_new_price_list() {
+        const company = this.wrapper.find('.company-filter').val();
+        if (!company) {
+            frappe.throw(__('Please select a company first'));
+            return;
+        }
+
+        frappe.prompt([
+            {
+                label: 'Price List Name',
+                fieldname: 'price_list_name',
+                fieldtype: 'Data',
+                reqd: 1
+            },
+            {
+                label: 'Currency',
+                fieldname: 'currency',
+                fieldtype: 'Link',
+                options: 'Currency',
+                reqd: 1,
+                default: frappe.defaults.get_default('currency')
+            },
+            {
+                label: 'Buying',
+                fieldname: 'buying',
+                fieldtype: 'Check'
+            },
+            {
+                label: 'Selling',
+                fieldname: 'selling',
+                fieldtype: 'Check'
+            }
+        ], (values) => {
+            if (!values.buying && !values.selling) {
+                frappe.throw(__('Please select at least one of Buying or Selling'));
+                return;
+            }
+
+            frappe.call({
+                method: 'frappe.client.insert',
+                args: {
+                    doc: {
+                        doctype: 'Price List',
+                        price_list_name: values.price_list_name,
+                        currency: values.currency,
+                        buying: values.buying,
+                        selling: values.selling,
+                        enabled: 1,
+                        company: company
+                    }
+                },
+                callback: (r) => {
+                    if (r.message) {
+                        frappe.show_alert({
+                            message: __('Price List {0} created successfully', [values.price_list_name]),
+                            indicator: 'green'
+                        });
+                        this.load_pricing_data(company);
+                    }
+                }
+            });
+        }, 'Create New Price List', 'Create');
+    }
+
     show_price_editor(itemPriceName) {
         frappe.db.get_doc('Item Price', itemPriceName)
             .then(doc => {
@@ -691,7 +760,7 @@ pos_ar.Pricing.PricingController = class {
 
                 .filter-item .select2-container.select2-container--focus .select2-selection--single {
                     border-color: var(--primary-color);
-                    box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.15);
+                    box-shadow: 0 0 0 4px var(--primary-color-light);
                 }
 
                 .filter-item .select2-container .select2-selection--single .select2-selection__rendered {
