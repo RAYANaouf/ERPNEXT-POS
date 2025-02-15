@@ -443,6 +443,12 @@
           $row.toggle(visible);
         });
       });
+      $(document).off("click", ".edit-price").on("click", ".edit-price", function(e) {
+        const itemName = $(this).data("item");
+        if (itemName) {
+          self.show_price_editor(itemName);
+        }
+      });
       let currentSort = { column: null, direction: "asc" };
       $content.find(".sortable").on("click", function() {
         const column = $(this).data("sort");
@@ -472,20 +478,57 @@
         $content.find("tbody").html(rows);
       });
     }
-    show_price_editor(itemCode) {
-      frappe.prompt([
-        {
-          label: "New Price",
-          fieldname: "price",
-          fieldtype: "Currency",
-          reqd: 1
-        }
-      ], (values) => {
-        frappe.show_alert({
-          message: __("Price updated successfully"),
-          indicator: "green"
+    show_price_editor(itemPriceName) {
+      frappe.db.get_doc("Item Price", itemPriceName).then((doc) => {
+        frappe.prompt([
+          {
+            label: "Current Price",
+            fieldname: "current_price",
+            fieldtype: "Currency",
+            read_only: 1,
+            default: doc.price_list_rate
+          },
+          {
+            label: "New Price",
+            fieldname: "price",
+            fieldtype: "Currency",
+            reqd: 1
+          }
+        ], (values) => {
+          frappe.call({
+            method: "frappe.client.set_value",
+            args: {
+              doctype: "Item Price",
+              name: itemPriceName,
+              fieldname: "price_list_rate",
+              value: values.price
+            },
+            callback: (r) => {
+              if (r.exc) {
+                frappe.msgprint({
+                  title: __("Error"),
+                  indicator: "red",
+                  message: __("Failed to update price")
+                });
+                return;
+              }
+              frappe.show_alert({
+                message: __("Price updated successfully"),
+                indicator: "green"
+              });
+              const company = this.wrapper.find(".company-filter").val();
+              this.load_pricing_data(company);
+            }
+          });
+        }, __("Update Price"), __("Update"));
+      }).catch((err) => {
+        frappe.msgprint({
+          title: __("Error"),
+          indicator: "red",
+          message: __("Failed to fetch item price details")
         });
-      }, __("Update Price"), __("Update"));
+        console.error("Error fetching item price:", err);
+      });
     }
     load_fixing_data(company) {
       console.log("Loading fixing data for company:", company);
@@ -6326,4 +6369,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.QS5WRDCE.js.map
+//# sourceMappingURL=pos.bundle.OHJPF3AL.js.map

@@ -481,6 +481,14 @@ pos_ar.Pricing.PricingController = class {
             });
         });
 
+        // Edit price button handler using event delegation
+        $(document).off('click', '.edit-price').on('click', '.edit-price', function(e) {
+            const itemName = $(this).data('item');
+            if (itemName) {
+                self.show_price_editor(itemName);
+            }
+        });
+
         // Sorting
         let currentSort = { column: null, direction: 'asc' };
         
@@ -523,22 +531,62 @@ pos_ar.Pricing.PricingController = class {
         });
     }
 
-    show_price_editor(itemCode) {
-        // Implementation for price editor dialog
-        frappe.prompt([
-            {
-                label: 'New Price',
-                fieldname: 'price',
-                fieldtype: 'Currency',
-                reqd: 1
-            }
-        ], (values) => {
-            // Here you would implement the price update logic
-            frappe.show_alert({
-                message: __('Price updated successfully'),
-                indicator: 'green'
+    show_price_editor(itemPriceName) {
+        frappe.db.get_doc('Item Price', itemPriceName)
+            .then(doc => {
+                frappe.prompt([
+                    {
+                        label: 'Current Price',
+                        fieldname: 'current_price',
+                        fieldtype: 'Currency',
+                        read_only: 1,
+                        default: doc.price_list_rate
+                    },
+                    {
+                        label: 'New Price',
+                        fieldname: 'price',
+                        fieldtype: 'Currency',
+                        reqd: 1
+                    }
+                ], (values) => {
+                    frappe.call({
+                        method: 'frappe.client.set_value',
+                        args: {
+                            doctype: 'Item Price',
+                            name: itemPriceName,
+                            fieldname: 'price_list_rate',
+                            value: values.price
+                        },
+                        callback: (r) => {
+                            if (r.exc) {
+                                frappe.msgprint({
+                                    title: __('Error'),
+                                    indicator: 'red',
+                                    message: __('Failed to update price')
+                                });
+                                return;
+                            }
+                            
+                            frappe.show_alert({
+                                message: __('Price updated successfully'),
+                                indicator: 'green'
+                            });
+                            
+                            // Refresh the pricing data
+                            const company = this.wrapper.find('.company-filter').val();
+                            this.load_pricing_data(company);
+                        }
+                    });
+                }, __('Update Price'), __('Update'));
+            })
+            .catch(err => {
+                frappe.msgprint({
+                    title: __('Error'),
+                    indicator: 'red',
+                    message: __('Failed to fetch item price details')
+                });
+                console.error('Error fetching item price:', err);
             });
-        }, __('Update Price'), __('Update'));
     }
 
     load_fixing_data(company) {

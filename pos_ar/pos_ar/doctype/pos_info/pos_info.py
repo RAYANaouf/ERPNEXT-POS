@@ -388,6 +388,7 @@ def get_item_prices(company=None):
         item_prices = frappe.get_all(
             "Item Price",
             fields=[
+				"name",
                 "item_code",
                 "price_list_rate",
                 "currency",
