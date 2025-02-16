@@ -9,6 +9,13 @@ pos_ar.Pricing.PricingController = class {
         this.add_style();
         this.setup_events();
         this.load_companies();
+
+
+        //global data 
+        this.priceLists = [];
+        this.brands = [];
+        this.priceMap = {}
+
     }
 
     setup_page() {
@@ -90,6 +97,11 @@ pos_ar.Pricing.PricingController = class {
         this.wrapper.find('.btn-primary').on('click', () => {
             this.create_new_price_list();
         });
+
+        // Handle export button click
+        this.wrapper.find('.btn-default:contains("Export")').on('click', () => {
+            this.export_pricing_data();
+        });
     }
 
     switch_screen(screen) {
@@ -117,7 +129,7 @@ pos_ar.Pricing.PricingController = class {
                     const companies = response.message;
                     const $companyFilter = this.wrapper.find('.company-filter');
                     $companyFilter.empty();
-                    
+
                     // Add companies without a default option
                     companies.forEach(company => {
                         $companyFilter.append(`<option value="${company.name}">${company.company_name}</option>`);
@@ -127,7 +139,7 @@ pos_ar.Pricing.PricingController = class {
                     if (frappe.defaults.get_default('company')) {
                         $companyFilter.val(frappe.defaults.get_default('company'));
                         this.filter_by_company(frappe.defaults.get_default('company'));
-                    }else{
+                    } else {
                         this.filter_by_company(companies[0].name);
                     }
 
@@ -151,7 +163,7 @@ pos_ar.Pricing.PricingController = class {
 
     async load_pricing_data(company) {
         if (!company) return;
-        
+
         try {
             // Get or initialize loading popover
             if (!this.loadingPopover) {
@@ -167,22 +179,22 @@ pos_ar.Pricing.PricingController = class {
             requestAnimationFrame(() => {
                 this.loadingPopover.showPopover();
             });
-            
+
             const result = await this.fetcher.fetchItemPrices(company);
             const data = result.prices;
-            const price_lists = result.price_lists;
-            const brands = result.brands;
-            
+            this.priceLists = result.price_lists;
+            this.brands = result.brands;
+
             // Hide loading popover
             this.loadingPopover.hidePopover();
-            
-            this.render_pricing_data(data, price_lists, brands);
+
+            this.render_pricing_data(data, this.priceLists, this.brands);
         } catch (error) {
             // Hide loading popover in case of error
             if (this.loadingPopover) {
                 this.loadingPopover.hidePopover();
             }
-            
+
             frappe.msgprint({
                 title: __('Error'),
                 indicator: 'red',
@@ -192,7 +204,7 @@ pos_ar.Pricing.PricingController = class {
         }
     }
 
-    render_pricing_data(data, price_lists, brands) {
+    render_pricing_data(data, priceLists, brands) {
         const $pricingScreen = this.wrapper.find('.pricing-screen');
         $pricingScreen.empty();
 
@@ -209,12 +221,12 @@ pos_ar.Pricing.PricingController = class {
             `);
             return;
         }
-        
+
         // Create a map for quick price lookup
-        const priceMap = {};
+        this.priceMap = {};
         data.forEach(item => {
             const key = `${item.brand || 'No Brand'}_${item.price_list}`;
-            priceMap[key] = {
+            this.priceMap[key] = {
                 name: item.name,
                 price: item.price_list_rate,
                 item_code: item.item_code,
@@ -253,7 +265,7 @@ pos_ar.Pricing.PricingController = class {
                                 <th class="sortable" data-sort="brand">
                                     Brand <i class="fa fa-sort"></i>
                                 </th>
-                                ${price_lists.map(pl => `
+                                ${priceLists.map(pl => `
                                     <th class="sortable" data-sort="price" data-price-list="${pl.name}">
                                         ${pl.name} <i class="fa fa-sort"></i>
                                     </th>
@@ -263,7 +275,7 @@ pos_ar.Pricing.PricingController = class {
                                 <td>
                                     <input type="text" class="form-control brand-filter" placeholder="Filter Brand...">
                                 </td>
-                                ${price_lists.map(() => `
+                                ${priceLists.map(() => `
                                     <td>
                                         <input type="text" class="form-control price-filter" placeholder="Filter Price...">
                                     </td>
@@ -274,14 +286,14 @@ pos_ar.Pricing.PricingController = class {
                             ${brands.map(brand => `
                                 <tr>
                                     <td>${brand.brand || brand.name}</td>
-                                    ${price_lists.map(pl => {
-                                        const priceData = priceMap[`${brand.name}_${pl.name}`] || {};
-                                        return `
+                                    ${priceLists.map(pl => {
+            const priceData = this.priceMap[`${brand.name}_${pl.name}`] || {};
+            return `
                                             <td>
-                                                ${priceData.price ? 
-                                                    `<div class="price-cell">
+                                                ${priceData.price ?
+                    `<div class="price-cell">
                                                         <div class="price-value">
-                                                            ${frappe.format(priceData.price, {fieldtype: 'Currency'})}
+                                                            ${frappe.format(priceData.price, { fieldtype: 'Currency' })}
                                                             <button class="btn btn-xs btn-default edit-price" 
                                                                     data-item="${priceData.name}"
                                                                     title="Edit Price">
@@ -289,11 +301,11 @@ pos_ar.Pricing.PricingController = class {
                                                             </button>
                                                         </div>
                                                     </div>`
-                                                    : '<div class="no-price">-</div>'
-                                                }
+                    : '<div class="no-price">-</div>'
+                }
                                             </td>
                                         `;
-                                    }).join('')}
+        }).join('')}
                                 </tr>
                             `).join('')}
                         </tbody>
@@ -444,22 +456,22 @@ pos_ar.Pricing.PricingController = class {
 
     setupTableEvents($content) {
         const self = this;
-        
+
         // Toggle filters
-        $content.find('.toggle-filters').on('click', function() {
+        $content.find('.toggle-filters').on('click', function () {
             $content.find('.filters').toggle();
         });
 
         // Clear filters
-        $content.find('.clear-filters').on('click', function() {
+        $content.find('.clear-filters').on('click', function () {
             $content.find('.filters input, .global-search').val('');
             $content.find('tbody tr').show();
         });
 
         // Global search
-        $content.find('.global-search').on('input', function() {
+        $content.find('.global-search').on('input', function () {
             const searchTerm = $(this).val().toLowerCase();
-            $content.find('tbody tr').each(function() {
+            $content.find('tbody tr').each(function () {
                 const $row = $(this);
                 const text = $row.text().toLowerCase();
                 $row.toggle(text.includes(searchTerm));
@@ -467,16 +479,16 @@ pos_ar.Pricing.PricingController = class {
         });
 
         // Column filters
-        $content.find('.brand-filter, .price-filter').on('input', function() {
+        $content.find('.brand-filter, .price-filter').on('input', function () {
             const $filters = $content.find('.filters input');
-            const filterValues = $filters.map(function() {
+            const filterValues = $filters.map(function () {
                 return {
                     column: $(this).closest('td').index(),
                     value: $(this).val().toLowerCase()
                 };
             }).get();
 
-            $content.find('tbody tr').each(function() {
+            $content.find('tbody tr').each(function () {
                 const $row = $(this);
                 const visible = filterValues.every(filter => {
                     const cellText = $row.find(`td:eq(${filter.column})`).text().toLowerCase();
@@ -487,7 +499,7 @@ pos_ar.Pricing.PricingController = class {
         });
 
         // Edit price button handler using event delegation
-        $(document).off('click', '.edit-price').on('click', '.edit-price', function(e) {
+        $(document).off('click', '.edit-price').on('click', '.edit-price', function (e) {
             const itemName = $(this).data('item');
             if (itemName) {
                 self.show_price_editor(itemName);
@@ -496,12 +508,12 @@ pos_ar.Pricing.PricingController = class {
 
         // Sorting
         let currentSort = { column: null, direction: 'asc' };
-        
-        $content.find('.sortable').on('click', function() {
+
+        $content.find('.sortable').on('click', function () {
             const column = $(this).data('sort');
             const priceList = $(this).data('price-list');
             const columnIndex = $(this).index();
-            
+
             // Update sort direction
             if (currentSort.column === columnIndex) {
                 currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
@@ -518,13 +530,13 @@ pos_ar.Pricing.PricingController = class {
             rows.sort((a, b) => {
                 let aVal = $(a).find(`td:eq(${columnIndex})`).text();
                 let bVal = $(b).find(`td:eq(${columnIndex})`).text();
-                
+
                 if (column === 'price') {
                     // Extract numeric values for price sorting
                     aVal = parseFloat(aVal.replace(/[^0-9.-]+/g, '')) || 0;
                     bVal = parseFloat(bVal.replace(/[^0-9.-]+/g, '')) || 0;
                 }
-                
+
                 if (currentSort.direction === 'asc') {
                     return aVal > bVal ? 1 : -1;
                 } else {
@@ -635,12 +647,12 @@ pos_ar.Pricing.PricingController = class {
                                 });
                                 return;
                             }
-                            
+
                             frappe.show_alert({
                                 message: __('Price updated successfully'),
                                 indicator: 'green'
                             });
-                            
+
                             // Refresh the pricing data
                             const company = this.wrapper.find('.company-filter').val();
                             this.load_pricing_data(company);
@@ -663,9 +675,48 @@ pos_ar.Pricing.PricingController = class {
         console.log('Loading fixing data for company:', company);
     }
 
+    export_pricing_data() {
+
+        const company = this.wrapper.find('.company-filter').val();
+        if (!company) {
+            frappe.msgprint({
+                title: __('Error'),
+                indicator: 'red',
+                message: __('Please select a company first')
+            });
+            return;
+        }
+
+        // Create the CSV content//+
+        let csvContent = "data:text/csv;charset=utf-8,";//+
+
+        // Add the header row//+
+        csvContent += "Brand," + this.priceLists.map(pl => pl.name).join(",") + "\n";//+
+        console.log("the price lists : ", csvContent)
+        //+
+        // Add the pricing data//+
+        this.brands.forEach(brand => {//+
+            let row = brand.name;//+
+            this.priceLists.forEach(pl => {//+
+                const data_price = this.priceMap[`${brand.name}_${pl.name}`] || {};//+
+
+                row += "," + (data_price.price || "empty");//+
+            });//+
+            csvContent += row + "\n";//+
+        });//+
+        //+
+        // Create a temporary link and trigger a download//+
+        const encodedUri = encodeURI(csvContent);//+
+        const link = document.createElement("a");//+
+        link.setAttribute("href", encodedUri);//+
+        link.setAttribute("download", `pricing_matrix_${company}.csv`);//+
+        document.body.appendChild(link);//+
+        link.click();//+
+    }
+
     add_style() {
         this.wrapper.append('<link rel="stylesheet" type="text/css" href="/assets/pos_ar/css/pricing_page/main.css">');
-        
+
         const style = `
             <style>
                 :root {

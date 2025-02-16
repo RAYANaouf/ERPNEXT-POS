@@ -27,6 +27,9 @@
       this.add_style();
       this.setup_events();
       this.load_companies();
+      this.priceLists = [];
+      this.brands = [];
+      this.priceMap = {};
     }
     setup_page() {
       this.page_content = $(`
@@ -99,6 +102,9 @@
       this.wrapper.find(".btn-primary").on("click", () => {
         this.create_new_price_list();
       });
+      this.wrapper.find('.btn-default:contains("Export")').on("click", () => {
+        this.export_pricing_data();
+      });
     }
     switch_screen(screen) {
       this.wrapper.find(".nav-item").removeClass("active");
@@ -159,10 +165,10 @@
         });
         const result = await this.fetcher.fetchItemPrices(company);
         const data = result.prices;
-        const price_lists = result.price_lists;
-        const brands = result.brands;
+        this.priceLists = result.price_lists;
+        this.brands = result.brands;
         this.loadingPopover.hidePopover();
-        this.render_pricing_data(data, price_lists, brands);
+        this.render_pricing_data(data, this.priceLists, this.brands);
       } catch (error) {
         if (this.loadingPopover) {
           this.loadingPopover.hidePopover();
@@ -175,7 +181,7 @@
         console.error("Error loading item prices:", error);
       }
     }
-    render_pricing_data(data, price_lists, brands) {
+    render_pricing_data(data, priceLists, brands) {
       const $pricingScreen = this.wrapper.find(".pricing-screen");
       $pricingScreen.empty();
       if (!data || data.length === 0) {
@@ -191,10 +197,10 @@
             `);
         return;
       }
-      const priceMap = {};
+      this.priceMap = {};
       data.forEach((item) => {
         const key = `${item.brand || "No Brand"}_${item.price_list}`;
-        priceMap[key] = {
+        this.priceMap[key] = {
           name: item.name,
           price: item.price_list_rate,
           item_code: item.item_code
@@ -232,7 +238,7 @@
                                 <th class="sortable" data-sort="brand">
                                     Brand <i class="fa fa-sort"></i>
                                 </th>
-                                ${price_lists.map((pl) => `
+                                ${priceLists.map((pl) => `
                                     <th class="sortable" data-sort="price" data-price-list="${pl.name}">
                                         ${pl.name} <i class="fa fa-sort"></i>
                                     </th>
@@ -242,7 +248,7 @@
                                 <td>
                                     <input type="text" class="form-control brand-filter" placeholder="Filter Brand...">
                                 </td>
-                                ${price_lists.map(() => `
+                                ${priceLists.map(() => `
                                     <td>
                                         <input type="text" class="form-control price-filter" placeholder="Filter Price...">
                                     </td>
@@ -253,8 +259,8 @@
                             ${brands.map((brand) => `
                                 <tr>
                                     <td>${brand.brand || brand.name}</td>
-                                    ${price_lists.map((pl) => {
-        const priceData = priceMap[`${brand.name}_${pl.name}`] || {};
+                                    ${priceLists.map((pl) => {
+        const priceData = this.priceMap[`${brand.name}_${pl.name}`] || {};
         return `
                                             <td>
                                                 ${priceData.price ? `<div class="price-cell">
@@ -596,6 +602,34 @@
     }
     load_fixing_data(company) {
       console.log("Loading fixing data for company:", company);
+    }
+    export_pricing_data() {
+      const company = this.wrapper.find(".company-filter").val();
+      if (!company) {
+        frappe.msgprint({
+          title: __("Error"),
+          indicator: "red",
+          message: __("Please select a company first")
+        });
+        return;
+      }
+      let csvContent = "data:text/csv;charset=utf-8,";
+      csvContent += "Brand," + this.priceLists.map((pl) => pl.name).join(",") + "\n";
+      console.log("the price lists : ", csvContent);
+      this.brands.forEach((brand) => {
+        let row = brand.name;
+        this.priceLists.forEach((pl) => {
+          const data_price = this.priceMap[`${brand.name}_${pl.name}`] || {};
+          row += "," + (data_price.price || "empty");
+        });
+        csvContent += row + "\n";
+      });
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", `pricing_matrix_${company}.csv`);
+      document.body.appendChild(link);
+      link.click();
     }
     add_style() {
       this.wrapper.append('<link rel="stylesheet" type="text/css" href="/assets/pos_ar/css/pricing_page/main.css">');
@@ -6433,4 +6467,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.YFQGWH3U.js.map
+//# sourceMappingURL=pos.bundle.JEVRZ7XK.js.map
