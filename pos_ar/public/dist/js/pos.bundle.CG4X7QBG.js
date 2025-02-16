@@ -1656,8 +1656,11 @@
         this.editPosItemQty(this.selectedItem.name, this.selectedItem.qty);
         this.selected_item_cart.refreshSelectedItem();
       } else if (action == "print") {
-        console.log("1.1..the map is ", structuredClone(this.selectedItemMaps.get(this.selectedTab.tabName)));
         this.history_cart.print_receipt(structuredClone(this.selectedItemMaps.get(this.selectedTab.tabName)));
+        this.selected_item_cart.refreshSelectedItem();
+        this.item_details.refreshDate(this.selectedItem);
+        this.savePosInvoice();
+        return;
       } else if (action == "remove") {
         this.syncInput = false;
         this.deleteItemFromPOsInvoice(this.selectedItem.name);
@@ -4064,6 +4067,7 @@
         printWindow.print();
         printWindow.close();
       };
+      console.log("check the poooooooooooooooooooooos : ", pos);
     }
   };
 
@@ -6472,4 +6476,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.XOOXT352.js.map
+//# sourceMappingURL=pos.bundle.CG4X7QBG.js.map
