@@ -617,7 +617,7 @@
       csvContent += "Brand," + this.priceLists.map((pl) => pl.name).join(",") + "\n";
       console.log("the price lists : ", csvContent);
       this.brands.forEach((brand) => {
-        let row = brand.name;
+        let row = brand.brand;
         this.priceLists.forEach((pl) => {
           const data_price = this.priceMap[`${brand.name}_${pl.name}`] || {};
           row += "," + (data_price.price || "empty");
@@ -6467,4 +6467,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.JEVRZ7XK.js.map
+//# sourceMappingURL=pos.bundle.OJYCFQP2.js.map

@@ -696,7 +696,7 @@ pos_ar.Pricing.PricingController = class {
         //+
         // Add the pricing data//+
         this.brands.forEach(brand => {//+
-            let row = brand.name;//+
+            let row = brand.brand;//+
             this.priceLists.forEach(pl => {//+
                 const data_price = this.priceMap[`${brand.name}_${pl.name}`] || {};//+
 
