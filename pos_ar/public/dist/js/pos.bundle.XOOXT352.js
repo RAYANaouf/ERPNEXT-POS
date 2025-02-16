@@ -100,7 +100,7 @@
         this.filter_by_company(company);
       });
       this.wrapper.find(".btn-primary").on("click", () => {
-        this.create_new_price_list();
+        this.create_new_item_price();
       });
       this.wrapper.find('.btn-default:contains("Export")').on("click", () => {
         this.export_pricing_data();
@@ -487,7 +487,7 @@
         $content.find("tbody").html(rows);
       });
     }
-    create_new_price_list() {
+    create_new_item_price() {
       const company = this.wrapper.find(".company-filter").val();
       if (!company) {
         frappe.throw(__("Please select a company first"));
@@ -495,58 +495,63 @@
       }
       frappe.prompt([
         {
-          label: "Price List Name",
-          fieldname: "price_list_name",
-          fieldtype: "Data",
+          label: "Brand",
+          fieldname: "brand",
+          fieldtype: "Link",
+          options: "Brand",
           reqd: 1
         },
         {
-          label: "Currency",
-          fieldname: "currency",
+          label: "Price List",
+          fieldname: "price_list",
           fieldtype: "Link",
-          options: "Currency",
-          reqd: 1,
-          default: frappe.defaults.get_default("currency")
+          options: "Price List",
+          reqd: 1
         },
         {
-          label: "Buying",
-          fieldname: "buying",
-          fieldtype: "Check"
-        },
-        {
-          label: "Selling",
-          fieldname: "selling",
-          fieldtype: "Check"
+          label: "Price List Rate",
+          fieldname: "price_list_rate",
+          fieldtype: "Currency",
+          reqd: 1
         }
       ], (values) => {
-        if (!values.buying && !values.selling) {
-          frappe.throw(__("Please select at least one of Buying or Selling"));
-          return;
-        }
-        frappe.call({
-          method: "frappe.client.insert",
-          args: {
-            doc: {
-              doctype: "Price List",
-              price_list_name: values.price_list_name,
-              currency: values.currency,
-              buying: values.buying,
-              selling: values.selling,
-              enabled: 1,
-              company
-            }
-          },
-          callback: (r) => {
-            if (r.message) {
-              frappe.show_alert({
-                message: __("Price List {0} created successfully", [values.price_list_name]),
-                indicator: "green"
-              });
-              this.load_pricing_data(company);
-            }
+        frappe.db.get_list("Item", {
+          filters: {
+            brand: values.brand
+          }
+        }).then((items) => {
+          if (items.length > 0) {
+            const item_code = items[0].name;
+            frappe.call({
+              method: "frappe.client.insert",
+              args: {
+                doc: {
+                  doctype: "Item Price",
+                  item_code,
+                  price_list: values.price_list,
+                  price_list_rate: values.price_list_rate,
+                  company
+                }
+              },
+              callback: (r) => {
+                if (r.message) {
+                  frappe.show_alert({
+                    message: __("Item Price created successfully"),
+                    indicator: "green"
+                  });
+                  this.load_pricing_data(company);
+                }
+              }
+            });
+          } else {
+            frappe.msgprint({
+              title: __("Error"),
+              indicator: "red",
+              message: __("No item with the specified brand exists. Please create an item with the specified brand first.")
+            });
           }
         });
-      }, "Create New Price List", "Create");
+      }, "Create New Item Price", "Create");
     }
     show_price_editor(itemPriceName) {
       frappe.db.get_doc("Item Price", itemPriceName).then((doc) => {
@@ -6467,4 +6472,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.OJYCFQP2.js.map
+//# sourceMappingURL=pos.bundle.XOOXT352.js.map
