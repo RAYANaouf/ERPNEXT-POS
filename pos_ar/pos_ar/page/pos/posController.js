@@ -208,6 +208,7 @@ pos_ar.PointOfSale.Controller = class {
 				method: 'pos_ar.pos_ar.doctype.pos_info.pos_info.check_opening_entry',
 				args: { user, posProfile }
 			});
+			console.log("the result is :::: " , response)
 			const r = response.message;
 			if (r.length === 0) {
 				this.create_opening_voucher()
