@@ -53,20 +53,8 @@
                             <span class="stock">Stock: ${item.stock}</span>
                         </div>
                     </div>
-                    <div class="item-actions">
-                        <button class="btn-edit"><i class="fa fa-edit"></i></button>
-                        <button class="btn-delete"><i class="fa fa-trash"></i></button>
-                    </div>
                 `).appendTo(container);
-        itemCard.find(".btn-edit").click(() => this.editItem(item));
-        itemCard.find(".btn-delete").click(() => this.deleteItem(item));
       });
-    }
-    editItem(item) {
-      frappe.msgprint(`Edit ${item.name}`);
-    }
-    deleteItem(item) {
-      frappe.msgprint(`Delete ${item.name}`);
     }
   };
 
@@ -6531,4 +6519,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.NBE4TKAL.js.map
+//# sourceMappingURL=pos.bundle.BEG7CFNE.js.map
