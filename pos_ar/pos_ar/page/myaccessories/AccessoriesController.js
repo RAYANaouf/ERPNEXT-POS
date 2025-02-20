@@ -8,67 +8,68 @@ pos_ar.myaccessories.AccessoriesController = class {
     }
 
     make() {
-        this.createTopBar();
+        this.createLayout();
     }
 
-    createTopBar() {
-        // Create modern page header
-        this.page = $('<div class="page-head d-flex justify-content-between border-bottom">').appendTo(this.wrapper);
+    createLayout() {
+        // Create the main container
+        const container = $('<div class="accessories-container">').appendTo(this.wrapper);
 
-        // Left section with title and search
-        const leftSection = $('<div class="d-flex align-items-center gap-4">').appendTo(this.page);
-
-        // Title section with icon
-        const titleSection = $('<div class="d-flex align-items-center">').appendTo(leftSection);
+        // Create top bar
+        const topBar = $('<div class="top-bar">').appendTo(container);
         
-        // Icon container with primary color background
-        $('<div class="d-flex align-items-center justify-content-center rounded" style="width: 32px; height: 32px; background: var(--primary-light)">')
-            .html('<i class="fa fa-box-open text-primary" style="font-size: 16px;"></i>')
-            .appendTo(titleSection);
+        // Left side of top bar
+        const leftSection = $('<div class="top-bar-left">').appendTo(topBar);
+        $('<h2>').text('Accessories').appendTo(leftSection);
+        
+        // Right side of top bar
+        const rightSection = $('<div class="top-bar-right">').appendTo(topBar);
+        $('<button class="btn-new">').html('<i class="fa fa-plus"></i> New Item').appendTo(rightSection);
 
-        // Title text
-        $('<h1 class="title-text ms-3">')
-            .text('Accessories Management')
-            .appendTo(titleSection);
-
-        // Right section with actions
-        const rightSection = $('<div class="d-flex align-items-center gap-2">').appendTo(this.page);
-
-        // Primary action button
-        const primaryBtn = $('<button class="btn btn-primary btn-sm d-flex align-items-center gap-2">')
-            .html('<i class="fa fa-plus"></i><span>New Accessory</span>')
-            .click(() => this.createNewAccessory())
-            .appendTo(rightSection);
-
-        // Button group for secondary actions
-        const btnGroup = $('<div class="btn-group">').appendTo(rightSection);
-
-        // Import button
-        $('<button class="btn btn-default btn-sm d-flex align-items-center gap-2">')
-            .html('<i class="fa fa-upload"></i><span>Import</span>')
-            .click(() => this.importAccessories())
-            .appendTo(btnGroup);
-
-        // Export button
-        $('<button class="btn btn-default btn-sm d-flex align-items-center gap-2">')
-            .html('<i class="fa fa-download"></i><span>Export</span>')
-            .click(() => this.exportAccessories())
-            .appendTo(btnGroup);
+        // Create items list container
+        const listContainer = $('<div class="items-container">').appendTo(container);
+        
+        // Add some sample items
+        this.loadItems(listContainer);
     }
 
-    createNewAccessory() {
-        frappe.new_doc('Accessory', {}, doc => {
-            frappe.set_route('Form', 'Accessory', doc.name);
+    loadItems(container) {
+        // Sample data - replace with actual data fetch
+        const items = [
+            { name: 'Keyboard', price: '29.99', stock: 15 },
+            { name: 'Mouse', price: '19.99', stock: 20 },
+            { name: 'Headphones', price: '49.99', stock: 10 },
+            { name: 'USB Cable', price: '9.99', stock: 30 }
+        ];
+
+        items.forEach(item => {
+            const itemCard = $('<div class="item-card">')
+                .html(`
+                    <div class="item-details">
+                        <h3>${item.name}</h3>
+                        <div class="item-meta">
+                            <span class="price">$${item.price}</span>
+                            <span class="stock">Stock: ${item.stock}</span>
+                        </div>
+                    </div>
+                    <div class="item-actions">
+                        <button class="btn-edit"><i class="fa fa-edit"></i></button>
+                        <button class="btn-delete"><i class="fa fa-trash"></i></button>
+                    </div>
+                `)
+                .appendTo(container);
+
+            // Add click handlers
+            itemCard.find('.btn-edit').click(() => this.editItem(item));
+            itemCard.find('.btn-delete').click(() => this.deleteItem(item));
         });
     }
 
-    importAccessories() {
-        // TODO: Implement import functionality
-        frappe.msgprint(__('Import functionality coming soon'));
+    editItem(item) {
+        frappe.msgprint(`Edit ${item.name}`);
     }
 
-    exportAccessories() {
-        // TODO: Implement export functionality
-        frappe.msgprint(__('Export functionality coming soon'));
+    deleteItem(item) {
+        frappe.msgprint(`Delete ${item.name}`);
     }
 };
