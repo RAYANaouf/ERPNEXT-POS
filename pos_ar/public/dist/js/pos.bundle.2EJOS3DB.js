@@ -22,6 +22,30 @@
     constructor(wrapper) {
       this.wrapper = $(wrapper).find(".layout-main-section");
       this.wrapper.append('<link rel="stylesheet" type="text/css" href="/assets/pos_ar/css/accessories_page/main.css">');
+      this.make();
+    }
+    make() {
+      this.createTopBar();
+    }
+    createTopBar() {
+      this.topBar = $('<div class="accessories-top-bar">').appendTo(this.wrapper);
+      const leftSection = $('<div class="top-bar-left">').appendTo(this.topBar);
+      $('<h2 class="page-title">').text("Accessories Management").appendTo(leftSection);
+      const rightSection = $('<div class="top-bar-right">').appendTo(this.topBar);
+      $('<button class="btn btn-primary">').html('<i class="fa fa-plus"></i> New Accessory').click(() => this.createNewAccessory()).appendTo(rightSection);
+      $('<button class="btn btn-default">').html('<i class="fa fa-upload"></i> Import').click(() => this.importAccessories()).appendTo(rightSection);
+      $('<button class="btn btn-default">').html('<i class="fa fa-download"></i> Export').click(() => this.exportAccessories()).appendTo(rightSection);
+    }
+    createNewAccessory() {
+      frappe.new_doc("Accessory", {}, (doc) => {
+        frappe.set_route("Form", "Accessory", doc.name);
+      });
+    }
+    importAccessories() {
+      frappe.msgprint(__("Import functionality coming soon"));
+    }
+    exportAccessories() {
+      frappe.msgprint(__("Export functionality coming soon"));
     }
   };
 
@@ -6486,4 +6510,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.VS25LIE3.js.map
+//# sourceMappingURL=pos.bundle.2EJOS3DB.js.map
