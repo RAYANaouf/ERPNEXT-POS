@@ -47,21 +47,35 @@
       return amount.toFixed(2) + " DA";
     }
     loadItems(container) {
-      const items = [
-        { name: "Keyboard", price: 2999.99, stock: 15 },
-        { name: "Mouse", price: 1999.99, stock: 20 },
-        { name: "Headphones", price: 4999.99, stock: 10 },
-        { name: "USB Cable", price: 999.99, stock: 30 }
-      ];
+      const today = frappe.datetime.get_today();
+      frappe.call({
+        method: "frappe.client.get_list",
+        args: {
+          doctype: "POS Invoice Item",
+          fields: ["item_name", "qty", "rate", "amount"],
+          filters: [
+            ["POS Invoice", "posting_date", ">=", today],
+            ["POS Invoice", "docstatus", "=", 1]
+          ],
+          order_by: "posting_date desc"
+        },
+        callback: (response) => {
+          if (response.message) {
+            this.renderItems(container, response.message);
+          }
+        }
+      });
+    }
+    renderItems(container, items) {
+      container.find(".item-row:not(.header)").remove();
       let grandTotal = 0;
       items.forEach((item) => {
-        const total = item.price * item.stock;
-        grandTotal += total;
+        grandTotal += item.amount;
         const itemRow = $('<div class="item-row">').html(`
-                    <div class="item-col name">${item.name}</div>
-                    <div class="item-col price">${this.formatCurrency(item.price)}</div>
-                    <div class="item-col qty">${item.stock}</div>
-                    <div class="item-col total">${this.formatCurrency(total)}</div>
+                    <div class="item-col name">${frappe.utils.escape_html(item.item_name)}</div>
+                    <div class="item-col price">${this.formatCurrency(item.rate)}</div>
+                    <div class="item-col qty">${item.qty}</div>
+                    <div class="item-col total">${this.formatCurrency(item.amount)}</div>
                 `).appendTo(container);
       });
       $('<div class="item-row grand-total">').html(`
@@ -72,10 +86,49 @@
             `).appendTo(container);
     }
     exportData() {
-      frappe.show_alert({
-        message: "Exporting data...",
-        indicator: "green"
+      const today = frappe.datetime.get_today();
+      frappe.call({
+        method: "frappe.client.get_list",
+        args: {
+          doctype: "POS Invoice Item",
+          fields: ["item_name", "qty", "rate", "amount"],
+          filters: [
+            ["POS Invoice", "posting_date", ">=", today],
+            ["POS Invoice", "docstatus", "=", 1]
+          ],
+          order_by: "posting_date desc"
+        },
+        callback: (response) => {
+          if (response.message) {
+            this.downloadCSV(response.message);
+          }
+        }
       });
+    }
+    downloadCSV(items) {
+      const headers = ["Item Name", "Price (DA)", "Quantity", "Total (DA)"];
+      let csvContent = headers.join(",") + "\n";
+      items.forEach((item) => {
+        const row = [
+          `"${item.item_name}"`,
+          item.rate.toFixed(2),
+          item.qty,
+          item.amount.toFixed(2)
+        ];
+        csvContent += row.join(",") + "\n";
+      });
+      const grandTotal = items.reduce((sum, item) => sum + item.amount, 0);
+      csvContent += `
+Grand Total,,,"${grandTotal.toFixed(2)}"`;
+      const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+      const link = document.createElement("a");
+      const url = URL.createObjectURL(blob);
+      link.setAttribute("href", url);
+      link.setAttribute("download", `accessories_sales_${frappe.datetime.get_today()}.csv`);
+      link.style.visibility = "hidden";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
     }
   };
 
@@ -6540,4 +6593,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.KFHG4IUA.js.map
+//# sourceMappingURL=pos.bundle.3NWWL67G.js.map
