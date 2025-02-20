@@ -100,65 +100,80 @@
 /* Items Container */
 .items-container {
     padding: 1.5rem;
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    max-width: 800px;
+    margin: 0 auto;
 }
 
 /* Item Card */
 .item-card {
     background: white;
     border-radius: 8px;
-    padding: 1rem;
+    padding: 1.25rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
     border: 1px solid var(--gray-200);
     transition: all 0.2s;
+    width: 100%;
 }
 
 .item-card:hover {
     border-color: var(--primary);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    transform: translateX(4px);
+}
+
+.item-details {
+    flex: 1;
+    min-width: 0;
 }
 
 .item-details h3 {
     margin: 0 0 0.5rem 0;
-    font-size: 1rem;
-    color: var(--text-color);
+    font-size: 1.125rem;
+    color: var(--gray-900);
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .item-meta {
     display: flex;
-    gap: 1rem;
-    color: var(--text-muted);
-    font-size: 0.875rem;
+    gap: 1.5rem;
+    color: var(--gray-600);
+    font-size: 0.9375rem;
 }
 
 .price {
     color: var(--primary);
-    font-weight: 500;
+    font-weight: 600;
+    font-size: 1rem;
 }
 
 .item-actions {
     display: flex;
-    gap: 0.5rem;
+    gap: 0.75rem;
+    margin-left: 2rem;
 }
 
 .btn-edit,
 .btn-delete {
     background: none;
     border: none;
-    padding: 6px;
-    border-radius: 4px;
+    padding: 0.5rem;
+    border-radius: 6px;
     cursor: pointer;
-    color: var(--text-muted);
+    color: var(--gray-500);
     transition: all 0.2s;
 }
 
 .btn-edit:hover {
     color: var(--primary);
-    background: var(--primary-light);
+    background: var(--primary-50);
 }
 
 .btn-delete:hover {
