@@ -1,0 +1,48 @@
+/*****************  erpnext page style  **************************/
+
+/*make the body width biger*/
+[data-route = "myaccessories"] .container.page-body{
+	width : 100vw  ; 
+	max-width : 100vw  ; 
+    background-color: #B5DAD4;
+}
+
+[data-route = "myaccessories"] .container.page-body .page-content .layout-main-section{
+		background: #B5DAD4;
+}
+
+/*hide the top bar of the page*/
+[data-route = "myaccessories"] .sticky-top{
+	display : none ;
+}
+
+/*hide the top bar of the page*/
+[data-route = "myaccessories"] .page-head{
+	display : none;
+}
+
+[data-route = "myaccessories"] .content{
+	background : #44A29265 ;
+}
+
+
+[data-route = "myaccessories"] .layout-main-section{
+	background-color: #B5DAD4;
+}
+
+/****************       logo         *****************/
+#logo {
+    opacity: 0;
+    transition: opacity 1s ease-in-out;
+}
+
+#logo.animate {
+    opacity: 1;
+}
+
+#logo {
+    position: absolute;
+    top: 50% ;
+    left: 50%;
+    transform:   translate(-50% , 50%)
+}

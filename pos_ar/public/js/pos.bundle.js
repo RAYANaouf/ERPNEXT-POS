@@ -1,11 +1,15 @@
 
 
 
-/********************************  Pricing page    **********************************/
+/********************************  Accessories page    **********************************/
+import "../../pos_ar/page/myaccessories/AccessoriesController.js"
+
+/********************************  Pricing page         **********************************/
 import "../../pos_ar/page/pricing/PricingController.js"
 import "../../pos_ar/page/pricing/remote/fetcher.js"
 
-/********************************  Pos page    ***************************************/
+
+/********************************  Pos page             **********************************/
 
 import "../../pos_ar/page/pos/posController.js"
 import "../../pos_ar/page/pos/pos_item_selector.js"
@@ -33,7 +37,6 @@ import "../../pos_ar/page/pos/remoteApi/FetchHandler.js"
 
 //screen manager
 import "../../pos_ar/page/pos/manager/ScreenManager.js"
-
 
 
 

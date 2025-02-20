@@ -16,6 +16,15 @@
     return a;
   };
 
+  // ../pos_ar/pos_ar/pos_ar/page/myaccessories/AccessoriesController.js
+  frappe.provide("pos_ar.myaccessories");
+  pos_ar.myaccessories.AccessoriesController = class {
+    constructor(wrapper) {
+      this.wrapper = $(wrapper).find(".layout-main-section");
+      this.wrapper.append('<link rel="stylesheet" type="text/css" href="/assets/pos_ar/css/accessories_page/main.css">');
+    }
+  };
+
   // ../pos_ar/pos_ar/pos_ar/page/pricing/PricingController.js
   frappe.provide("pos_ar.Pricing");
   pos_ar.Pricing.PricingController = class {
@@ -6477,4 +6486,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.L76NY2YA.js.map
+//# sourceMappingURL=pos.bundle.VS25LIE3.js.map
