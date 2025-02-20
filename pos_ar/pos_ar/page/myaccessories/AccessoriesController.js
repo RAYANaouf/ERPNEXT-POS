@@ -21,39 +21,74 @@ pos_ar.myaccessories.AccessoriesController = class {
         // Left side of top bar
         const leftSection = $('<div class="top-bar-left">').appendTo(topBar);
         $('<h2>').text('Accessories').appendTo(leftSection);
-        
-        // Right side of top bar
+
+        // Right side of top bar with export button
         const rightSection = $('<div class="top-bar-right">').appendTo(topBar);
-        $('<button class="btn-new">').html('<i class="fa fa-plus"></i> New Item').appendTo(rightSection);
+        $('<button class="btn-export">')
+            .html('<i class="fa fa-download"></i> Export')
+            .click(() => this.exportData())
+            .appendTo(rightSection);
 
         // Create items list container
         const listContainer = $('<div class="items-container">').appendTo(container);
         
-        // Add some sample items
+        // Add header row
+        const headerRow = $('<div class="item-row header">').html(`
+            <div class="item-col name">Name</div>
+            <div class="item-col price">Price</div>
+            <div class="item-col qty">Quantity</div>
+            <div class="item-col total">Total</div>
+        `).appendTo(listContainer);
+
+        // Add items
         this.loadItems(listContainer);
+    }
+
+    formatCurrency(amount) {
+        return amount.toFixed(2) + ' DA';
     }
 
     loadItems(container) {
         // Sample data - replace with actual data fetch
         const items = [
-            { name: 'Keyboard', price: '29.99', stock: 15 },
-            { name: 'Mouse', price: '19.99', stock: 20 },
-            { name: 'Headphones', price: '49.99', stock: 10 },
-            { name: 'USB Cable', price: '9.99', stock: 30 }
+            { name: 'Keyboard', price: 2999.99, stock: 15 },
+            { name: 'Mouse', price: 1999.99, stock: 20 },
+            { name: 'Headphones', price: 4999.99, stock: 10 },
+            { name: 'USB Cable', price: 999.99, stock: 30 }
         ];
 
+        let grandTotal = 0;
+
         items.forEach(item => {
-            const itemCard = $('<div class="item-card">')
+            const total = item.price * item.stock;
+            grandTotal += total;
+            const itemRow = $('<div class="item-row">')
                 .html(`
-                    <div class="item-details">
-                        <h3>${item.name}</h3>
-                        <div class="item-meta">
-                            <span class="price">$${item.price}</span>
-                            <span class="stock">Stock: ${item.stock}</span>
-                        </div>
-                    </div>
+                    <div class="item-col name">${item.name}</div>
+                    <div class="item-col price">${this.formatCurrency(item.price)}</div>
+                    <div class="item-col qty">${item.stock}</div>
+                    <div class="item-col total">${this.formatCurrency(total)}</div>
                 `)
                 .appendTo(container);
         });
+
+        // Add grand total row
+        $('<div class="item-row grand-total">')
+            .html(`
+                <div class="item-col name">Grand Total</div>
+                <div class="item-col price"></div>
+                <div class="item-col qty"></div>
+                <div class="item-col total">${this.formatCurrency(grandTotal)}</div>
+            `)
+            .appendTo(container);
+    }
+
+    exportData() {
+        // Implement export functionality
+        frappe.show_alert({
+            message: 'Exporting data...',
+            indicator: 'green'
+        });
+        // Add actual export logic here
     }
 };
