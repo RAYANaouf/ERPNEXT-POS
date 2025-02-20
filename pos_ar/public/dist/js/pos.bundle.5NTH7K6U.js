@@ -28,13 +28,16 @@
       this.createTopBar();
     }
     createTopBar() {
-      this.topBar = $('<div class="accessories-top-bar">').appendTo(this.wrapper);
-      const leftSection = $('<div class="top-bar-left">').appendTo(this.topBar);
-      $('<h2 class="page-title">').text("Accessories Management").appendTo(leftSection);
-      const rightSection = $('<div class="top-bar-right">').appendTo(this.topBar);
-      $('<button class="btn btn-primary">').html('<i class="fa fa-plus"></i> New Accessory').click(() => this.createNewAccessory()).appendTo(rightSection);
-      $('<button class="btn btn-default">').html('<i class="fa fa-upload"></i> Import').click(() => this.importAccessories()).appendTo(rightSection);
-      $('<button class="btn btn-default">').html('<i class="fa fa-download"></i> Export').click(() => this.exportAccessories()).appendTo(rightSection);
+      this.page = $('<div class="page-head d-flex justify-content-between border-bottom">').appendTo(this.wrapper);
+      const leftSection = $('<div class="d-flex align-items-center gap-4">').appendTo(this.page);
+      const titleSection = $('<div class="d-flex align-items-center">').appendTo(leftSection);
+      $('<div class="d-flex align-items-center justify-content-center rounded" style="width: 32px; height: 32px; background: var(--primary-light)">').html('<i class="fa fa-box-open text-primary" style="font-size: 16px;"></i>').appendTo(titleSection);
+      $('<h1 class="title-text ms-3">').text("Accessories Management").appendTo(titleSection);
+      const rightSection = $('<div class="d-flex align-items-center gap-2">').appendTo(this.page);
+      const primaryBtn = $('<button class="btn btn-primary btn-sm d-flex align-items-center gap-2">').html('<i class="fa fa-plus"></i><span>New Accessory</span>').click(() => this.createNewAccessory()).appendTo(rightSection);
+      const btnGroup = $('<div class="btn-group">').appendTo(rightSection);
+      $('<button class="btn btn-default btn-sm d-flex align-items-center gap-2">').html('<i class="fa fa-upload"></i><span>Import</span>').click(() => this.importAccessories()).appendTo(btnGroup);
+      $('<button class="btn btn-default btn-sm d-flex align-items-center gap-2">').html('<i class="fa fa-download"></i><span>Export</span>').click(() => this.exportAccessories()).appendTo(btnGroup);
     }
     createNewAccessory() {
       frappe.new_doc("Accessory", {}, (doc) => {
@@ -6510,4 +6513,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.2EJOS3DB.js.map
+//# sourceMappingURL=pos.bundle.5NTH7K6U.js.map
