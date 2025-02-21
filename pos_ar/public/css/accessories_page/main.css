@@ -121,6 +121,95 @@
     outline: none;
 }
 
+.brand-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.brand-filter-input {
+    height: 38px !important;
+    border: 1px solid var(--gray-300) !important;
+    border-radius: 6px !important;
+    padding: 0 2rem 0 0.75rem !important;
+    font-size: 0.9375rem !important;
+    color: var(--gray-900) !important;
+    background-color: white !important;
+    transition: all 0.2s !important;
+    width: 100% !important;
+}
+
+.brand-filter-input:hover {
+    border-color: var(--gray-400) !important;
+}
+
+.brand-filter-input:focus {
+    border-color: var(--primary) !important;
+    box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.1) !important;
+    outline: none !important;
+}
+
+.clear-brand-btn {
+    position: absolute;
+    right: 0.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    padding: 0.25rem;
+    color: var(--gray-600);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+    z-index: 2;
+}
+
+.clear-brand-btn:hover {
+    opacity: 1;
+    color: var(--gray-800);
+}
+
+/* Hide Frappe's default Link field arrow */
+.brand-input-wrapper .link-btn {
+    display: none !important;
+}
+
+/* Awesomplete dropdown styling */
+.awesomplete > ul {
+    border: 1px solid var(--gray-300);
+    border-radius: 6px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    background: white;
+    margin: 0.5rem 0 0;
+    padding: 0.5rem 0;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.awesomplete > ul > li {
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.awesomplete > ul > li:hover {
+    background-color: var(--gray-100);
+}
+
+.awesomplete > ul > li[aria-selected="true"] {
+    background-color: var(--primary-light);
+    color: var(--primary);
+}
+
+.awesomplete mark {
+    background: rgba(var(--primary-rgb), 0.1);
+    color: var(--primary);
+    font-weight: 500;
+}
+
 .btn-export {
     background: var(--primary);
     color: white;

@@ -25,6 +25,7 @@
       this.selectedCompany = frappe.defaults.get_user_default("company");
       this.selectedPOSOpening = "";
       this.selectedBrand = "";
+      this.brandList = [];
       this.make();
     }
     make() {
@@ -53,10 +54,34 @@
       }).appendTo(posOpeningWrapper);
       const brandWrapper = $('<div class="filter-group">').appendTo(filterContainer);
       $("<label>").text("Brand").appendTo(brandWrapper);
-      this.brandSelect = $("<select>").addClass("form-control").change(() => {
-        this.selectedBrand = this.brandSelect.val();
+      const brandInputWrapper = $('<div class="brand-input-wrapper">').appendTo(brandWrapper);
+      this.brandField = frappe.ui.form.make_control({
+        parent: brandInputWrapper,
+        df: {
+          fieldtype: "Link",
+          options: "Brand",
+          placeholder: "Type to search brands...",
+          only_select: false,
+          filter_fields: ["name"],
+          get_query: () => {
+            return {
+              filters: {}
+            };
+          }
+        },
+        render_input: true
+      });
+      this.brandField.refresh();
+      this.brandField.$input.addClass("brand-filter-input").removeClass("input-with-feedback");
+      const clearBtn = $("<button>").addClass("clear-brand-btn").html('<i class="fa fa-times"></i>').click(() => {
+        this.brandField.set_value("");
+        this.selectedBrand = "";
         this.loadItems(container.find(".items-container"));
-      }).appendTo(brandWrapper);
+      }).appendTo(brandInputWrapper);
+      this.brandField.$input.on("change", () => {
+        this.selectedBrand = this.brandField.get_value();
+        this.loadItems(container.find(".items-container"));
+      });
       frappe.call({
         method: "frappe.client.get_list",
         args: {
@@ -74,28 +99,6 @@
             });
             this.companySelect.val(this.selectedCompany);
             this.loadPOSOpenings();
-          }
-        }
-      });
-      frappe.call({
-        method: "frappe.desk.reportview.get_list",
-        args: {
-          doctype: "Brand",
-          fields: ["name"],
-          limit_page_length: 1e3,
-          order_by: "name asc"
-        },
-        callback: (response) => {
-          if (response.message) {
-            this.brandSelect.empty();
-            this.brandSelect.append(
-              $("<option></option>").val("").text("All Brands")
-            );
-            response.message.forEach((brand) => {
-              this.brandSelect.append(
-                $("<option></option>").val(brand.name).text(brand.name)
-              );
-            });
           }
         }
       });
@@ -6681,4 +6684,4 @@ Grand Total,,,"${grandTotal.toFixed(2)}"`;
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.Q33IHFIV.js.map
+//# sourceMappingURL=pos.bundle.WXYPNOSX.js.map
