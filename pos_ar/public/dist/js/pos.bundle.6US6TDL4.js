@@ -91,7 +91,8 @@
         args: {
           doctype: "POS Opening Entry",
           filters: {
-            company: this.selectedCompany
+            company: this.selectedCompany,
+            docstatus: 1
           },
           fields: ["name", "pos_profile"],
           limit: 0
@@ -6654,4 +6655,4 @@ Grand Total,,,"${grandTotal.toFixed(2)}"`;
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.F45AWMNE.js.map
+//# sourceMappingURL=pos.bundle.6US6TDL4.js.map

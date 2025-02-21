@@ -115,7 +115,8 @@ pos_ar.myaccessories.AccessoriesController = class {
             args: {
                 doctype: 'POS Opening Entry',
                 filters: {
-                    company: this.selectedCompany
+                    company   : this.selectedCompany,
+                    docstatus : 1
                 },
                 fields: ['name', 'pos_profile'],
                 limit: 0
