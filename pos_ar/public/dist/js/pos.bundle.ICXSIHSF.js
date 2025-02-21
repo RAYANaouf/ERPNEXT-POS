@@ -77,6 +77,7 @@
       }).appendTo(brandInputWrapper);
       this.brandField.$input.on("change", () => {
         this.selectedBrand = this.brandField.get_value();
+        console.log("selected brand: ", this.selectedBrand);
         this.loadItems(container.find(".items-container"));
       });
       frappe.call({
@@ -6675,4 +6676,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.CX5T7N74.js.map
+//# sourceMappingURL=pos.bundle.ICXSIHSF.js.map

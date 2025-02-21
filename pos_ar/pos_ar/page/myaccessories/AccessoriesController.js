@@ -97,6 +97,7 @@ pos_ar.myaccessories.AccessoriesController = class {
         // Handle brand selection
         this.brandField.$input.on('change', () => {
             this.selectedBrand = this.brandField.get_value();
+            console.log("selected brand: " , this.selectedBrand);
             this.loadItems(container.find('.items-container'));
         });
 
