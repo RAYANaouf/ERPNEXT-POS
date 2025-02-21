@@ -182,6 +182,7 @@ pos_ar.myaccessories.AccessoriesController = class {
         });
     }
 
+
     loadItems(container) {
         frappe.call({
             method: 'pos_ar.pos_ar.doctype.pos_info.pos_info.get_saled_item',
@@ -192,11 +193,13 @@ pos_ar.myaccessories.AccessoriesController = class {
             },
             callback: (response) => {
                 if (response.message) {
-                    this.renderItems(container, response.message.items);
+                    this.data = response.message.items; // Store data for export
+                    this.renderItems(container, this.data);
                 }
             }
         });
     }
+    
 
     renderItems(container, items) {
         container.find('.item-row:not(.header)').remove();
@@ -231,56 +234,47 @@ pos_ar.myaccessories.AccessoriesController = class {
             `)
             .appendTo(container);
     }
+    
+
+
+
     exportData() {
-        // Collect the displayed items
-        const items = [];
-        let totalQty = 0;
-        let grandTotal = 0;
+        // Convert this.data to an array if it's an object
+        const dataArray = Object.entries(this.data || {}).map(([key, value]) => ({
+            name: key,
+            qty: value.qty,
+            total: value.rate * value.qty
+        }));
     
-        this.wrapper.find('.item-row:not(.header):not(.no-data)').each(function() {
-            const name = $(this).find('.item-col.name').text().trim();
-            const qty = $(this).find('.item-col.qty').text().trim();
-            const total = $(this).find('.item-col.total').text().trim();
-    
-            if (name && qty && total) {
-                items.push({ name, qty, total });
-                // Accumulate quantities and totals
-                totalQty += parseInt(qty.replace(/[^0-9.-]+/g, ''));
-                grandTotal += parseFloat(total.replace(/[^0-9.-]+/g, ''));
-            }
-        });
-    
-        // Check if there are items to export
-        if (items.length === 0) {
-            frappe.msgprint('No items to export.');
+        // Check if dataArray is not empty
+        if (dataArray.length === 0) {
+            frappe.msgprint("No data to export.");
             return;
         }
     
-        // Prepare data for Excel
-        const worksheetData = [
-            ['Name', 'Quantity', 'Total'], // Header row
-            ...items.map(item => [item.name, item.qty, item.total]), // Item rows
-            ['Total', totalQty, grandTotal.toFixed(2)] // Total row
-        ];
+        // Create a new workbook and add the sheet
+        const wb = XLSX.utils.book_new();
+        const ws = XLSX.utils.json_to_sheet(dataArray);
+        XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
     
-        // Create a worksheet and a workbook
-        const worksheet = XLSX.utils.aoa_to_sheet(worksheetData);
-        const workbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workbook, worksheet, 'Accessories Sales');
+        // Use type 'array' instead of 'blob'
+        const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
     
-        // Generate the Excel file and trigger the download
-        const xlsxFile = XLSX.write(workbook, { bookType: 'xlsx', type: 'blob' });
-        const url = URL.createObjectURL(xlsxFile);
+        // Create a Blob from the array buffer
+        const blob = new Blob([wbout], { type: 'application/octet-stream' });
     
-        // Create a download link and trigger the download
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = 'accessories_sales_data.xlsx';
-        link.style.display = 'none';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+        // Create download link and trigger download
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "data.xlsx";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
     }
+    
+    
         
     
 };
