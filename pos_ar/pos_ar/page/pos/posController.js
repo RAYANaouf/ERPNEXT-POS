@@ -1223,7 +1223,7 @@ pos_ar.PointOfSale.Controller = class {
 		}
 
 		//check if there is a pos to sync
-		if (this.unsyncedPos == 0) {
+		if (this.unsyncedPos <= 0) {
 			// with options
 			frappe.msgprint({
 				title: __('Sync Complete'),
@@ -1235,7 +1235,6 @@ pos_ar.PointOfSale.Controller = class {
 
 		let counter = 0;
 		let failure = 0;
-		let seccess = 0;
 
 		this.appData.getNotSyncedPos(
 			(allUnsyncedPos) => {

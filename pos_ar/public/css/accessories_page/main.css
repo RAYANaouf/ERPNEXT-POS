@@ -32,7 +32,7 @@
 
 .accessories-container {
     padding: 0;
-    height: 100%;
+    height: 100vh;
     background: var(--gray-50);
 }
 
@@ -48,6 +48,39 @@
     position: sticky;
     top: 0;
     z-index: 100;
+}
+
+.top-bar-left h2 {
+    margin: 0;
+    font-size: 1.75rem;
+    color: var(--gray-900);
+    font-weight: 700;
+}
+
+.top-bar-center {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    margin: 0 2rem;
+}
+
+.date-filter {
+    background: white;
+    border: 1px solid var(--gray-300);
+    border-radius: 8px;
+    padding: 0.5rem;
+}
+
+.date-filter input[type="date"] {
+    border: none;
+    font-size: 0.9375rem;
+    color: var(--gray-900);
+    padding: 0.25rem;
+    cursor: pointer;
+}
+
+.date-filter input[type="date"]:focus {
+    outline: none;
 }
 
 .top-bar h2 {
@@ -167,6 +200,19 @@
 .item-row.grand-total .item-col.total {
     color: var(--primary);
     font-size: 1.125rem;
+}
+
+.item-row.no-data {
+    text-align: center;
+    color: var(--gray-600);
+    padding: 2rem;
+    background: var(--gray-50);
+    border-radius: 8px;
+}
+
+.item-row.no-data .item-col {
+    justify-content: center;
+    font-style: italic;
 }
 
 /* Columns */

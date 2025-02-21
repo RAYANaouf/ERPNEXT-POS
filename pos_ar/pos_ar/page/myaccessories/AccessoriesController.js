@@ -4,6 +4,7 @@ pos_ar.myaccessories.AccessoriesController = class {
     constructor(wrapper) {
         this.wrapper = $(wrapper).find(".layout-main-section");
         this.wrapper.append('<link rel="stylesheet" type="text/css" href="/assets/pos_ar/css/accessories_page/main.css">');
+        this.selectedDate = frappe.datetime.get_today();
         this.make();
     }
 
@@ -21,6 +22,19 @@ pos_ar.myaccessories.AccessoriesController = class {
         // Left side of top bar
         const leftSection = $('<div class="top-bar-left">').appendTo(topBar);
         $('<h2>').text('Accessories').appendTo(leftSection);
+
+        // Center section with date filter
+        const centerSection = $('<div class="top-bar-center">').appendTo(topBar);
+        const dateWrapper = $('<div class="date-filter">').appendTo(centerSection);
+        
+        // Add date picker
+        this.datePicker = $('<input type="date">')
+            .val(this.selectedDate)
+            .change(() => {
+                this.selectedDate = this.datePicker.val();
+                this.loadItems(container.find('.items-container'));
+            })
+            .appendTo(dateWrapper);
 
         // Right side of top bar with export button
         const rightSection = $('<div class="top-bar-right">').appendTo(topBar);
@@ -49,23 +63,12 @@ pos_ar.myaccessories.AccessoriesController = class {
     }
 
     loadItems(container) {
-        // Get today's date in YYYY-MM-DD format
-        const today = frappe.datetime.get_today();
-
         frappe.call({
-            method: 'frappe.client.get_list',
-            args: {
-                doctype: 'POS Invoice Item',
-                fields: ['item_name', 'qty', 'rate', 'amount'],
-                filters: [
-                    ['POS Invoice', 'posting_date', '>=', today],
-                    ['POS Invoice', 'docstatus', '=', 1]
-                ],
-                order_by: 'posting_date desc'
-            },
+            method: 'pos_ar.pos_ar.doctype.pos_info.pos_info.get_saled_item',
+            args: {   },
             callback: (response) => {
                 if (response.message) {
-                    this.renderItems(container, response.message);
+                    this.renderItems(container, response.message.items);
                 }
             }
         });
@@ -74,16 +77,24 @@ pos_ar.myaccessories.AccessoriesController = class {
     renderItems(container, items) {
         container.find('.item-row:not(.header)').remove(); // Clear existing items
 
+        if (items.length === 0) {
+            // Show no data message
+            $('<div class="item-row no-data">')
+                .html('<div class="item-col name">No sales data found for selected date</div>')
+                .appendTo(container);
+            return;
+        }
+
         let grandTotal = 0;
 
         items.forEach(item => {
-            grandTotal += item.amount;
+            grandTotal += item.rate;
             const itemRow = $('<div class="item-row">')
                 .html(`
                     <div class="item-col name">${frappe.utils.escape_html(item.item_name)}</div>
                     <div class="item-col price">${this.formatCurrency(item.rate)}</div>
                     <div class="item-col qty">${item.qty}</div>
-                    <div class="item-col total">${this.formatCurrency(item.amount)}</div>
+                    <div class="item-col total">${this.formatCurrency(item.rate * item.qty)}</div>
                 `)
                 .appendTo(container);
         });
@@ -100,16 +111,13 @@ pos_ar.myaccessories.AccessoriesController = class {
     }
 
     exportData() {
-        // Get today's date in YYYY-MM-DD format
-        const today = frappe.datetime.get_today();
-
         frappe.call({
             method: 'frappe.client.get_list',
             args: {
                 doctype: 'POS Invoice Item',
                 fields: ['item_name', 'qty', 'rate', 'amount'],
                 filters: [
-                    ['POS Invoice', 'posting_date', '>=', today],
+                    ['POS Invoice', 'posting_date', '=', this.selectedDate],
                     ['POS Invoice', 'docstatus', '=', 1]
                 ],
                 order_by: 'posting_date desc'
@@ -144,7 +152,7 @@ pos_ar.myaccessories.AccessoriesController = class {
         const link = document.createElement('a');
         const url = URL.createObjectURL(blob);
         link.setAttribute('href', url);
-        link.setAttribute('download', `accessories_sales_${frappe.datetime.get_today()}.csv`);
+        link.setAttribute('download', `accessories_sales_${this.selectedDate}.csv`);
         link.style.visibility = 'hidden';
         document.body.appendChild(link);
         link.click();

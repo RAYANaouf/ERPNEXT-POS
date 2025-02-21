@@ -424,3 +424,38 @@ def get_item_prices(company=None):
             "brands": [],
             "prices": []
         }
+
+
+
+
+#i create it for nacimo optic (tizi) to get all selled accessories 		
+@frappe.whitelist()
+def get_saled_item():
+
+    try:
+        # Filter item prices by company if provided
+        filters = {"docstatus": 1}
+
+    
+        items = frappe.get_all(
+            "POS Invoice Item",
+			filters=filters,
+            fields=[
+				"item_name",
+                "qty",
+                "rate"
+            ]
+        )
+
+
+        return {
+            "items": items
+        }
+
+    except Exception as e:
+        frappe.log_error(f"Error fetching items : {str(e)}")
+        return {
+            "items": []
+        }
+
+
