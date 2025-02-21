@@ -24,6 +24,7 @@
       this.wrapper.append('<link rel="stylesheet" type="text/css" href="/assets/pos_ar/css/accessories_page/main.css">');
       this.selectedDate = frappe.datetime.get_today();
       this.selectedCompany = frappe.defaults.get_user_default("company");
+      this.selectedPOSOpening = "";
       this.make();
     }
     make() {
@@ -38,8 +39,14 @@
       const companyWrapper = $('<div class="company-filter">').appendTo(centerSection);
       this.companySelect = $("<select>").addClass("form-control").change(() => {
         this.selectedCompany = this.companySelect.val();
+        this.loadPOSOpenings();
         this.loadItems(container.find(".items-container"));
       }).appendTo(companyWrapper);
+      const posOpeningWrapper = $('<div class="pos-opening-filter">').appendTo(centerSection);
+      this.posOpeningSelect = $("<select>").addClass("form-control").change(() => {
+        this.selectedPOSOpening = this.posOpeningSelect.val();
+        this.loadItems(container.find(".items-container"));
+      }).appendTo(posOpeningWrapper);
       frappe.call({
         method: "frappe.client.get_list",
         args: {
@@ -56,6 +63,7 @@
               );
             });
             this.companySelect.val(this.selectedCompany);
+            this.loadPOSOpenings();
           }
         }
       });
@@ -77,12 +85,41 @@
     formatCurrency(amount) {
       return amount.toFixed(2) + " DA";
     }
+    loadPOSOpenings() {
+      frappe.call({
+        method: "frappe.client.get_list",
+        args: {
+          doctype: "POS Opening Entry",
+          filters: {
+            company: this.selectedCompany
+          },
+          fields: ["name", "pos_profile"],
+          limit: 0
+        },
+        callback: (response) => {
+          if (response.message) {
+            this.posOpeningSelect.empty();
+            this.posOpeningSelect.append(
+              $("<option></option>").val("").text("All POS Sessions")
+            );
+            response.message.forEach((entry) => {
+              this.posOpeningSelect.append(
+                $("<option></option>").val(entry.name).text(`${entry.name} (${entry.pos_profile})`)
+              );
+            });
+            this.posOpeningSelect.val(this.selectedPOSOpening);
+          }
+        }
+      });
+    }
     loadItems(container) {
       console.log("company : ", this.selectedCompany);
+      console.log("pos opening : ", this.selectedPOSOpening);
       frappe.call({
         method: "pos_ar.pos_ar.doctype.pos_info.pos_info.get_saled_item",
         args: {
-          company: this.selectedCompany
+          company: this.selectedCompany,
+          pos_opening_entry: this.selectedPOSOpening
         },
         callback: (response) => {
           if (response.message) {
@@ -6617,4 +6654,4 @@ Grand Total,,,"${grandTotal.toFixed(2)}"`;
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.YOXMOBQV.js.map
+//# sourceMappingURL=pos.bundle.F45AWMNE.js.map

@@ -428,35 +428,49 @@ def get_item_prices(company=None):
 
 
 
-
-#i create it for nacimo optic (tizi) to get all selled accessories 		
+# I created it for nacimo optic (tizi) to get all sold accessories 		
 @frappe.whitelist()
-def get_saled_item(company = None):
-
+def get_saled_item(company=None, pos_opening_entry=None):
     try:
-        # Filter item prices by company if provided
-        
-        filters_invoice = {"docstatus": 1}
+        filters_invoice = {"docstatus": 1}  # Include docstatus filter
 
-        item_sold = {}
-
+        # Check if company is provided
         if company:
-            filters_invoice["company"] =  company 
+            filters_invoice["company"] = company
         else:
             return {}
 
+        # Handle pos_opening_entry filter
+        if pos_opening_entry:
+            opening_entry = frappe.get_doc("POS Opening Invoice", pos_opening_entry)
+            start_time = opening_entry.period_start_date
+
+            # If status is Open - Get all after start time
+            if opening_entry.status == "Open":
+                filters_invoice["posting_date"] = [">=", start_time]
+            
+            # If status is Closed - Get all between start and end time
+            elif opening_entry.status == "Closed":
+                closing_entry = frappe.get_doc("POS Closing Entry", opening_entry.pos_closing_entry)
+                end_time = closing_entry.period_end_date
+                next_day = end_time + timedelta(days=1)
+                filters_invoice["posting_date"] = ["between", (start_time, next_day)]
+
+        # Get POS Invoices with the applied filters
         posInvoices = frappe.get_all(
-			"POS Invoice",
-			filters=filters_invoice,
-			fields = ["name"]
-		)
+            "POS Invoice",
+            filters=filters_invoice,
+            fields=["name"]
+        )
+
+        item_sold = {}
 
         for invoice in posInvoices:
             invoice_name = invoice["name"]
 
-            filters_item  = {"docstatus": 1 , "parent": invoice_name}
+            filters_item = {"docstatus": 1, "parent": invoice_name}
 
-            pos_items = frappe.get_all("POS Invoice Item", filters=filters_item , fields=["item_code","qty","rate","brand"])
+            pos_items = frappe.get_all("POS Invoice Item", filters=filters_item, fields=["item_code", "qty", "rate", "brand"])
 
             for item in pos_items:
                 if str(item["brand"]) != "19":
@@ -475,9 +489,7 @@ def get_saled_item(company = None):
         }
 
     except Exception as e:
-        frappe.log_error(f"Error fetching items : {str(e)}")
+        frappe.log_error(f"Error fetching items: {str(e)}")
         return {
             "items": []
         }
-
-
