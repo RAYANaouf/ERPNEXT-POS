@@ -384,7 +384,7 @@ def get_item_prices(company=None):
         # Filter item prices by company if provided
         filters = {"enabled": 1}
         if company:
-            filters["company"] = company
+            filters["custom_company"] = company
         
         item_prices = frappe.get_all(
             "Item Price",
@@ -442,6 +442,8 @@ def get_saled_item(company = None):
 
         if company:
             filters_invoice["company"] =  company 
+        else:
+            return {}
 
         posInvoices = frappe.get_all(
 			"POS Invoice",
@@ -457,7 +459,7 @@ def get_saled_item(company = None):
             pos_items = frappe.get_all("POS Invoice Item", filters=filters_item , fields=["item_code","qty","rate","brand"])
 
             for item in pos_items:
-                if str(item["brand"]) != "19":
+                if str(item["brand"]) != "nike":
                     continue
                 if item["item_code"] in item_sold:
                     item_sold[item["item_code"]]["qty"] += item["qty"]
