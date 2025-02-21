@@ -235,9 +235,6 @@ pos_ar.myaccessories.AccessoriesController = class {
             .appendTo(container);
     }
     
-
-
-
     exportData() {
         // Convert this.data to an array if it's an object
         const dataArray = Object.entries(this.data || {}).map(([key, value]) => ({
@@ -252,9 +249,27 @@ pos_ar.myaccessories.AccessoriesController = class {
             return;
         }
     
+        // Calculate totals
+        const totalRecords = dataArray.length;
+        const totalQty = dataArray.reduce((sum, item) => sum + (item.qty || 0), 0);
+        const totalCost = dataArray.reduce((sum, item) => sum + (item.total || 0), 0);
+    
+        // Add the totals row
+        dataArray.push({
+            name: "Total",
+            qty: totalQty,
+            total: totalCost
+        });
+    
         // Create a new workbook and add the sheet
         const wb = XLSX.utils.book_new();
         const ws = XLSX.utils.json_to_sheet(dataArray);
+    
+        // Add the total records in the first column of the last row
+        const lastRowIndex = dataArray.length;
+        ws[`A${lastRowIndex + 1}`] = { t: 's', v: 'Total Records' };
+        ws[`B${lastRowIndex + 1}`] = { t: 'n', v: totalRecords };
+    
         XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
     
         // Use type 'array' instead of 'blob'
@@ -273,6 +288,7 @@ pos_ar.myaccessories.AccessoriesController = class {
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
     }
+    
     
     
         

@@ -187,8 +187,19 @@
         frappe.msgprint("No data to export.");
         return;
       }
+      const totalRecords = dataArray.length;
+      const totalQty = dataArray.reduce((sum, item) => sum + (item.qty || 0), 0);
+      const totalCost = dataArray.reduce((sum, item) => sum + (item.total || 0), 0);
+      dataArray.push({
+        name: "Total",
+        qty: totalQty,
+        total: totalCost
+      });
       const wb = XLSX.utils.book_new();
       const ws = XLSX.utils.json_to_sheet(dataArray);
+      const lastRowIndex = dataArray.length;
+      ws[`A${lastRowIndex + 1}`] = { t: "s", v: "Total Records" };
+      ws[`B${lastRowIndex + 1}`] = { t: "n", v: totalRecords };
       XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
       const wbout = XLSX.write(wb, { bookType: "xlsx", type: "array" });
       const blob = new Blob([wbout], { type: "application/octet-stream" });
@@ -6663,4 +6674,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.SZWZ75US.js.map
+//# sourceMappingURL=pos.bundle.LZIM7RDF.js.map
