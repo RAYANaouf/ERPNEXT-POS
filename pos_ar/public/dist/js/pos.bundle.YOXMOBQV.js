@@ -78,6 +78,7 @@
       return amount.toFixed(2) + " DA";
     }
     loadItems(container) {
+      console.log("company : ", this.selectedCompany);
       frappe.call({
         method: "pos_ar.pos_ar.doctype.pos_info.pos_info.get_saled_item",
         args: {
@@ -6616,4 +6617,4 @@ Grand Total,,,"${grandTotal.toFixed(2)}"`;
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.2ZTARXHV.js.map
+//# sourceMappingURL=pos.bundle.YOXMOBQV.js.map

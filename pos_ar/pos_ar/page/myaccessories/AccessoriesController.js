@@ -97,6 +97,9 @@ pos_ar.myaccessories.AccessoriesController = class {
     }
 
     loadItems(container) {
+
+        console.log("company : " , this.selectedCompany);
+
         frappe.call({
             method: 'pos_ar.pos_ar.doctype.pos_info.pos_info.get_saled_item',
             args: {

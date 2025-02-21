@@ -384,7 +384,7 @@ def get_item_prices(company=None):
         # Filter item prices by company if provided
         filters = {"enabled": 1}
         if company:
-            filters["custom_company"] = company
+            filters["company"] = company
         
         item_prices = frappe.get_all(
             "Item Price",
