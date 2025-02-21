@@ -2,6 +2,7 @@
 # For license information, please see license.txt
 
 from ast import If
+from dataclasses import fields
 from functools import cache
 from pickle import FALSE
 import frappe
@@ -430,26 +431,43 @@ def get_item_prices(company=None):
 
 #i create it for nacimo optic (tizi) to get all selled accessories 		
 @frappe.whitelist()
-def get_saled_item():
+def get_saled_item(company = None):
 
     try:
         # Filter item prices by company if provided
-        filters = {"docstatus": 1}
+        
+        filters_invoice = {"docstatus": 1}
 
-    
-        items = frappe.get_all(
-            "POS Invoice Item",
-			filters=filters,
-            fields=[
-				"item_name",
-                "qty",
-                "rate"
-            ]
-        )
+        item_sold = {}
 
+        if company:
+            filters_invoice = {"company": company} 
+
+        posInvoices = frappe.get_all(
+			"POS Invoice",
+			filters=filters_invoice,
+			fields = ["name"]
+		)
+
+        for invoice in posInvoices:
+            invoice_name = invoice["name"]
+
+            filters_item  = {"docstatus": 1 , "parent": invoice_name}
+
+            pos_items = frappe.get_all("POS Invoice Item", filters=filters_item , fields=["item_code","qty","rate"])
+
+            for item in pos_items:
+                if item["item_code"] in item_sold:
+                    item_sold[item["item_code"]]["qty"] += item["qty"]
+                    item_sold[item["item_code"]]["rate"] += item["qty"] * item["rate"]
+                else:
+                    item_sold[item["item_code"]] = {
+                        "qty": item["qty"],
+                        "rate": item["qty"] * item["rate"]
+                    }
 
         return {
-            "items": items
+            "items": item_sold
         }
 
     except Exception as e:

@@ -76,29 +76,36 @@ pos_ar.myaccessories.AccessoriesController = class {
 
     renderItems(container, items) {
         container.find('.item-row:not(.header)').remove(); // Clear existing items
-
-        if (items.length === 0) {
+    
+        console.log(items);
+    
+        // Check if there are no items
+        if (Object.keys(items).length === 0) {
             // Show no data message
             $('<div class="item-row no-data">')
                 .html('<div class="item-col name">No sales data found for selected date</div>')
                 .appendTo(container);
             return;
         }
-
+    
         let grandTotal = 0;
-
-        items.forEach(item => {
-            grandTotal += item.rate;
-            const itemRow = $('<div class="item-row">')
+    
+        // Iterate over map entries
+        Object.entries(items).forEach(([itemName, item]) => {
+            const itemTotal = item.rate * item.qty;
+            grandTotal += itemTotal;
+    
+            // Create item row
+            $('<div class="item-row">')
                 .html(`
-                    <div class="item-col name">${frappe.utils.escape_html(item.item_name)}</div>
+                    <div class="item-col name">${frappe.utils.escape_html(itemName)}</div>
                     <div class="item-col price">${this.formatCurrency(item.rate)}</div>
                     <div class="item-col qty">${item.qty}</div>
-                    <div class="item-col total">${this.formatCurrency(item.rate * item.qty)}</div>
+                    <div class="item-col total">${this.formatCurrency(itemTotal)}</div>
                 `)
                 .appendTo(container);
         });
-
+    
         // Add grand total row
         $('<div class="item-row grand-total">')
             .html(`
@@ -109,6 +116,7 @@ pos_ar.myaccessories.AccessoriesController = class {
             `)
             .appendTo(container);
     }
+    
 
     exportData() {
         frappe.call({
