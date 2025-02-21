@@ -5,6 +5,7 @@ pos_ar.myaccessories.AccessoriesController = class {
         this.wrapper = $(wrapper).find(".layout-main-section");
         this.wrapper.append('<link rel="stylesheet" type="text/css" href="/assets/pos_ar/css/accessories_page/main.css">');
         this.selectedDate = frappe.datetime.get_today();
+        this.selectedCompany = frappe.defaults.get_user_default('company');
         this.make();
     }
 
@@ -25,6 +26,40 @@ pos_ar.myaccessories.AccessoriesController = class {
 
         // Center section with date filter
         const centerSection = $('<div class="top-bar-center">').appendTo(topBar);
+        
+        // Add company filter
+        const companyWrapper = $('<div class="company-filter">').appendTo(centerSection);
+        this.companySelect = $('<select>')
+            .addClass('form-control')
+            .change(() => {
+                this.selectedCompany = this.companySelect.val();
+                this.loadItems(container.find('.items-container'));
+            })
+            .appendTo(companyWrapper);
+
+        // Load companies
+        frappe.call({
+            method: 'frappe.client.get_list',
+            args: {
+                doctype: 'Company',
+                fields: ['name'],
+                limit: 0
+            },
+            callback: (response) => {
+                if (response.message) {
+                    this.companySelect.empty();
+                    response.message.forEach(company => {
+                        this.companySelect.append(
+                            $('<option></option>')
+                                .val(company.name)
+                                .text(company.name)
+                        );
+                    });
+                    this.companySelect.val(this.selectedCompany);
+                }
+            }
+        });
+
         const dateWrapper = $('<div class="date-filter">').appendTo(centerSection);
         
         // Add date picker
@@ -64,7 +99,9 @@ pos_ar.myaccessories.AccessoriesController = class {
     loadItems(container) {
         frappe.call({
             method: 'pos_ar.pos_ar.doctype.pos_info.pos_info.get_saled_item',
-            args: {   },
+            args: {
+                company: this.selectedCompany
+            },
             callback: (response) => {
                 if (response.message) {
                     this.renderItems(container, response.message.items);

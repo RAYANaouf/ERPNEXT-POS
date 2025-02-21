@@ -441,7 +441,7 @@ def get_saled_item(company = None):
         item_sold = {}
 
         if company:
-            filters_invoice = {"company": company} 
+            filters_invoice["company"] =  company 
 
         posInvoices = frappe.get_all(
 			"POS Invoice",
