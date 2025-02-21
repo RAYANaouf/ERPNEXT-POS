@@ -454,7 +454,7 @@ def get_saled_item(company = None):
 
             filters_item  = {"docstatus": 1 , "parent": invoice_name}
 
-            pos_items = frappe.get_all("POS Invoice Item", filters=filters_item , fields=["item_code","qty","rate"])
+            pos_items = frappe.get_all("POS Invoice Item", filters=filters_item , fields=["item_code","qty","rate","brand"])
 
             for item in pos_items:
                 if item["brand"] != 19:
