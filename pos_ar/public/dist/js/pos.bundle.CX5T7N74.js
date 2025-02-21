@@ -141,6 +141,7 @@
       });
     }
     loadItems(container) {
+      console.log("loading items : ", this.selectedBrand);
       frappe.call({
         method: "pos_ar.pos_ar.doctype.pos_info.pos_info.get_saled_item",
         args: {
@@ -6674,4 +6675,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.LZIM7RDF.js.map
+//# sourceMappingURL=pos.bundle.CX5T7N74.js.map
