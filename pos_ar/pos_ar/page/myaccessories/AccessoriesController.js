@@ -35,7 +35,6 @@ pos_ar.myaccessories.AccessoriesController = class {
         
         // Add company filter
         const companyWrapper = $('<div class="filter-group">').appendTo(filterContainer);
-        $('<label>').text('Company').appendTo(companyWrapper);
         this.companySelect = $('<select>')
             .addClass('form-control')
             .change(() => {
@@ -47,7 +46,6 @@ pos_ar.myaccessories.AccessoriesController = class {
 
         // Add POS Opening Entry filter
         const posOpeningWrapper = $('<div class="filter-group">').appendTo(filterContainer);
-        $('<label>').text('POS Session').appendTo(posOpeningWrapper);
         this.posOpeningSelect = $('<select>')
             .addClass('form-control')
             .change(() => {
@@ -58,7 +56,6 @@ pos_ar.myaccessories.AccessoriesController = class {
 
         // Add Brand filter with autocomplete
         const brandWrapper = $('<div class="filter-group">').appendTo(filterContainer);
-        $('<label>').text('Brand').appendTo(brandWrapper);
         const brandInputWrapper = $('<div class="brand-input-wrapper">').appendTo(brandWrapper);
         
         // Create the brand input using Frappe's Link field
@@ -72,7 +69,7 @@ pos_ar.myaccessories.AccessoriesController = class {
                 filter_fields: ['name'],
                 get_query: () => {
                     return {
-                        filters: {}  // No additional filters
+                        filters: {}
                     };
                 }
             },
@@ -202,90 +199,88 @@ pos_ar.myaccessories.AccessoriesController = class {
     }
 
     renderItems(container, items) {
-        container.find('.item-row:not(.header)').remove(); // Clear existing items
-    
-        console.log(items);
+        container.find('.item-row:not(.header)').remove();
     
         // Check if there are no items
         if (Object.keys(items).length === 0) {
-            // Show no data message
             $('<div class="item-row no-data">')
                 .html('<div class="item-col name">No sales data found for selected date</div>')
                 .appendTo(container);
             return;
         }
     
+        let grandTotal = 0;
     
-        // Iterate over map entries
         Object.entries(items).forEach(([itemName, item]) => {
+            grandTotal += item.rate * item.qty;
     
-            // Create item row
             $('<div class="item-row">')
                 .html(`
                     <div class="item-col name">${frappe.utils.escape_html(itemName)}</div>
                     <div class="item-col qty">${item.qty}</div>
-                    <div class="item-col total">${this.formatCurrency(item.rate)}</div>
+                    <div class="item-col total">${this.formatCurrency(item.rate * item.qty)}</div>
                 `)
                 .appendTo(container);
         });
     
-        // Add grand total row
         $('<div class="item-row grand-total">')
             .html(`
                 <div class="item-col name">Grand Total</div>
                 <div class="item-col qty"></div>
-                <div class="item-col total">${this.formatCurrency(item.rate)}</div>
+                <div class="item-col total">${this.formatCurrency(grandTotal)}</div>
             `)
             .appendTo(container);
     }
-    
-
     exportData() {
-        frappe.call({
-            method: 'frappe.client.get_list',
-            args: {
-                doctype: 'POS Invoice Item',
-                fields: ['item_name', 'qty', 'rate', 'amount'],
-                filters: [
-                    ['POS Invoice', 'posting_date', '=', this.selectedDate],
-                    ['POS Invoice', 'docstatus', '=', 1]
-                ],
-                order_by: 'posting_date desc'
-            },
-            callback: (response) => {
-                if (response.message) {
-                    this.downloadCSV(response.message);
-                }
+        // Collect the displayed items
+        const items = [];
+        let totalQty = 0;
+        let grandTotal = 0;
+    
+        this.wrapper.find('.item-row:not(.header):not(.no-data)').each(function() {
+            const name = $(this).find('.item-col.name').text().trim();
+            const qty = $(this).find('.item-col.qty').text().trim();
+            const total = $(this).find('.item-col.total').text().trim();
+    
+            if (name && qty && total) {
+                items.push({ name, qty, total });
+                // Accumulate quantities and totals
+                totalQty += parseInt(qty.replace(/[^0-9.-]+/g, ''));
+                grandTotal += parseFloat(total.replace(/[^0-9.-]+/g, ''));
             }
         });
-    }
-
-    downloadCSV(items) {
-        const headers = ['Item Name', 'Price (DA)', 'Quantity', 'Total (DA)'];
-        let csvContent = headers.join(',') + '\n';
-
-        items.forEach(item => {
-            const row = [
-                `"${item.item_name}"`,
-                item.rate.toFixed(2),
-                item.qty,
-                item.amount.toFixed(2)
-            ];
-            csvContent += row.join(',') + '\n';
-        });
-
-        // Add grand total
-        const grandTotal = items.reduce((sum, item) => sum + item.amount, 0);
-        csvContent += `\nGrand Total,,,"${grandTotal.toFixed(2)}"`;
-
-        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    
+        // Check if there are items to export
+        if (items.length === 0) {
+            frappe.msgprint('No items to export.');
+            return;
+        }
+    
+        // Prepare data for Excel
+        const worksheetData = [
+            ['Name', 'Quantity', 'Total'], // Header row
+            ...items.map(item => [item.name, item.qty, item.total]), // Item rows
+            ['Total', totalQty, grandTotal.toFixed(2)] // Total row
+        ];
+    
+        // Create a worksheet and a workbook
+        const worksheet = XLSX.utils.aoa_to_sheet(worksheetData);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, 'Accessories Sales');
+    
+        // Generate the Excel file and trigger the download
+        const xlsxFile = XLSX.write(workbook, { bookType: 'xlsx', type: 'blob' });
+        const url = URL.createObjectURL(xlsxFile);
+    
+        // Create a download link and trigger the download
         const link = document.createElement('a');
-        const url = URL.createObjectURL(blob);
-        link.setAttribute('href', url);
-        link.setAttribute('download', `accessories_sales_${this.selectedDate}.csv`);
-        link.style.visibility = 'hidden';
+        link.href = url;
+        link.download = 'accessories_sales_data.xlsx';
+        link.style.display = 'none';
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
     }
+        
+    
 };

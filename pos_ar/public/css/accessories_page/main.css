@@ -125,6 +125,8 @@
     position: relative;
     display: flex;
     align-items: center;
+    position: relative;
+    bottom: -6px;
 }
 
 .brand-filter-input {
@@ -289,6 +291,10 @@
 .item-col.total {
     flex: 1;
     text-align: right;
+}
+
+.form-group{
+    margin: 0;
 }
 
 /* Responsive Design */
