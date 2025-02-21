@@ -49,7 +49,6 @@ pos_ar.myaccessories.AccessoriesController = class {
         // Add header row
         const headerRow = $('<div class="item-row header">').html(`
             <div class="item-col name">Name</div>
-            <div class="item-col price">Price</div>
             <div class="item-col qty">Quantity</div>
             <div class="item-col total">Total</div>
         `).appendTo(listContainer);
@@ -88,20 +87,16 @@ pos_ar.myaccessories.AccessoriesController = class {
             return;
         }
     
-        let grandTotal = 0;
     
         // Iterate over map entries
         Object.entries(items).forEach(([itemName, item]) => {
-            const itemTotal = item.rate * item.qty;
-            grandTotal += itemTotal;
     
             // Create item row
             $('<div class="item-row">')
                 .html(`
                     <div class="item-col name">${frappe.utils.escape_html(itemName)}</div>
-                    <div class="item-col price">${this.formatCurrency(item.rate)}</div>
                     <div class="item-col qty">${item.qty}</div>
-                    <div class="item-col total">${this.formatCurrency(itemTotal)}</div>
+                    <div class="item-col total">${this.formatCurrency(item.rate)}</div>
                 `)
                 .appendTo(container);
         });
@@ -110,9 +105,8 @@ pos_ar.myaccessories.AccessoriesController = class {
         $('<div class="item-row grand-total">')
             .html(`
                 <div class="item-col name">Grand Total</div>
-                <div class="item-col price"></div>
                 <div class="item-col qty"></div>
-                <div class="item-col total">${this.formatCurrency(grandTotal)}</div>
+                <div class="item-col total">${this.formatCurrency(item.rate)}</div>
             `)
             .appendTo(container);
     }

@@ -44,7 +44,6 @@
       const listContainer = $('<div class="items-container">').appendTo(container);
       const headerRow = $('<div class="item-row header">').html(`
             <div class="item-col name">Name</div>
-            <div class="item-col price">Price</div>
             <div class="item-col qty">Quantity</div>
             <div class="item-col total">Total</div>
         `).appendTo(listContainer);
@@ -71,22 +70,17 @@
         $('<div class="item-row no-data">').html('<div class="item-col name">No sales data found for selected date</div>').appendTo(container);
         return;
       }
-      let grandTotal = 0;
-      Object.entries(items).forEach(([itemName, item]) => {
-        const itemTotal = item.rate * item.qty;
-        grandTotal += itemTotal;
+      Object.entries(items).forEach(([itemName, item2]) => {
         $('<div class="item-row">').html(`
                     <div class="item-col name">${frappe.utils.escape_html(itemName)}</div>
-                    <div class="item-col price">${this.formatCurrency(item.rate)}</div>
-                    <div class="item-col qty">${item.qty}</div>
-                    <div class="item-col total">${this.formatCurrency(itemTotal)}</div>
+                    <div class="item-col qty">${item2.qty}</div>
+                    <div class="item-col total">${this.formatCurrency(item2.rate)}</div>
                 `).appendTo(container);
       });
       $('<div class="item-row grand-total">').html(`
                 <div class="item-col name">Grand Total</div>
-                <div class="item-col price"></div>
                 <div class="item-col qty"></div>
-                <div class="item-col total">${this.formatCurrency(grandTotal)}</div>
+                <div class="item-col total">${this.formatCurrency(item.rate)}</div>
             `).appendTo(container);
     }
     exportData() {
@@ -111,16 +105,16 @@
     downloadCSV(items) {
       const headers = ["Item Name", "Price (DA)", "Quantity", "Total (DA)"];
       let csvContent = headers.join(",") + "\n";
-      items.forEach((item) => {
+      items.forEach((item2) => {
         const row = [
-          `"${item.item_name}"`,
-          item.rate.toFixed(2),
-          item.qty,
-          item.amount.toFixed(2)
+          `"${item2.item_name}"`,
+          item2.rate.toFixed(2),
+          item2.qty,
+          item2.amount.toFixed(2)
         ];
         csvContent += row.join(",") + "\n";
       });
-      const grandTotal = items.reduce((sum, item) => sum + item.amount, 0);
+      const grandTotal = items.reduce((sum, item2) => sum + item2.amount, 0);
       csvContent += `
 Grand Total,,,"${grandTotal.toFixed(2)}"`;
       const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
@@ -317,12 +311,12 @@ Grand Total,,,"${grandTotal.toFixed(2)}"`;
         return;
       }
       this.priceMap = {};
-      data.forEach((item) => {
-        const key = `${item.brand || "No Brand"}_${item.price_list}`;
+      data.forEach((item2) => {
+        const key = `${item2.brand || "No Brand"}_${item2.price_list}`;
         this.priceMap[key] = {
-          name: item.name,
-          price: item.price_list_rate,
-          item_code: item.item_code
+          name: item2.name,
+          price: item2.price_list_rate,
+          item_code: item2.item_code
         };
       });
       const $content = $(`
@@ -1406,8 +1400,8 @@ Grand Total,,,"${grandTotal.toFixed(2)}"`;
         this.defaultPriceList,
         this.getItemPrice.bind(this),
         this.auto_select.bind(this),
-        (item) => {
-          this.itemClick_selector(item);
+        (item2) => {
+          this.itemClick_selector(item2);
         }
       );
       this.screenManager.registerScreen("item_selector", this.item_selector);
@@ -1427,8 +1421,8 @@ Grand Total,,,"${grandTotal.toFixed(2)}"`;
         this.selectedItem,
         this.selectedField,
         this.getItemPrice.bind(this),
-        (item) => {
-          this.onSelectedItemClick(item);
+        (item2) => {
+          this.onSelectedItemClick(item2);
         },
         (tab) => {
           this.screenManager.navigate("home");
@@ -1553,9 +1547,9 @@ Grand Total,,,"${grandTotal.toFixed(2)}"`;
       this.screenManager.registerScreen("unsynced_pos_cart", this.unsynced_pos_cart);
       this.screenManager.unsynced_pos_cart = this.unsynced_pos_cart;
     }
-    itemClick_selector(item, refresh) {
+    itemClick_selector(item2, refresh) {
       this.syncInput = false;
-      const itemCloned = structuredClone(item);
+      const itemCloned = structuredClone(item2);
       itemCloned.discount_amount = 0;
       itemCloned.discount_percentage = 0;
       Object.assign(this.selectedItem, itemCloned);
@@ -1573,14 +1567,14 @@ Grand Total,,,"${grandTotal.toFixed(2)}"`;
       this.selected_item_cart.scrollToBottom();
       this.savePosInvoice();
     }
-    onSelectedItemClick(item) {
+    onSelectedItemClick(item2) {
       this.syncInput = false;
-      const clonedItem = structuredClone(item);
+      const clonedItem = structuredClone(item2);
       Object.assign(this.selectedItem, clonedItem);
       this.selectedField.field_name = "quantity";
       this.selected_item_cart.makeSelectedButtonHighlighted();
       this.screenManager.navigate("item_details");
-      this.item_details.refreshDate(item);
+      this.item_details.refreshDate(item2);
     }
     saveCheckInOut(checkInOut) {
       checkInOut.is_sync = 0;
@@ -1606,8 +1600,8 @@ Grand Total,,,"${grandTotal.toFixed(2)}"`;
       console.log("savePosInvoice : ", this.selectedItemMaps.get(this.selectedTab.tabName));
       this.appData.savePosInvoice(this.selectedItemMaps.get(this.selectedTab.tabName));
     }
-    auto_select(item) {
-      this.itemClick_selector(item);
+    auto_select(item2) {
+      this.itemClick_selector(item2);
       this.item_selector.refresh();
     }
     onMenuClick(menu) {
@@ -1906,23 +1900,23 @@ Grand Total,,,"${grandTotal.toFixed(2)}"`;
       }
       let items = [];
       let is_return = 1;
-      this.selectedItemMaps.get(this.selectedTab.tabName).items.forEach((item) => {
+      this.selectedItemMaps.get(this.selectedTab.tabName).items.forEach((item2) => {
         let newItem = {
-          "item_name": item.item_name,
-          "item_code": item.item_code,
-          "rate": item.rate,
-          "qty": item.qty,
-          "description": item.description,
-          "image": item.image,
+          "item_name": item2.item_name,
+          "item_code": item2.item_code,
+          "rate": item2.rate,
+          "qty": item2.qty,
+          "description": item2.description,
+          "image": item2.image,
           "use_serial_batch_fields": 1,
           "cost_center": this.appData.appData.pos_profile.cost_center,
-          "discount_percentage": item.discount_percentage,
-          "discount_amount": item.discount_amount,
+          "discount_percentage": item2.discount_percentage,
+          "discount_amount": item2.discount_amount,
           "warehouse": this.appData.appData.pos_profile.warehouse,
           "income_account": this.appData.appData.pos_profile.income_account
         };
         items.push(newItem);
-        if (item.qty > 0)
+        if (item2.qty > 0)
           is_return = 0;
       });
       this.selectedItemMaps.get(this.selectedTab.tabName).is_return = is_return;
@@ -1930,8 +1924,8 @@ Grand Total,,,"${grandTotal.toFixed(2)}"`;
       if (items.length == 0)
         return;
       let total = 0;
-      this.selectedItemMaps.get(this.selectedTab.tabName).items.forEach((item) => {
-        total += item.rate * item.qty;
+      this.selectedItemMaps.get(this.selectedTab.tabName).items.forEach((item2) => {
+        total += item2.rate * item2.qty;
       });
       if (this.calculatePaidAmount(this.selectedItemMaps.get(this.selectedTab.tabName)) > total) {
         this.selectedItemMaps.get(this.selectedTab.tabName).paid_amount = total;
@@ -2055,8 +2049,8 @@ Grand Total,,,"${grandTotal.toFixed(2)}"`;
       let grandTotal = 0;
       let allTaxes = 0;
       let discount = 0;
-      pos.items.forEach((item) => {
-        netTotal += item.qty * item.rate;
+      pos.items.forEach((item2) => {
+        netTotal += item2.qty * item2.rate;
       });
       this.taxes_and_charges.forEach((tax) => {
         allTaxes += tax.rate / 100 * netTotal;
@@ -2072,7 +2066,7 @@ Grand Total,,,"${grandTotal.toFixed(2)}"`;
       }
     }
     checkIfRateZero(pos) {
-      return pos.items.some((item) => item.rate == 0);
+      return pos.items.some((item2) => item2.rate == 0);
     }
     onClosePOS() {
       if (this.unsyncedPos > 0) {
@@ -2119,9 +2113,9 @@ Grand Total,,,"${grandTotal.toFixed(2)}"`;
       invoice.consolidated_invoice = null;
       invoice.outstanding_amount = 0;
       let newItems = [];
-      invoice.items.forEach((item) => {
-        if (item.qty > 0) {
-          let newItem = structuredClone(item);
+      invoice.items.forEach((item2) => {
+        if (item2.qty > 0) {
+          let newItem = structuredClone(item2);
           newItem.qty = newItem.qty * -1;
           newItem.description = "Returned item";
           newItems.push(newItem);
@@ -2229,15 +2223,15 @@ Grand Total,,,"${grandTotal.toFixed(2)}"`;
         });
       }
     }
-    getItemPrice(item, priceList) {
+    getItemPrice(item2, priceList) {
       const mode = this.settings_data.settings.itemPriceBasedOn;
       if (mode == "brand") {
-        if (item.brand == null)
+        if (item2.brand == null)
           return 0;
-        const price = this.appData.appData.item_prices.find((itemPrice2) => itemPrice2.brand == item.brand && itemPrice2.price_list == priceList);
+        const price = this.appData.appData.item_prices.find((itemPrice2) => itemPrice2.brand == item2.brand && itemPrice2.price_list == priceList);
         return price ? price.price_list_rate : 0;
       } else if (mode == "priceList") {
-        const price = this.appData.appData.item_prices.find((itemPrice2) => itemPrice2.item_code == item.item_name && itemPrice2.price_list == priceList);
+        const price = this.appData.appData.item_prices.find((itemPrice2) => itemPrice2.item_code == item2.item_name && itemPrice2.price_list == priceList);
         return price ? price.price_list_rate : 0;
       }
     }
@@ -2273,11 +2267,11 @@ Grand Total,,,"${grandTotal.toFixed(2)}"`;
       const posInvoice = this.selectedItemMaps.get(this.selectedTab.tabName);
       const posItems = posInvoice.items;
       let exist = false;
-      posItems.forEach((item) => {
-        if (item.name == clickedItem.name) {
+      posItems.forEach((item2) => {
+        if (item2.name == clickedItem.name) {
           exist = true;
-          item.qty += 1;
-          const clone = structuredClone(item);
+          item2.qty += 1;
+          const clone = structuredClone(item2);
           Object.assign(this.selectedItem, clone);
         }
       });
@@ -2295,38 +2289,38 @@ Grand Total,,,"${grandTotal.toFixed(2)}"`;
     deleteItemFromPOsInvoice(itemId) {
       const posInvoice = this.selectedItemMaps.get(this.selectedTab.tabName);
       const posItems = posInvoice.items;
-      posInvoice.items = posItems.filter((item) => item.name != itemId);
+      posInvoice.items = posItems.filter((item2) => item2.name != itemId);
       this.selectedItem = structuredClone({ name: "" });
     }
     editPosItemQty(itemName, qty) {
       let items = this.selectedItemMaps.get(this.selectedTab.tabName).items;
-      items.forEach((item) => {
-        if (item.name == itemName) {
-          item.qty = qty;
+      items.forEach((item2) => {
+        if (item2.name == itemName) {
+          item2.qty = qty;
         }
       });
     }
     editPosItemRate(itemName, rate) {
       let items = this.selectedItemMaps.get(this.selectedTab.tabName).items;
-      items.forEach((item) => {
-        if (item.name == itemName) {
-          item.rate = rate;
+      items.forEach((item2) => {
+        if (item2.name == itemName) {
+          item2.rate = rate;
         }
       });
     }
     editPosItemDiscountPercentage(itemName, discountPercentage) {
       let items = this.selectedItemMaps.get(this.selectedTab.tabName).items;
-      items.forEach((item) => {
-        if (item.name == itemName) {
-          item.discount_percentage = discountPercentage;
+      items.forEach((item2) => {
+        if (item2.name == itemName) {
+          item2.discount_percentage = discountPercentage;
         }
       });
     }
     editPosItemDiscountAmount(itemName, discountAmount) {
       let items = this.selectedItemMaps.get(this.selectedTab.tabName).items;
-      items.forEach((item) => {
-        if (item.name == itemName) {
-          item.discount_amount = discountAmount;
+      items.forEach((item2) => {
+        if (item2.name == itemName) {
+          item2.discount_amount = discountAmount;
         }
       });
     }
@@ -2423,20 +2417,20 @@ Grand Total,,,"${grandTotal.toFixed(2)}"`;
         return;
       }
       for (let i = 0; i < filtered_item_list.length && i < 300; i++) {
-        let item = filtered_item_list[i];
+        let item2 = filtered_item_list[i];
         const itemBox = document.createElement("div");
         itemBox.classList.add("itemBox");
         itemBox.classList.add("columnBox");
         itemBox.classList.add("C_A_Center");
         itemBox.addEventListener("click", (event2) => {
           const isNotImpty = itemInput.value.length > 0;
-          this.on_item_click(item, isNotImpty);
+          this.on_item_click(item2, isNotImpty);
         });
-        const imageUrl = item.image || "/assets/pos_ar/images/no_image.png";
-        const price = this.get_item_price(item, this.selected_price_list.name);
+        const imageUrl = item2.image || "/assets/pos_ar/images/no_image.png";
+        const price = this.get_item_price(item2, this.selected_price_list.name);
         itemBox.innerHTML = `
-				<img class="itemImage" src="${imageUrl}" alt="${item.item_name}" onerror="this.src='/assets/pos_ar/images/no_image.png'">
-				<div class="itemTitle">${item.item_name}</div>
+				<img class="itemImage" src="${imageUrl}" alt="${item2.item_name}" onerror="this.src='/assets/pos_ar/images/no_image.png'">
+				<div class="itemTitle">${item2.item_name}</div>
 				<div class="itemPrice">${price} DA</div>
 			`;
         itemsContainer_html.appendChild(itemBox);
@@ -2468,7 +2462,7 @@ Grand Total,,,"${grandTotal.toFixed(2)}"`;
     filterListByItemData(value) {
       const itemIds = this.barcode_map[value];
       if (itemIds && itemIds.length > 0) {
-        const items = this.item_list.filter((item) => itemIds.includes(item.name));
+        const items = this.item_list.filter((item2) => itemIds.includes(item2.name));
         if (items.length === 1) {
           this.auto_select(items[0]);
           const itemInput = document.getElementById("ItemInput");
@@ -2479,7 +2473,7 @@ Grand Total,,,"${grandTotal.toFixed(2)}"`;
         }
       }
       return this.item_list.filter(
-        (item) => item.item_name.toLowerCase().includes(value.toLowerCase())
+        (item2) => item2.item_name.toLowerCase().includes(value.toLowerCase())
       );
     }
     getItemByItemGroup(item_group) {
@@ -2498,9 +2492,9 @@ Grand Total,,,"${grandTotal.toFixed(2)}"`;
       getChild(item_group);
       let filtredItemList = [];
       let getFiltredItems = (group) => {
-        this.item_list.forEach((item) => {
-          if (item.item_group == group) {
-            filtredItemList.push(item);
+        this.item_list.forEach((item2) => {
+          if (item2.item_group == group) {
+            filtredItemList.push(item2);
           }
         });
       };
@@ -2956,7 +2950,7 @@ Grand Total,,,"${grandTotal.toFixed(2)}"`;
       this.customerInput.val(this.selected_item_maps.get(this.selected_tab.tabName).customer);
       const selectedItemsContainer = document.getElementById("selectedItemsContainer");
       selectedItemsContainer.innerHTML = "";
-      this.selected_item_maps.get(this.selected_tab.tabName).items.forEach((item) => {
+      this.selected_item_maps.get(this.selected_tab.tabName).items.forEach((item2) => {
         const itemElement = document.createElement("div");
         const leftGroup = document.createElement("div");
         const rightGroup = document.createElement("div");
@@ -2964,28 +2958,28 @@ Grand Total,,,"${grandTotal.toFixed(2)}"`;
         const itemQuantity = document.createElement("div");
         const itemPrice2 = document.createElement("div");
         if (!this.settings_data.settings.showItemImage) {
-        } else if (item.image) {
+        } else if (item2.image) {
           const itemImage = document.createElement("img");
-          itemImage.src = item.image;
+          itemImage.src = item2.image;
           itemImage.classList.add("selectedItemImage");
           leftGroup.appendChild(itemImage);
         } else {
           const itemImageHolder = document.createElement("div");
           const itemImageLatter = document.createElement("div");
           itemImageHolder.classList.add("selectedItemImage", "rowBox", "centerItem");
-          itemImageLatter.textContent = item.name[0];
+          itemImageLatter.textContent = item2.name[0];
           itemImageHolder.appendChild(itemImageLatter);
           leftGroup.appendChild(itemImageHolder);
         }
-        itemName.textContent = item.item_name;
+        itemName.textContent = item2.item_name;
         itemName.classList.add("selectedItemName");
         leftGroup.appendChild(itemName);
-        itemQuantity.textContent = item.qty;
+        itemQuantity.textContent = item2.qty;
         itemQuantity.classList.add("itemQuantity");
         itemQuantity.style.fontSize = "18px";
         itemQuantity.style.fontWeight = "600";
         rightGroup.appendChild(itemQuantity);
-        itemPrice2.textContent = item.rate - item.discount_amount + " DA";
+        itemPrice2.textContent = item2.rate - item2.discount_amount + " DA";
         itemPrice2.classList.add("itemPrice");
         itemPrice2.style.fontSize = "18px";
         itemPrice2.style.fontWeight = "600";
@@ -2998,11 +2992,11 @@ Grand Total,,,"${grandTotal.toFixed(2)}"`;
         rightGroup.classList.add("rowBox", "align_center", "rightGroup");
         itemElement.appendChild(rightGroup);
         itemElement.classList.add("rowBox", "align_center", "row_sbtw", "ItemElement", "pointer");
-        if (item.name == this.selected_item.name)
+        if (item2.name == this.selected_item.name)
           itemElement.classList.add("selected");
         itemElement.addEventListener("click", (event2) => {
           this.makeItemHighlight(itemElement);
-          this.on_selected_item_click(item);
+          this.on_selected_item_click(item2);
         });
         selectedItemsContainer.appendChild(itemElement);
       });
@@ -3192,8 +3186,8 @@ Grand Total,,,"${grandTotal.toFixed(2)}"`;
     }
     calculateNetTotal() {
       let netTotal = 0;
-      this.selected_item_maps.get(this.selected_tab.tabName).items.forEach((item) => {
-        netTotal += item.rate * item.qty;
+      this.selected_item_maps.get(this.selected_tab.tabName).items.forEach((item2) => {
+        netTotal += item2.rate * item2.qty;
       });
       if (this.selected_item_maps.get(this.selected_tab.tabName).additional_discount_percentage > 0) {
         netTotal -= netTotal * (this.selected_item_maps.get(this.selected_tab.tabName).additional_discount_percentage / 100);
@@ -3221,8 +3215,8 @@ Grand Total,,,"${grandTotal.toFixed(2)}"`;
     }
     calculateQnatity() {
       let quantity = 0;
-      this.selected_item_maps.get(this.selected_tab.tabName).items.forEach((item) => {
-        quantity += item.qty;
+      this.selected_item_maps.get(this.selected_tab.tabName).items.forEach((item2) => {
+        quantity += item2.qty;
       });
       const totalQuantity_HTML = document.getElementById("totalQuantityValue");
       totalQuantity_HTML.textContent = quantity;
@@ -3240,10 +3234,10 @@ Grand Total,,,"${grandTotal.toFixed(2)}"`;
       this.invoice_data.grandTotal = grandTotal;
     }
     resetItemRateBaseOnPriceList() {
-      this.selected_item_maps.get(this.selected_tab.tabName).items.forEach((item) => {
-        item.rate = this.get_item_price(item, this.selected_item_maps.get(this.selected_tab.tabName).priceList);
-        item.discount_percentage = 0;
-        item.discount_amount = 0;
+      this.selected_item_maps.get(this.selected_tab.tabName).items.forEach((item2) => {
+        item2.rate = this.get_item_price(item2, this.selected_item_maps.get(this.selected_tab.tabName).priceList);
+        item2.discount_percentage = 0;
+        item2.discount_amount = 0;
       });
     }
     makeItemHighlight(itemElement) {
@@ -3317,7 +3311,7 @@ Grand Total,,,"${grandTotal.toFixed(2)}"`;
       this.c2.append('<div class="columnBox"><label for="itemDetailsDiscountMontantInput">Discount (montant)</label><input type="float" id="itemDetailsDiscountMontantInput" class="pointerCursor"></div>');
       this.c2.append('<div class="columnBox"><label for="itemDetailsPriceListRateInput">Price List Rate</label><input type="text" id="itemDetailsPriceListRateInput" disabled></div>');
     }
-    refreshDate(item) {
+    refreshDate(item2) {
       var _a, _b;
       const imageContainer = document.getElementById("detailsItemImage");
       const name = document.getElementById("detailsItemName");
@@ -3332,32 +3326,32 @@ Grand Total,,,"${grandTotal.toFixed(2)}"`;
       const uom = document.getElementById("itemDetailsUomInput");
       const priceList = document.getElementById("detailsItemPriceListInput");
       const priceListRate = document.getElementById("itemDetailsPriceListRateInput");
-      if (item.image) {
+      if (item2.image) {
         const image = document.createElement("img");
-        image.src = item.image;
+        image.src = item2.image;
         imageContainer.innerHTML = "";
         imageContainer.appendChild(image);
       } else {
         const image = document.createElement("div");
-        image.textContent = item.item_name[0];
+        image.textContent = item2.item_name[0];
         image.style.fontSize = "xx-large";
         image.style.fontWeight = "700";
         imageContainer.innerHTML = "";
         imageContainer.appendChild(image);
       }
-      name.textContent = item.item_name;
+      name.textContent = item2.item_name;
       name.classList.add("rowBox", "align_center");
-      quantity.value = item.qty;
-      rate.value = item.rate;
-      discountedRate.value = item.rate - item.discount_amount;
-      discount_amount.value = (_a = item.discount_amount) != null ? _a : 0;
-      discount_percentage.value = (_b = item.discount_percentage) != null ? _b : 0;
-      available.value = this.getQtyInWarehouse(item.name, this.warehouse);
-      uom.value = item.stock_uom;
+      quantity.value = item2.qty;
+      rate.value = item2.rate;
+      discountedRate.value = item2.rate - item2.discount_amount;
+      discount_amount.value = (_a = item2.discount_amount) != null ? _a : 0;
+      discount_percentage.value = (_b = item2.discount_percentage) != null ? _b : 0;
+      available.value = this.getQtyInWarehouse(item2.name, this.warehouse);
+      uom.value = item2.stock_uom;
       priceList.value = this.price_lists[0].price_list_name;
       warehouse.textContent = "Warehouse : " + this.warehouse;
-      itemGroup.textContent = "Item Group : " + item.item_group;
-      priceListRate.value = this.getItemPrice(item.name) + "DA";
+      itemGroup.textContent = "Item Group : " + item2.item_group;
+      priceListRate.value = this.getItemPrice(item2.name) + "DA";
       console.log("end ref");
       this.makeSelectedFieldHighlighted();
     }
@@ -4026,13 +4020,13 @@ Grand Total,,,"${grandTotal.toFixed(2)}"`;
         this.actionButtonsContainer.css("display", "flex");
       }
       this.itemList.html("");
-      this.selected_pos.items.forEach((item) => {
-        this.itemList.append(`<div class="rowBox align_item">    <div class="itemName rowBox align_center">${item.item_name}</div>   <div class="itemQuantity rowBox align_center">${item.qty}</div>   <div class="itemCost rowBox align_center">${item.qty * item.rate} DA</div>  </div>`);
+      this.selected_pos.items.forEach((item2) => {
+        this.itemList.append(`<div class="rowBox align_item">    <div class="itemName rowBox align_center">${item2.item_name}</div>   <div class="itemQuantity rowBox align_center">${item2.qty}</div>   <div class="itemCost rowBox align_center">${item2.qty * item2.rate} DA</div>  </div>`);
       });
       this.totalList.html("");
       let netTotal = 0;
-      this.selected_pos.items.forEach((item) => {
-        netTotal += item.rate * item.qty;
+      this.selected_pos.items.forEach((item2) => {
+        netTotal += item2.rate * item2.qty;
       });
       if (this.selected_pos.taxes_and_charges == "" || this.selected_pos.taxes_and_charges == null) {
         this.totalList.append(`<div class="rowBox align_item"> <div class="grandTotalName rowBox align_center">Grand Total</div> <div class="grandTotalPrice rowBox align_center">${netTotal} DA</div> </div>`);
@@ -4168,9 +4162,9 @@ Grand Total,,,"${grandTotal.toFixed(2)}"`;
       const creation_time = pos.creation_time;
       const [date, time] = creation_time.split(" ");
       let invoiceHTML = `<style>#company_container {width: 100% ; height: 40px ; display:flex; align-items:center; font-size : 12px;}table{width: 100%; margin-top:16px;}tr{width:100%; height:16px;}tr:nth-child(1){}#first_row{border: 5px solid black;}#logContainer{width: 100%;height:80px;display : flex;justify-content:center;}#logContainer img{width:50%; height:100%;}#top_data_container{width:100%;display:flex;}#top_data_container>div.c1{font-size:12px;flex-grow:1;}#top_data_container>div.c2{font-size:12px;flex-grow:1;display:flex;flex-direction:column;align-items:end;}td>div{height:18px; width:100%;font-size:12px;display:flex; justify-content:start; align-items:center;}#footer_message{height:20px;}</style><div style="display:flex; flex-direction:column;"><div id="logContainer"  ><div style="width:20%;"></div><img src="/assets/pos_ar/images/logo.jpg"  id="company_logo"><div style="width:20%;"></div></div><div id="company_container"><div style="flex-grow:1;"></div><p style="margin:0px 25px;">${this.company.company_name}</p><div style="flex-grow:1;"></div></div><div id="top_data_container"><div class="c1"><div class="customer" style="font-weight:600;font-size:18px;"> Customer : ${pos.customer} </div><div class="refrence"> Commande : ${pos.refNum} </div></div><div class="c2"><div class="date"> ${date}/${time} </div></div></div><table><tr id="first_row" ><th style="boder:1px solid black;">Nom</th><th>Qt\xE9</th><th>Prix</th><th>Value</th>`;
-      pos.items.forEach((item) => {
-        netTotal += item.rate * item.qty;
-        invoiceHTML += `<tr > <td ><div >${item.item_name}</div></td>  <td><div>${item.qty}</div></td>  <td><div>${item.rate}</div></td>  <td><div>${item.rate * item.qty}</div></td></tr>`;
+      pos.items.forEach((item2) => {
+        netTotal += item2.rate * item2.qty;
+        invoiceHTML += `<tr > <td ><div >${item2.item_name}</div></td>  <td><div>${item2.qty}</div></td>  <td><div>${item2.rate}</div></td>  <td><div>${item2.rate * item2.qty}</div></td></tr>`;
       });
       invoiceHTML += `<tr style="height:23px;font-size:12px;font-weight:700;" > <td colspan="3" ><div >      </div></td>   <td><div> ${netTotal + netTotal * (taxes / 100) - pos.additional_discount_percentage * netTotal} DA </div></td></tr>`;
       invoiceHTML += `<tr style="height:23px;font-size:12px;font-weight:700;" > <td colspan="3" ><div >Ancien Sold        </div></td>   <td><div> ${ancien_sold} DA </div></td></tr>`;
@@ -4277,10 +4271,10 @@ Grand Total,,,"${grandTotal.toFixed(2)}"`;
       return new Promise((resolve, reject) => {
         const transaction = this.db.transaction(["Item"], "readwrite");
         const store = transaction.objectStore("Item");
-        itemList.forEach((item) => {
-          const request = store.put(item);
+        itemList.forEach((item2) => {
+          const request = store.put(item2);
           request.onerror = (err) => {
-            console.error("db => error saving Item : ", item, "err : ", err);
+            console.error("db => error saving Item : ", item2, "err : ", err);
             reject(err);
           };
         });
@@ -5160,7 +5154,7 @@ Grand Total,,,"${grandTotal.toFixed(2)}"`;
     refreshCheckInOutList() {
       this.check_in_out_list.empty();
       console.log("this.checkList : ", this.checkList);
-      const filteredList = this.checkList.filter((item) => item.check_type == this.filter || this.filter == "All");
+      const filteredList = this.checkList.filter((item2) => item2.check_type == this.filter || this.filter == "All");
       filteredList.forEach((checkInOut) => {
         const checkInOutObject = document.createElement("div");
         checkInOutObject.classList.add("checkInOutItem", "rowBox");
@@ -5199,12 +5193,12 @@ Grand Total,,,"${grandTotal.toFixed(2)}"`;
       let inAmount = 0;
       let outAmount = 0;
       let allAmount = 0;
-      this.checkList.forEach((item) => {
-        allAmount += parseFloat(item.amount) || 0;
-        if (item.check_type == "In")
-          inAmount += parseFloat(item.amount) || 0;
-        else if (item.check_type == "Out")
-          outAmount += parseFloat(item.amount) || 0;
+      this.checkList.forEach((item2) => {
+        allAmount += parseFloat(item2.amount) || 0;
+        if (item2.check_type == "In")
+          inAmount += parseFloat(item2.amount) || 0;
+        else if (item2.check_type == "Out")
+          outAmount += parseFloat(item2.amount) || 0;
       });
       this.check_in_amount.append(`${inAmount.toFixed(2)} DA`);
       this.check_out_amount.append(`${outAmount.toFixed(2)} DA`);
@@ -5728,21 +5722,21 @@ Grand Total,,,"${grandTotal.toFixed(2)}"`;
       header.find("#unsyncedId").text(this.selectedInvoice.name);
       header.find("#unsyncedRealId").text(this.selectedInvoice.pos_profile);
       this.itemList.empty();
-      this.selectedInvoice.items.forEach((item) => {
+      this.selectedInvoice.items.forEach((item2) => {
         const itemRow = document.createElement("div");
         itemRow.classList.add("itemRow", "rowBox");
         const itemName = document.createElement("div");
         itemName.classList.add("itemName");
-        itemName.textContent = item.item_name;
+        itemName.textContent = item2.item_name;
         const itemQty = document.createElement("div");
         itemQty.classList.add("itemQty");
-        itemQty.textContent = item.qty;
+        itemQty.textContent = item2.qty;
         const itemRate = document.createElement("div");
         itemRate.classList.add("itemRate");
-        itemRate.textContent = format_currency(item.rate, this.selectedInvoice.currency);
+        itemRate.textContent = format_currency(item2.rate, this.selectedInvoice.currency);
         const itemAmount = document.createElement("div");
         itemAmount.classList.add("itemAmount");
-        itemAmount.textContent = format_currency(item.amount, this.selectedInvoice.currency);
+        itemAmount.textContent = format_currency(item2.amount, this.selectedInvoice.currency);
         itemRow.appendChild(itemName);
         itemRow.appendChild(itemQty);
         itemRow.appendChild(itemRate);
@@ -6172,7 +6166,7 @@ Grand Total,,,"${grandTotal.toFixed(2)}"`;
       );
     }
     combineLocalAndUpdated(local, updated) {
-      const combinedMap = new Map(local.map((item) => [item.name, item]));
+      const combinedMap = new Map(local.map((item2) => [item2.name, item2]));
       this.appData.deleted_documents.forEach((deleted) => {
         combinedMap.delete(deleted.name);
       });
@@ -6595,4 +6589,4 @@ Grand Total,,,"${grandTotal.toFixed(2)}"`;
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.FEIT6RZ7.js.map
+//# sourceMappingURL=pos.bundle.DL6KKQUQ.js.map
