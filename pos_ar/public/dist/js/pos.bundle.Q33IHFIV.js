@@ -22,9 +22,9 @@
     constructor(wrapper) {
       this.wrapper = $(wrapper).find(".layout-main-section");
       this.wrapper.append('<link rel="stylesheet" type="text/css" href="/assets/pos_ar/css/accessories_page/main.css">');
-      this.selectedDate = frappe.datetime.get_today();
       this.selectedCompany = frappe.defaults.get_user_default("company");
       this.selectedPOSOpening = "";
+      this.selectedBrand = "";
       this.make();
     }
     make() {
@@ -32,21 +32,31 @@
     }
     createLayout() {
       const container = $('<div class="accessories-container">').appendTo(this.wrapper);
-      const topBar = $('<div class="top-bar">').appendTo(container);
+      const topBar = $('<div class="top-bar shadow">').appendTo(container);
       const leftSection = $('<div class="top-bar-left">').appendTo(topBar);
+      $('<div class="page-icon"><i class="fa fa-box-open fa-lg"></i></div>').appendTo(leftSection);
       $("<h2>").text("Accessories").appendTo(leftSection);
       const centerSection = $('<div class="top-bar-center">').appendTo(topBar);
-      const companyWrapper = $('<div class="company-filter">').appendTo(centerSection);
+      const filterContainer = $('<div class="filter-container">').appendTo(centerSection);
+      const companyWrapper = $('<div class="filter-group">').appendTo(filterContainer);
+      $("<label>").text("Company").appendTo(companyWrapper);
       this.companySelect = $("<select>").addClass("form-control").change(() => {
         this.selectedCompany = this.companySelect.val();
         this.loadPOSOpenings();
         this.loadItems(container.find(".items-container"));
       }).appendTo(companyWrapper);
-      const posOpeningWrapper = $('<div class="pos-opening-filter">').appendTo(centerSection);
+      const posOpeningWrapper = $('<div class="filter-group">').appendTo(filterContainer);
+      $("<label>").text("POS Session").appendTo(posOpeningWrapper);
       this.posOpeningSelect = $("<select>").addClass("form-control").change(() => {
         this.selectedPOSOpening = this.posOpeningSelect.val();
         this.loadItems(container.find(".items-container"));
       }).appendTo(posOpeningWrapper);
+      const brandWrapper = $('<div class="filter-group">').appendTo(filterContainer);
+      $("<label>").text("Brand").appendTo(brandWrapper);
+      this.brandSelect = $("<select>").addClass("form-control").change(() => {
+        this.selectedBrand = this.brandSelect.val();
+        this.loadItems(container.find(".items-container"));
+      }).appendTo(brandWrapper);
       frappe.call({
         method: "frappe.client.get_list",
         args: {
@@ -67,13 +77,30 @@
           }
         }
       });
-      const dateWrapper = $('<div class="date-filter">').appendTo(centerSection);
-      this.datePicker = $('<input type="date">').val(this.selectedDate).change(() => {
-        this.selectedDate = this.datePicker.val();
-        this.loadItems(container.find(".items-container"));
-      }).appendTo(dateWrapper);
+      frappe.call({
+        method: "frappe.desk.reportview.get_list",
+        args: {
+          doctype: "Brand",
+          fields: ["name"],
+          limit_page_length: 1e3,
+          order_by: "name asc"
+        },
+        callback: (response) => {
+          if (response.message) {
+            this.brandSelect.empty();
+            this.brandSelect.append(
+              $("<option></option>").val("").text("All Brands")
+            );
+            response.message.forEach((brand) => {
+              this.brandSelect.append(
+                $("<option></option>").val(brand.name).text(brand.name)
+              );
+            });
+          }
+        }
+      });
       const rightSection = $('<div class="top-bar-right">').appendTo(topBar);
-      $('<button class="btn-export">').html('<i class="fa fa-download"></i> Export').click(() => this.exportData()).appendTo(rightSection);
+      $('<button class="btn btn-primary btn-export">').html('<i class="fa fa-download mr-2"></i>Export').click(() => this.exportData()).appendTo(rightSection);
       const listContainer = $('<div class="items-container">').appendTo(container);
       const headerRow = $('<div class="item-row header">').html(`
             <div class="item-col name">Name</div>
@@ -114,13 +141,12 @@
       });
     }
     loadItems(container) {
-      console.log("company : ", this.selectedCompany);
-      console.log("pos opening : ", this.selectedPOSOpening);
       frappe.call({
         method: "pos_ar.pos_ar.doctype.pos_info.pos_info.get_saled_item",
         args: {
           company: this.selectedCompany,
-          pos_opening_entry: this.selectedPOSOpening
+          pos_opening_entry: this.selectedPOSOpening,
+          brand: this.selectedBrand
         },
         callback: (response) => {
           if (response.message) {
@@ -6655,4 +6681,4 @@ Grand Total,,,"${grandTotal.toFixed(2)}"`;
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.6US6TDL4.js.map
+//# sourceMappingURL=pos.bundle.Q33IHFIV.js.map
