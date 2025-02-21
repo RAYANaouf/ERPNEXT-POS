@@ -442,7 +442,7 @@ def get_saled_item(company=None, pos_opening_entry=None):
 
         # Handle pos_opening_entry filter
         if pos_opening_entry:
-            opening_entry = frappe.get_doc("POS Opening Invoice", pos_opening_entry)
+            opening_entry = frappe.get_doc("POS Opening Entry", pos_opening_entry)
             start_time = opening_entry.period_start_date
 
             # If status is Open - Get all after start time
