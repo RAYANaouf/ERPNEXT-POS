@@ -351,41 +351,44 @@
 
 /* Custom Action Button */
 #customActionBtn {
-    background-color: #8c5eff;
-    transition: background-color 0.2s;
+    background: var(--primary-color);
     border: none;
     padding: 0;
     cursor: pointer;
-    width: 40px;
-    height: 40px;
+    width: 35px;
+    height: 35px;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 4px;
+    border-radius: 5px;
+    transition: all 0.2s ease;
+    margin: 0 5px;
 }
 
 #customActionBtn:hover {
-    background-color: #7340ff;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 #customActionBtn i {
     color: white;
-    font-size: 18px;
+    font-size: 16px;
 }
 
-/* Popover Styles */
+/* Modern Popover Styles */
 #myPopover {
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    border: 1px solid #e5e7eb;
+    padding: 0;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    border: none;
     background: white;
-    width: 400px;
+    width: 450px;
     position: fixed;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
     z-index: 1000;
+    overflow: hidden;
 }
 
 #myPopover[popover] {
@@ -394,38 +397,82 @@
 
 #myPopover[popover]:popover-open {
     display: block;
+    animation: popoverFadeIn 0.2s ease;
+}
+
+@keyframes popoverFadeIn {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -48%);
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, -50%);
+    }
 }
 
 #myPopover::backdrop {
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(2px);
+    animation: backdropFadeIn 0.2s ease;
+}
+
+@keyframes backdropFadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
 }
 
 #myPopover .popover-header {
-    margin: -20px -20px 20px -20px;
-    padding: 15px 20px;
-    border-bottom: 1px solid #e5e7eb;
-    background: #f8f9fa;
-    border-radius: 8px 8px 0 0;
+    padding: 20px 25px;
+    background: var(--primary-color);
+    color: white;
 }
 
 #myPopover .popover-header h2 {
     margin: 0;
-    font-size: 16px;
-    color: #1a1a1a;
+    font-size: 18px;
+    font-weight: 500;
+    color: white;
 }
 
 #myPopover .popover-content {
-    min-height: 100px;
-    margin-bottom: 20px;
+    padding: 25px;
+    min-height: 120px;
 }
 
 #myPopover .popover-footer {
     display: flex;
     justify-content: flex-end;
-    gap: 10px;
-    margin: 0 -20px -20px -20px;
-    padding: 15px 20px;
-    border-top: 1px solid #e5e7eb;
+    gap: 12px;
+    padding: 20px 25px;
     background: #f8f9fa;
-    border-radius: 0 0 8px 8px;
+    border-top: 1px solid #eee;
+}
+
+#myPopover .btn {
+    padding: 8px 20px;
+    border-radius: 6px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+#myPopover .btn-default {
+    background: #f0f0f0;
+    color: #666;
+    border: none;
+}
+
+#myPopover .btn-default:hover {
+    background: #e5e5e5;
+}
+
+#myPopover .btn-primary {
+    background: var(--primary-color);
+    color: white;
+    border: none;
+}
+
+#myPopover .btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
