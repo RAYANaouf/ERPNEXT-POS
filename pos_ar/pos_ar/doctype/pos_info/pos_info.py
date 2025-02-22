@@ -438,7 +438,10 @@ def get_saled_item(company=None, pos_opening_entry=None, brand=None):
         if company:
             filters_invoice["company"] = company
         else:
-            return {}
+            return {
+                "items": {},
+                "error" : str(e)
+            }
 
         # Handle pos_opening_entry filter
         if pos_opening_entry:
@@ -453,8 +456,7 @@ def get_saled_item(company=None, pos_opening_entry=None, brand=None):
             elif opening_entry.status == "Closed":
                 closing_entry = frappe.get_doc("POS Closing Entry", opening_entry.pos_closing_entry)
                 end_time = closing_entry.period_end_date
-                next_day = end_time + timedelta(days=1)
-                filters_invoice["posting_date"] = ["between", (start_time, next_day)]
+                filters_invoice["posting_date"] = ["between", (start_time, end_time)]
 
         # Get POS Invoices with the applied filters
         posInvoices = frappe.get_all(
@@ -500,5 +502,6 @@ def get_saled_item(company=None, pos_opening_entry=None, brand=None):
     except Exception as e:
         frappe.log_error(f"Error fetching items: {str(e)}")
         return {
-            "items": []
+            "items": {},
+            "error" : str(e)
         }
