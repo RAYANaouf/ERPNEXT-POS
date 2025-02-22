@@ -2688,8 +2688,7 @@
 					<!-- Content will go here -->
 				</div>
 				<div class="popover-footer">
-					<button class="btn btn-default" id="cancelBtn">Cancel</button>
-					<button class="btn btn-primary" id="confirmBtn">Confirm</button>
+					<button class="btn btn-primary" id="confirmBtn">Done</button>
 				</div>
 			</div>
 		`);
@@ -5102,6 +5101,7 @@
       const showDiscountField = this.settings_data.settings.showDiscountField ? "checked" : "";
       const searchByGroup = this.settings_data.settings.search_by_group ? "checked" : "";
       const onlineDebt = this.settings_data.settings.onlineDebt ? "checked" : "";
+      const sendInvoiceToOtherPos = this.settings_data.settings.sendInvoiceToOtherPos ? "checked" : "";
       const keyboardStyle = this.settings_data.settings.keyboard_style;
       console.log("check it here : ", this.settings_data.settings.onlineDebt);
       this.leftContainer.addClass("columnBox");
@@ -5134,6 +5134,8 @@
       });
       this.general_settings_c2.append('<div for="showItemDetailsCartCheckBox" style="font-weight:600;"> Get Client Debt OnLine : </div>');
       this.general_settings_c2.append(`<div class="rowBox align_center" style="height:50px;"><label for="onlineDebtCheckBox" style="margin-right:16px;width:50%;" > online debt: </label> <input type="checkbox"  name="onlineDebtCheckBox" id="onlineDebtCheckBoxCheckBox" ${onlineDebt} ></div>`);
+      this.general_settings_c2.append('<div for="sendInvoiceToOtherPosCheckBox" style="font-weight:600;"> Send Invoice To Other POS : </div>');
+      this.general_settings_c2.append(`<div class="rowBox align_center" style="height:50px;"><label for="sendInvoiceToOtherPosCheckBox" style="margin-right:16px;width:50%;" > send invoice: </label> <input type="checkbox"  name="sendInvoiceToOtherPosCheckBox" id="sendInvoiceToOtherPosCheckBox" ${sendInvoiceToOtherPos} ></div>`);
       this.general_settings_c1.append('<div for="showItemDetailsCartCheckBox" style="font-weight:600;"> Item Details Cart : </div>');
       this.general_settings_c1.append(`<div class="rowBox align_center" style="height:50px;"><label for="showItemDetailsCartCheckBox" style="margin-right:16px;width:50%;" > show cart: </label> <input type="checkbox"  name="showItemDetailsCartCheckBox" id="showItemDetailsCartCheckBox" ${showItemDetailsCart} ></div>`);
       this.general_settings_c1.append('<div for="showItemDetailsCartCheckBox" style="font-weight:600;"> Item Image : </div>');
@@ -5206,7 +5208,7 @@
         this.settings_data.setSettings(
           this.settings_data.settings,
           () => {
-            this.on_settings_change("");
+            this.on_settings_change("search_by_group");
           },
           () => {
             console.error("error to save the settings changes (settings.js)");
@@ -5222,6 +5224,18 @@
           },
           () => {
             console.error("error to save the settings changes (pos_settings.js)");
+          }
+        );
+      });
+      this.general_settings_c2.find("#sendInvoiceToOtherPosCheckBox").on("click", (event2) => {
+        this.settings_data.settings.sendInvoiceToOtherPos = $(event2.target).is(":checked");
+        this.settings_data.setSettings(
+          this.settings_data.settings,
+          () => {
+            this.on_settings_change("sendInvoiceToOtherPos");
+          },
+          () => {
+            console.error("error to save the settings changes (settings.js)");
           }
         );
       });
@@ -6012,7 +6026,8 @@
         showDiscountField: false,
         onlineDebt: true,
         testing: false,
-        search_by_group: false
+        search_by_group: false,
+        sendInvoiceToOtherPos: false
       };
       this.db.getSettings(
         (res) => {
@@ -6026,7 +6041,8 @@
               showItemImage: false,
               showDiscountField: false,
               onlineDebt: true,
-              search_by_group: false
+              search_by_group: false,
+              sendInvoiceToOtherPos: false
             };
           }
           console.log("test result : ", this.settings);
@@ -6040,7 +6056,8 @@
             showItemImage: false,
             showDiscountField: false,
             onlineDebt: true,
-            search_by_group: false
+            search_by_group: false,
+            sendInvoiceToOtherPos: false
           };
         }
       );
@@ -6747,4 +6764,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.UX3DII5M.js.map
+//# sourceMappingURL=pos.bundle.XW43U5G2.js.map

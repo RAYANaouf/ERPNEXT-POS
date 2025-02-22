@@ -90,8 +90,7 @@ pos_ar.PointOfSale.pos_customer_box = class{
 					<!-- Content will go here -->
 				</div>
 				<div class="popover-footer">
-					<button class="btn btn-default" id="cancelBtn">Cancel</button>
-					<button class="btn btn-primary" id="confirmBtn">Confirm</button>
+					<button class="btn btn-primary" id="confirmBtn">Done</button>
 				</div>
 			</div>
 		`)

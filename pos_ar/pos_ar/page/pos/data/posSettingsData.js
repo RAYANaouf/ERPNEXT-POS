@@ -16,7 +16,8 @@ pos_ar.PointOfSale.posSettingsData = class{
 			showDiscountField : false       ,
 			onlineDebt        : true        ,
 			testing           : false,
-			search_by_group   : false
+			search_by_group   : false,
+			sendInvoiceToOtherPos : false
 		}
 
 
@@ -35,7 +36,8 @@ pos_ar.PointOfSale.posSettingsData = class{
 						showItemImage     : false       ,
 						showDiscountField : false       ,
 						onlineDebt        : true        ,
-						search_by_group   : false
+						search_by_group   : false,
+						sendInvoiceToOtherPos : false
 					}
 				}
 
@@ -51,7 +53,8 @@ pos_ar.PointOfSale.posSettingsData = class{
 					showItemImage     : false       ,
 					showDiscountField : false       ,
 					onlineDebt        : true        ,
-					search_by_group   : false
+					search_by_group   : false,
+					sendInvoiceToOtherPos : false
 				}
 
 			}
