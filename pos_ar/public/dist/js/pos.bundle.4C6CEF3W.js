@@ -2694,6 +2694,56 @@
 				</div>
 			</div>
 		`);
+      const style = document.createElement("style");
+      style.textContent = `
+			.invoice-list {
+				max-height: 400px;
+				overflow-y: auto;
+				padding: 10px;
+			}
+			.invoice-item {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				padding: 10px;
+				border-bottom: 1px solid #eee;
+				margin-bottom: 8px;
+			}
+			.invoice-item:hover {
+				background-color: #f8f9fa;
+			}
+			.invoice-details {
+				flex: 1;
+			}
+			.invoice-name {
+				font-weight: bold;
+				color: var(--text-color);
+				margin-bottom: 4px;
+			}
+			.invoice-customer {
+				color: var(--text-muted);
+				font-size: 0.9em;
+				margin-bottom: 2px;
+			}
+			.invoice-date {
+				color: var(--text-muted);
+				font-size: 0.85em;
+			}
+			.invoice-amount {
+				font-weight: bold;
+				color: var(--text-color);
+				margin-top: 4px;
+			}
+			.invoice-actions {
+				margin-left: 10px;
+			}
+			.no-invoices {
+				text-align: center;
+				padding: 20px;
+				color: var(--text-muted);
+			}
+		`;
+      document.head.appendChild(style);
       this.actionContainer.append(`
 			<div id="MenuBox" class="action-btn">
 				<img src="/assets/pos_ar/images/menu.png" alt="Menu">
@@ -2795,6 +2845,49 @@
       const cancelBtn = document.getElementById("cancelBtn");
       const confirmBtn = document.getElementById("confirmBtn");
       toggleButton.addEventListener("click", () => {
+        frappe.call({
+          method: "frappe.client.get_list",
+          args: {
+            doctype: "POS Invoice",
+            filters: {
+              "docstatus": 1
+            },
+            fields: ["name", "customer", "grand_total", "posting_date"],
+            order_by: "posting_date desc"
+          },
+          callback: function(response) {
+            const invoices = response.message || [];
+            const content = document.querySelector(".popover-content");
+            if (invoices.length === 0) {
+              content.innerHTML = '<div class="no-invoices">No non-consolidated invoices found</div>';
+            } else {
+              let html = '<div class="invoice-list">';
+              invoices.forEach((invoice) => {
+                html += `
+								<div class="invoice-item" data-name="${invoice.name}">
+									<div class="invoice-details">
+										<div class="invoice-name">${invoice.name}</div>
+										<div class="invoice-customer">${invoice.customer || "No Customer"}</div>
+										<div class="invoice-date">${frappe.datetime.str_to_user(invoice.posting_date)}</div>
+										<div class="invoice-amount">${format_currency(invoice.grand_total)}</div>
+									</div>
+									<div class="invoice-actions">
+										<button class="btn btn-xs btn-default view-invoice">View</button>
+									</div>
+								</div>
+							`;
+              });
+              html += "</div>";
+              content.innerHTML = html;
+              content.querySelectorAll(".view-invoice").forEach((btn) => {
+                btn.addEventListener("click", (e) => {
+                  const invoiceName = e.target.closest(".invoice-item").dataset.name;
+                  frappe.set_route("Form", "POS Invoice", invoiceName);
+                });
+              });
+            }
+          }
+        });
         popover.togglePopover();
       });
       cancelBtn.addEventListener("click", () => {
@@ -6766,4 +6859,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.OCDYT6Y6.js.map
+//# sourceMappingURL=pos.bundle.4C6CEF3W.js.map
