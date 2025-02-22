@@ -177,7 +177,8 @@
         },
         callback: (response) => {
           loadingSpinner.remove();
-          if (response.message && response.message.items && response.message.items.length > 0) {
+          console.log("Response:", response);
+          if (response.message && response.message.items && Object.keys(response.message.items).length > 0) {
             this.data = response.message.items;
             this.renderItems(container, this.data);
           } else {
@@ -6709,4 +6710,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.KNQFQVBG.js.map
+//# sourceMappingURL=pos.bundle.BIJMPK5Z.js.map
