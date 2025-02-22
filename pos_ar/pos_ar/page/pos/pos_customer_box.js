@@ -9,6 +9,7 @@ pos_ar.PointOfSale.pos_customer_box = class{
 		saveCheckInOut   ,
 		onMenuClick      ,
 		onDebtClick      ,
+		onPrintPos       ,
 	){
 		this.wrapper           = wrapper          ;
 		this.customers_list    = customersList    ;
@@ -18,6 +19,7 @@ pos_ar.PointOfSale.pos_customer_box = class{
 		this.on_menu_click     = onMenuClick      ;
 		this.save_check_in_out = saveCheckInOut   ;
 		this.on_debt_click     = onDebtClick      ;
+		this.on_print_pos      = onPrintPos       ;
 
 		//local
 		this.online       = true  ;
@@ -98,31 +100,39 @@ pos_ar.PointOfSale.pos_customer_box = class{
 		// Add styles for the invoice popup
 		const style = document.createElement('style');
 		style.textContent = `
+			#myPopover {
+				min-width: 600px !important;
+				max-width: 80vw !important;
+			}
 			.invoice-list {
 				max-height: 400px;
 				overflow-y: auto;
 				padding: 10px;
+				width: 100%;
 			}
 			.invoice-item {
 				display: flex;
 				justify-content: space-between;
 				align-items: center;
-				padding: 10px;
+				padding: 12px 15px;
 				border-bottom: 1px solid #eee;
 				margin-bottom: 8px;
+				width: 100%;
 			}
 			.invoice-item:hover {
 				background-color: #f8f9fa;
 			}
 			.invoice-details {
 				flex: 1;
+				min-width: 0; /* Prevents flex item from overflowing */
 			}
 			.invoice-name {
 				font-weight: bold;
 				color: var(--text-color);
 				margin-bottom: 4px;
+				font-size: 1.1em;
 			}
-			.invoice-customer {
+			.invoice-id {
 				color: var(--text-muted);
 				font-size: 0.9em;
 				margin-bottom: 2px;
@@ -137,12 +147,23 @@ pos_ar.PointOfSale.pos_customer_box = class{
 				margin-top: 4px;
 			}
 			.invoice-actions {
-				margin-left: 10px;
+				margin-left: 20px;
+				white-space: nowrap;
 			}
 			.no-invoices {
 				text-align: center;
 				padding: 20px;
 				color: var(--text-muted);
+			}
+			.popover-content {
+				width: 100%;
+				padding: 0;
+			}
+			.print-invoice {
+				padding: 6px 12px;
+			}
+			.print-invoice i {
+				margin-right: 4px;
 			}
 		`;
 		document.head.appendChild(style);
@@ -258,6 +279,8 @@ pos_ar.PointOfSale.pos_customer_box = class{
 
 	setListeners(){
 
+		let me = this
+
 		const popover = document.getElementById('myPopover');
 		const toggleButton = document.getElementById('popupBtn');
 		const cancelBtn = document.getElementById('cancelBtn');
@@ -272,7 +295,7 @@ pos_ar.PointOfSale.pos_customer_box = class{
 					filters: {
 						'docstatus': 1
 					},
-					fields: ['name', 'customer', 'grand_total', 'posting_date'],
+					fields: ['*'],
 					order_by: 'posting_date desc'
 				},
 				callback: function(response) {
@@ -287,13 +310,15 @@ pos_ar.PointOfSale.pos_customer_box = class{
 							html += `
 								<div class="invoice-item" data-name="${invoice.name}">
 									<div class="invoice-details">
-										<div class="invoice-name">${invoice.name}</div>
-										<div class="invoice-customer">${invoice.customer || 'No Customer'}</div>
+										<div class="invoice-name">${invoice.customer || 'No Customer'}</div>
+										<div class="invoice-id">${invoice.name}</div>
 										<div class="invoice-date">${frappe.datetime.str_to_user(invoice.posting_date)}</div>
 										<div class="invoice-amount">${format_currency(invoice.grand_total)}</div>
 									</div>
 									<div class="invoice-actions">
-										<button class="btn btn-xs btn-default view-invoice">View</button>
+										<button class="btn btn-xs btn-default print-invoice">
+											<i class="fa fa-print"></i> Print
+										</button>
 									</div>
 								</div>
 							`;
@@ -301,11 +326,20 @@ pos_ar.PointOfSale.pos_customer_box = class{
 						html += '</div>';
 						content.innerHTML = html;
 
-						// Add click handlers for view buttons
-						content.querySelectorAll('.view-invoice').forEach(btn => {
+						
+
+						// Add click handlers for print buttons
+						content.querySelectorAll('.print-invoice').forEach(btn => {
 							btn.addEventListener('click', (e) => {
 								const invoiceName = e.target.closest('.invoice-item').dataset.name;
-								frappe.set_route('Form', 'POS Invoice', invoiceName);
+								frappe.run_serially([
+									() => frappe.model.with_doc('POS Invoice', invoiceName),
+									() => {
+										const doc = frappe.get_doc('POS Invoice', invoiceName);
+										me.on_print_pos(doc)
+									}
+								]);
+								
 							});
 						});
 					}

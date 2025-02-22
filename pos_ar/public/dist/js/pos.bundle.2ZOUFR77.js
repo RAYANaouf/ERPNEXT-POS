@@ -1505,6 +1505,9 @@
         this.onMenuClick.bind(this),
         () => {
           this.screenManager.navigate("debt_cart");
+        },
+        (pos) => {
+          this.history_cart.print_receipt(pos);
         }
       );
       this.screenManager.registerScreen("customer_box", this.customer_box);
@@ -2630,7 +2633,7 @@
 
   // ../pos_ar/pos_ar/pos_ar/page/pos/pos_customer_box.js
   pos_ar.PointOfSale.pos_customer_box = class {
-    constructor(wrapper, customersList, selectedCustomer, backHome, onSync, saveCheckInOut, onMenuClick, onDebtClick) {
+    constructor(wrapper, customersList, selectedCustomer, backHome, onSync, saveCheckInOut, onMenuClick, onDebtClick, onPrintPos) {
       this.wrapper = wrapper;
       this.customers_list = customersList;
       this.selected_customer = selectedCustomer;
@@ -2639,6 +2642,7 @@
       this.on_menu_click = onMenuClick;
       this.save_check_in_out = saveCheckInOut;
       this.on_debt_click = onDebtClick;
+      this.on_print_pos = onPrintPos;
       this.online = true;
       this.show_menu = false;
       this.start_work();
@@ -2696,31 +2700,39 @@
 		`);
       const style = document.createElement("style");
       style.textContent = `
+			#myPopover {
+				min-width: 600px !important;
+				max-width: 80vw !important;
+			}
 			.invoice-list {
 				max-height: 400px;
 				overflow-y: auto;
 				padding: 10px;
+				width: 100%;
 			}
 			.invoice-item {
 				display: flex;
 				justify-content: space-between;
 				align-items: center;
-				padding: 10px;
+				padding: 12px 15px;
 				border-bottom: 1px solid #eee;
 				margin-bottom: 8px;
+				width: 100%;
 			}
 			.invoice-item:hover {
 				background-color: #f8f9fa;
 			}
 			.invoice-details {
 				flex: 1;
+				min-width: 0; /* Prevents flex item from overflowing */
 			}
 			.invoice-name {
 				font-weight: bold;
 				color: var(--text-color);
 				margin-bottom: 4px;
+				font-size: 1.1em;
 			}
-			.invoice-customer {
+			.invoice-id {
 				color: var(--text-muted);
 				font-size: 0.9em;
 				margin-bottom: 2px;
@@ -2735,12 +2747,23 @@
 				margin-top: 4px;
 			}
 			.invoice-actions {
-				margin-left: 10px;
+				margin-left: 20px;
+				white-space: nowrap;
 			}
 			.no-invoices {
 				text-align: center;
 				padding: 20px;
 				color: var(--text-muted);
+			}
+			.popover-content {
+				width: 100%;
+				padding: 0;
+			}
+			.print-invoice {
+				padding: 6px 12px;
+			}
+			.print-invoice i {
+				margin-right: 4px;
 			}
 		`;
       document.head.appendChild(style);
@@ -2840,6 +2863,7 @@
       this.sync_btn.addClass("Synced");
     }
     setListeners() {
+      let me = this;
       const popover = document.getElementById("myPopover");
       const toggleButton = document.getElementById("popupBtn");
       const cancelBtn = document.getElementById("cancelBtn");
@@ -2852,7 +2876,7 @@
             filters: {
               "docstatus": 1
             },
-            fields: ["name", "customer", "grand_total", "posting_date"],
+            fields: ["*"],
             order_by: "posting_date desc"
           },
           callback: function(response) {
@@ -2866,23 +2890,31 @@
                 html += `
 								<div class="invoice-item" data-name="${invoice.name}">
 									<div class="invoice-details">
-										<div class="invoice-name">${invoice.name}</div>
-										<div class="invoice-customer">${invoice.customer || "No Customer"}</div>
+										<div class="invoice-name">${invoice.customer || "No Customer"}</div>
+										<div class="invoice-id">${invoice.name}</div>
 										<div class="invoice-date">${frappe.datetime.str_to_user(invoice.posting_date)}</div>
 										<div class="invoice-amount">${format_currency(invoice.grand_total)}</div>
 									</div>
 									<div class="invoice-actions">
-										<button class="btn btn-xs btn-default view-invoice">View</button>
+										<button class="btn btn-xs btn-default print-invoice">
+											<i class="fa fa-print"></i> Print
+										</button>
 									</div>
 								</div>
 							`;
               });
               html += "</div>";
               content.innerHTML = html;
-              content.querySelectorAll(".view-invoice").forEach((btn) => {
+              content.querySelectorAll(".print-invoice").forEach((btn) => {
                 btn.addEventListener("click", (e) => {
                   const invoiceName = e.target.closest(".invoice-item").dataset.name;
-                  frappe.set_route("Form", "POS Invoice", invoiceName);
+                  frappe.run_serially([
+                    () => frappe.model.with_doc("POS Invoice", invoiceName),
+                    () => {
+                      const doc = frappe.get_doc("POS Invoice", invoiceName);
+                      me.on_print_pos(doc);
+                    }
+                  ]);
                 });
               });
             }
@@ -4400,6 +4432,7 @@
       this.refreshData();
     }
     async print_receipt(pos) {
+      console.log("pos : ", pos);
       let netTotal = 0;
       let taxes = 0;
       let grandTotal = 0;
@@ -4409,17 +4442,21 @@
       console.log("check the condition : ", this.app_settings.settings.onlineDebt);
       if (this.app_settings.settings.onlineDebt) {
         ancien_sold = await this.app_data.fetchCustomerDebt(customer.name);
-        console.log("the result id : ", ancien_sold);
+        console.log("the result is : ", ancien_sold);
       }
-      const creation_time = pos.creation_time;
+      let creation_time = pos.creation_time || pos.creation;
+      if (!creation_time) {
+        console.error("No creation or creation_time found in pos object.");
+        return;
+      }
       const [date, time] = creation_time.split(" ");
-      let invoiceHTML = `<style>#company_container {width: 100% ; height: 40px ; display:flex; align-items:center; font-size : 12px;}table{width: 100%; margin-top:16px;}tr{width:100%; height:16px;}tr:nth-child(1){}#first_row{border: 5px solid black;}#logContainer{width: 100%;height:80px;display : flex;justify-content:center;}#logContainer img{width:50%; height:100%;}#top_data_container{width:100%;display:flex;}#top_data_container>div.c1{font-size:12px;flex-grow:1;}#top_data_container>div.c2{font-size:12px;flex-grow:1;display:flex;flex-direction:column;align-items:end;}td>div{height:18px; width:100%;font-size:12px;display:flex; justify-content:start; align-items:center;}#footer_message{height:20px;}</style><div style="display:flex; flex-direction:column;"><div id="logContainer"  ><div style="width:20%;"></div><img src="/assets/pos_ar/images/logo.jpg"  id="company_logo"><div style="width:20%;"></div></div><div id="company_container"><div style="flex-grow:1;"></div><p style="margin:0px 25px;">${this.company.company_name}</p><div style="flex-grow:1;"></div></div><div id="top_data_container"><div class="c1"><div class="customer" style="font-weight:600;font-size:18px;"> Customer : ${pos.customer} </div><div class="refrence"> Commande : ${pos.refNum} </div></div><div class="c2"><div class="date"> ${date}/${time} </div></div></div><table><tr id="first_row" ><th style="boder:1px solid black;">Nom</th><th>Qt\xE9</th><th>Prix</th><th>Value</th>`;
+      let invoiceHTML = `<style>#company_container {width: 100% ; height: 40px ; display:flex; align-items:center; font-size : 12px;}table{width: 100%; margin-top:16px;}tr{width:100%; height:16px;}#logContainer{width: 100%;height:80px;display : flex;justify-content:center;}#logContainer img{width:50%; height:100%;}#top_data_container{width:100%;display:flex;}#top_data_container>div.c1{font-size:12px;flex-grow:1;}#top_data_container>div.c2{font-size:12px;flex-grow:1;display:flex;flex-direction:column;align-items:end;}td>div{height:18px; width:100%;font-size:12px;display:flex; justify-content:start; align-items:center;}#footer_message{height:20px;}</style><div style="display:flex; flex-direction:column;"><div id="logContainer"><div style="width:20%;"></div><img src="/assets/pos_ar/images/logo.jpg"  id="company_logo"><div style="width:20%;"></div></div><div id="company_container"><div style="flex-grow:1;"></div><p style="margin:0px 25px;">${this.company.company_name}</p><div style="flex-grow:1;"></div></div><div id="top_data_container"><div class="c1"><div class="customer" style="font-weight:600;font-size:18px;"> Customer : ${pos.customer} </div><div class="refrence"> Commande : ${pos.refNum} </div></div><div class="c2"><div class="date"> ${date}/${time} </div></div></div><table><tr id="first_row"><th>Nom</th><th>Qt\xE9</th><th>Prix</th><th>Value</th>`;
       pos.items.forEach((item) => {
         netTotal += item.rate * item.qty;
-        invoiceHTML += `<tr > <td ><div >${item.item_name}</div></td>  <td><div>${item.qty}</div></td>  <td><div>${item.rate}</div></td>  <td><div>${item.rate * item.qty}</div></td></tr>`;
+        invoiceHTML += `<tr><td><div>${item.item_name}</div></td>  <td><div>${item.qty}</div></td>  <td><div>${item.rate}</div></td>  <td><div>${item.rate * item.qty}</div></td></tr>`;
       });
-      invoiceHTML += `<tr style="height:23px;font-size:12px;font-weight:700;" > <td colspan="3" ><div >      </div></td>   <td><div> ${netTotal + netTotal * (taxes / 100) - pos.additional_discount_percentage * netTotal} DA </div></td></tr>`;
-      invoiceHTML += `<tr style="height:23px;font-size:12px;font-weight:700;" > <td colspan="3" ><div >Ancien Sold        </div></td>   <td><div> ${ancien_sold} DA </div></td></tr>`;
+      invoiceHTML += `<tr style="height:23px;font-size:12px;font-weight:700;"><td colspan="3"><div>      </div></td><td><div>${netTotal + netTotal * (taxes / 100) - pos.additional_discount_percentage * netTotal} DA</div></td></tr>`;
+      invoiceHTML += `<tr style="height:23px;font-size:12px;font-weight:700;"><td colspan="3"><div>Ancien Sold</div></td><td><div>${ancien_sold} DA</div></td></tr>`;
       invoiceHTML += "</table>";
       invoiceHTML += '<div id="footer_message" style="width:100%; display:flex; align-items:center; margin-top:30px;"><div style="flex-grow:1;"></div><div style="margin:30px 25px;"> Thank You, Come Again</div><div style="flex-grow:1;"></div></div>';
       invoiceHTML += "</div>";
@@ -4432,7 +4469,6 @@
         printWindow.print();
         printWindow.close();
       };
-      console.log("check the poooooooooooooooooooooos : ", pos);
     }
   };
 
@@ -6859,4 +6895,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.4C6CEF3W.js.map
+//# sourceMappingURL=pos.bundle.2ZOUFR77.js.map

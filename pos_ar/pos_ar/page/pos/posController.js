@@ -366,6 +366,9 @@ pos_ar.PointOfSale.Controller = class {
 			this.onMenuClick.bind(this),
 			() => {
 				this.screenManager.navigate("debt_cart");
+			},
+			(pos)=>{
+				this.history_cart.print_receipt(pos)
 			}
 		)
 

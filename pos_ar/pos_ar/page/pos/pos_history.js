@@ -446,28 +446,38 @@ pos_ar.PointOfSale.pos_history = class {
 		this.refreshData();
 	}
 
+	
+
+
+
+
 
 	async print_receipt(pos) {
-
-		let netTotal = 0
-		let taxes = 0
-		let grandTotal = 0
-
-		console.log("appData : ", this.app_data)
-		let customer = this.app_data.appData.customers.find(customer => customer.name == pos.customer)
-
+		console.log("pos : ", pos);
+	
+		let netTotal = 0;
+		let taxes = 0;
+		let grandTotal = 0;
+	
+		console.log("appData : ", this.app_data);
+		let customer = this.app_data.appData.customers.find(customer => customer.name == pos.customer);
+	
 		let ancien_sold = customer.custom_debt;
-
-		console.log("check the condition : ", this.app_settings.settings.onlineDebt)
+	
+		console.log("check the condition : ", this.app_settings.settings.onlineDebt);
 		if (this.app_settings.settings.onlineDebt) {
 			ancien_sold = await this.app_data.fetchCustomerDebt(customer.name);
-			console.log("the result id : ", ancien_sold)
+			console.log("the result is : ", ancien_sold);
 		}
-
-		const creation_time = pos.creation_time
-		const [date, time] = creation_time.split(' ')
-
-
+	
+		// Check if creation or creation_time exists and assign accordingly
+		let creation_time = pos.creation_time || pos.creation;
+		if (!creation_time) {
+			console.error("No creation or creation_time found in pos object.");
+			return;
+		}
+		const [date, time] = creation_time.split(' ');
+	
 		let invoiceHTML =
 			'<style>' +
 			'#company_container {' +
@@ -476,17 +486,10 @@ pos_ar.PointOfSale.pos_history = class {
 			'font-size : 12px;' +
 			'}' +
 			'table{' +
-			//'border: 1px solid #505050; border-spacing:0px;'+
 			'width: 100%; margin-top:16px;' +
 			'}' +
 			'tr{' +
 			'width:100%; height:16px;' +
-			'}' +
-			'tr:nth-child(1){' +
-			'' +
-			'}' +
-			'#first_row{' +
-			'border: 5px solid black;' +
 			'}' +
 			'#logContainer{' +
 			'width: 100%;height:80px;' +
@@ -516,7 +519,7 @@ pos_ar.PointOfSale.pos_history = class {
 			'}' +
 			'</style>' +
 			'<div style="display:flex; flex-direction:column;">' +
-			'<div id="logContainer"  >' +
+			'<div id="logContainer">' +
 			'<div style="width:20%;"></div>' +
 			'<img src="/assets/pos_ar/images/logo.jpg"  id="company_logo">' +
 			'<div style="width:20%;"></div>' +
@@ -536,61 +539,41 @@ pos_ar.PointOfSale.pos_history = class {
 			'</div>' +
 			'</div>' +
 			'<table>' +
-			'<tr id="first_row" ><th style="boder:1px solid black;">Nom</th><th>Qté</th><th>Prix</th><th>Value</th>'
-
+			'<tr id="first_row"><th>Nom</th><th>Qté</th><th>Prix</th><th>Value</th>';
+	
 		pos.items.forEach(item => {
-			netTotal += item.rate * item.qty
-			invoiceHTML += `<tr > <td ><div >${item.item_name}</div></td>  <td><div>${item.qty}</div></td>  <td><div>${item.rate}</div></td>  <td><div>${item.rate * item.qty}</div></td></tr>`
-		})
-
-		invoiceHTML += `<tr style="height:23px;font-size:12px;font-weight:700;" > <td colspan="3" ><div >      </div></td>   <td><div> ${netTotal + (netTotal * (taxes / 100)) - pos.additional_discount_percentage * netTotal} DA </div></td></tr>`
-		invoiceHTML += `<tr style="height:23px;font-size:12px;font-weight:700;" > <td colspan="3" ><div >Ancien Sold        </div></td>   <td><div> ${ancien_sold} DA </div></td></tr>`
-		//invoiceHTML += `<tr style="height:23px;font-size:12px;font-weight:700;" > <td colspan="3" ><div >Versement   </div></td>   <td><div> ${pos.total_customer_payment} DA </div></td></tr>`
-
-
-
-		invoiceHTML += '</table>'
-
-		/*
-
-		invoiceHTML += `<div style="height:23px;"> <p style="font-size:12px;font-weight:500;" ><span style="font-size:12px;font-weight:600;">Sous-total : </span> ${netTotal} DA </p> </div>`
-		invoiceHTML += `<div style="height:23px;"> <p style="font-size:12px;font-weight:500;" ><span style="font-size:12px;font-weight:600;">Reduction : </span> ${pos.additional_discount_percentage * netTotal} DA </p> </div>`
-
-		this.sales_taxes.forEach(tax => {
-			taxes += tax.rate
-			invoiceHTML += `<div style="height:23px;"> <p style="font-size:12px;font-weight:500;" ><span style="font-size:12px;font-weight:600;">${tax.description} : </span> ${tax.rate} % </p> </div>`
-		})
-
-		invoiceHTML += `<div style="height:23px;"> <p style="font-size:12px;font-weight:500;" ><span style="font-size:12px;font-weight:600;">Total : </span> ${netTotal+(netTotal*(taxes/100)) - pos.additional_discount_percentage * netTotal} DA </p> </div>`
-		*/
-
+			netTotal += item.rate * item.qty;
+			invoiceHTML += `<tr><td><div>${item.item_name}</div></td>  <td><div>${item.qty}</div></td>  <td><div>${item.rate}</div></td>  <td><div>${item.rate * item.qty}</div></td></tr>`;
+		});
+	
+		invoiceHTML += `<tr style="height:23px;font-size:12px;font-weight:700;"><td colspan="3"><div>      </div></td><td><div>${netTotal + (netTotal * (taxes / 100)) - pos.additional_discount_percentage * netTotal} DA</div></td></tr>`;
+		invoiceHTML += `<tr style="height:23px;font-size:12px;font-weight:700;"><td colspan="3"><div>Ancien Sold</div></td><td><div>${ancien_sold} DA</div></td></tr>`;
+		invoiceHTML += '</table>';
+	
 		invoiceHTML +=
 			'<div id="footer_message" style="width:100%; display:flex; align-items:center; margin-top:30px;">' +
 			'<div style="flex-grow:1;"></div>' +
 			'<div style="margin:30px 25px;"> Thank You, Come Again</div>' +
 			'<div style="flex-grow:1;"></div>' +
-			'</div>'
-
-		invoiceHTML += '</div>'
-
-
-
+			'</div>';
+	
+		invoiceHTML += '</div>';
+	
 		// Open a new window and print the HTML content
 		const printWindow = window.open('', '_blank');
 		printWindow.document.write(invoiceHTML);
 		printWindow.document.close();
-
-
+	
 		const logoImage = printWindow.document.getElementById('company_logo');
 		logoImage.onload = () => {
 			printWindow.focus();
 			printWindow.print();
 			printWindow.close();
 		};
-
-
-		console.log("check the poooooooooooooooooooooos : ", pos)
-
 	}
+	
+
+
+
 
 }
