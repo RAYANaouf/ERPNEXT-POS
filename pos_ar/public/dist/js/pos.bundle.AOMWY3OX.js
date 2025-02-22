@@ -76,9 +76,22 @@
         this.loadItems(container.find(".items-container"));
       }).appendTo(brandInputWrapper);
       this.brandField.$input.on("change", () => {
-        this.selectedBrand = this.brandField.get_value();
-        console.log("selected brand: ", this.selectedBrand);
-        this.loadItems(container.find(".items-container"));
+        const newValue = this.brandField.get_value();
+        if (this.selectedBrand !== newValue) {
+          this.selectedBrand = newValue;
+          console.log("Brand changed to:", this.selectedBrand);
+          setTimeout(() => {
+            this.loadItems(container.find(".items-container"));
+          }, 100);
+        }
+      });
+      this.brandField.$input.on("awesomplete-selectcomplete", () => {
+        const newValue = this.brandField.get_value();
+        if (this.selectedBrand !== newValue) {
+          this.selectedBrand = newValue;
+          console.log("Brand selected from dropdown:", this.selectedBrand);
+          this.loadItems(container.find(".items-container"));
+        }
       });
       frappe.call({
         method: "frappe.client.get_list",
@@ -142,19 +155,33 @@
       });
     }
     loadItems(container) {
-      console.log("loading items : ", this.selectedBrand);
+      container.find(".item-row:not(.header)").remove();
+      container.append('<div class="loading-message">Loading items...</div>');
+      console.log("Loading items with filters:", {
+        company: this.selectedCompany,
+        pos_opening_entry: this.selectedPOSOpening,
+        brand: this.selectedBrand
+      });
       frappe.call({
         method: "pos_ar.pos_ar.doctype.pos_info.pos_info.get_saled_item",
         args: {
           company: this.selectedCompany,
           pos_opening_entry: this.selectedPOSOpening,
-          brand: this.selectedBrand
+          brand: this.selectedBrand || ""
         },
         callback: (response) => {
+          container.find(".loading-message").remove();
           if (response.message) {
             this.data = response.message.items;
             this.renderItems(container, this.data);
+          } else {
+            container.append('<div class="no-items-message">No items found</div>');
           }
+        },
+        error: (err) => {
+          container.find(".loading-message").remove();
+          container.append('<div class="error-message">Error loading items</div>');
+          console.error("Error loading items:", err);
         }
       });
     }
@@ -6676,4 +6703,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.ICXSIHSF.js.map
+//# sourceMappingURL=pos.bundle.AOMWY3OX.js.map
