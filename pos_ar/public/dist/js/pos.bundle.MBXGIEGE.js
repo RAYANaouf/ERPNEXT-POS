@@ -1710,11 +1710,9 @@
       );
     }
     onSettingsChange(settingName) {
-      if (settingName == "itemPriceBasedOn") {
-        this.item_selector.refreshItemSelector();
-        this.selected_item_cart.resetItemRateBaseOnPriceList();
-        this.selected_item_cart.refreshSelectedItem();
-      }
+      this.item_selector.refreshItemSelector();
+      this.selected_item_cart.resetItemRateBaseOnPriceList();
+      this.selected_item_cart.refreshSelectedItem();
     }
     savePosInvoice(saveWithZeroRate) {
       this.selectedItemMaps.get(this.selectedTab.tabName).synced = false;
@@ -6764,4 +6762,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.XW43U5G2.js.map
+//# sourceMappingURL=pos.bundle.MBXGIEGE.js.map

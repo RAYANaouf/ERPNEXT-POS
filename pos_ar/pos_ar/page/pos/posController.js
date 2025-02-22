@@ -610,14 +610,12 @@ pos_ar.PointOfSale.Controller = class {
 
 
 	onSettingsChange(settingName) {
-		if (settingName == "itemPriceBasedOn") {
 			//refreshing selected_item_cart and item_selector_cart
 			this.item_selector.refreshItemSelector();
 			//recalculate price
 			this.selected_item_cart.resetItemRateBaseOnPriceList()
 			//redraw
 			this.selected_item_cart.refreshSelectedItem()
-		}
 	}
 
 
