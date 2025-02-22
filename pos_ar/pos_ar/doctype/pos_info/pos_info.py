@@ -505,3 +505,31 @@ def get_saled_item(company=None, pos_opening_entry=None, brand=None):
             "items": {},
             "error" : str(e)
         }
+
+@frappe.whitelist()
+def get_non_consolidated_invoices():
+    """
+    Get all POS invoices that are not consolidated and filtered by the user's company
+    Returns:
+        list: List of POS invoices with their details
+    """
+    company = frappe.defaults.get_user_default("company")
+    
+    invoices = frappe.get_all(
+        "POS Invoice",
+        filters={
+            "docstatus": 1,  # Submitted documents
+            "consolidated_invoice": "",  # Not consolidated
+            "company": company
+        },
+        order_by="posting_date desc"
+    )
+    
+    # Get complete invoice doc for each invoice
+    for i, invoice in enumerate(invoices):
+        doc = frappe.get_doc("POS Invoice", invoice.name)
+        # Ensure creation_time is available for printing
+        doc.creation_time = doc.creation
+        invoices[i] = doc
+    
+    return invoices

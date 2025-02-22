@@ -289,15 +289,7 @@ pos_ar.PointOfSale.pos_customer_box = class{
 		toggleButton.addEventListener('click', () => {
 			// Fetch non-consolidated POS invoices
 			frappe.call({
-				method: 'frappe.client.get_list',
-				args: {
-					doctype: 'POS Invoice',
-					filters: {
-						'docstatus': 1
-					},
-					fields: ['*'],
-					order_by: 'posting_date desc'
-				},
+				method: 'pos_ar.pos_ar.doctype.pos_info.pos_info.get_non_consolidated_invoices',
 				callback: function(response) {
 					const invoices = response.message || [];
 					const content = document.querySelector('.popover-content');
@@ -326,20 +318,12 @@ pos_ar.PointOfSale.pos_customer_box = class{
 						html += '</div>';
 						content.innerHTML = html;
 
-						
-
 						// Add click handlers for print buttons
 						content.querySelectorAll('.print-invoice').forEach(btn => {
 							btn.addEventListener('click', (e) => {
 								const invoiceName = e.target.closest('.invoice-item').dataset.name;
-								frappe.run_serially([
-									() => frappe.model.with_doc('POS Invoice', invoiceName),
-									() => {
-										const doc = frappe.get_doc('POS Invoice', invoiceName);
-										me.on_print_pos(doc)
-									}
-								]);
-								
+								const invoice = invoices.find(inv => inv.name === invoiceName);
+								me.on_print_pos(invoice);
 							});
 						});
 					}
