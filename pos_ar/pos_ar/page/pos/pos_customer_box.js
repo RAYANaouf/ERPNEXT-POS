@@ -65,6 +65,29 @@ pos_ar.PointOfSale.pos_customer_box = class{
 			</div>
 		`)
 
+		// Add new custom button with popover
+		this.actionContainer.append(`
+			<button id="customActionBtn" class="action-btn">
+				<i class="fa fa-star"></i>
+			</button>
+		`)
+
+		// Add popover element
+		this.wrapper.append(`
+			<div id="myPopover" popover>
+				<div class="popover-header">
+					<h2>Custom Action</h2>
+				</div>
+				<div class="popover-content">
+					<!-- Content will go here -->
+				</div>
+				<div class="popover-footer">
+					<button class="btn btn-default" id="cancelBtn">Cancel</button>
+					<button class="btn btn-primary" id="confirmBtn">Confirm</button>
+				</div>
+			</div>
+		`)
+
 		// Menu button
 		this.actionContainer.append(`
 			<div id="MenuBox" class="action-btn">
@@ -175,6 +198,24 @@ pos_ar.PointOfSale.pos_customer_box = class{
 	}
 
 	setListeners(){
+
+		const popover = document.getElementById('myPopover');
+		const toggleButton = document.getElementById('customActionBtn');
+		const cancelBtn = document.getElementById('cancelBtn');
+		const confirmBtn = document.getElementById('confirmBtn');
+
+		toggleButton.addEventListener('click', () => {
+			popover.togglePopover();
+		});
+
+		cancelBtn.addEventListener('click', () => {
+			popover.hidePopover();
+		});
+
+		confirmBtn.addEventListener('click', () => {
+			// Handle confirm action here
+			popover.hidePopover();
+		});
 
 		this.sync_btn.on('click' , (event)=>{
 			frappe.confirm('Are you sure you want to sync',
