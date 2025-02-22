@@ -2670,14 +2670,14 @@
 			</div>
 		`);
       this.actionContainer.append(`
-			<button id="customActionBtn" class="action-btn">
+			<div id="popupBtn" class="action-btn">
 				<i class="fa fa-star"></i>
-			</button>
+			</div>
 		`);
       this.wrapper.append(`
 			<div id="myPopover" popover>
 				<div class="popover-header">
-					<h2>Custom Action</h2>
+					<h2>Invoices</h2>
 				</div>
 				<div class="popover-content">
 					<!-- Content will go here -->
@@ -2785,7 +2785,7 @@
     }
     setListeners() {
       const popover = document.getElementById("myPopover");
-      const toggleButton = document.getElementById("customActionBtn");
+      const toggleButton = document.getElementById("popupBtn");
       const cancelBtn = document.getElementById("cancelBtn");
       const confirmBtn = document.getElementById("confirmBtn");
       toggleButton.addEventListener("click", () => {
@@ -6742,4 +6742,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.WXRTHBUT.js.map
+//# sourceMappingURL=pos.bundle.FTBHLVMW.js.map

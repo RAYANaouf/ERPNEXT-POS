@@ -67,16 +67,16 @@ pos_ar.PointOfSale.pos_customer_box = class{
 
 		// Add new custom button with popover
 		this.actionContainer.append(`
-			<button id="customActionBtn" class="action-btn">
+			<div id="popupBtn" class="action-btn">
 				<i class="fa fa-star"></i>
-			</button>
+			</div>
 		`)
 
 		// Add popover element
 		this.wrapper.append(`
 			<div id="myPopover" popover>
 				<div class="popover-header">
-					<h2>Custom Action</h2>
+					<h2>Invoices</h2>
 				</div>
 				<div class="popover-content">
 					<!-- Content will go here -->
@@ -200,7 +200,7 @@ pos_ar.PointOfSale.pos_customer_box = class{
 	setListeners(){
 
 		const popover = document.getElementById('myPopover');
-		const toggleButton = document.getElementById('customActionBtn');
+		const toggleButton = document.getElementById('popupBtn');
 		const cancelBtn = document.getElementById('cancelBtn');
 		const confirmBtn = document.getElementById('confirmBtn');
 
