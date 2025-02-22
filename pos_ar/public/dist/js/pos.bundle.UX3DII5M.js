@@ -2670,10 +2670,15 @@
 			</div>
 		`);
       this.actionContainer.append(`
-			<div id="popupBtn" class="action-btn">
+			<div id="popupBtn" class="action-btn" style="display: none;">
 				<i class="fa fa-star"></i>
 			</div>
 		`);
+      frappe.db.get_value("Company", frappe.defaults.get_default("company"), "name").then((r) => {
+        if (r.message.name === "OPTILENS TIZIOUZOU" || r.message.name === "Tizi") {
+          document.getElementById("popupBtn").style.display = "flex";
+        }
+      });
       this.wrapper.append(`
 			<div id="myPopover" popover>
 				<div class="popover-header">
@@ -6742,4 +6747,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.FTBHLVMW.js.map
+//# sourceMappingURL=pos.bundle.UX3DII5M.js.map

@@ -67,10 +67,18 @@ pos_ar.PointOfSale.pos_customer_box = class{
 
 		// Add new custom button with popover
 		this.actionContainer.append(`
-			<div id="popupBtn" class="action-btn">
+			<div id="popupBtn" class="action-btn" style="display: none;">
 				<i class="fa fa-star"></i>
 			</div>
 		`)
+
+		// Check company and show button if it's OPTILENS TIZIOUZOU
+		frappe.db.get_value('Company', frappe.defaults.get_default('company'), 'name')
+			.then(r => {
+				if (r.message.name === "OPTILENS TIZIOUZOU" || r.message.name === "Tizi" ) {
+					document.getElementById('popupBtn').style.display = 'flex';
+				}
+			});
 
 		// Add popover element
 		this.wrapper.append(`
