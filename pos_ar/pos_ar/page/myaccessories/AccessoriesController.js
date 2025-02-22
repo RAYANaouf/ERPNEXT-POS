@@ -201,9 +201,17 @@ pos_ar.myaccessories.AccessoriesController = class {
 
 
     loadItems(container) {
-        // Clear any previous loading state
+        // Clear any previous content
         container.find('.item-row:not(.header)').remove();
-        container.append('<div class="loading-message">Loading items...</div>');
+        container.find('.loading-spinner, .error-message, .no-items-message').remove();
+
+        // Add loading spinner
+        const loadingSpinner = $(`
+            <div class="loading-spinner">
+                <div class="spinner"></div>
+                <div class="loading-text">Loading items...</div>
+            </div>
+        `).appendTo(container);
 
         console.log("Loading items with filters:", {
             company: this.selectedCompany,
@@ -216,20 +224,22 @@ pos_ar.myaccessories.AccessoriesController = class {
             args: {
                 company: this.selectedCompany,
                 pos_opening_entry: this.selectedPOSOpening,
-                brand: this.selectedBrand || ''  // Ensure we pass empty string if no brand selected
+                brand: this.selectedBrand || ''
             },
             callback: (response) => {
-                container.find('.loading-message').remove();
-                if (response.message) {
-                    this.data = response.message.items; // Store data for export
+                loadingSpinner.remove();
+                if (response.message && response.message.items && response.message.items.length > 0) {
+                    this.data = response.message.items;
                     this.renderItems(container, this.data);
                 } else {
-                    container.append('<div class="no-items-message">No items found</div>');
+                    $('<div class="no-items-message">').text('No items found').appendTo(container);
                 }
             },
             error: (err) => {
-                container.find('.loading-message').remove();
-                container.append('<div class="error-message">Error loading items</div>');
+                loadingSpinner.remove();
+                $('<div class="error-message">')
+                    .text('Error loading items. Please try again.')
+                    .appendTo(container);
                 console.error("Error loading items:", err);
             }
         });
