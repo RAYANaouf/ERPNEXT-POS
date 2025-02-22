@@ -1138,6 +1138,8 @@ pos_ar.PointOfSale.Controller = class {
 
 		const pos = structuredClone(this.selectedItemMaps.get(this.selectedTab.tabName))
 
+		// Set custom_is_shared based on sendInvoiceToOtherPos setting
+		pos.custom_is_shared = this.settings_data.settings.sendInvoiceToOtherPos ? 1 : 0;
 
 		if (status == 'Unpaid') {
 			pos.synced = true
@@ -1382,7 +1384,8 @@ pos_ar.PointOfSale.Controller = class {
 
 		window.addEventListener('online', function () {
 			frappe.msgprint('the connection is back (online mode)')
-		})
+		}
+		)
 	}
 
 	/*****************************  tools  **********************************/

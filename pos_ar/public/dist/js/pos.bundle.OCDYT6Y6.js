@@ -2061,6 +2061,7 @@
       const status = this.checkIfPaid(this.selectedItemMaps.get(this.selectedTab.tabName));
       this.selectedItemMaps.get(this.selectedTab.tabName).status = status;
       const pos = structuredClone(this.selectedItemMaps.get(this.selectedTab.tabName));
+      pos.custom_is_shared = this.settings_data.settings.sendInvoiceToOtherPos ? 1 : 0;
       if (status == "Unpaid") {
         pos.synced = true;
         frappe.db.insert(
@@ -2218,9 +2219,12 @@
       window.addEventListener("offline", function() {
         frappe.msgprint("you lose the connection (offline mode)");
       });
-      window.addEventListener("online", function() {
-        frappe.msgprint("the connection is back (online mode)");
-      });
+      window.addEventListener(
+        "online",
+        function() {
+          frappe.msgprint("the connection is back (online mode)");
+        }
+      );
     }
     makePosInvoiceReturn(posInvoice) {
       let invoice = structuredClone(posInvoice);
@@ -6762,4 +6766,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.MBXGIEGE.js.map
+//# sourceMappingURL=pos.bundle.OCDYT6Y6.js.map
