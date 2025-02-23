@@ -1146,6 +1146,9 @@ pos_ar.PointOfSale.Controller = class {
 
 		if (status == 'Unpaid') {
 			pos.synced = true
+
+			console.log("debuging rayan :::: " , pos)
+
 			frappe.db.insert(
 				pos
 			).then(r => {
@@ -1180,6 +1183,7 @@ pos_ar.PointOfSale.Controller = class {
 
 
 			}).catch(err => {
+				console.log("debuging rayan 22222222 :::: " , pos)
 				this.payment_cart.hide_waiting()
 				console.log("cant push pos invoice : ", err);
 			})

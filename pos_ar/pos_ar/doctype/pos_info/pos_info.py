@@ -520,7 +520,8 @@ def get_non_consolidated_invoices():
         filters={
             "docstatus": 1,  # Submitted documents
             "consolidated_invoice": "",  # Not consolidated
-            "company": company
+            "company": company,
+            "custom_is_shared" : 1
         },
         order_by="posting_date desc"
     )

@@ -88,6 +88,9 @@ pos_ar.PointOfSale.pos_customer_box = class{
 				<div class="popover-header">
 					<h2>Invoices</h2>
 				</div>
+				<div class="search-container">
+					<input type="text" class="search-box" placeholder="Search by customer name..." />
+				</div>
 				<div class="popover-content">
 					<!-- Content will go here -->
 				</div>
@@ -103,6 +106,26 @@ pos_ar.PointOfSale.pos_customer_box = class{
 			#myPopover {
 				min-width: 600px !important;
 				max-width: 80vw !important;
+			}
+			.search-container {
+				padding: 10px 15px;
+				border-bottom: 1px solid var(--border-color);
+				background-color: var(--fg-color);
+			}
+			.search-box {
+				width: 100%;
+				padding: 8px 12px;
+				border: 1px solid var(--border-color);
+				border-radius: 6px;
+				font-size: 14px;
+				outline: none;
+				transition: border-color 0.2s;
+			}
+			.search-box:focus {
+				border-color: var(--primary-color);
+			}
+			.search-box::placeholder {
+				color: var(--text-muted);
 			}
 			.invoice-list {
 				max-height: 400px;
@@ -293,40 +316,59 @@ pos_ar.PointOfSale.pos_customer_box = class{
 				callback: function(response) {
 					const invoices = response.message || [];
 					const content = document.querySelector('.popover-content');
+					const searchBox = document.querySelector('.search-box');
 					
-					if (invoices.length === 0) {
-						content.innerHTML = '<div class="no-invoices">No non-consolidated invoices found</div>';
-					} else {
-						let html = '<div class="invoice-list">';
-						invoices.forEach(invoice => {
-							html += `
-								<div class="invoice-item" data-name="${invoice.name}">
-									<div class="invoice-details">
-										<div class="invoice-name">${invoice.customer || 'No Customer'}</div>
-										<div class="invoice-id">${invoice.name}</div>
-										<div class="invoice-date">${frappe.datetime.str_to_user(invoice.posting_date)}</div>
-										<div class="invoice-amount">${format_currency(invoice.grand_total)}</div>
+					function renderInvoices(filteredInvoices) {
+						if (filteredInvoices.length === 0) {
+							content.innerHTML = '<div class="no-invoices">No invoices found</div>';
+						} else {
+							let html = '<div class="invoice-list">';
+							filteredInvoices.forEach(invoice => {
+								html += `
+									<div class="invoice-item" data-name="${invoice.name}">
+										<div class="invoice-details">
+											<div class="invoice-name">${invoice.customer || 'No Customer'}</div>
+											<div class="invoice-id">${invoice.name}</div>
+											<div class="invoice-date">${frappe.datetime.str_to_user(invoice.posting_date)}</div>
+											<div class="invoice-amount">${format_currency(invoice.grand_total)}</div>
+										</div>
+										<div class="invoice-actions">
+											<button class="btn btn-xs btn-default print-invoice">
+												<i class="fa fa-print"></i> Print
+											</button>
+										</div>
 									</div>
-									<div class="invoice-actions">
-										<button class="btn btn-xs btn-default print-invoice">
-											<i class="fa fa-print"></i> Print
-										</button>
-									</div>
-								</div>
-							`;
-						});
-						html += '</div>';
-						content.innerHTML = html;
-
-						// Add click handlers for print buttons
-						content.querySelectorAll('.print-invoice').forEach(btn => {
-							btn.addEventListener('click', (e) => {
-								const invoiceName = e.target.closest('.invoice-item').dataset.name;
-								const invoice = invoices.find(inv => inv.name === invoiceName);
-								me.on_print_pos(invoice);
+								`;
 							});
-						});
+							html += '</div>';
+							content.innerHTML = html;
+
+							// Add click handlers for print buttons
+							content.querySelectorAll('.print-invoice').forEach(btn => {
+								btn.addEventListener('click', (e) => {
+									const invoiceName = e.target.closest('.invoice-item').dataset.name;
+									const invoice = invoices.find(inv => inv.name === invoiceName);
+									console.log("the invoiceeeeeeeeeeee is ",invoice);
+									me.on_print_pos(invoice);
+								});
+							});
+						}
 					}
+
+					// Initial render
+					renderInvoices(invoices);
+
+					// Add search functionality
+					searchBox.addEventListener('input', (e) => {
+						const searchTerm = e.target.value.toLowerCase();
+						const filteredInvoices = invoices.filter(invoice => 
+							(invoice.customer || '').toLowerCase().includes(searchTerm)
+						);
+						renderInvoices(filteredInvoices);
+					});
+
+					// Clear search when popup opens
+					searchBox.value = '';
 				}
 			});
 			popover.togglePopover();
