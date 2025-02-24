@@ -204,27 +204,31 @@ pos_ar.PointOfSale.Controller = class {
 		const user = frappe.session.user;
 		let posProfile = frappe.defaults.get_default("POS Profile");
 
+		let profile = await frappe.db.get_doc('POS Profile' , posProfile);
+
+		this.appData.appData.pos_profile = profile;
+
+
+		console.log("the pos profile ",this.appData.appData.pos_profile , profile , posProfile)
+
 		if (!posProfile) {
 			// Clear main container
-			this.$components_wrapper.empty();
+			this.wrapper.html("");
 			
 			// Create and append dialog
 			const dialog = $(`
-				<div class="pos-profile-dialog d-flex flex-column align-items-center justify-content-center h-100">
-					<div class="alert alert-warning">
+				<div class="pos-profile-dialog d-flex flex-column align-items-center justify-content-center" style="height: 100vh;">
+					<div class="alert alert-warning text-center">
 						<h3>${__('POS Profile Not Set')}</h3>
 						<p>${__('Please set a default POS Profile to continue using the POS.')}</p>
-						<button class="btn btn-primary mt-3" onclick="frappe.set_route('List', 'POS Profile')">
+						<button class="btn btn-primary mt-3" onclick="">
 							${__('Set POS Profile')}
 						</button>
 					</div>
 				</div>
-			`).css({
-				'min-height': '300px',
-				'padding': '2rem'
-			});
+			`);
 			
-			this.$components_wrapper.append(dialog);
+			this.wrapper.append(dialog);
 			return false;
 		}
 
