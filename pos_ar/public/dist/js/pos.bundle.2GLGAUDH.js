@@ -1362,15 +1362,22 @@
       const user = frappe.session.user;
       let posProfile = frappe.defaults.get_default("POS Profile");
       if (!posProfile) {
-        frappe.msgprint({
-          title: __("POS Profile Required"),
-          indicator: "red",
-          message: __("Please select a POS Profile to continue."),
-          primary_action: {
-            label: __("Select POS Profile"),
-            action: () => frappe.set_route("List", "POS Profile")
-          }
+        this.$components_wrapper.empty();
+        const dialog = $(`
+				<div class="pos-profile-dialog d-flex flex-column align-items-center justify-content-center h-100">
+					<div class="alert alert-warning">
+						<h3>${__("POS Profile Not Set")}</h3>
+						<p>${__("Please set a default POS Profile to continue using the POS.")}</p>
+						<button class="btn btn-primary mt-3" onclick="frappe.set_route('List', 'POS Profile')">
+							${__("Set POS Profile")}
+						</button>
+					</div>
+				</div>
+			`).css({
+          "min-height": "300px",
+          "padding": "2rem"
         });
+        this.$components_wrapper.append(dialog);
         return false;
       }
       try {
@@ -6932,4 +6939,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.UUWDKSA3.js.map
+//# sourceMappingURL=pos.bundle.2GLGAUDH.js.map
