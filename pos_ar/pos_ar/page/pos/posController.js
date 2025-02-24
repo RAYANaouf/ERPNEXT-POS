@@ -201,8 +201,22 @@ pos_ar.PointOfSale.Controller = class {
 	}
 
 	async checkForPOSEntry() {
-		const user = frappe.session.user
-		const posProfile = this.appData.appData.pos_profile.name
+		const user = frappe.session.user;
+		let posProfile = frappe.defaults.get_default("POS Profile");
+
+		if (!posProfile) {
+			frappe.msgprint({
+				title: __('POS Profile Required'),
+				indicator: 'red',
+				message: __('Please select a POS Profile to continue.'),
+				primary_action: {
+					label: __('Select POS Profile'),
+					action: () => frappe.set_route('List', 'POS Profile')
+				}
+			});
+			return false;
+		}
+
 		try {
 			const response = await frappe.call({
 				method: 'pos_ar.pos_ar.doctype.pos_info.pos_info.check_opening_entry',
@@ -824,7 +838,6 @@ pos_ar.PointOfSale.Controller = class {
 			let oldRate = this.selectedItem.rate;
 			let persent = ((parseFloat(value) * 100) / oldRate).toFixed(2);
 			let montant = parseFloat(value);
-
 			//prevent negatif result
 			if (persent > 100) {
 				persent = 100;
