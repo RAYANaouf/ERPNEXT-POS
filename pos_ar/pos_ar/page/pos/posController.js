@@ -204,13 +204,8 @@ pos_ar.PointOfSale.Controller = class {
 		const user = frappe.session.user;
 		let posProfile = frappe.defaults.get_default("POS Profile");
 
-		let profile = await frappe.db.get_doc('POS Profile' , posProfile);
 
-		this.appData.appData.pos_profile = profile;
-
-
-		console.log("the pos profile ",this.appData.appData.pos_profile , profile , posProfile)
-
+		
 		if (!posProfile) {
 			// Clear main container
 			this.wrapper.html("");
@@ -231,6 +226,13 @@ pos_ar.PointOfSale.Controller = class {
 			this.wrapper.append(dialog);
 			return false;
 		}
+
+		
+
+		let profile = await frappe.db.get_doc('POS Profile' , posProfile);
+
+		this.appData.appData.pos_profile = profile;
+
 
 		try {
 			const response = await frappe.call({

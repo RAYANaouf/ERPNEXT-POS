@@ -1361,9 +1361,6 @@
     async checkForPOSEntry() {
       const user = frappe.session.user;
       let posProfile = frappe.defaults.get_default("POS Profile");
-      let profile = await frappe.db.get_doc("POS Profile", posProfile);
-      this.appData.appData.pos_profile = profile;
-      console.log("the pos profile ", this.appData.appData.pos_profile, profile, posProfile);
       if (!posProfile) {
         this.wrapper.html("");
         const dialog = $(`
@@ -1380,6 +1377,8 @@
         this.wrapper.append(dialog);
         return false;
       }
+      let profile = await frappe.db.get_doc("POS Profile", posProfile);
+      this.appData.appData.pos_profile = profile;
       try {
         const response = await frappe.call({
           method: "pos_ar.pos_ar.doctype.pos_info.pos_info.check_opening_entry",
@@ -6939,4 +6938,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.SH4EAZUV.js.map
+//# sourceMappingURL=pos.bundle.YODF6MDF.js.map
