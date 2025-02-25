@@ -2231,12 +2231,25 @@
         child.reason_note = check.reason_note;
         child.user = check.owner;
       });
+      this.POSOpeningEntry.name = "";
+      this.wrapper.html("");
+      const dialog = $(`
+			<div class="pos-profile-dialog d-flex flex-column align-items-center justify-content-center" style="height: 100vh;">
+				<div class="alert alert-warning text-center">
+					<h3>${__("POS is Closed")}</h3>
+					<p>${__("Please refresh the page after trying to close.")}</p>
+					<button class="btn btn-primary mt-3" onclick="location.reload()">
+						${__("Refresh Page")}
+					</button>
+				</div>
+			</div>
+		`);
+      this.wrapper.append(dialog);
       frappe.set_route("Form", "POS Closing Entry", voucher.name).then(() => {
         window.addEventListener("popstate", (event2) => {
           frappe.set_route("Form", "POS Closing Entry", voucher.name);
         });
       });
-      this.POSOpeningEntry.name = "";
     }
     setListeners() {
       window.addEventListener("offline", function() {
@@ -6938,4 +6951,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.YODF6MDF.js.map
+//# sourceMappingURL=pos.bundle.LACB6RXS.js.map
