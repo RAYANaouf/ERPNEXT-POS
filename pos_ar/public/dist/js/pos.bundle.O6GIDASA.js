@@ -4511,9 +4511,9 @@
         netTotal += item.rate * item.qty;
         invoiceHTML += `<tr><td><div>${item.item_name}</div></td>  <td><div>${item.qty}</div></td>  <td><div>${item.rate}</div></td>  <td><div>${item.rate * item.qty}</div></td></tr>`;
       });
-      invoiceHTML += `<tr style="height:23px;font-size:12px;font-weight:700;"><td colspan="3"><div>      </div></td><td><div>${netTotal + netTotal * (taxes / 100) - pos.additional_discount_percentage * netTotal} DA</div></td></tr>`;
-      invoiceHTML += `<tr style="height:23px;font-size:12px;font-weight:700;"><td colspan="3"><div>Ancien Sold</div></td><td><div>${ancien_sold} DA</div></td></tr>`;
       invoiceHTML += "</table>";
+      invoiceHTML += `<div>Ancien Sold : ${ancien_sold} DA</div>`;
+      invoiceHTML += `<div> Total : ${netTotal + netTotal * (taxes / 100) - pos.additional_discount_percentage * netTotal} DA</div>`;
       invoiceHTML += '<div id="footer_message" style="width:100%; display:flex; align-items:center; margin-top:30px;"><div style="flex-grow:1;"></div><div style="flex-grow:1;"></div></div>';
       invoiceHTML += "</div>";
       const printWindow = window.open("", "_blank");
@@ -6951,4 +6951,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.6HOJ46VC.js.map
+//# sourceMappingURL=pos.bundle.O6GIDASA.js.map
