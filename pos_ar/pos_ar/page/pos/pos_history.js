@@ -497,7 +497,7 @@ pos_ar.PointOfSale.pos_history = class {
 			'justify-content:center;' +
 			'}' +
 			'#logContainer img{' +
-			'width:50%; height:100%;' +
+			'width:80%; height:100%;' +
 			'}' +
 			'#top_data_container{' +
 			'width:100%;display:flex;' +
@@ -520,9 +520,9 @@ pos_ar.PointOfSale.pos_history = class {
 			'</style>' +
 			'<div style="display:flex; flex-direction:column;">' +
 			'<div id="logContainer">' +
-			'<div style="width:20%;"></div>' +
+			'<div style="width:5%;"></div>' +
 			'<img src="/assets/pos_ar/images/logo.jpg"  id="company_logo">' +
-			'<div style="width:20%;"></div>' +
+			'<div style="width:5%;"></div>' +
 			'</div>' +
 			'<div id="company_container">' +
 			'<div style="flex-grow:1;"></div>' +
@@ -531,7 +531,7 @@ pos_ar.PointOfSale.pos_history = class {
 			'</div>' +
 			'<div id="top_data_container">' +
 			'<div class="c1">' +
-			`<div class="customer" style="font-weight:600;font-size:18px;"> Customer : ${pos.customer} </div>` +
+			`<div class="customer" style="font-weight:600;font-size:18px;"> Client : ${pos.customer} </div>` +
 			`<div class="refrence"> Commande : ${pos.refNum} </div>` +
 			'</div>' +
 			'<div class="c2">' +
@@ -539,7 +539,7 @@ pos_ar.PointOfSale.pos_history = class {
 			'</div>' +
 			'</div>' +
 			'<table>' +
-			'<tr id="first_row"><th>Nom</th><th>Qté</th><th>Prix</th><th>Value</th>';
+			'<tr id="first_row"><th>Nom</th><th>Qté</th><th>Prix</th><th>Valeur</th>';
 	
 		pos.items.forEach(item => {
 			netTotal += item.rate * item.qty;
@@ -553,7 +553,6 @@ pos_ar.PointOfSale.pos_history = class {
 		invoiceHTML +=
 			'<div id="footer_message" style="width:100%; display:flex; align-items:center; margin-top:30px;">' +
 			'<div style="flex-grow:1;"></div>' +
-			'<div style="margin:30px 25px;"> Thank You, Come Again</div>' +
 			'<div style="flex-grow:1;"></div>' +
 			'</div>';
 	
