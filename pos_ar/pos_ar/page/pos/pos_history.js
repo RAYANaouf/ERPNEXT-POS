@@ -626,6 +626,9 @@ pos_ar.PointOfSale.pos_history = class {
 			const discount = pos.additional_discount_percentage ? (totals.netTotal * pos.additional_discount_percentage) : 0;
 			totals.grandTotal = totals.netTotal - discount;
 
+
+
+
 			// Add totals section
 			receiptHTML += `
 						</tbody>
@@ -635,7 +638,7 @@ pos_ar.PointOfSale.pos_history = class {
 						<div>Quantité Totale: ${totals.totalQty}</div>
 						 <div>Remise: ${formatNumber(discount)} DA</div>
 						<div class="bold">Total: ${formatNumber(totals.grandTotal)} DA</div>
-						<div>Ancien Solde: ${formatNumber(ancien_sold)} DA</div>
+						<div>Total Solde: ${formatNumber(ancien_sold)} DA</div>
 					</div>
 
 					<div class="receipt-footer">

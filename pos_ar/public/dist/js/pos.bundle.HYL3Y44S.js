@@ -4657,7 +4657,7 @@
 						<div>Quantit\xE9 Totale: ${totals.totalQty}</div>
 						 <div>Remise: ${formatNumber(discount)} DA</div>
 						<div class="bold">Total: ${formatNumber(totals.grandTotal)} DA</div>
-						<div>Ancien Solde: ${formatNumber(ancien_sold)} DA</div>
+						<div>Total Solde: ${formatNumber(ancien_sold)} DA</div>
 					</div>
 
 					<div class="receipt-footer">
@@ -7110,4 +7110,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.SZCZPZAF.js.map
+//# sourceMappingURL=pos.bundle.HYL3Y44S.js.map
