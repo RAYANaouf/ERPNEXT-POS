@@ -446,141 +446,227 @@ pos_ar.PointOfSale.pos_history = class {
 		this.refreshData();
 	}
 
-	
+	 async print_receipt(pos) {
+		try {
+			if (!pos) {
+				console.error("No POS data provided");
+				frappe.throw(__("Error: No POS data available for printing"));
+				return;
+			}
 
+			// Initialize totals
+			const totals = {
+				netTotal: 0,
+				taxes: 0,
+				grandTotal: 0,
+				totalQty: 0,
+				totalItems: 0
+			};
 
+			// Format number helper
+			const formatNumber = (num) => {
+				return new Intl.NumberFormat('fr-DZ', {
+					minimumFractionDigits: 2,
+					maximumFractionDigits: 2
+				}).format(num);
+			};
 
+			// Get customer data
+			const customer = this.app_data.appData.customers.find(customer => customer.name == pos.customer);
+			if (!customer) {
+				console.error("Customer not found:", pos.customer);
+				frappe.throw(__("Error: Customer information not found"));
+				return;
+			}
 
+			let ancien_sold = customer.custom_debt;
+			if (this.app_settings.settings.onlineDebt) {
+				ancien_sold = await this.app_data.fetchCustomerDebt(customer.name);
+			}
 
-	async print_receipt(pos) {
-		console.log("pos : ", pos);
-	
-		let netTotal = 0;
-		let taxes = 0;
-		let grandTotal = 0;
-		let totalQty = 0;
-	
-		console.log("appData : ", this.app_data);
-		let customer = this.app_data.appData.customers.find(customer => customer.name == pos.customer);
-	
-		let ancien_sold = customer.custom_debt;
-	
-		console.log("check the condition : ", this.app_settings.settings.onlineDebt);
-		if (this.app_settings.settings.onlineDebt) {
-			ancien_sold = await this.app_data.fetchCustomerDebt(customer.name);
-			console.log("the result is : ", ancien_sold);
+			// Parse creation time
+			const creation_time = pos.creation_time || pos.creation;
+			if (!creation_time) {
+				console.error("No creation time found in POS object");
+				frappe.throw(__("Error: Invalid receipt date"));
+				return;
+			}
+			const [date, time] = creation_time.split(' ');
+
+			// Generate CSS styles
+			const styles = `
+				<style>
+					@media print {
+						@page {
+							margin: 0;
+							size: 80mm auto;
+						}
+						body {
+							margin: 10mm;
+						}
+					}
+					body {
+						font-family: Arial, sans-serif;
+						line-height: 1.4;
+						color: #000;
+					}
+					.receipt-container {
+						max-width: 80mm;
+						margin: 0 auto;
+						padding: 10px;
+					}
+					.logo-container {
+						text-align: center;
+						margin-bottom: 10px;
+					}
+					.logo-container img {
+						max-width: 60mm;
+						height: auto;
+					}
+					.company-name {
+						text-align: center;
+						font-size: 16px;
+						font-weight: bold;
+						margin: 10px 0;
+					}
+					.receipt-header {
+						margin: 10px 0;
+						padding: 5px 0;
+						border-top: 1px dashed #000;
+						border-bottom: 1px dashed #000;
+					}
+					.customer-info {
+						margin-bottom: 10px;
+					}
+					.receipt-table {
+						width: 100%;
+						border-collapse: collapse;
+						margin: 10px 0;
+					}
+					.receipt-table th {
+						border-bottom: 1px solid #000;
+						padding: 5px;
+						text-align: left;
+						font-size: 12px;
+					}
+					.receipt-table td {
+						padding: 5px;
+						font-size: 12px;
+						border-bottom: 1px dotted #ccc;
+					}
+					.totals {
+						margin: 10px 0;
+						text-align: right;
+						font-size: 14px;
+					}
+					.receipt-footer {
+						margin-top: 20px;
+						text-align: center;
+						font-size: 12px;
+						border-top: 1px dashed #000;
+						padding-top: 10px;
+					}
+					.bold {
+						font-weight: bold;
+					}
+					.text-right {
+						text-align: right;
+					}
+				</style>
+			`;
+
+			// Generate receipt HTML
+			let receiptHTML = `
+				${styles}
+				<div class="receipt-container">
+					<div class="logo-container">
+						<img src="/assets/pos_ar/images/logo.jpg" alt="Company Logo">
+					</div>
+					<div class="company-name">${this.company.company_name}</div>
+					
+					<div class="receipt-header">
+						<div class="customer-info">
+							<div class="bold">Client: ${pos.customer}</div>
+							<div>Commande: ${pos.refNum}</div>
+							<div>Date: ${date}</div>
+							<div>Heure: ${time}</div>
+						</div>
+					</div>
+
+					<table class="receipt-table">
+						<thead>
+							<tr>
+								<th>Article</th>
+								<th class="text-right">Qté</th>
+								<th class="text-right">Prix</th>
+								<th class="text-right">Total</th>
+							</tr>
+						</thead>
+						<tbody>
+			`;
+
+			// Add items to receipt
+			pos.items.forEach(item => {
+				const itemTotal = item.rate * item.qty;
+				totals.netTotal += itemTotal;
+				totals.totalQty += item.qty;
+				totals.totalItems += 1;
+
+				receiptHTML += `
+					<tr>
+						<td>${item.item_name}</td>
+						<td class="text-right">${item.qty}</td>
+						<td class="text-right">${formatNumber(item.rate)}</td>
+						<td class="text-right">${formatNumber(itemTotal)}</td>
+					</tr>
+				`;
+			});
+
+			// Calculate final totals
+			const discount = pos.additional_discount_percentage ? (totals.netTotal * pos.additional_discount_percentage) : 0;
+			totals.grandTotal = totals.netTotal - discount;
+
+			// Add totals section
+			receiptHTML += `
+						</tbody>
+					</table>
+
+					<div class="totals">
+						<div>Quantité Totale: ${totals.totalQty}</div>
+						 <div>Remise: ${formatNumber(discount)} DA</div>
+						<div class="bold">Total: ${formatNumber(totals.grandTotal)} DA</div>
+						<div>Ancien Solde: ${formatNumber(ancien_sold)} DA</div>
+					</div>
+
+					<div class="receipt-footer">
+						<div>Merci de votre visite!</div>
+						<div>${this.company.company_name}</div>
+					</div>
+				</div>
+			`;
+
+			// Print the receipt
+			const printWindow = window.open('', '_blank');
+			if (!printWindow) {
+				frappe.throw(__("Error: Popup blocked. Please allow popups for printing."));
+				return;
+			}
+
+			printWindow.document.write(receiptHTML);
+			printWindow.document.close();
+
+			// Wait for images to load before printing
+			printWindow.onload = () => {
+				setTimeout(() => {
+					printWindow.focus();
+					printWindow.print();
+					printWindow.close();
+				}, 250); // Small delay to ensure styles are applied
+			};
+
+		} catch (error) {
+			console.error("Error printing receipt:", error);
+			frappe.throw(__("Error printing receipt. Please try again."));
 		}
-	
-		// Check if creation or creation_time exists and assign accordingly
-		let creation_time = pos.creation_time || pos.creation;
-		if (!creation_time) {
-			console.error("No creation or creation_time found in pos object.");
-			return;
-		}
-		const [date, time] = creation_time.split(' ');
-	
-		let invoiceHTML =
-			'<style>' +
-			'#company_container {' +
-			'width: 100% ; height: 40px ; ' +
-			'display:flex; align-items:center; ' +
-			'font-size : 12px;' +
-			'}' +
-			'table{' +
-			'width: 100%; margin-top:16px;' +
-			'}' +
-			'tr{' +
-			'width:100%; height:16px;' +
-			'}' +
-			'#logContainer{' +
-			'width: 100%;height:80px;' +
-			'display : flex;' +
-			'justify-content:center;' +
-			'}' +
-			'#logContainer img{' +
-			'width:80%; height:100%;' +
-			'}' +
-			'#top_data_container{' +
-			'width:100%;display:flex;' +
-			'}' +
-			'#top_data_container>div.c1{' +
-			'font-size:12px;flex-grow:1;' +
-			'}' +
-			'#top_data_container>div.c2{' +
-			'font-size:12px;flex-grow:1;' +
-			'display:flex;flex-direction:column;align-items:end;' +
-			'}' +
-			'td>div{' +
-			'height:18px; width:100%;' +
-			'font-size:12px;' +
-			'display:flex; justify-content:start; align-items:center;' +
-			'}' +
-			'#footer_message{' +
-			'height:20px;' +
-			'}' +
-			'</style>' +
-			'<div style="display:flex; flex-direction:column;">' +
-			'<div id="logContainer">' +
-			'<div style="width:5%;"></div>' +
-			'<img src="/assets/pos_ar/images/logo.jpg"  id="company_logo">' +
-			'<div style="width:5%;"></div>' +
-			'</div>' +
-			'<div id="company_container">' +
-			'<div style="flex-grow:1;"></div>' +
-			`<p style="margin:0px 25px;">${this.company.company_name}</p>` +
-			'<div style="flex-grow:1;"></div>' +
-			'</div>' +
-			'<div id="top_data_container">' +
-			'<div class="c1">' +
-			`<div class="customer" style="font-weight:600;font-size:18px;"> Client : ${pos.customer} </div>` +
-			`<div class="refrence"> Commande : ${pos.refNum} </div>` +
-			'</div>' +
-			'<div class="c2">' +
-			`<div class="date"> ${date}/${time} </div>` +
-			'</div>' +
-			'</div>' +
-			'<table>' +
-			'<tr id="first_row"><th>Nom</th><th>Qté</th><th>Prix</th><th>Valeur</th>';
-	
-		pos.items.forEach(item => {
-			netTotal += item.rate * item.qty;
-			totalQty += 1 ;
-			invoiceHTML += `<tr><td><div>${item.item_name}</div></td>  <td><div>${item.qty}</div></td>  <td><div>${item.rate}</div></td>  <td><div>${item.rate * item.qty}</div></td></tr>`;
-		});
-
-
-		invoiceHTML += `<tr><td><div></div></td>  <td><div>${totalQty}</div></td>  <td><div></div></td>  <td><div>${netTotal + (netTotal * (taxes / 100)) - pos.additional_discount_percentage * netTotal} DA</div></td></tr>`;
-
-	
-		invoiceHTML += '</table>';
-	
-		//invoiceHTML += `<div> Total : ${netTotal + (netTotal * (taxes / 100)) - pos.additional_discount_percentage * netTotal} DA</div>`;
-
-		invoiceHTML += `<div>Total Sold : ${ancien_sold} DA</div>`;
-
-		invoiceHTML +=
-			'<div id="footer_message" style="width:100%; display:flex; align-items:center; margin-top:30px;">' +
-			'<div style="flex-grow:1;"></div>' +
-			'<div style="flex-grow:1;"></div>' +
-			'</div>';
-	
-		invoiceHTML += '</div>';
-	
-		// Open a new window and print the HTML content
-		const printWindow = window.open('', '_blank');
-		printWindow.document.write(invoiceHTML);
-		printWindow.document.close();
-	
-		const logoImage = printWindow.document.getElementById('company_logo');
-		logoImage.onload = () => {
-			printWindow.focus();
-			printWindow.print();
-			printWindow.close();
-		};
 	}
-	
-
-
-
-
 }
