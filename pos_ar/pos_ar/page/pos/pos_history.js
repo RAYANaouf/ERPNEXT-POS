@@ -638,8 +638,10 @@ pos_ar.PointOfSale.pos_history = class {
 					<div class="totals">
 						<div>Quantité Totale: ${totals.totalQty}</div>
 						 <div>Remise: ${formatNumber(discount)} DA</div>
-						<div class="bold">Total: ${formatNumber(totals.grandTotal)} DA</div>
-						<div>Total Solde: ${formatNumber(ancien_sold)} DA</div>
+						<div style="margin-top:15px; text-align:right;">
+							<div class="bold">Total: ${formatNumber(totals.grandTotal)} DA</div>
+							<div>Total Solde: ${formatNumber(ancien_sold)} DA</div>
+						</div>
 					</div>
 
 					<div class="receipt-footer">
