@@ -588,9 +588,9 @@ pos_ar.PointOfSale.pos_history = class {
 					<div class="receipt-header">
 						<div class="customer-info">
 							<div class="bold">Client: ${pos.customer}</div>
-							<div >Commande: ${pos.refNum}</div>
-							<div>Date: ${date}</div>
-							<div>Heure: ${time}</div>
+							<div style="font-size:10px;">Commande: ${pos.refNum}</div>
+							<div style="font-size:10px;">Date: ${date}</div>
+							<div style="font-size:10px;">Heure: ${time}</div>
 						</div>
 					</div>
 
