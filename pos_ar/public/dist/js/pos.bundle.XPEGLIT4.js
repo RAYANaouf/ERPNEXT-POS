@@ -4533,7 +4533,7 @@
 							size: 80mm auto;
 						}
 						body {
-							margin: 10mm;
+							margin: 1mm;
 						}
 					}
 					body {
@@ -4544,14 +4544,15 @@
 					.receipt-container {
 						max-width: 80mm;
 						margin: 0 auto;
-						padding: 10px;
+						padding: 1px;
 					}
 					.logo-container {
 						text-align: center;
 						margin-bottom: 10px;
+						margin-top: 10px;
 					}
 					.logo-container img {
-						max-width: 60mm;
+						width:90%;
 						height: auto;
 					}
 					.company-name {
@@ -4616,7 +4617,7 @@
 					<div class="receipt-header">
 						<div class="customer-info">
 							<div class="bold">Client: ${pos.customer}</div>
-							<div>Commande: ${pos.refNum}</div>
+							<div >Commande: ${pos.refNum}</div>
 							<div>Date: ${date}</div>
 							<div>Heure: ${time}</div>
 						</div>
@@ -7110,4 +7111,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.HYL3Y44S.js.map
+//# sourceMappingURL=pos.bundle.XPEGLIT4.js.map
