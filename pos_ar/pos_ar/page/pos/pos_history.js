@@ -458,6 +458,7 @@ pos_ar.PointOfSale.pos_history = class {
 		let netTotal = 0;
 		let taxes = 0;
 		let grandTotal = 0;
+		let totalQty = 0;
 	
 		console.log("appData : ", this.app_data);
 		let customer = this.app_data.appData.customers.find(customer => customer.name == pos.customer);
@@ -543,14 +544,19 @@ pos_ar.PointOfSale.pos_history = class {
 	
 		pos.items.forEach(item => {
 			netTotal += item.rate * item.qty;
+			totalQty += 1 ;
 			invoiceHTML += `<tr><td><div>${item.item_name}</div></td>  <td><div>${item.qty}</div></td>  <td><div>${item.rate}</div></td>  <td><div>${item.rate * item.qty}</div></td></tr>`;
 		});
+
+
+		invoiceHTML += `<tr><td><div></div></td>  <td><div>${totalQty}</div></td>  <td><div></div></td>  <td><div>${netTotal + (netTotal * (taxes / 100)) - pos.additional_discount_percentage * netTotal} DA</div></td></tr>`;
+
 	
 		invoiceHTML += '</table>';
 	
+		//invoiceHTML += `<div> Total : ${netTotal + (netTotal * (taxes / 100)) - pos.additional_discount_percentage * netTotal} DA</div>`;
 
-		invoiceHTML += `<div>Ancien Sold : ${ancien_sold} DA</div>`;
-		invoiceHTML += `<div> Total : ${netTotal + (netTotal * (taxes / 100)) - pos.additional_discount_percentage * netTotal} DA</div>`;
+		invoiceHTML += `<div>Total Sold : ${ancien_sold} DA</div>`;
 
 		invoiceHTML +=
 			'<div id="footer_message" style="width:100%; display:flex; align-items:center; margin-top:30px;">' +

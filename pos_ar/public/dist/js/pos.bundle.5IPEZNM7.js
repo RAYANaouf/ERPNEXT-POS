@@ -2586,7 +2586,8 @@
           this.on_item_click(item, isNotImpty);
         });
         const imageUrl = item.image || "/assets/pos_ar/images/no_image.png";
-        const price = this.get_item_price(item, this.selected_price_list.name);
+        console.log("selected prce list : ", this.selected_price_list.name);
+        const price = this.get_item_price(item, frappe.defaults.get_default("Price List"));
         itemBox.innerHTML = `
 				<img class="itemImage" src="${imageUrl}" alt="${item.item_name}" onerror="this.src='/assets/pos_ar/images/no_image.png'">
 				<div class="itemTitle">${item.item_name}</div>
@@ -4492,6 +4493,7 @@
       let netTotal = 0;
       let taxes = 0;
       let grandTotal = 0;
+      let totalQty = 0;
       console.log("appData : ", this.app_data);
       let customer = this.app_data.appData.customers.find((customer2) => customer2.name == pos.customer);
       let ancien_sold = customer.custom_debt;
@@ -4509,11 +4511,12 @@
       let invoiceHTML = `<style>#company_container {width: 100% ; height: 40px ; display:flex; align-items:center; font-size : 12px;}table{width: 100%; margin-top:16px;}tr{width:100%; height:16px;}#logContainer{width: 100%;height:80px;display : flex;justify-content:center;}#logContainer img{width:80%; height:100%;}#top_data_container{width:100%;display:flex;}#top_data_container>div.c1{font-size:12px;flex-grow:1;}#top_data_container>div.c2{font-size:12px;flex-grow:1;display:flex;flex-direction:column;align-items:end;}td>div{height:18px; width:100%;font-size:12px;display:flex; justify-content:start; align-items:center;}#footer_message{height:20px;}</style><div style="display:flex; flex-direction:column;"><div id="logContainer"><div style="width:5%;"></div><img src="/assets/pos_ar/images/logo.jpg"  id="company_logo"><div style="width:5%;"></div></div><div id="company_container"><div style="flex-grow:1;"></div><p style="margin:0px 25px;">${this.company.company_name}</p><div style="flex-grow:1;"></div></div><div id="top_data_container"><div class="c1"><div class="customer" style="font-weight:600;font-size:18px;"> Client : ${pos.customer} </div><div class="refrence"> Commande : ${pos.refNum} </div></div><div class="c2"><div class="date"> ${date}/${time} </div></div></div><table><tr id="first_row"><th>Nom</th><th>Qt\xE9</th><th>Prix</th><th>Valeur</th>`;
       pos.items.forEach((item) => {
         netTotal += item.rate * item.qty;
+        totalQty += 1;
         invoiceHTML += `<tr><td><div>${item.item_name}</div></td>  <td><div>${item.qty}</div></td>  <td><div>${item.rate}</div></td>  <td><div>${item.rate * item.qty}</div></td></tr>`;
       });
+      invoiceHTML += `<tr><td><div></div></td>  <td><div>${totalQty}</div></td>  <td><div></div></td>  <td><div>${netTotal + netTotal * (taxes / 100) - pos.additional_discount_percentage * netTotal} DA</div></td></tr>`;
       invoiceHTML += "</table>";
-      invoiceHTML += `<div>Ancien Sold : ${ancien_sold} DA</div>`;
-      invoiceHTML += `<div> Total : ${netTotal + netTotal * (taxes / 100) - pos.additional_discount_percentage * netTotal} DA</div>`;
+      invoiceHTML += `<div>Total Sold : ${ancien_sold} DA</div>`;
       invoiceHTML += '<div id="footer_message" style="width:100%; display:flex; align-items:center; margin-top:30px;"><div style="flex-grow:1;"></div><div style="flex-grow:1;"></div></div>';
       invoiceHTML += "</div>";
       const printWindow = window.open("", "_blank");
@@ -6951,4 +6954,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.O6GIDASA.js.map
+//# sourceMappingURL=pos.bundle.5IPEZNM7.js.map
