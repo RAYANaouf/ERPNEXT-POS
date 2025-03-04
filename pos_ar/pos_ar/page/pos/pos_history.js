@@ -557,7 +557,7 @@ pos_ar.PointOfSale.pos_history = class {
 					}
 					.totals {
 						margin: 10px 0;
-						text-align: right;
+						text-align: left;
 						font-size: 14px;
 					}
 					.receipt-footer {
@@ -635,12 +635,18 @@ pos_ar.PointOfSale.pos_history = class {
 						</tbody>
 					</table>
 
-					<div class="totals">
+					<div class="totals" style="text-align:left;">
 						<div>Quantité Totale: ${totals.totalQty}</div>
 						 <div>Remise: ${formatNumber(discount)} DA</div>
-						<div style="margin-top:15px; text-align:right;">
-							<div class="bold">Total: ${formatNumber(totals.grandTotal)} DA</div>
-							<div>Total Solde: ${formatNumber(ancien_sold)} DA</div>
+						<div style="margin-top:15px; text-align:left;">
+							<div class="bold" style="display:flex; align-items:center; font-size:18px;">
+								<div style="width:120px; font-size:18px;">Total:</div>
+								<div style="flex-grow:1; text-align:center; font-size:18px;">${formatNumber(totals.grandTotal)} DA</div>
+							</div>
+							<div style="display:flex; align-items:center; font-size:14px;">
+								<div style="width:120px; font-size:14px;">Total Solde:</div>
+								<div style="flex-grow:1; text-align:center; font-size:14px;">${formatNumber(ancien_sold)} DA</div>
+							</div>
 						</div>
 					</div>
 
