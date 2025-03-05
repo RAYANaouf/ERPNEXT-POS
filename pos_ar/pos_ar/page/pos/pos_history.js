@@ -466,8 +466,8 @@ pos_ar.PointOfSale.pos_history = class {
 			// Format number helper
 			const formatNumber = (num) => {
 				return new Intl.NumberFormat('fr-DZ', {
-					minimumFractionDigits: 2,
-					maximumFractionDigits: 2
+					minimumFractionDigits: 0,
+					maximumFractionDigits: 0
 				}).format(num);
 			};
 

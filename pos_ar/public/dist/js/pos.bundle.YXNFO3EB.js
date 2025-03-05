@@ -4504,8 +4504,8 @@
         };
         const formatNumber = (num) => {
           return new Intl.NumberFormat("fr-DZ", {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0
           }).format(num);
         };
         const customer = this.app_data.appData.customers.find((customer2) => customer2.name == pos.customer);
@@ -7119,4 +7119,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.PB5WBAI7.js.map
+//# sourceMappingURL=pos.bundle.YXNFO3EB.js.map
