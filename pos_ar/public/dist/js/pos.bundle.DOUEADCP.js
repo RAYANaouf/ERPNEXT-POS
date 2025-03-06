@@ -344,7 +344,7 @@
         const brand = $button.data("brand");
         const priceList = $button.data("price-list");
         const prices = this.priceMap[`${brand}_${priceList}`];
-        console.log("look here2 ::: ", prices);
+        const uniquePrices = [...new Set(prices.map((p) => p.price))];
         const d = new frappe.ui.Dialog({
           title: __(`Fix Prices for ${brand}`),
           fields: [
@@ -361,9 +361,9 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        ${prices.map((p) => `
+                                        ${uniquePrices.map((price) => `
                                             <tr>
-                                                <td>${p.price}</td>
+                                                <td>${price}</td>
                                             </tr>
                                         `).join("")}
                                     </tbody>
@@ -7578,4 +7578,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.C2ICCRUJ.js.map
+//# sourceMappingURL=pos.bundle.DOUEADCP.js.map

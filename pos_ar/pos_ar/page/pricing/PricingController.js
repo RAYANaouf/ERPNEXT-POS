@@ -110,9 +110,10 @@ pos_ar.Pricing.PricingController = class {
             const priceList = $button.data('price-list');
             
             // Get prices from the priceMap for this brand and price list
-            const prices = this.priceMap[`${brand}_${priceList}`]
-
-            console.log("look here2 ::: " , prices)
+            const prices = this.priceMap[`${brand}_${priceList}`];
+            
+            // Get unique prices
+            const uniquePrices = [...new Set(prices.map(p => p.price))];
             
             // Create dialog showing current prices and new price field
             const d = new frappe.ui.Dialog({
@@ -131,9 +132,9 @@ pos_ar.Pricing.PricingController = class {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        ${prices.map(p => `
+                                        ${uniquePrices.map(price => `
                                             <tr>
-                                                <td>${p.price}</td>
+                                                <td>${price}</td>
                                             </tr>
                                         `).join('')}
                                     </tbody>
