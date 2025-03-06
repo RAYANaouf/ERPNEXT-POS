@@ -434,11 +434,14 @@
       this.priceMap = {};
       data.forEach((item) => {
         const key = `${item.brand || "No Brand"}_${item.price_list}`;
-        this.priceMap[key] = {
+        if (!this.priceMap[key]) {
+          this.priceMap[key] = [];
+        }
+        this.priceMap[key].push({
           name: item.name,
           price: item.price_list_rate,
           item_code: item.item_code
-        };
+        });
       });
       const $content = $(`
             <div class="pricing-data">
@@ -494,19 +497,20 @@
                                 <tr>
                                     <td>${brand.brand || brand.name}</td>
                                     ${priceLists.map((pl) => {
-        const priceData = this.priceMap[`${brand.name}_${pl.name}`] || {};
+        const priceData = this.priceMap[`${brand.name}_${pl.name}`] || [];
+        const hasDifferentPrices = priceData.length > 1 && !priceData.every((item) => item.price === priceData[0].price);
         return `
                                             <td>
-                                                ${priceData.price ? `<div class="price-cell">
+                                                ${priceData.length > 0 ? `<div class="price-cell ${hasDifferentPrices ? "different-prices" : ""}">
                                                         <div class="price-value">
-                                                            ${frappe.format(priceData.price, { fieldtype: "Currency" })}
+                                                            ${priceData.map((pd) => frappe.format(pd.price, { fieldtype: "Currency" })).join("<br>")}
                                                             <button class="btn btn-xs btn-default edit-price" 
-                                                                    data-item="${priceData.name}"
+                                                                    data-item="${priceData[0].name}"
                                                                     title="Edit Price">
                                                                 <i class="fa fa-pencil"></i>
                                                             </button>
                                                         </div>
-                                                    </div>` : '<div class="no-price">-</div>'}
+                                                    </div>` : ""}
                                             </td>
                                         `;
       }).join("")}
@@ -647,6 +651,9 @@
                 .toggle-filters:hover, .clear-filters:hover {
                     background-color: var(--fg-hover-color);
                     border-color: var(--gray-600);
+                }
+                .price-cell.different-prices {
+                    border: 2px solid red !important;
                 }
             </style>
         `);
@@ -702,11 +709,14 @@
       this.priceMap = {};
       data.forEach((item) => {
         const key = `${item.brand || "No Brand"}_${item.price_list}`;
-        this.priceMap[key] = {
+        if (!this.priceMap[key]) {
+          this.priceMap[key] = [];
+        }
+        this.priceMap[key].push({
           name: item.name,
           price: item.price_list_rate,
           item_code: item.item_code
-        };
+        });
       });
       const $content = $(`
             <div class="pricing-data">
@@ -762,19 +772,20 @@
                                 <tr>
                                     <td>${brand.brand || brand.name}</td>
                                     ${priceLists.map((pl) => {
-        const priceData = this.priceMap[`${brand.name}_${pl.name}`] || {};
+        const priceData = this.priceMap[`${brand.name}_${pl.name}`] || [];
+        const hasDifferentPrices = priceData.length > 1 && !priceData.every((item) => item.price === priceData[0].price);
         return `
                                             <td>
-                                                ${priceData.price ? `<div class="price-cell">
+                                                ${priceData.length > 0 ? `<div class="price-cell ${hasDifferentPrices ? "different-prices" : ""}">
                                                         <div class="price-value">
-                                                            ${frappe.format(priceData.price, { fieldtype: "Currency" })}
+                                                            ${priceData.map((pd) => frappe.format(pd.price, { fieldtype: "Currency" })).join("<br>")}
                                                             <button class="btn btn-xs btn-default edit-price" 
-                                                                    data-item="${priceData.name}"
+                                                                    data-item="${priceData[0].name}"
                                                                     title="Edit Price">
                                                                 <i class="fa fa-pencil"></i>
                                                             </button>
                                                         </div>
-                                                    </div>` : '<div class="no-price">-</div>'}
+                                                    </div>` : ""}
                                             </td>
                                         `;
       }).join("")}
@@ -915,6 +926,9 @@
                 .toggle-filters:hover, .clear-filters:hover {
                     background-color: var(--fg-hover-color);
                     border-color: var(--gray-600);
+                }
+                .price-cell.different-prices {
+                    border: 2px solid red !important;
                 }
             </style>
         `);
@@ -1123,8 +1137,8 @@
       this.brands.forEach((brand) => {
         let row = brand.brand;
         this.priceLists.forEach((pl) => {
-          const data_price = this.priceMap[`${brand.name}_${pl.name}`] || {};
-          row += "," + (data_price.price || "empty");
+          const data_price = this.priceMap[`${brand.name}_${pl.name}`] || [];
+          row += "," + (data_price.length > 0 ? data_price.map((pd) => pd.price).join(",") : "empty");
         });
         csvContent += row + "\n";
       });
@@ -7422,4 +7436,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.N4VRE2IG.js.map
+//# sourceMappingURL=pos.bundle.PAIH2D6S.js.map

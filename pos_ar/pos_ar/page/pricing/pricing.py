@@ -6,9 +6,6 @@ from frappe.utils import get_site_url, get_files_path
 
 
 
-
-
-
 @frappe.whitelist()
 def get_all_item_prices(company=None):
     """
@@ -68,4 +65,6 @@ def get_all_item_prices(company=None):
             "brands": [],
             "prices": []
         }
+
+
 
