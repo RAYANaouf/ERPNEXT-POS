@@ -343,19 +343,56 @@
         const $button = $(e.currentTarget);
         const brand = $button.data("brand");
         const priceList = $button.data("price-list");
-        frappe.confirm(
-          `Are you sure you want to fix prices for brand "${brand}" in price list "${priceList}"?`,
-          () => {
+        const prices = this.priceMap[`${brand}_${priceList}`];
+        console.log("look here2 ::: ", prices);
+        const d = new frappe.ui.Dialog({
+          title: __(`Fix Prices for ${brand}`),
+          fields: [
+            {
+              fieldtype: "HTML",
+              fieldname: "current_prices",
+              label: __("Current Prices"),
+              options: `
+                            <div class="current-prices-table">
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>${__("Current Price")}</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        ${prices.map((p) => `
+                                            <tr>
+                                                <td>${p.price}</td>
+                                            </tr>
+                                        `).join("")}
+                                    </tbody>
+                                </table>
+                            </div>
+                        `
+            },
+            {
+              fieldtype: "Currency",
+              fieldname: "new_price",
+              label: __("New Price"),
+              reqd: 1,
+              description: __("This price will be applied to all items shown above")
+            }
+          ],
+          primary_action_label: __("Update Prices"),
+          primary_action: (values) => {
             frappe.call({
               method: "pos_ar.pos_ar.page.pricing.pricing.fix_prices",
               args: {
                 brand,
-                price_list: priceList
+                price_list: priceList,
+                new_price: values.new_price
               },
               freeze: true,
               freeze_message: __("Fixing Prices..."),
               callback: (r) => {
                 if (!r.exc) {
+                  d.hide();
                   frappe.show_alert({
                     message: __("Prices fixed successfully"),
                     indicator: "green"
@@ -370,7 +407,8 @@
               }
             });
           }
-        );
+        });
+        d.show();
       });
       $(document).off("click", ".edit-price").on("click", ".edit-price", function(e) {
         const itemName = $(this).data("item");
@@ -7540,4 +7578,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.OATVGMB3.js.map
+//# sourceMappingURL=pos.bundle.C2ICCRUJ.js.map
