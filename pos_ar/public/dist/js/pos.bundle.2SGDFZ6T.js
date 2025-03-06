@@ -840,7 +840,171 @@
       });
     }
     load_fixing_data(company) {
-      console.log("Loading fixing data for company:", company);
+      if (!company)
+        return;
+      try {
+        if (!this.loadingPopover) {
+          this.loadingPopover = document.getElementById("loadingPopover");
+        }
+        if (this.loadingPopover.matches(":popover-open")) {
+          this.loadingPopover.hidePopover();
+        }
+        requestAnimationFrame(() => {
+          this.loadingPopover.showPopover();
+        });
+        frappe.call({
+          method: "frappe.client.get_list",
+          args: {
+            doctype: "Item Price",
+            fields: ["name", "item_code", "item_name", "brand", "price_list", "price_list_rate"],
+            filters: {
+              "selling": 1
+            },
+            order_by: "modified desc"
+          },
+          callback: (response) => {
+            if (response.message) {
+              const data = response.message;
+              const uniqueBrands = [...new Set(data.map((item) => item.brand || "No Brand"))];
+              const brands = uniqueBrands.map((brand) => ({ name: brand }));
+              frappe.call({
+                method: "frappe.client.get_list",
+                args: {
+                  doctype: "Price List",
+                  fields: ["name"],
+                  filters: {
+                    "enabled": 1
+                  },
+                  order_by: "name"
+                },
+                callback: (plResponse) => {
+                  if (plResponse.message) {
+                    const priceLists = plResponse.message;
+                    this.render_fixing_data(data, priceLists, brands);
+                  }
+                  this.loadingPopover.hidePopover();
+                }
+              });
+            } else {
+              this.loadingPopover.hidePopover();
+            }
+          }
+        });
+      } catch (error) {
+        if (this.loadingPopover) {
+          this.loadingPopover.hidePopover();
+        }
+        frappe.msgprint({
+          title: __("Error"),
+          indicator: "red",
+          message: __("Failed to load fixing data")
+        });
+      }
+    }
+    render_fixing_data(data, priceLists, brands) {
+      const $fixingScreen = this.wrapper.find(".fixing-screen");
+      $fixingScreen.empty();
+      if (!data || data.length === 0) {
+        $fixingScreen.html(`
+                <div class="no-data-state">
+                    <div class="no-data-icon">
+                        <i class="fa fa-wrench"></i>
+                    </div>
+                    <div class="no-data-message">
+                        No fixing data found for this company
+                    </div>
+                </div>
+            `);
+        return;
+      }
+      const priceMap = {};
+      data.forEach((item) => {
+        const key = `${item.brand || "No Brand"}_${item.price_list}`;
+        priceMap[key] = {
+          name: item.name,
+          price: item.price_list_rate,
+          item_code: item.item_code
+        };
+      });
+      const $content = $(`
+            <div class="fixing-data">
+                <div class="fixing-controls">
+                    <div class="row align-items-center">
+                        <div class="col-md-6">
+                            <div class="search-wrapper">
+                                <div class="search-field">
+                                    <i class="fa fa-search search-icon"></i>
+                                    <input type="text" class="form-control global-search" placeholder="Search across all columns...">
+                                    <button class="btn btn-link btn-clear-search" style="display: none;">
+                                        <i class="fa fa-times"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 text-right">
+                            <button class="btn btn-default toggle-filters">
+                                <i class="fa fa-filter"></i> Filters
+                            </button>
+                            <button class="btn btn-default clear-filters">
+                                <i class="fa fa-times"></i> Clear
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="fixing-table">
+                    <table class="table table-bordered table-hover">
+                        <thead>
+                            <tr class="headers">
+                                <th class="sortable" data-sort="brand">
+                                    Brand <i class="fa fa-sort"></i>
+                                </th>
+                                ${priceLists.map((pl) => `
+                                    <th class="sortable" data-sort="price" data-price-list="${pl.name}">
+                                        ${pl.name} <i class="fa fa-sort"></i>
+                                    </th>
+                                `).join("")}
+                            </tr>
+                            <tr class="filters" style="display: none;">
+                                <td>
+                                    <input type="text" class="form-control brand-filter" placeholder="Filter Brand...">
+                                </td>
+                                ${priceLists.map(() => `
+                                    <td>
+                                        <input type="text" class="form-control price-filter" placeholder="Filter Price...">
+                                    </td>
+                                `).join("")}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${brands.map((brand) => `
+                                <tr>
+                                    <td>${brand.brand || brand.name}</td>
+                                    ${priceLists.map((pl) => {
+        const priceData = priceMap[`${brand.name}_${pl.name}`] || {};
+        return `
+                                            <td>
+                                                ${priceData.price ? `<div class="price-cell">
+                                                        <div class="price-value">
+                                                            ${frappe.format(priceData.price, { fieldtype: "Currency" })}
+                                                            <button class="btn btn-xs btn-default edit-price" 
+                                                                    data-item="${priceData.name}"
+                                                                    title="Edit Price">
+                                                                <i class="fa fa-pencil"></i>
+                                                            </button>
+                                                        </div>
+                                                    </div>` : '<div class="no-price">-</div>'}
+                                            </td>
+                                        `;
+      }).join("")}
+                                </tr>
+                            `).join("")}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        `);
+      $fixingScreen.append($content);
+      this.setupTableEvents($content);
     }
     export_pricing_data() {
       const company = this.wrapper.find(".company-filter").val();
@@ -7144,4 +7308,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.WCPEZ4EE.js.map
+//# sourceMappingURL=pos.bundle.2SGDFZ6T.js.map
