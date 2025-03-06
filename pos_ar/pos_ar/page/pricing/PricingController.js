@@ -516,7 +516,6 @@ pos_ar.Pricing.PricingController = class {
 
     }
 
-
     render_Fixing_data(data, priceLists, brands) {
         const $fixingScreen = this.wrapper.find('.fixing-screen');
         $fixingScreen.empty();
