@@ -46,6 +46,8 @@ pos_ar.PointOfSale.Controller = class {
 			this.settings_data = new pos_ar.PointOfSale.posSettingsData(this.db)
 			//api fetch handler
 			this.dataHandler = new pos_ar.PointOfSale.FetchHandler()
+
+			console.log("warehouse ::::::::", await this.dataHandler.fetchStockBalance())
 			//local app data
 			this.appData = new pos_ar.PointOfSale.posAppData(this.db, this.dataHandler)
 			await this.appData.getAllData()

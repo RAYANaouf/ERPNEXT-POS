@@ -1240,6 +1240,7 @@
         this.db = await pos_ar.PointOfSale.pos_db.openDatabase();
         this.settings_data = new pos_ar.PointOfSale.posSettingsData(this.db);
         this.dataHandler = new pos_ar.PointOfSale.FetchHandler();
+        console.log("warehouse ::::::::", await this.dataHandler.fetchStockBalance());
         this.appData = new pos_ar.PointOfSale.posAppData(this.db, this.dataHandler);
         await this.appData.getAllData();
         this.screenManager = new pos_ar.PointOfSale.ScreenManager(this.settings_data);
@@ -6535,6 +6536,7 @@
     async getItems() {
       const localItems = [];
       const updatedItems = await this.api_handler.fetchItems(this.since);
+      console.log("here is the items ::::: ", updatedItems);
       await this.db.saveItemList(updatedItems);
       this.appData.items = this.combineLocalAndUpdated(localItems, updatedItems);
     }
@@ -6726,6 +6728,17 @@
         return [];
       }
     }
+    async fetchStockBalance(since) {
+      try {
+        return await frappe.db.get_list("Stock Ledger Entry", {
+          fields: ["*"],
+          limit: 1e5
+        });
+      } catch (error) {
+        console.error("Error fetching stock balance:", error);
+        return [];
+      }
+    }
     async fetchBrands(since) {
       try {
         const filter = {};
@@ -6757,7 +6770,7 @@
       try {
         const filter = { disabled: 0 };
         return await frappe.db.get_list("Item", {
-          fields: ["name", "item_name", "image", "brand", "item_group", "description", "stock_uom", "barcodes"],
+          fields: ["name", "item_name", "image", "brand", "item_group", "description", "stock_uom"],
           filters: filter,
           limit: 1e5,
           order_by: "item_name ASC"
@@ -6771,6 +6784,18 @@
       try {
         const response = await frappe.call({
           method: "pos_ar.pos_ar.doctype.pos_info.pos_info.get_item_barcodes",
+          args: {}
+        });
+        return response.message;
+      } catch (error) {
+        console.error("Error fetching Item Barcodes:", error);
+        return [];
+      }
+    }
+    async fetchStockQty() {
+      try {
+        const response = await frappe.call({
+          method: "pos_ar.pos_ar.doctype.pos_info.pos_info.get_stock_availability",
           args: {}
         });
         return response.message;
@@ -7119,4 +7144,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.YXNFO3EB.js.map
+//# sourceMappingURL=pos.bundle.WCPEZ4EE.js.map

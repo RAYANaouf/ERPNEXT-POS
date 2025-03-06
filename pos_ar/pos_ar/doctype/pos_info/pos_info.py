@@ -534,3 +534,44 @@ def get_non_consolidated_invoices():
         invoices[i] = doc
     
     return invoices
+
+
+
+
+
+@frappe.whitelist()
+def get_stock_availability(item_code, warehouse):
+    if frappe.db.get_value("Item", item_code, "is_stock_item"):
+        is_stock_item = True
+        bin_qty = get_bin_qty(item_code, warehouse)
+        pos_sales_qty = get_pos_reserved_qty(item_code, warehouse)
+
+        return bin_qty - pos_sales_qty, is_stock_item
+    else:
+        is_stock_item = True
+        if frappe.db.exists("Product Bundle", {"name": item_code, "disabled": 0}):
+            return get_bundle_availability(item_code, warehouse), is_stock_item
+        else:
+            is_stock_item = False
+		# Is a service item or non_stock item
+    return 0, is_stock_item
+
+
+@frappe.whitelist()
+def get_items(warehouse):
+            
+            
+        filters_item = {
+            "disabled": 0,
+        }
+        items = frappe.get_all(
+            "Item",
+            filters = filters_item,
+            fields=["name"]
+        )
+        for item in items:
+            get_stock_availability(item.name, warehouse)
+        
+        return items
+            
+             

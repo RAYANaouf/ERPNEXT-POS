@@ -24,6 +24,31 @@ pos_ar.PointOfSale.FetchHandler = class FetchHandler{
 		}
 	}
 
+	async fetchStockBalance(since ) {
+		try {
+			/*if(since){
+				filter.modified = ['>',since]
+			}*/
+/*			const profile = await frappe.db.get_list('POS Profile' , {
+				fields  : ['name' , 'warehouse'],
+				filters : {disabled : 0 , name : frappe.defaults.get_default("POS Profile")},
+				limit   : 1
+			})
+
+			const filter = { 'warehouse' : profile[0].warehouse }
+
+			console.log("warehouse ::::: profile :::::" , profile)
+*/			
+			return await frappe.db.get_list('Stock Ledger Entry' , {
+				fields : ['*'],
+				limit : 100000
+			}) 
+		} catch (error) {
+			console.error('Error fetching stock balance:', error);
+			return []
+		}
+	}
+
 
 	async fetchBrands(since) {
 		try {
@@ -68,7 +93,7 @@ pos_ar.PointOfSale.FetchHandler = class FetchHandler{
 				filter.modified = ['>',since]
 			}*/
 			return await frappe.db.get_list('Item', {
-				fields: ['name', 'item_name' , 'image' , 'brand' ,'item_group' , 'description' , 'stock_uom' , 'barcodes' ],
+				fields: ['name', 'item_name' , 'image' , 'brand' ,'item_group' , 'description' , 'stock_uom'   ],
 				filters: filter,
 				limit : 100000,
 				order_by: 'item_name ASC',
@@ -85,6 +110,20 @@ pos_ar.PointOfSale.FetchHandler = class FetchHandler{
 		try {
 			const response = await frappe.call({
 				method: 'pos_ar.pos_ar.doctype.pos_info.pos_info.get_item_barcodes',
+				args: { }
+			});
+			return response.message;  // The fetched item barcodes
+		} catch (error) {
+			console.error('Error fetching Item Barcodes:', error);
+			return [];
+		}
+	}
+
+
+	async fetchStockQty() {
+		try {
+			const response = await frappe.call({
+				method: 'pos_ar.pos_ar.doctype.pos_info.pos_info.get_stock_availability',
 				args: { }
 			});
 			return response.message;  // The fetched item barcodes
