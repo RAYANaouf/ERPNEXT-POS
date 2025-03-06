@@ -509,12 +509,7 @@
                                                 ${priceData.length > 0 ? `<div class="price-cell ${hasDifferentPrices ? "different-prices" : ""}">
                                                         <div class="price-value">
                                                             ${frappe.format(priceData[0].price, { fieldtype: "Currency" })}
-                                                            ${hasDifferentPrices ? '<div class="price-warning">(Multiple prices)</div>' : ""}
-                                                            <button class="btn btn-xs btn-default edit-price" 
-                                                                    data-item="${priceData[0].name}"
-                                                                    title="Edit Price">
-                                                                <i class="fa fa-pencil"></i>
-                                                            </button>
+
                                                         </div>
                                                     </div>` : ""}
                                             </td>
@@ -792,13 +787,13 @@
                                                             ${frappe.format(priceData[0].price, { fieldtype: "Currency" })}
                                                             ${hasDifferentPrices ? `
                                                                 <div class="price-warning">(Multiple prices)</div>
-                                                                <button class="btn btn-xs btn-danger fix-prices" 
+                                                                <button class="btn btn-xs btn-danger btn-modern fix-prices" 
                                                                     data-brand="${brand.name}"
                                                                     data-price-list="${pl.name}"
                                                                     title="Fix Price Discrepancy">
                                                                     Fix
                                                                 </button>` : ""}
-                                                            <button class="btn btn-xs btn-default edit-price" 
+                                                            <button class="btn btn-xs btn-default btn-modern edit-price" 
                                                                     data-item="${priceData[0].name}"
                                                                     title="Edit Price">
                                                                 <i class="fa fa-pencil"></i>
@@ -964,6 +959,54 @@
                 .fix-prices {
                     margin-top: 4px;
                     margin-left: 4px;
+                }
+                .edit-price {
+                    margin-left: 4px;
+                }
+                .btn-modern {
+                    border: none;
+                    padding: 6px 12px;
+                    border-radius: 4px;
+                    font-weight: 500;
+                    transition: all 0.2s ease;
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 6px;
+                    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                }
+
+                .btn-modern:hover {
+                    transform: translateY(-1px);
+                    box-shadow: 0 4px 6px rgba(0,0,0,0.15);
+                }
+
+                .btn-modern:active {
+                    transform: translateY(0);
+                    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+                }
+
+                .btn-modern.btn-danger {
+                    background: #ff4d4d;
+                    color: white;
+                }
+
+                .btn-modern.btn-danger:hover {
+                    background: #ff3333;
+                }
+
+                .btn-modern.btn-default {
+                    background: #f8f9fa;
+                    color: #495057;
+                    border: 1px solid #dee2e6;
+                }
+
+                .btn-modern.btn-default:hover {
+                    background: #e9ecef;
+                }
+
+                .btn-modern.btn-xs {
+                    padding: 4px 8px;
+                    font-size: 12px;
                 }
             </style>
         `);
@@ -7471,4 +7514,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.7NUU2OLN.js.map
+//# sourceMappingURL=pos.bundle.MKGYQTWI.js.map
