@@ -503,7 +503,8 @@
                                             <td>
                                                 ${priceData.length > 0 ? `<div class="price-cell ${hasDifferentPrices ? "different-prices" : ""}">
                                                         <div class="price-value">
-                                                            ${priceData.map((pd) => frappe.format(pd.price, { fieldtype: "Currency" })).join("<br>")}
+                                                            ${frappe.format(priceData[0].price, { fieldtype: "Currency" })}
+                                                            ${hasDifferentPrices ? '<div class="price-warning">(Multiple prices)</div>' : ""}
                                                             <button class="btn btn-xs btn-default edit-price" 
                                                                     data-item="${priceData[0].name}"
                                                                     title="Edit Price">
@@ -654,6 +655,11 @@
                 }
                 .price-cell.different-prices {
                     border: 2px solid red !important;
+                }
+                .price-warning {
+                    color: red;
+                    font-size: 0.8em;
+                    margin-top: 2px;
                 }
             </style>
         `);
@@ -778,7 +784,8 @@
                                             <td>
                                                 ${priceData.length > 0 ? `<div class="price-cell ${hasDifferentPrices ? "different-prices" : ""}">
                                                         <div class="price-value">
-                                                            ${priceData.map((pd) => frappe.format(pd.price, { fieldtype: "Currency" })).join("<br>")}
+                                                            ${frappe.format(priceData[0].price, { fieldtype: "Currency" })}
+                                                            ${hasDifferentPrices ? '<div class="price-warning">(Multiple prices)</div>' : ""}
                                                             <button class="btn btn-xs btn-default edit-price" 
                                                                     data-item="${priceData[0].name}"
                                                                     title="Edit Price">
@@ -929,6 +936,11 @@
                 }
                 .price-cell.different-prices {
                     border: 2px solid red !important;
+                }
+                .price-warning {
+                    color: red;
+                    font-size: 0.8em;
+                    margin-top: 2px;
                 }
             </style>
         `);
@@ -7436,4 +7448,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.PAIH2D6S.js.map
+//# sourceMappingURL=pos.bundle.YIKDWVTK.js.map
