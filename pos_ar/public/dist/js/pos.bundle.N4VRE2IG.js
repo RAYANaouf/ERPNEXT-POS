@@ -652,6 +652,274 @@
         `);
       $pricingScreen.append(style).append($content);
     }
+    async load_fixing_data(company) {
+      if (!company)
+        return;
+      try {
+        if (!this.loadingPopover) {
+          this.loadingPopover = document.getElementById("loadingPopover");
+        }
+        if (this.loadingPopover.matches(":popover-open")) {
+          this.loadingPopover.hidePopover();
+        }
+        requestAnimationFrame(() => {
+          this.loadingPopover.showPopover();
+        });
+        const result = await this.fetcher.fetchAllItemPrices(company);
+        const data = result.prices;
+        this.priceLists = result.price_lists;
+        this.brands = result.brands;
+        this.loadingPopover.hidePopover();
+        this.render_Fixing_data(data, this.priceLists, this.brands);
+      } catch (error) {
+        if (this.loadingPopover) {
+          this.loadingPopover.hidePopover();
+        }
+        frappe.msgprint({
+          title: __("Error"),
+          indicator: "red",
+          message: __("Failed to load item prices")
+        });
+        console.error("Error loading item prices:", error);
+      }
+    }
+    render_Fixing_data(data, priceLists, brands) {
+      const $fixingScreen = this.wrapper.find(".fixing-screen");
+      $fixingScreen.empty();
+      if (!data || data.length === 0) {
+        $fixingScreen.html(`
+                <div class="no-data-state">
+                    <div class="no-data-icon">
+                        <i class="fa fa-tag"></i>
+                    </div>
+                    <div class="no-data-message">
+                        No item prices found for this company
+                    </div>
+                </div>
+            `);
+        return;
+      }
+      this.priceMap = {};
+      data.forEach((item) => {
+        const key = `${item.brand || "No Brand"}_${item.price_list}`;
+        this.priceMap[key] = {
+          name: item.name,
+          price: item.price_list_rate,
+          item_code: item.item_code
+        };
+      });
+      const $content = $(`
+            <div class="pricing-data">
+                <div class="pricing-controls">
+                    <div class="row align-items-center">
+                        <div class="col-md-6">
+                            <div class="search-wrapper">
+                                <div class="search-field">
+                                    <i class="fa fa-search search-icon"></i>
+                                    <input type="text" class="form-control global-search" placeholder="Search across all columns...">
+                                    <button class="btn btn-link btn-clear-search" style="display: none;">
+                                        <i class="fa fa-times"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 text-right">
+                            <button class="btn btn-default toggle-filters">
+                                <i class="fa fa-filter"></i> Filters
+                            </button>
+                            <button class="btn btn-default clear-filters">
+                                <i class="fa fa-times"></i> Clear
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="pricing-table">
+                    <table class="table table-bordered table-hover">
+                        <thead>
+                            <tr class="headers">
+                                <th class="sortable" data-sort="brand">
+                                    Brand <i class="fa fa-sort"></i>
+                                </th>
+                                ${priceLists.map((pl) => `
+                                    <th class="sortable" data-sort="price" data-price-list="${pl.name}">
+                                        ${pl.name} <i class="fa fa-sort"></i>
+                                    </th>
+                                `).join("")}
+                            </tr>
+                            <tr class="filters" style="display: none;">
+                                <td>
+                                    <input type="text" class="form-control brand-filter" placeholder="Filter Brand...">
+                                </td>
+                                ${priceLists.map(() => `
+                                    <td>
+                                        <input type="text" class="form-control price-filter" placeholder="Filter Price...">
+                                    </td>
+                                `).join("")}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${brands.map((brand) => `
+                                <tr>
+                                    <td>${brand.brand || brand.name}</td>
+                                    ${priceLists.map((pl) => {
+        const priceData = this.priceMap[`${brand.name}_${pl.name}`] || {};
+        return `
+                                            <td>
+                                                ${priceData.price ? `<div class="price-cell">
+                                                        <div class="price-value">
+                                                            ${frappe.format(priceData.price, { fieldtype: "Currency" })}
+                                                            <button class="btn btn-xs btn-default edit-price" 
+                                                                    data-item="${priceData.name}"
+                                                                    title="Edit Price">
+                                                                <i class="fa fa-pencil"></i>
+                                                            </button>
+                                                        </div>
+                                                    </div>` : '<div class="no-price">-</div>'}
+                                            </td>
+                                        `;
+      }).join("")}
+                                </tr>
+                            `).join("")}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        `);
+      this.setupTableEvents($content);
+      const style = $(`
+            <style>
+                .pricing-table {
+                    overflow-x: auto;
+                }
+                .pricing-table table {
+                    width: 100%;
+                    border-collapse: collapse;
+                    margin-bottom: 0;
+                }
+                .pricing-table th, .pricing-table td {
+                    text-align: center;
+                    padding: 12px;
+                    vertical-align: middle;
+                }
+                .pricing-table th:first-child, 
+                .pricing-table td:first-child {
+                    text-align: left;
+                    font-weight: bold;
+                    position: sticky;
+                    left: 0;
+                    background: var(--bg-color);
+                    z-index: 1;
+                }
+                .pricing-table .headers th {
+                    background-color: var(--bg-gray);
+                    position: sticky;
+                    top: 0;
+                    z-index: 2;
+                }
+                .pricing-table .headers th:first-child {
+                    z-index: 3;
+                }
+                .pricing-table .sortable {
+                    cursor: pointer;
+                }
+                .pricing-table .sortable:hover {
+                    background-color: var(--bg-light-gray);
+                }
+                .pricing-table .filters input {
+                    width: 100%;
+                    padding: 4px 8px;
+                    border-radius: 4px;
+                }
+                .price-cell {
+                    display: flex;
+                    flex-direction: column;
+                    gap: var(--margin-xs);
+                    align-items: center;
+                }
+                .price-value {
+                    display: flex;
+                    align-items: center;
+                    gap: var(--margin-xs);
+                    font-weight: 500;
+                    color: var(--text-color);
+                }
+                .no-price {
+                    color: var(--text-muted);
+                    font-style: italic;
+                }
+                .edit-price {
+                    visibility: hidden;
+                    padding: var(--padding-xs) !important;
+                    min-width: 28px;
+                    min-height: 28px;
+                    border: 1px solid var(--border-color);
+                    background: var(--control-bg);
+                    color: var(--text-color);
+                    border-radius: var(--border-radius-sm);
+                    transition: all 0.2s;
+                }
+                .price-cell:hover .edit-price {
+                    visibility: visible;
+                }
+                .pricing-controls {
+                    padding: var(--padding-md);
+                    margin-bottom: var(--margin-lg);
+                }
+                .search-wrapper {
+                    max-width: 500px;
+                }
+                .search-field {
+                    position: relative;
+                    display: flex;
+                    align-items: center;
+                    background: var(--control-bg);
+                    border: 1px solid var(--border-color);
+                    border-radius: var(--border-radius-lg);
+                    transition: all 0.2s;
+                }
+                .search-field:focus-within {
+                    border-color: var(--primary-color);
+                    box-shadow: 0 0 0 3px var(--primary-color-light);
+                }
+                .search-icon {
+                    color: var(--text-muted);
+                    padding: 0 var(--padding-sm);
+                    font-size: 14px;
+                }
+                .search-field .form-control {
+                    border: none;
+                    box-shadow: none;
+                    padding: var(--padding-sm) var(--padding-xs);
+                    background: transparent;
+                    height: 40px;
+                    font-size: var(--text-base);
+                }
+                .search-field .form-control:focus {
+                    outline: none;
+                }
+                .btn-clear-search {
+                    color: var(--text-muted);
+                    padding: var(--padding-xs) var(--padding-sm);
+                    margin-right: 2px;
+                }
+                .btn-clear-search:hover {
+                    color: var(--text-color);
+                }
+                .toggle-filters, .clear-filters {
+                    padding: var(--padding-sm) var(--padding-md);
+                    font-weight: 500;
+                    border-radius: var(--border-radius-lg);
+                    margin-left: var(--margin-sm);
+                    transition: all 0.2s ease;
+                }
+                .toggle-filters:hover, .clear-filters:hover {
+                    background-color: var(--fg-hover-color);
+                    border-color: var(--gray-600);
+                }
+            </style>
+        `);
+      $fixingScreen.append(style).append($content);
+    }
     setupTableEvents($content) {
       const self = this;
       $content.find(".toggle-filters").on("click", function() {
@@ -838,173 +1106,6 @@
         });
         console.error("Error fetching item price:", err);
       });
-    }
-    load_fixing_data(company) {
-      if (!company)
-        return;
-      try {
-        if (!this.loadingPopover) {
-          this.loadingPopover = document.getElementById("loadingPopover");
-        }
-        if (this.loadingPopover.matches(":popover-open")) {
-          this.loadingPopover.hidePopover();
-        }
-        requestAnimationFrame(() => {
-          this.loadingPopover.showPopover();
-        });
-        frappe.call({
-          method: "frappe.client.get_list",
-          args: {
-            doctype: "Item Price",
-            fields: ["name", "item_code", "item_name", "brand", "price_list", "price_list_rate"],
-            filters: {
-              "selling": 1
-            },
-            order_by: "modified desc"
-          },
-          callback: (response) => {
-            if (response.message) {
-              const data = response.message;
-              const uniqueBrands = [...new Set(data.map((item) => item.brand || "No Brand"))];
-              const brands = uniqueBrands.map((brand) => ({ name: brand }));
-              frappe.call({
-                method: "frappe.client.get_list",
-                args: {
-                  doctype: "Price List",
-                  fields: ["name"],
-                  filters: {
-                    "enabled": 1
-                  },
-                  order_by: "name"
-                },
-                callback: (plResponse) => {
-                  if (plResponse.message) {
-                    const priceLists = plResponse.message;
-                    this.render_fixing_data(data, priceLists, brands);
-                  }
-                  this.loadingPopover.hidePopover();
-                }
-              });
-            } else {
-              this.loadingPopover.hidePopover();
-            }
-          }
-        });
-      } catch (error) {
-        if (this.loadingPopover) {
-          this.loadingPopover.hidePopover();
-        }
-        frappe.msgprint({
-          title: __("Error"),
-          indicator: "red",
-          message: __("Failed to load fixing data")
-        });
-      }
-    }
-    render_fixing_data(data, priceLists, brands) {
-      const $fixingScreen = this.wrapper.find(".fixing-screen");
-      $fixingScreen.empty();
-      if (!data || data.length === 0) {
-        $fixingScreen.html(`
-                <div class="no-data-state">
-                    <div class="no-data-icon">
-                        <i class="fa fa-wrench"></i>
-                    </div>
-                    <div class="no-data-message">
-                        No fixing data found for this company
-                    </div>
-                </div>
-            `);
-        return;
-      }
-      const priceMap = {};
-      data.forEach((item) => {
-        const key = `${item.brand || "No Brand"}_${item.price_list}`;
-        priceMap[key] = {
-          name: item.name,
-          price: item.price_list_rate,
-          item_code: item.item_code
-        };
-      });
-      const $content = $(`
-            <div class="fixing-data">
-                <div class="fixing-controls">
-                    <div class="row align-items-center">
-                        <div class="col-md-6">
-                            <div class="search-wrapper">
-                                <div class="search-field">
-                                    <i class="fa fa-search search-icon"></i>
-                                    <input type="text" class="form-control global-search" placeholder="Search across all columns...">
-                                    <button class="btn btn-link btn-clear-search" style="display: none;">
-                                        <i class="fa fa-times"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6 text-right">
-                            <button class="btn btn-default toggle-filters">
-                                <i class="fa fa-filter"></i> Filters
-                            </button>
-                            <button class="btn btn-default clear-filters">
-                                <i class="fa fa-times"></i> Clear
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                <div class="fixing-table">
-                    <table class="table table-bordered table-hover">
-                        <thead>
-                            <tr class="headers">
-                                <th class="sortable" data-sort="brand">
-                                    Brand <i class="fa fa-sort"></i>
-                                </th>
-                                ${priceLists.map((pl) => `
-                                    <th class="sortable" data-sort="price" data-price-list="${pl.name}">
-                                        ${pl.name} <i class="fa fa-sort"></i>
-                                    </th>
-                                `).join("")}
-                            </tr>
-                            <tr class="filters" style="display: none;">
-                                <td>
-                                    <input type="text" class="form-control brand-filter" placeholder="Filter Brand...">
-                                </td>
-                                ${priceLists.map(() => `
-                                    <td>
-                                        <input type="text" class="form-control price-filter" placeholder="Filter Price...">
-                                    </td>
-                                `).join("")}
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${brands.map((brand) => `
-                                <tr>
-                                    <td>${brand.brand || brand.name}</td>
-                                    ${priceLists.map((pl) => {
-        const priceData = priceMap[`${brand.name}_${pl.name}`] || {};
-        return `
-                                            <td>
-                                                ${priceData.price ? `<div class="price-cell">
-                                                        <div class="price-value">
-                                                            ${frappe.format(priceData.price, { fieldtype: "Currency" })}
-                                                            <button class="btn btn-xs btn-default edit-price" 
-                                                                    data-item="${priceData.name}"
-                                                                    title="Edit Price">
-                                                                <i class="fa fa-pencil"></i>
-                                                            </button>
-                                                        </div>
-                                                    </div>` : '<div class="no-price">-</div>'}
-                                            </td>
-                                        `;
-      }).join("")}
-                                </tr>
-                            `).join("")}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        `);
-      $fixingScreen.append($content);
-      this.setupTableEvents($content);
     }
     export_pricing_data() {
       const company = this.wrapper.find(".company-filter").val();
@@ -1361,6 +1462,19 @@
       try {
         const response = await frappe.call({
           method: "pos_ar.pos_ar.doctype.pos_info.pos_info.get_item_prices",
+          args: { company }
+        });
+        console.log("fetched item prices", response.message);
+        return response.message || [];
+      } catch (error) {
+        console.error("Error fetching item prices:", error);
+        return [];
+      }
+    }
+    async fetchAllItemPrices(company) {
+      try {
+        const response = await frappe.call({
+          method: "pos_ar.pos_ar.page.pricing.pricing.get_all_item_prices",
           args: { company }
         });
         console.log("fetched item prices", response.message);
@@ -7308,4 +7422,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.2SGDFZ6T.js.map
+//# sourceMappingURL=pos.bundle.N4VRE2IG.js.map

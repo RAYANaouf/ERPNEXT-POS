@@ -20,4 +20,21 @@ pos_ar.Pricing.PricingFetcher = class {
 	}
 
 
+
+	//that is for the fixing scene to resolve the conflicting prices
+	async fetchAllItemPrices( company ) {
+		try {
+			const response = await frappe.call({
+				method: 'pos_ar.pos_ar.page.pricing.pricing.get_all_item_prices',
+				args: { company }
+			});
+			console.log("fetched item prices" , response.message);
+			return response.message || [];  // The fetched item prices
+		} catch (error) {
+			console.error('Error fetching item prices:', error);
+			return [];
+		}
+	}
+
+
 }
