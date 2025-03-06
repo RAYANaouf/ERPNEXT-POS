@@ -339,11 +339,45 @@
       this.wrapper.find('.btn-default:contains("Export")').on("click", () => {
         this.export_pricing_data();
       });
-      $(document).on("click", ".fix-prices", function() {
-        const brand = $(this).data("brand");
-        const priceList = $(this).data("price-list");
-        frappe.msgprint(`Fixing price discrepancy for brand ${brand} in price list ${priceList}`);
+      this.wrapper.on("click", ".fix-prices", (e) => {
+        const $button = $(e.currentTarget);
+        const brand = $button.data("brand");
+        const priceList = $button.data("price-list");
+        frappe.confirm(
+          `Are you sure you want to fix prices for brand "${brand}" in price list "${priceList}"?`,
+          () => {
+            frappe.call({
+              method: "pos_ar.pos_ar.page.pricing.pricing.fix_prices",
+              args: {
+                brand,
+                price_list: priceList
+              },
+              freeze: true,
+              freeze_message: __("Fixing Prices..."),
+              callback: (r) => {
+                if (!r.exc) {
+                  frappe.show_alert({
+                    message: __("Prices fixed successfully"),
+                    indicator: "green"
+                  });
+                  const company = $(".company-filter").val();
+                  if (this.current_screen === "fixing") {
+                    this.load_fixing_data(company);
+                  } else {
+                    this.load_pricing_data(company);
+                  }
+                }
+              }
+            });
+          }
+        );
       });
+      $(document).off("click", ".edit-price").on("click", ".edit-price", function(e) {
+        const itemName = $(this).data("item");
+        if (itemName) {
+          this.show_price_editor(itemName);
+        }
+      }.bind(this));
     }
     switch_screen(screen) {
       this.wrapper.find(".nav-item").removeClass("active");
@@ -811,56 +845,6 @@
             </div>
         `);
       this.setupTableEvents($content);
-      $content.find(".fix-prices").on("click", (e) => {
-        const $btn = $(e.currentTarget);
-        const brand = $btn.data("brand");
-        const priceList = $btn.data("price-list");
-        const priceData = this.priceMap[`${brand}_${priceList}`] || [];
-        const currentPrices = priceData.map((item) => item.price);
-        console.log("we are heree !!!");
-        frappe.prompt([
-          {
-            label: "Current Prices",
-            fieldname: "current_prices",
-            fieldtype: "Small Text",
-            read_only: 1,
-            default: currentPrices.join(", "),
-            description: "List of different prices currently set for this brand"
-          },
-          {
-            label: "New Price",
-            fieldname: "new_price",
-            fieldtype: "Currency",
-            reqd: 1,
-            description: "This price will be applied to all items of this brand in the selected price list"
-          }
-        ], (values) => {
-          frappe.call({
-            method: "pos_ar.pos_ar.page.pricing.pricing.fix_price_discrepancy",
-            args: {
-              brand,
-              price_list: priceList,
-              new_price: values.new_price
-            },
-            callback: (r) => {
-              if (r.exc) {
-                frappe.msgprint({
-                  title: __("Error"),
-                  indicator: "red",
-                  message: __("Failed to update prices")
-                });
-                return;
-              }
-              frappe.show_alert({
-                message: __("Prices updated successfully"),
-                indicator: "green"
-              });
-              const company = this.wrapper.find(".company-filter").val();
-              this.load_fixing_data(company);
-            }
-          });
-        }, __("Fix Price Discrepancy"), __("Update"));
-      });
       const style = $(`
             <style>
                 .pricing-table {
@@ -1090,12 +1074,6 @@
           $row.toggle(visible);
         });
       });
-      $(document).off("click", ".edit-price").on("click", ".edit-price", function(e) {
-        const itemName = $(this).data("item");
-        if (itemName) {
-          self.show_price_editor(itemName);
-        }
-      });
       let currentSort = { column: null, direction: "asc" };
       $content.find(".sortable").on("click", function() {
         const column = $(this).data("sort");
@@ -1230,7 +1208,11 @@
                 indicator: "green"
               });
               const company = this.wrapper.find(".company-filter").val();
-              this.load_pricing_data(company);
+              if (this.current_screen === "fixing") {
+                this.load_fixing_data(company);
+              } else {
+                this.load_pricing_data(company);
+              }
             }
           });
         }, __("Update Price"), __("Update"));
@@ -7558,4 +7540,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.MESYRSEO.js.map
+//# sourceMappingURL=pos.bundle.OATVGMB3.js.map
