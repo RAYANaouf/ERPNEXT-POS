@@ -339,6 +339,11 @@
       this.wrapper.find('.btn-default:contains("Export")').on("click", () => {
         this.export_pricing_data();
       });
+      $(document).on("click", ".fix-prices", function() {
+        const brand = $(this).data("brand");
+        const priceList = $(this).data("price-list");
+        frappe.msgprint(`Fixing price discrepancy for brand ${brand} in price list ${priceList}`);
+      });
     }
     switch_screen(screen) {
       this.wrapper.find(".nav-item").removeClass("active");
@@ -785,7 +790,14 @@
                                                 ${priceData.length > 0 ? `<div class="price-cell ${hasDifferentPrices ? "different-prices" : ""}">
                                                         <div class="price-value">
                                                             ${frappe.format(priceData[0].price, { fieldtype: "Currency" })}
-                                                            ${hasDifferentPrices ? '<div class="price-warning">(Multiple prices)</div>' : ""}
+                                                            ${hasDifferentPrices ? `
+                                                                <div class="price-warning">(Multiple prices)</div>
+                                                                <button class="btn btn-xs btn-danger fix-prices" 
+                                                                    data-brand="${brand.name}"
+                                                                    data-price-list="${pl.name}"
+                                                                    title="Fix Price Discrepancy">
+                                                                    Fix
+                                                                </button>` : ""}
                                                             <button class="btn btn-xs btn-default edit-price" 
                                                                     data-item="${priceData[0].name}"
                                                                     title="Edit Price">
@@ -804,6 +816,12 @@
             </div>
         `);
       this.setupTableEvents($content);
+      $content.find(".fix-prices").on("click", (e) => {
+        const $btn = $(e.currentTarget);
+        const brand = $btn.data("brand");
+        const priceList = $btn.data("price-list");
+        frappe.msgprint(`Fix button clicked for ${brand} - ${priceList}`);
+      });
       const style = $(`
             <style>
                 .pricing-table {
@@ -941,6 +959,11 @@
                     color: red;
                     font-size: 0.8em;
                     margin-top: 2px;
+                    margin-bottom: 4px;
+                }
+                .fix-prices {
+                    margin-top: 4px;
+                    margin-left: 4px;
                 }
             </style>
         `);
@@ -7448,4 +7471,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.6ZZQOSJ5.js.map
+//# sourceMappingURL=pos.bundle.7NUU2OLN.js.map

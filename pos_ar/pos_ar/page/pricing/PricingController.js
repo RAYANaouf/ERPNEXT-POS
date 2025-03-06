@@ -102,6 +102,15 @@ pos_ar.Pricing.PricingController = class {
         this.wrapper.find('.btn-default:contains("Export")').on('click', () => {
             this.export_pricing_data();
         });
+
+        // Handle price fixing
+        $(document).on('click', '.fix-prices', function() {
+            const brand = $(this).data('brand');
+            const priceList = $(this).data('price-list');
+            
+            frappe.msgprint(`Fixing price discrepancy for brand ${brand} in price list ${priceList}`);
+            // TODO: Implement actual price fixing logic
+        });
     }
 
     switch_screen(screen) {
@@ -162,6 +171,7 @@ pos_ar.Pricing.PricingController = class {
     }
 
     async load_pricing_data(company) {
+
         if (!company) return;
 
         try {
@@ -612,7 +622,14 @@ pos_ar.Pricing.PricingController = class {
                                                     `<div class="price-cell ${hasDifferentPrices ? 'different-prices' : ''}">
                                                         <div class="price-value">
                                                             ${frappe.format(priceData[0].price, { fieldtype: 'Currency' })}
-                                                            ${hasDifferentPrices ? '<div class="price-warning">(Multiple prices)</div>' : ''}
+                                                            ${hasDifferentPrices ? `
+                                                                <div class="price-warning">(Multiple prices)</div>
+                                                                <button class="btn btn-xs btn-danger fix-prices" 
+                                                                    data-brand="${brand.name}"
+                                                                    data-price-list="${pl.name}"
+                                                                    title="Fix Price Discrepancy">
+                                                                    Fix
+                                                                </button>` : ''}
                                                             <button class="btn btn-xs btn-default edit-price" 
                                                                     data-item="${priceData[0].name}"
                                                                     title="Edit Price">
@@ -633,10 +650,19 @@ pos_ar.Pricing.PricingController = class {
             </div>
         `);
 
-        // Add event handlers
-        this.setupTableEvents($content);
 
-        // Add some custom styles for the matrix layout
+                // Add event handlers
+                this.setupTableEvents($content);
+
+
+        // Add event listener for the fix button
+        $content.find('.fix-prices').on('click', (e) => {
+            const $btn = $(e.currentTarget);
+            const brand = $btn.data('brand');
+            const priceList = $btn.data('price-list');
+            frappe.msgprint(`Fix button clicked for ${brand} - ${priceList}`);
+        });
+
         const style = $(`
             <style>
                 .pricing-table {
@@ -774,12 +800,16 @@ pos_ar.Pricing.PricingController = class {
                     color: red;
                     font-size: 0.8em;
                     margin-top: 2px;
+                    margin-bottom: 4px;
+                }
+                .fix-prices {
+                    margin-top: 4px;
+                    margin-left: 4px;
                 }
             </style>
         `);
 
         $fixingScreen.append(style).append($content);
-
     }
 
     setupTableEvents($content) {
