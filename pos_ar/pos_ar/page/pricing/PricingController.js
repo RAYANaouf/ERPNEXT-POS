@@ -655,7 +655,56 @@ pos_ar.Pricing.PricingController = class {
             const $btn = $(e.currentTarget);
             const brand = $btn.data('brand');
             const priceList = $btn.data('price-list');
-            frappe.msgprint(`Fix button clicked for ${brand} - ${priceList}`);
+            
+            // Get current prices for this brand and price list
+            const priceData = this.priceMap[`${brand}_${priceList}`] || [];
+            const currentPrices = priceData.map(item => item.price);
+            console.log("we are heree !!!")
+            frappe.prompt([
+                {
+                    label: 'Current Prices',
+                    fieldname: 'current_prices',
+                    fieldtype: 'Small Text',
+                    read_only: 1,
+                    default: currentPrices.join(', '),
+                    description: 'List of different prices currently set for this brand'
+                },
+                {
+                    label: 'New Price',
+                    fieldname: 'new_price',
+                    fieldtype: 'Currency',
+                    reqd: 1,
+                    description: 'This price will be applied to all items of this brand in the selected price list'
+                }
+            ], (values) => {
+                frappe.call({
+                    method: 'pos_ar.pos_ar.page.pricing.pricing.fix_price_discrepancy',
+                    args: {
+                        brand: brand,
+                        price_list: priceList,
+                        new_price: values.new_price
+                    },
+                    callback: (r) => {
+                        if (r.exc) {
+                            frappe.msgprint({
+                                title: __('Error'),
+                                indicator: 'red',
+                                message: __('Failed to update prices')
+                            });
+                            return;
+                        }
+
+                        frappe.show_alert({
+                            message: __('Prices updated successfully'),
+                            indicator: 'green'
+                        });
+
+                        // Refresh the pricing data
+                        const company = this.wrapper.find('.company-filter').val();
+                        this.load_fixing_data(company);
+                    }
+                });
+            }, __('Fix Price Discrepancy'), __('Update'));
         });
 
         const style = $(`
