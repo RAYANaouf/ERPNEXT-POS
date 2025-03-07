@@ -162,6 +162,7 @@ pos_ar.Pricing.PricingController = class {
                         freeze: true,
                         freeze_message: __('Fixing Prices...'),
                         callback: (r) => {
+                            console.log("r : ",r);
                             if (!r.exc) {
                                 d.hide();
                                 frappe.show_alert({

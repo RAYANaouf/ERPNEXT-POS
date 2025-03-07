@@ -66,5 +66,19 @@ def get_all_item_prices(company=None):
             "prices": []
         }
 
-
-
+@frappe.whitelist()
+def fix_prices(brand, price_list, new_price):
+    try:
+        # Update all item prices for this brand and price list
+        frappe.db.sql("""
+            UPDATE `tabItem Price`
+            SET price_list_rate = %s
+            WHERE brand = %s AND price_list = %s
+        """, (new_price, brand, price_list))
+        
+        frappe.db.commit()
+        return True
+        
+    except Exception as e:
+        frappe.log_error(f"Error fixing prices: {str(e)}")
+        frappe.throw(_("Failed to update prices. Please check the error log."))

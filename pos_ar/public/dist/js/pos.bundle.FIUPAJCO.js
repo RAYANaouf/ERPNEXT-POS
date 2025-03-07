@@ -391,6 +391,7 @@
               freeze: true,
               freeze_message: __("Fixing Prices..."),
               callback: (r) => {
+                console.log("r : ", r);
                 if (!r.exc) {
                   d.hide();
                   frappe.show_alert({
@@ -7578,4 +7579,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.DOUEADCP.js.map
+//# sourceMappingURL=pos.bundle.FIUPAJCO.js.map
