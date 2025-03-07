@@ -345,7 +345,7 @@
           "This will add missing price entries for all items. Do you want to continue?",
           () => {
             frappe.call({
-              method: "pos_ar.pos_ar.page.pricing.pricing.add_price_for_all_item",
+              method: "pos_ar.pos_ar.page.pricing.pricing.add_price_for_all_item2",
               freeze: true,
               freeze_message: __("Adding missing prices..."),
               callback: (r) => {
@@ -7606,4 +7606,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.YR72I446.js.map
+//# sourceMappingURL=pos.bundle.EFOFCMXD.js.map

@@ -129,8 +129,7 @@ def add_price_for_all_item():
         frappe.log_error(f"Error fixing prices: {str(e)}")
         frappe.throw(_(f"Failed to update prices. Please check the error log. {str(e)}"))
         
-        
-@frappe.whitelist()
+  @frappe.whitelist()
 def add_price_for_all_item2():
     try:
         # Fetch all required data in bulk to minimize database calls
@@ -177,12 +176,9 @@ def add_price_for_all_item2():
                     })
                     new_item_prices.append(item_price_doc)
 
-        # Bulk insert all new item prices efficiently
-        if new_item_prices:
-            frappe.get_doc({
-                "doctype": "Bulk Insert",
-                "items": [doc.as_dict() for doc in new_item_prices]
-            }).insert(ignore_permissions=True)
+        # Insert new item prices efficiently
+        for doc in new_item_prices:
+            doc.insert(ignore_permissions=True)
 
         frappe.db.commit()  # Commit all changes
         return True
@@ -190,4 +186,3 @@ def add_price_for_all_item2():
     except Exception as e:
         frappe.log_error(f"Error fixing prices: {str(e)}")
         frappe.throw(_(f"Failed to update prices. Please check the error log. {str(e)}"))
-
