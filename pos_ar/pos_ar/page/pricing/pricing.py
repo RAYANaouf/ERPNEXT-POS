@@ -128,3 +128,66 @@ def add_price_for_all_item():
     except Exception as e:
         frappe.log_error(f"Error fixing prices: {str(e)}")
         frappe.throw(_(f"Failed to update prices. Please check the error log. {str(e)}"))
+        
+        
+@frappe.whitelist()
+def add_price_for_all_item2():
+    try:
+        # Fetch all required data in bulk to minimize database calls
+        price_lists = [p['name'] for p in frappe.db.sql("SELECT name FROM `tabPrice List`", as_dict=True)]
+        items = frappe.db.sql("SELECT name, brand FROM `tabItem`", as_dict=True)
+
+        # Fetch existing item prices to avoid duplicate checks
+        existing_prices = frappe.db.sql("""
+            SELECT item_code, price_list FROM `tabItem Price`
+        """, as_dict=True)
+        existing_prices_set = {(p['item_code'], p['price_list']) for p in existing_prices}
+
+        # Fetch brand-based prices in bulk
+        brand_prices = frappe.db.sql("""
+            SELECT ip.price_list_rate, i.brand, ip.price_list
+            FROM `tabItem Price` ip
+            INNER JOIN `tabItem` i ON i.name = ip.item_code
+        """, as_dict=True)
+        
+        # Create a dictionary for quick lookup of brand prices
+        brand_price_map = {}
+        for bp in brand_prices:
+            key = (bp['brand'], bp['price_list'])
+            if key not in brand_price_map:
+                brand_price_map[key] = bp['price_list_rate']
+
+        # Prepare a list for new item prices to insert
+        new_item_prices = []
+
+        # Iterate over each price list and item
+        for price_list in price_lists:
+            for item in items:
+                # Check if item price already exists
+                if (item['name'], price_list) not in existing_prices_set:
+                    # Determine the price to set
+                    price_to_set = brand_price_map.get((item['brand'], price_list), 0)
+
+                    # Create a new item price document
+                    item_price_doc = frappe.get_doc({
+                        "doctype": "Item Price",
+                        "item_code": item['name'],
+                        "price_list": price_list,
+                        "price_list_rate": price_to_set
+                    })
+                    new_item_prices.append(item_price_doc)
+
+        # Bulk insert all new item prices efficiently
+        if new_item_prices:
+            frappe.get_doc({
+                "doctype": "Bulk Insert",
+                "items": [doc.as_dict() for doc in new_item_prices]
+            }).insert(ignore_permissions=True)
+
+        frappe.db.commit()  # Commit all changes
+        return True
+
+    except Exception as e:
+        frappe.log_error(f"Error fixing prices: {str(e)}")
+        frappe.throw(_(f"Failed to update prices. Please check the error log. {str(e)}"))
+
