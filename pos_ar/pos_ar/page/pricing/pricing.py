@@ -128,33 +128,42 @@ def add_price_for_all_item():
     except Exception as e:
         frappe.log_error(f"Error fixing prices: {str(e)}")
         frappe.throw(_(f"Failed to update prices. Please check the error log. {str(e)}"))
-        
-  @frappe.whitelist()
-def add_price_for_all_item2():
+       
+       
+       
+       
+@frappe.whitelist()
+def add_price_for_all_item_by_brand(brand):
     try:
-        # Fetch all required data in bulk to minimize database calls
-        price_lists = [p['name'] for p in frappe.db.sql("SELECT name FROM `tabPrice List`", as_dict=True)]
-        items = frappe.db.sql("SELECT name, brand FROM `tabItem`", as_dict=True)
+        # Validate the brand parameter
+        if not brand:
+            frappe.throw(_("Please specify a brand."))
 
-        # Fetch existing item prices to avoid duplicate checks
-        existing_prices = frappe.db.sql("""
-            SELECT item_code, price_list FROM `tabItem Price`
-        """, as_dict=True)
+        # Fetch all price lists
+        price_lists = [p['name'] for p in frappe.db.sql("SELECT name FROM `tabPrice List`", as_dict=True)]
+
+        # Fetch items for the specified brand
+        items = frappe.db.sql("SELECT name FROM `tabItem` WHERE brand = %s", brand, as_dict=True)
+
+        if not items:
+            frappe.throw(_("No items found for the specified brand: {0}".format(brand)))
+
+        # Fetch item price for the specified items
+        item_prices = frappe.db.sql("SELECT * FROM `tabItem Price` WHERE item_code IN (%s)" % ', '.join([item['name'] for item in items]), as_dict=True)
+
+        
         existing_prices_set = {(p['item_code'], p['price_list']) for p in existing_prices}
 
-        # Fetch brand-based prices in bulk
+        # Fetch brand-based prices in bulk for the specified brand
         brand_prices = frappe.db.sql("""
-            SELECT ip.price_list_rate, i.brand, ip.price_list
+            SELECT ip.price_list_rate, ip.price_list
             FROM `tabItem Price` ip
             INNER JOIN `tabItem` i ON i.name = ip.item_code
-        """, as_dict=True)
-        
+            WHERE i.brand = %s
+        """, brand, as_dict=True)
+
         # Create a dictionary for quick lookup of brand prices
-        brand_price_map = {}
-        for bp in brand_prices:
-            key = (bp['brand'], bp['price_list'])
-            if key not in brand_price_map:
-                brand_price_map[key] = bp['price_list_rate']
+        brand_price_map = {bp['price_list']: bp['price_list_rate'] for bp in brand_prices}
 
         # Prepare a list for new item prices to insert
         new_item_prices = []
@@ -165,7 +174,7 @@ def add_price_for_all_item2():
                 # Check if item price already exists
                 if (item['name'], price_list) not in existing_prices_set:
                     # Determine the price to set
-                    price_to_set = brand_price_map.get((item['brand'], price_list), 0)
+                    price_to_set = brand_price_map.get(price_list, 0)
 
                     # Create a new item price document
                     item_price_doc = frappe.get_doc({
@@ -181,8 +190,8 @@ def add_price_for_all_item2():
             doc.insert(ignore_permissions=True)
 
         frappe.db.commit()  # Commit all changes
-        return True
+        return {"status": "success", "message": "Prices updated successfully for brand: {0}".format(brand)}
 
     except Exception as e:
-        frappe.log_error(f"Error fixing prices: {str(e)}")
-        frappe.throw(_(f"Failed to update prices. Please check the error log. {str(e)}"))
+        frappe.log_error(f"Error fixing prices for brand {brand}: {str(e)}")
+        frappe.throw(_(f"Failed to update prices for brand {brand}. Please check the error log. {str(e)}"))
