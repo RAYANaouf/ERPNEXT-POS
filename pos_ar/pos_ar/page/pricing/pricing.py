@@ -199,7 +199,7 @@ def add_price_for_all_item_by_brand2(brand):
             frappe.throw(_("Please specify a brand."))
 
         # Fetch all price lists
-        price_lists = [p['name'] for p in frappe.db.sql("SELECT name FROM `tabPrice List`", as_dict=True)]
+        price_lists = [p['name'] for p in frappe.db.sql("SELECT name FROM `tabPrice List` where enabled = 1", as_dict=True)]
 
         # Fetch items for the specified brand using parameterized query correctly
         items = frappe.db.sql("SELECT name FROM `tabItem` WHERE brand = %s", (brand,), as_dict=True)
