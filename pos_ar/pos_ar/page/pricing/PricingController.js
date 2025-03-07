@@ -716,7 +716,14 @@ pos_ar.Pricing.PricingController = class {
                         <tbody>
                             ${brands.map(brand => `
                                 <tr>
-                                    <td>${brand.brand || brand.name}</td>
+                                    <td>
+                                        ${brand.brand || brand.name}
+                                        <button class="btn btn-xs btn-primary btn-modern set-brand-prices" 
+                                            data-brand="${brand.name}"
+                                            title="Set Prices for All Items">
+                                            Set Prices
+                                        </button>
+                                    </td>
                                     ${priceLists.map(pl => {
                                         const priceData = this.priceMap[`${brand.name}_${pl.name}`] || [];
                                         const hasDifferentPrices = priceData.length > 1 && 
@@ -1041,6 +1048,39 @@ pos_ar.Pricing.PricingController = class {
             });
 
             $content.find('tbody').html(rows);
+        });
+
+        // Set prices button handler
+        $content.find('.set-brand-prices').on('click', (e) => {
+            const brand = $(e.currentTarget).data('brand');
+            frappe.confirm(
+                `This will set prices for all items of brand "${brand}". Do you want to continue?`,
+                () => {
+                    frappe.call({
+                        method: 'pos_ar.pos_ar.page.pricing.pricing.add_price_for_all_item_by_brand2',
+                        args: {
+                            brand: brand
+                        },
+                        freeze: true,
+                        freeze_message: __('Setting Prices...'),
+                        callback: (r) => {
+                            if (!r.exc) {
+                                frappe.show_alert({
+                                    message: __('Prices set successfully'),
+                                    indicator: 'green'
+                                });
+                                // Refresh the current view
+                                const company = $('.company-filter').val();
+                                if (this.current_screen === 'fixing') {
+                                    this.load_fixing_data(company);
+                                } else {
+                                    this.load_pricing_data(company);
+                                }
+                            }
+                        }
+                    });
+                }
+            );
         });
     }
 

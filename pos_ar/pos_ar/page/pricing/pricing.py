@@ -151,47 +151,108 @@ def add_price_for_all_item_by_brand(brand):
         # Fetch item price for the specified items
         item_prices = frappe.db.sql("SELECT * FROM `tabItem Price` WHERE item_code IN (%s)" % ', '.join([item['name'] for item in items]), as_dict=True)
 
-        
-        existing_prices_set = {(p['item_code'], p['price_list']) for p in existing_prices}
 
-        # Fetch brand-based prices in bulk for the specified brand
-        brand_prices = frappe.db.sql("""
-            SELECT ip.price_list_rate, ip.price_list
-            FROM `tabItem Price` ip
-            INNER JOIN `tabItem` i ON i.name = ip.item_code
-            WHERE i.brand = %s
-        """, brand, as_dict=True)
-
-        # Create a dictionary for quick lookup of brand prices
-        brand_price_map = {bp['price_list']: bp['price_list_rate'] for bp in brand_prices}
-
-        # Prepare a list for new item prices to insert
-        new_item_prices = []
-
-        # Iterate over each price list and item
-        for price_list in price_lists:
+        # Initialize the maps
+        itemCode_priceList = {}
+        priceList = {}
+        # Populate the maps
+        for price in item_prices:
+            item_code = price['item_code']
+            pricelist_name = price['price_list']
+            rate = price['price_list_rate']
+            # Create the combined key for itemCode_priceList map
+            key = f"{item_code}_{pricelist_name}"
+            itemCode_priceList[key] = rate
+            # Update priceList map
+            priceList[pricelist_name] = rate
+            
+        for list in price_lists:
             for item in items:
-                # Check if item price already exists
-                if (item['name'], price_list) not in existing_prices_set:
-                    # Determine the price to set
-                    price_to_set = brand_price_map.get(price_list, 0)
-
-                    # Create a new item price document
-                    item_price_doc = frappe.get_doc({
-                        "doctype": "Item Price",
-                        "item_code": item['name'],
-                        "price_list": price_list,
-                        "price_list_rate": price_to_set
-                    })
-                    new_item_prices.append(item_price_doc)
-
-        # Insert new item prices efficiently
-        for doc in new_item_prices:
-            doc.insert(ignore_permissions=True)
-
-        frappe.db.commit()  # Commit all changes
-        return {"status": "success", "message": "Prices updated successfully for brand: {0}".format(brand)}
+                key = f"{item['name']}_{list}"
+                if key not in itemCode_priceList:
+                    if list in priceList:
+                        frappe.get_doc(
+                            doctype="Item Price",
+                            item_code=item['name'],
+                            price_list=list,
+                            price_list_rate=priceList[list]
+                        ).insert()
+                    else:
+                        frappe.get_doc(
+                            doctype="Item Price",
+                            item_code=item['name'],
+                            price_list=list,
+                            price_list_rate=0
+                        ).insert()
+            
 
     except Exception as e:
         frappe.log_error(f"Error fixing prices for brand {brand}: {str(e)}")
         frappe.throw(_(f"Failed to update prices for brand {brand}. Please check the error log. {str(e)}"))
+        
+        
+@frappe.whitelist()
+def add_price_for_all_item_by_brand2(brand):
+    try:
+        # Validate the brand parameter
+        if not brand:
+            frappe.throw(_("Please specify a brand."))
+
+        # Fetch all price lists
+        price_lists = [p['name'] for p in frappe.db.sql("SELECT name FROM `tabPrice List`", as_dict=True)]
+
+        # Fetch items for the specified brand using parameterized query correctly
+        items = frappe.db.sql("SELECT name FROM `tabItem` WHERE brand = %s", (brand,), as_dict=True)
+
+        if not items:
+            frappe.throw(_("No items found for the specified brand: {0}".format(brand)))
+
+        # Fetch item price for the specified items using a safer method
+        item_names = [item['name'] for item in items]
+        placeholders = ', '.join(['%s'] * len(item_names))
+        item_prices = frappe.db.sql(
+            f"SELECT * FROM `tabItem Price` WHERE item_code IN ({placeholders})",
+            tuple(item_names),
+            as_dict=True
+        )
+
+        # Initialize the maps
+        itemCode_priceList = {}
+        priceList = {}
+
+        # Populate the maps
+        for price in item_prices:
+            item_code = price['item_code']
+            pricelist_name = price['price_list']
+            rate = price['price_list_rate']
+            # Create the combined key for itemCode_priceList map
+            key = f"{item_code}_{pricelist_name}"
+            itemCode_priceList[key] = rate
+            # Update priceList map
+            priceList[pricelist_name] = rate
+
+        # Prepare documents for bulk insert
+        new_prices = []
+        for price_list in price_lists:
+            for item in items:
+                key = f"{item['name']}_{price_list}"
+                if key not in itemCode_priceList:
+                    rate = priceList.get(price_list, 0)
+                    new_prices.append({
+                        "doctype": "Item Price",
+                        "item_code": item['name'],
+                        "price_list": price_list,
+                        "price_list_rate": rate
+                    })
+
+        # Bulk insert new item prices if any
+        if new_prices:
+            for price_doc in new_prices:
+                frappe.get_doc(price_doc).insert()
+
+        frappe.db.commit()  # Commit the changes to the database
+
+    except Exception as e:
+        frappe.log_error(f"Error fixing prices for brand {brand}: {str(e)}")
+        frappe.throw(_(f"Failed to update prices for brand {brand}. Please check the error log. {str(e)}"))
+
