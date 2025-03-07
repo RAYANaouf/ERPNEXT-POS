@@ -1051,7 +1051,7 @@ pos_ar.Pricing.PricingController = class {
         });
 
         // Set prices button handler
-        $content.find('.set-brand-prices').on('click', (e) => {
+        $content.on('click', '.set-brand-prices', (e) => {
             const brand = $(e.currentTarget).data('brand');
             frappe.confirm(
                 `This will set prices for all items of brand "${brand}". Do you want to continue?`,

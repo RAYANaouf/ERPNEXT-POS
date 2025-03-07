@@ -1175,7 +1175,7 @@
         });
         $content.find("tbody").html(rows);
       });
-      $content.find(".set-brand-prices").on("click", (e) => {
+      $content.on("click", ".set-brand-prices", (e) => {
         const brand = $(e.currentTarget).data("brand");
         frappe.confirm(
           `This will set prices for all items of brand "${brand}". Do you want to continue?`,
@@ -7643,4 +7643,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.B5OW3EAD.js.map
+//# sourceMappingURL=pos.bundle.B7JQLIDU.js.map
