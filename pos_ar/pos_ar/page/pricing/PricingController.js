@@ -42,6 +42,7 @@ pos_ar.Pricing.PricingController = class {
                     </div>
                     <div class="top-bar-right">
                         <button class="btn btn-primary">New Price</button>
+                        <button class="btn btn-primary fix-all-prices">Fix All Prices</button>
                         <button class="btn btn-default">Import</button>
                         <button class="btn btn-default">Export</button>
                     </div>
@@ -101,6 +102,35 @@ pos_ar.Pricing.PricingController = class {
         // Handle export button click
         this.wrapper.find('.btn-default:contains("Export")').on('click', () => {
             this.export_pricing_data();
+        });
+
+        // Handle Fix All Prices button click
+        this.wrapper.find('.fix-all-prices').on('click', () => {
+            frappe.confirm(
+                'This will add missing price entries for all items. Do you want to continue?',
+                () => {
+                    frappe.call({
+                        method: 'pos_ar.pos_ar.page.pricing.pricing.add_price_for_all_item',
+                        freeze: true,
+                        freeze_message: __('Adding missing prices...'),
+                        callback: (r) => {
+                            if (!r.exc) {
+                                frappe.show_alert({
+                                    message: __('Prices added successfully'),
+                                    indicator: 'green'
+                                });
+                                // Refresh the current view
+                                const company = $('.company-filter').val();
+                                if (this.current_screen === 'fixing') {
+                                    this.load_fixing_data(company);
+                                } else {
+                                    this.load_pricing_data(company);
+                                }
+                            }
+                        }
+                    });
+                }
+            );
         });
 
         // Handle price fixing
