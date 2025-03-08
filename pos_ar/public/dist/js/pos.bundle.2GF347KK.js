@@ -614,13 +614,19 @@
           const max = Math.max(...allPricesForBrand);
           const min = Math.min(...allPricesForBrand);
           const range = max - min;
-          const threshold = range / 3;
+          const threshold = range / 6;
           if (currentPrice >= max - threshold) {
+            priceClass = "price-highest";
+          } else if (currentPrice >= max - 2 * threshold) {
             priceClass = "price-high";
-          } else if (currentPrice >= min + threshold) {
-            priceClass = "price-medium";
-          } else {
+          } else if (currentPrice >= max - 3 * threshold) {
+            priceClass = "price-medium-high";
+          } else if (currentPrice >= max - 4 * threshold) {
+            priceClass = "price-medium-low";
+          } else if (currentPrice >= max - 5 * threshold) {
             priceClass = "price-low";
+          } else {
+            priceClass = "price-lowest";
           }
         }
         return `
@@ -779,14 +785,23 @@
                     font-size: 0.8em;
                     margin-top: 2px;
                 }
-                .price-high {
-                    background-color: rgba(255, 0, 0, 0.1) !important;
+                .price-highest {
+                    background-color: rgba(0, 255, 0, 0.1) !important;
                 }
-                .price-medium {
+                .price-high {
+                    background-color: rgba(100, 255, 0, 0.1) !important;
+                }
+                .price-medium-high {
+                    background-color: rgba(200, 255, 0, 0.1) !important;
+                }
+                .price-medium-low {
                     background-color: rgba(255, 165, 0, 0.1) !important;
                 }
                 .price-low {
-                    background-color: rgba(0, 255, 0, 0.1) !important;
+                    background-color: rgba(255, 100, 0, 0.1) !important;
+                }
+                .price-lowest {
+                    background-color: rgba(255, 0, 0, 0.1) !important;
                 }
                 .price-cell {
                     padding: 8px;
@@ -928,13 +943,19 @@
           const max = Math.max(...allPricesForBrand);
           const min = Math.min(...allPricesForBrand);
           const range = max - min;
-          const threshold = range / 3;
+          const threshold = range / 6;
           if (currentPrice >= max - threshold) {
+            priceClass = "price-highest";
+          } else if (currentPrice >= max - 2 * threshold) {
             priceClass = "price-high";
-          } else if (currentPrice >= min + threshold) {
-            priceClass = "price-medium";
-          } else {
+          } else if (currentPrice >= max - 3 * threshold) {
+            priceClass = "price-medium-high";
+          } else if (currentPrice >= max - 4 * threshold) {
+            priceClass = "price-medium-low";
+          } else if (currentPrice >= max - 5 * threshold) {
             priceClass = "price-low";
+          } else {
+            priceClass = "price-lowest";
           }
         }
         return `
@@ -1159,14 +1180,23 @@
                     padding: 4px 8px;
                     font-size: 12px;
                 }
-                .price-high {
-                    background-color: rgba(255, 0, 0, 0.1) !important;
+                .price-highest {
+                    background-color: rgba(0, 255, 0, 0.15) !important;
                 }
-                .price-medium {
-                    background-color: rgba(255, 165, 0, 0.1) !important;
+                .price-high {
+                    background-color: rgba(100, 255, 0, 0.15) !important;
+                }
+                .price-medium-high {
+                    background-color: rgba(200, 255, 0, 0.15) !important;
+                }
+                .price-medium-low {
+                    background-color: rgba(255, 165, 0, 0.15) !important;
                 }
                 .price-low {
-                    background-color: rgba(0, 255, 0, 0.1) !important;
+                    background-color: rgba(255, 100, 0, 0.15) !important;
+                }
+                .price-lowest {
+                    background-color: rgba(255, 0, 0, 0.15) !important;
                 }
                 .price-cell {
                     padding: 8px;
@@ -1731,14 +1761,23 @@
                 @keyframes spin {
                     to { transform: rotate(360deg); }
                 }
-                .price-high {
-                    background-color: rgba(255, 0, 0, 0.1) !important;
+                .price-highest {
+                    background-color: rgba(0, 255, 0, 0.1) !important;
                 }
-                .price-medium {
+                .price-high {
+                    background-color: rgba(100, 255, 0, 0.1) !important;
+                }
+                .price-medium-high {
+                    background-color: rgba(200, 255, 0, 0.1) !important;
+                }
+                .price-medium-low {
                     background-color: rgba(255, 165, 0, 0.1) !important;
                 }
                 .price-low {
-                    background-color: rgba(0, 255, 0, 0.1) !important;
+                    background-color: rgba(255, 100, 0, 0.1) !important;
+                }
+                .price-lowest {
+                    background-color: rgba(255, 0, 0, 0.1) !important;
                 }
                 .price-cell {
                     padding: 8px;
@@ -7719,4 +7758,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.R33R3MXU.js.map
+//# sourceMappingURL=pos.bundle.2GF347KK.js.map
