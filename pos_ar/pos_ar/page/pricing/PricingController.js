@@ -343,6 +343,22 @@ pos_ar.Pricing.PricingController = class {
             return;
         }
 
+        // Load and apply saved column order
+        const savedOrder = JSON.parse(localStorage.getItem('priceListOrder') || '[]');
+        if (savedOrder.length > 0) {
+            priceLists.sort((a, b) => {
+                const aIndex = savedOrder.indexOf(a.name);
+                const bIndex = savedOrder.indexOf(b.name);
+                if (aIndex === -1 && bIndex === -1) return 0;
+                if (aIndex === -1) return 1;
+                if (bIndex === -1) return -1;
+                return aIndex - bIndex;
+            });
+        } else {
+            // First time, save the current order
+            localStorage.setItem('priceListOrder', JSON.stringify(priceLists.map(pl => pl.name)));
+        }
+
         // Create a map for quick price lookup
         this.priceMap = {};
         data.forEach(item => {
@@ -390,8 +406,11 @@ pos_ar.Pricing.PricingController = class {
                                     Brand <i class="fa fa-sort"></i>
                                 </th>
                                 ${priceLists.map(pl => `
-                                    <th class="sortable" data-sort="price" data-price-list="${pl.name}">
-                                        ${pl.name} <i class="fa fa-sort"></i>
+                                    <th class="sortable draggable-header" data-sort="price" data-price-list="${pl.name}" draggable="true">
+                                        <div class="header-content">
+                                            <i class="fa fa-grip-vertical drag-handle"></i>
+                                            ${pl.name} <i class="fa fa-sort"></i>
+                                        </div>
                                     </th>
                                 `).join('')}
                             </tr>
@@ -631,6 +650,20 @@ pos_ar.Pricing.PricingController = class {
                     padding: 8px;
                     border-radius: 4px;
                 }
+                .header-content {
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    cursor: grab;
+                }
+                .drag-handle {
+                    color: var(--text-muted);
+                    cursor: grab;
+                }
+                .draggable-header.dragging {
+                    opacity: 0.5;
+                    background: var(--bg-light-gray);
+                }
             </style>
         `);
 
@@ -702,6 +735,22 @@ pos_ar.Pricing.PricingController = class {
             return;
         }
 
+        // Load and apply saved column order
+        const savedOrder = JSON.parse(localStorage.getItem('priceListOrder') || '[]');
+        if (savedOrder.length > 0) {
+            priceLists.sort((a, b) => {
+                const aIndex = savedOrder.indexOf(a.name);
+                const bIndex = savedOrder.indexOf(b.name);
+                if (aIndex === -1 && bIndex === -1) return 0;
+                if (aIndex === -1) return 1;
+                if (bIndex === -1) return -1;
+                return aIndex - bIndex;
+            });
+        } else {
+            // First time, save the current order
+            localStorage.setItem('priceListOrder', JSON.stringify(priceLists.map(pl => pl.name)));
+        }
+
         // Create a map for quick price lookup
         this.priceMap = {};
         data.forEach(item => {
@@ -749,8 +798,11 @@ pos_ar.Pricing.PricingController = class {
                                     Brand <i class="fa fa-sort"></i>
                                 </th>
                                 ${priceLists.map(pl => `
-                                    <th class="sortable" data-sort="price" data-price-list="${pl.name}">
-                                        ${pl.name} <i class="fa fa-sort"></i>
+                                    <th class="sortable draggable-header" data-sort="price" data-price-list="${pl.name}" draggable="true">
+                                        <div class="header-content">
+                                            <i class="fa fa-grip-vertical drag-handle"></i>
+                                            ${pl.name} <i class="fa fa-sort"></i>
+                                        </div>
                                     </th>
                                 `).join('')}
                             </tr>
@@ -846,11 +898,10 @@ pos_ar.Pricing.PricingController = class {
             </div>
         `);
 
-
         // Add event handlers
         this.setupTableEvents($content);
 
-
+        // Add some custom styles for the matrix layout
         const style = $(`
             <style>
                 .pricing-table {
@@ -1029,13 +1080,13 @@ pos_ar.Pricing.PricingController = class {
                 }
 
                 .btn-modern.btn-default {
-                    background: #f8f9fa;
-                    color: #495057;
-                    border: 1px solid #dee2e6;
+                    background: var(--surface-color);
+                    border: 1px solid var(--border-color);
+                    color: var(--text-primary);
                 }
 
                 .btn-modern.btn-default:hover {
-                    background: #e9ecef;
+                    background: var(--surface-color);
                 }
 
                 .btn-modern.btn-xs {
@@ -1063,6 +1114,20 @@ pos_ar.Pricing.PricingController = class {
                 .price-cell {
                     padding: 8px;
                     border-radius: 4px;
+                }
+                .header-content {
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    cursor: grab;
+                }
+                .drag-handle {
+                    color: var(--text-muted);
+                    cursor: grab;
+                }
+                .draggable-header.dragging {
+                    opacity: 0.5;
+                    background: var(--bg-light-gray);
                 }
             </style>
         `);
@@ -1186,6 +1251,75 @@ pos_ar.Pricing.PricingController = class {
                     });
                 }
             );
+        });
+
+        // Setup drag and drop for price list columns
+        const $headers = $content.find('.draggable-header');
+        let draggedHeader = null;
+
+        $headers.each((_, header) => {
+            $(header).on('dragstart', (e) => {
+                draggedHeader = header;
+                $(header).addClass('dragging');
+                e.originalEvent.dataTransfer.setData('text/plain', $(header).data('priceList'));
+            });
+
+            $(header).on('dragend', () => {
+                $(draggedHeader).removeClass('dragging');
+                draggedHeader = null;
+            });
+
+            $(header).on('dragover', (e) => {
+                e.preventDefault();
+            });
+
+            $(header).on('drop', (e) => {
+                e.preventDefault();
+                if (!draggedHeader || draggedHeader === header) return;
+
+                const $allHeaders = $content.find('.draggable-header');
+                const draggedIndex = $allHeaders.index(draggedHeader);
+                const dropIndex = $allHeaders.index(header);
+
+                // Reorder the columns in the table
+                const $rows = $content.find('tr');
+                $rows.each((_, row) => {
+                    const $cells = $(row).find('td, th');
+                    const $draggedCell = $cells.eq(draggedIndex + 1); // +1 for brand column
+                    const $dropCell = $cells.eq(dropIndex + 1);
+
+                    // Store the HTML and data
+                    const draggedHtml = $draggedCell.html();
+                    const dropHtml = $dropCell.html();
+                    const draggedData = {
+                        sort: $draggedCell.data('sort'),
+                        priceList: $draggedCell.data('priceList')
+                    };
+                    const dropData = {
+                        sort: $dropCell.data('sort'),
+                        priceList: $dropCell.data('priceList')
+                    };
+
+                    // Swap contents
+                    $draggedCell.html(dropHtml);
+                    $dropCell.html(draggedHtml);
+
+                    // Swap data attributes for headers
+                    if ($(row).hasClass('headers')) {
+                        $draggedCell.data(dropData);
+                        $dropCell.data(draggedData);
+                    }
+                });
+
+                // Update localStorage with new order
+                const currentOrder = JSON.parse(localStorage.getItem('priceListOrder') || '[]');
+                const draggedPriceList = $(draggedHeader).data('priceList');
+                const dropPriceList = $(header).data('priceList');
+                const newOrder = currentOrder.filter(pl => pl !== draggedPriceList && pl !== dropPriceList);
+                const baseIndex = Math.min(currentOrder.indexOf(dropPriceList), currentOrder.indexOf(draggedPriceList));
+                newOrder.splice(baseIndex, 0, dropPriceList, draggedPriceList);
+                localStorage.setItem('priceListOrder', JSON.stringify(newOrder));
+            });
         });
     }
 
@@ -1695,6 +1829,20 @@ pos_ar.Pricing.PricingController = class {
                 .price-cell {
                     padding: 8px;
                     border-radius: 4px;
+                }
+                .header-content {
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    cursor: grab;
+                }
+                .drag-handle {
+                    color: var(--text-muted);
+                    cursor: grab;
+                }
+                .draggable-header.dragging {
+                    opacity: 0.5;
+                    background: var(--bg-light-gray);
                 }
             </style>
         `;
