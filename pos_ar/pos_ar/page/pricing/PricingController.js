@@ -415,13 +415,37 @@ pos_ar.Pricing.PricingController = class {
                                         const hasDifferentPrices = priceData.length > 1 && 
                                             !priceData.every(item => item.price === priceData[0].price);
                                         
+                                        // Get all prices for this brand across all price lists
+                                        const allPricesForBrand = priceLists.map(plist => {
+                                            const data = this.priceMap[`${brand.name}_${plist.name}`] || [];
+                                            return data.length > 0 ? data[0].price : 0;
+                                        }).filter(price => price > 0);
+
+                                        // Calculate price range
+                                        const currentPrice = priceData.length > 0 ? priceData[0].price : 0;
+                                        let priceClass = '';
+                                        
+                                        if (currentPrice > 0 && allPricesForBrand.length > 0) {
+                                            const max = Math.max(...allPricesForBrand);
+                                            const min = Math.min(...allPricesForBrand);
+                                            const range = max - min;
+                                            const threshold = range / 3;
+
+                                            if (currentPrice >= max - threshold) {
+                                                priceClass = 'price-high';
+                                            } else if (currentPrice >= min + threshold) {
+                                                priceClass = 'price-medium';
+                                            } else {
+                                                priceClass = 'price-low';
+                                            }
+                                        }
+                                        
                                         return `
                                             <td>
                                                 ${priceData.length > 0 ?
-                                                    `<div class="price-cell ${hasDifferentPrices ? 'different-prices' : ''}">
+                                                    `<div class="price-cell ${hasDifferentPrices ? 'different-prices' : ''} ${priceClass}">
                                                         <div class="price-value">
                                                             ${frappe.format(priceData[0].price, { fieldtype: 'Currency' })}
-
                                                         </div>
                                                     </div>` :
                                                     ''
@@ -579,6 +603,19 @@ pos_ar.Pricing.PricingController = class {
                     font-size: 0.8em;
                     margin-top: 2px;
                 }
+                .price-high {
+                    background-color: rgba(255, 0, 0, 0.1) !important;
+                }
+                .price-medium {
+                    background-color: rgba(255, 165, 0, 0.1) !important;
+                }
+                .price-low {
+                    background-color: rgba(0, 255, 0, 0.1) !important;
+                }
+                .price-cell {
+                    padding: 8px;
+                    border-radius: 4px;
+                }
             </style>
         `);
 
@@ -729,10 +766,35 @@ pos_ar.Pricing.PricingController = class {
                                         const hasDifferentPrices = priceData.length > 1 && 
                                             !priceData.every(item => item.price === priceData[0].price);
                                         
+                                        // Get all prices for this brand across all price lists
+                                        const allPricesForBrand = priceLists.map(plist => {
+                                            const data = this.priceMap[`${brand.name}_${plist.name}`] || [];
+                                            return data.length > 0 ? data[0].price : 0;
+                                        }).filter(price => price > 0);
+
+                                        // Calculate price range
+                                        const currentPrice = priceData.length > 0 ? priceData[0].price : 0;
+                                        let priceClass = '';
+                                        
+                                        if (currentPrice > 0 && allPricesForBrand.length > 0) {
+                                            const max = Math.max(...allPricesForBrand);
+                                            const min = Math.min(...allPricesForBrand);
+                                            const range = max - min;
+                                            const threshold = range / 3;
+
+                                            if (currentPrice >= max - threshold) {
+                                                priceClass = 'price-high';
+                                            } else if (currentPrice >= min + threshold) {
+                                                priceClass = 'price-medium';
+                                            } else {
+                                                priceClass = 'price-low';
+                                            }
+                                        }
+                                        
                                         return `
                                             <td>
                                                 ${priceData.length > 0 ?
-                                                    `<div class="price-cell ${hasDifferentPrices ? 'different-prices' : ''}">
+                                                    `<div class="price-cell ${hasDifferentPrices ? 'different-prices' : ''} ${priceClass}">
                                                         <div class="price-value">
                                                             ${frappe.format(priceData[0].price, { fieldtype: 'Currency' })}
                                                             ${hasDifferentPrices ? `
@@ -958,6 +1020,19 @@ pos_ar.Pricing.PricingController = class {
                 .btn-modern.btn-xs {
                     padding: 4px 8px;
                     font-size: 12px;
+                }
+                .price-high {
+                    background-color: rgba(255, 0, 0, 0.1) !important;
+                }
+                .price-medium {
+                    background-color: rgba(255, 165, 0, 0.1) !important;
+                }
+                .price-low {
+                    background-color: rgba(0, 255, 0, 0.1) !important;
+                }
+                .price-cell {
+                    padding: 8px;
+                    border-radius: 4px;
                 }
             </style>
         `);
@@ -1568,6 +1643,19 @@ pos_ar.Pricing.PricingController = class {
 
                 @keyframes spin {
                     to { transform: rotate(360deg); }
+                }
+                .price-high {
+                    background-color: rgba(255, 0, 0, 0.1) !important;
+                }
+                .price-medium {
+                    background-color: rgba(255, 165, 0, 0.1) !important;
+                }
+                .price-low {
+                    background-color: rgba(0, 255, 0, 0.1) !important;
+                }
+                .price-cell {
+                    padding: 8px;
+                    border-radius: 4px;
                 }
             </style>
         `;

@@ -604,12 +604,30 @@
                                     ${priceLists.map((pl) => {
         const priceData = this.priceMap[`${brand.name}_${pl.name}`] || [];
         const hasDifferentPrices = priceData.length > 1 && !priceData.every((item) => item.price === priceData[0].price);
+        const allPricesForBrand = priceLists.map((plist) => {
+          const data2 = this.priceMap[`${brand.name}_${plist.name}`] || [];
+          return data2.length > 0 ? data2[0].price : 0;
+        }).filter((price) => price > 0);
+        const currentPrice = priceData.length > 0 ? priceData[0].price : 0;
+        let priceClass = "";
+        if (currentPrice > 0 && allPricesForBrand.length > 0) {
+          const max = Math.max(...allPricesForBrand);
+          const min = Math.min(...allPricesForBrand);
+          const range = max - min;
+          const threshold = range / 3;
+          if (currentPrice >= max - threshold) {
+            priceClass = "price-high";
+          } else if (currentPrice >= min + threshold) {
+            priceClass = "price-medium";
+          } else {
+            priceClass = "price-low";
+          }
+        }
         return `
                                             <td>
-                                                ${priceData.length > 0 ? `<div class="price-cell ${hasDifferentPrices ? "different-prices" : ""}">
+                                                ${priceData.length > 0 ? `<div class="price-cell ${hasDifferentPrices ? "different-prices" : ""} ${priceClass}">
                                                         <div class="price-value">
                                                             ${frappe.format(priceData[0].price, { fieldtype: "Currency" })}
-
                                                         </div>
                                                     </div>` : ""}
                                             </td>
@@ -761,6 +779,19 @@
                     font-size: 0.8em;
                     margin-top: 2px;
                 }
+                .price-high {
+                    background-color: rgba(255, 0, 0, 0.1) !important;
+                }
+                .price-medium {
+                    background-color: rgba(255, 165, 0, 0.1) !important;
+                }
+                .price-low {
+                    background-color: rgba(0, 255, 0, 0.1) !important;
+                }
+                .price-cell {
+                    padding: 8px;
+                    border-radius: 4px;
+                }
             </style>
         `);
       $pricingScreen.append(style).append($content);
@@ -887,9 +918,28 @@
                                     ${priceLists.map((pl) => {
         const priceData = this.priceMap[`${brand.name}_${pl.name}`] || [];
         const hasDifferentPrices = priceData.length > 1 && !priceData.every((item) => item.price === priceData[0].price);
+        const allPricesForBrand = priceLists.map((plist) => {
+          const data2 = this.priceMap[`${brand.name}_${plist.name}`] || [];
+          return data2.length > 0 ? data2[0].price : 0;
+        }).filter((price) => price > 0);
+        const currentPrice = priceData.length > 0 ? priceData[0].price : 0;
+        let priceClass = "";
+        if (currentPrice > 0 && allPricesForBrand.length > 0) {
+          const max = Math.max(...allPricesForBrand);
+          const min = Math.min(...allPricesForBrand);
+          const range = max - min;
+          const threshold = range / 3;
+          if (currentPrice >= max - threshold) {
+            priceClass = "price-high";
+          } else if (currentPrice >= min + threshold) {
+            priceClass = "price-medium";
+          } else {
+            priceClass = "price-low";
+          }
+        }
         return `
                                             <td>
-                                                ${priceData.length > 0 ? `<div class="price-cell ${hasDifferentPrices ? "different-prices" : ""}">
+                                                ${priceData.length > 0 ? `<div class="price-cell ${hasDifferentPrices ? "different-prices" : ""} ${priceClass}">
                                                         <div class="price-value">
                                                             ${frappe.format(priceData[0].price, { fieldtype: "Currency" })}
                                                             ${hasDifferentPrices ? `
@@ -1108,6 +1158,19 @@
                 .btn-modern.btn-xs {
                     padding: 4px 8px;
                     font-size: 12px;
+                }
+                .price-high {
+                    background-color: rgba(255, 0, 0, 0.1) !important;
+                }
+                .price-medium {
+                    background-color: rgba(255, 165, 0, 0.1) !important;
+                }
+                .price-low {
+                    background-color: rgba(0, 255, 0, 0.1) !important;
+                }
+                .price-cell {
+                    padding: 8px;
+                    border-radius: 4px;
                 }
             </style>
         `);
@@ -1667,6 +1730,19 @@
 
                 @keyframes spin {
                     to { transform: rotate(360deg); }
+                }
+                .price-high {
+                    background-color: rgba(255, 0, 0, 0.1) !important;
+                }
+                .price-medium {
+                    background-color: rgba(255, 165, 0, 0.1) !important;
+                }
+                .price-low {
+                    background-color: rgba(0, 255, 0, 0.1) !important;
+                }
+                .price-cell {
+                    padding: 8px;
+                    border-radius: 4px;
                 }
             </style>
         `;
@@ -7643,4 +7719,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.B7JQLIDU.js.map
+//# sourceMappingURL=pos.bundle.R33R3MXU.js.map
