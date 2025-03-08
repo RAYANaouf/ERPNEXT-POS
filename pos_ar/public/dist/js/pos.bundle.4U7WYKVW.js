@@ -289,7 +289,6 @@
                     </div>
                     <div class="top-bar-right">
                         <button class="btn btn-primary">New Price</button>
-                        <button class="btn btn-primary fix-all-prices">Fix All Prices</button>
                         <button class="btn btn-default">Import</button>
                         <button class="btn btn-default">Export</button>
                     </div>
@@ -339,32 +338,6 @@
       });
       this.wrapper.find('.btn-default:contains("Export")').on("click", () => {
         this.export_pricing_data();
-      });
-      this.wrapper.find(".fix-all-prices").on("click", () => {
-        frappe.confirm(
-          "This will add missing price entries for all items. Do you want to continue?",
-          () => {
-            frappe.call({
-              method: "pos_ar.pos_ar.page.pricing.pricing.add_price_for_all_item2",
-              freeze: true,
-              freeze_message: __("Adding missing prices..."),
-              callback: (r) => {
-                if (!r.exc) {
-                  frappe.show_alert({
-                    message: __("Prices added successfully"),
-                    indicator: "green"
-                  });
-                  const company = $(".company-filter").val();
-                  if (this.current_screen === "fixing") {
-                    this.load_fixing_data(company);
-                  } else {
-                    this.load_pricing_data(company);
-                  }
-                }
-              }
-            });
-          }
-        );
       });
       this.wrapper.on("click", ".fix-prices", (e) => {
         const $button = $(e.currentTarget);
@@ -976,7 +949,7 @@
                                 <tr>
                                     <td>
                                         ${brand.brand || brand.name}
-                                        <button class="btn btn-xs btn-primary btn-modern set-brand-prices" 
+                                        <button class="btn btn-xs btn-primary btn-modern set-brand-prices" style="display:none;"
                                             data-brand="${brand.name}"
                                             title="Set Prices for All Items">
                                             Set Prices
@@ -7891,4 +7864,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.MR6XHITO.js.map
+//# sourceMappingURL=pos.bundle.4U7WYKVW.js.map
