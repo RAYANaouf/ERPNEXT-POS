@@ -412,7 +412,7 @@
         d.show();
       });
       $(document).off("click", ".edit-price").on("click", ".edit-price", function(e) {
-        const itemName = $(this).data("item");
+        const itemName = $(this).data("name");
         if (itemName) {
           this.show_price_editor(itemName);
         }
@@ -626,6 +626,11 @@
                                                 ${priceData.length > 0 ? `<div class="price-cell ${hasDifferentPrices ? "different-prices" : ""} ${priceClass}">
                                                         <div class="price-value">
                                                             ${frappe.format(priceData[0].price, { fieldtype: "Currency" })}
+                                                            <button class="btn btn-xs btn-default edit-price" 
+                                                                data-name="${priceData[0].name}"
+                                                                title="Edit Price">
+                                                                <i class="fa fa-pencil"></i>
+                                                            </button>
                                                         </div>
                                                     </div>` : ""}
                                             </td>
@@ -997,8 +1002,8 @@
                                                                     Fix
                                                                 </button>` : ""}
                                                             <button class="btn btn-xs btn-default btn-modern edit-price" 
-                                                                    data-item="${priceData[0].name}"
-                                                                    title="Edit Price">
+                                                                data-name="${priceData[0].name}"
+                                                                title="Edit Price">
                                                                 <i class="fa fa-pencil"></i>
                                                             </button>
                                                         </div>
@@ -1336,6 +1341,11 @@
             });
           }
         );
+      });
+      $content.on("click", ".edit-price", (e) => {
+        e.stopPropagation();
+        const itemName = $(e.currentTarget).data("name");
+        this.show_price_editor(itemName);
       });
       const $headers = $content.find(".draggable-header");
       let draggedHeader = null;
@@ -7864,4 +7874,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.4U7WYKVW.js.map
+//# sourceMappingURL=pos.bundle.Q5FCORMP.js.map
