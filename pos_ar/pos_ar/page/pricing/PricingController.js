@@ -610,22 +610,22 @@ pos_ar.Pricing.PricingController = class {
                     margin-top: 2px;
                 }
                 .price-highest {
-                    background-color: rgba(0, 255, 0, 0.1) !important;
+                    background-color: rgba(0, 255, 0, 0.35) !important;
                 }
                 .price-high {
-                    background-color: rgba(100, 255, 0, 0.1) !important;
+                    background-color: rgba(100, 255, 0, 0.35) !important;
                 }
                 .price-medium-high {
-                    background-color: rgba(200, 255, 0, 0.1) !important;
+                    background-color: rgba(200, 255, 0, 0.35) !important;
                 }
                 .price-medium-low {
-                    background-color: rgba(255, 165, 0, 0.1) !important;
+                    background-color: rgba(255, 165, 0, 0.35) !important;
                 }
                 .price-low {
-                    background-color: rgba(255, 100, 0, 0.1) !important;
+                    background-color: rgba(255, 100, 0, 0.35) !important;
                 }
                 .price-lowest {
-                    background-color: rgba(255, 0, 0, 0.1) !important;
+                    background-color: rgba(255, 0, 0, 0.35) !important;
                 }
                 .price-cell {
                     padding: 8px;
@@ -1043,22 +1043,22 @@ pos_ar.Pricing.PricingController = class {
                     font-size: 12px;
                 }
                 .price-highest {
-                    background-color: rgba(0, 255, 0, 0.15) !important;
+                    background-color: rgba(0, 255, 0, 0.35) !important;
                 }
                 .price-high {
-                    background-color: rgba(100, 255, 0, 0.15) !important;
+                    background-color: rgba(100, 255, 0, 0.35) !important;
                 }
                 .price-medium-high {
-                    background-color: rgba(200, 255, 0, 0.15) !important;
+                    background-color: rgba(200, 255, 0, 0.35) !important;
                 }
                 .price-medium-low {
-                    background-color: rgba(255, 165, 0, 0.15) !important;
+                    background-color: rgba(255, 165, 0, 0.35) !important;
                 }
                 .price-low {
-                    background-color: rgba(255, 100, 0, 0.15) !important;
+                    background-color: rgba(255, 100, 0, 0.35) !important;
                 }
                 .price-lowest {
-                    background-color: rgba(255, 0, 0, 0.15) !important;
+                    background-color: rgba(255, 0, 0, 0.35) !important;
                 }
                 .price-cell {
                     padding: 8px;
@@ -1675,22 +1675,22 @@ pos_ar.Pricing.PricingController = class {
                     to { transform: rotate(360deg); }
                 }
                 .price-highest {
-                    background-color: rgba(0, 255, 0, 0.1) !important;
+                    background-color: rgba(0, 255, 0, 0.35) !important;
                 }
                 .price-high {
-                    background-color: rgba(100, 255, 0, 0.1) !important;
+                    background-color: rgba(100, 255, 0, 0.35) !important;
                 }
                 .price-medium-high {
-                    background-color: rgba(200, 255, 0, 0.1) !important;
+                    background-color: rgba(200, 255, 0, 0.35) !important;
                 }
                 .price-medium-low {
-                    background-color: rgba(255, 165, 0, 0.1) !important;
+                    background-color: rgba(255, 165, 0, 0.35) !important;
                 }
                 .price-low {
-                    background-color: rgba(255, 100, 0, 0.1) !important;
+                    background-color: rgba(255, 100, 0, 0.35) !important;
                 }
                 .price-lowest {
-                    background-color: rgba(255, 0, 0, 0.1) !important;
+                    background-color: rgba(255, 0, 0, 0.35) !important;
                 }
                 .price-cell {
                     padding: 8px;

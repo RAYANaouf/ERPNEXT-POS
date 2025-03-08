@@ -786,22 +786,22 @@
                     margin-top: 2px;
                 }
                 .price-highest {
-                    background-color: rgba(0, 255, 0, 0.1) !important;
+                    background-color: rgba(0, 255, 0, 0.35) !important;
                 }
                 .price-high {
-                    background-color: rgba(100, 255, 0, 0.1) !important;
+                    background-color: rgba(100, 255, 0, 0.35) !important;
                 }
                 .price-medium-high {
-                    background-color: rgba(200, 255, 0, 0.1) !important;
+                    background-color: rgba(200, 255, 0, 0.35) !important;
                 }
                 .price-medium-low {
-                    background-color: rgba(255, 165, 0, 0.1) !important;
+                    background-color: rgba(255, 165, 0, 0.35) !important;
                 }
                 .price-low {
-                    background-color: rgba(255, 100, 0, 0.1) !important;
+                    background-color: rgba(255, 100, 0, 0.35) !important;
                 }
                 .price-lowest {
-                    background-color: rgba(255, 0, 0, 0.1) !important;
+                    background-color: rgba(255, 0, 0, 0.35) !important;
                 }
                 .price-cell {
                     padding: 8px;
@@ -1181,22 +1181,22 @@
                     font-size: 12px;
                 }
                 .price-highest {
-                    background-color: rgba(0, 255, 0, 0.15) !important;
+                    background-color: rgba(0, 255, 0, 0.35) !important;
                 }
                 .price-high {
-                    background-color: rgba(100, 255, 0, 0.15) !important;
+                    background-color: rgba(100, 255, 0, 0.35) !important;
                 }
                 .price-medium-high {
-                    background-color: rgba(200, 255, 0, 0.15) !important;
+                    background-color: rgba(200, 255, 0, 0.35) !important;
                 }
                 .price-medium-low {
-                    background-color: rgba(255, 165, 0, 0.15) !important;
+                    background-color: rgba(255, 165, 0, 0.35) !important;
                 }
                 .price-low {
-                    background-color: rgba(255, 100, 0, 0.15) !important;
+                    background-color: rgba(255, 100, 0, 0.35) !important;
                 }
                 .price-lowest {
-                    background-color: rgba(255, 0, 0, 0.15) !important;
+                    background-color: rgba(255, 0, 0, 0.35) !important;
                 }
                 .price-cell {
                     padding: 8px;
@@ -1762,22 +1762,22 @@
                     to { transform: rotate(360deg); }
                 }
                 .price-highest {
-                    background-color: rgba(0, 255, 0, 0.1) !important;
+                    background-color: rgba(0, 255, 0, 0.35) !important;
                 }
                 .price-high {
-                    background-color: rgba(100, 255, 0, 0.1) !important;
+                    background-color: rgba(100, 255, 0, 0.35) !important;
                 }
                 .price-medium-high {
-                    background-color: rgba(200, 255, 0, 0.1) !important;
+                    background-color: rgba(200, 255, 0, 0.35) !important;
                 }
                 .price-medium-low {
-                    background-color: rgba(255, 165, 0, 0.1) !important;
+                    background-color: rgba(255, 165, 0, 0.35) !important;
                 }
                 .price-low {
-                    background-color: rgba(255, 100, 0, 0.1) !important;
+                    background-color: rgba(255, 100, 0, 0.35) !important;
                 }
                 .price-lowest {
-                    background-color: rgba(255, 0, 0, 0.1) !important;
+                    background-color: rgba(255, 0, 0, 0.35) !important;
                 }
                 .price-cell {
                     padding: 8px;
@@ -7758,4 +7758,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.2GF347KK.js.map
+//# sourceMappingURL=pos.bundle.EJ2LVA7R.js.map
