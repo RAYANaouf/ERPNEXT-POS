@@ -647,7 +647,8 @@
       const style = $(`
             <style>
                 .pricing-table {
-                    overflow-x: auto;
+                    height: calc(100vh - 300px);
+                    overflow: auto;
                 }
                 .pricing-table table {
                     width: 100%;
@@ -1022,7 +1023,8 @@
       const style = $(`
             <style>
                 .pricing-table {
-                    overflow-x: auto;
+                    height: calc(100vh - 300px);
+                    overflow: auto;
                 }
                 .pricing-table table {
                     width: 100%;
@@ -7874,4 +7876,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.Q5FCORMP.js.map
+//# sourceMappingURL=pos.bundle.4QHGLE55.js.map

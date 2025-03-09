@@ -468,7 +468,8 @@ pos_ar.Pricing.PricingController = class {
         const style = $(`
             <style>
                 .pricing-table {
-                    overflow-x: auto;
+                    height: calc(100vh - 300px);
+                    overflow: auto;
                 }
                 .pricing-table table {
                     width: 100%;
@@ -880,7 +881,8 @@ pos_ar.Pricing.PricingController = class {
         const style = $(`
             <style>
                 .pricing-table {
-                    overflow-x: auto;
+                    height: calc(100vh - 300px);
+                    overflow: auto;
                 }
                 .pricing-table table {
                     width: 100%;
