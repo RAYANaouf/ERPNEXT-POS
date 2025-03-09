@@ -373,38 +373,42 @@ def pay_selected_invoice(invoices, payment_amount):
 
 
 
-
 @frappe.whitelist()
 def get_item_prices(company=None):
     """
-    Fetches price lists and item prices for the specified company.
+    Fetches price lists and item prices for the specified company or price lists with no company set.
     Returns both price lists and item prices for easier rendering.
     """
     try:
-        # Filter item prices by company if provided
-        filters = {"enabled": 1}
-        if company:
-            filters["custom_company"] = company
-        
-        item_prices = frappe.get_all(
-            "Item Price",
-            fields=[
-				"name",
-                "item_code",
-                "price_list_rate",
-                "currency",
-                "price_list",
-                "brand",
-                "modified"
-            ]
-        )
-
-        # Get price lists that are linked to the specified company
+        # Filter price lists for the specified company or with no company set
         price_lists = frappe.get_all(
             "Price List",
-            filters=filters,
+            filters=[
+                ["enabled", "=", 1],  # Ensure price list is enabled
+                ["custom_company", "in", [company, "", None]]  # Match company or no company set
+            ],
             fields=["name"]
         )
+
+        # Filter item prices by the price lists fetched
+        item_prices = []
+        if price_lists:
+            # Extract price list names to filter item prices
+            price_list_names = [pl["name"] for pl in price_lists]
+            
+            item_prices = frappe.get_all(
+                "Item Price",
+                filters={"price_list": ["in", price_list_names]},  # Filter by price lists
+                fields=[
+                    "name",
+                    "item_code",
+                    "price_list_rate",
+                    "currency",
+                    "price_list",
+                    "brand",
+                    "modified"
+                ]
+            )
 
         # Get all fields from brands
         brands = frappe.get_all(
@@ -425,6 +429,7 @@ def get_item_prices(company=None):
             "brands": [],
             "prices": []
         }
+
 
 
 

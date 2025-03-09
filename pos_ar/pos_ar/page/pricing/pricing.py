@@ -13,18 +13,18 @@ def get_all_item_prices(company=None):
     Returns both price lists and item prices for easier rendering.
     """
     try:
-        # Filter item prices by company if provided
-        filters = {"enabled": 1}
-        if company:
-            filters["custom_company"] = company
-            
-            
-            
-        # Get price lists that are linked to the specified company
+        # Filter price lists for the specified company or with no company set
         price_lists = frappe.get_all(
             "Price List",
-            filters=filters
+            filters=[
+                ["enabled", "=", 1],  # Ensure price list is enabled
+                ["custom_company", "in", [company, "", None]]  # Match company or no company set
+            ],
+            fields=["name"]
         )
+        
+        
+        
         
         # Extract price list names for filtering item prices
         price_list_names = [pl["name"] for pl in price_lists]
