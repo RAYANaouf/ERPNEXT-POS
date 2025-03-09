@@ -1399,19 +1399,20 @@ pos_ar.Pricing.PricingController = class {
                     },
                     {
                         label: 'New Price',
-                        fieldname: 'price',
+                        fieldname: 'new_price',
                         fieldtype: 'Currency',
                         reqd: 1
                     }
                 ], (values) => {
                     frappe.call({
-                        method: 'frappe.client.set_value',
+                        method: 'pos_ar.pos_ar.page.pricing.pricing.fix_prices',
                         args: {
-                            doctype: 'Item Price',
-                            name: itemPriceName,
-                            fieldname: 'price_list_rate',
-                            value: values.price
+                            brand: doc.brand,
+                            price_list: doc.price_list,
+                            new_price: values.new_price
                         },
+                        freeze: true,
+                        freeze_message: __('Updating Price...'),
                         callback: (r) => {
                             if (r.exc) {
                                 frappe.msgprint({
@@ -1439,12 +1440,12 @@ pos_ar.Pricing.PricingController = class {
                 }, __('Update Price'), __('Update'));
             })
             .catch(err => {
+                console.error(err);
                 frappe.msgprint({
                     title: __('Error'),
                     indicator: 'red',
-                    message: __('Failed to fetch item price details')
+                    message: __('Failed to fetch price details')
                 });
-                console.error('Error fetching item price:', err);
             });
     }
 
