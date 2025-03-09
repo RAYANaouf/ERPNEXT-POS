@@ -204,6 +204,14 @@ pos_ar.Pricing.PricingController = class {
         this.wrapper.find(`.${screen}-screen`).addClass('active');
 
         this.current_screen = screen;
+        
+        // Reload data based on current screen
+        const company = this.wrapper.find('.company-filter').val();
+        if (screen === 'fixing') {
+            this.load_fixing_data(company);
+        } else {
+            this.load_pricing_data(company);
+        }
     }
 
     load_companies() {

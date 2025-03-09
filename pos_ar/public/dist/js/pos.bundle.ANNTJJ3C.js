@@ -424,6 +424,12 @@
       this.wrapper.find(".screen").removeClass("active");
       this.wrapper.find(`.${screen}-screen`).addClass("active");
       this.current_screen = screen;
+      const company = this.wrapper.find(".company-filter").val();
+      if (screen === "fixing") {
+        this.load_fixing_data(company);
+      } else {
+        this.load_pricing_data(company);
+      }
     }
     load_companies() {
       frappe.call({
@@ -7876,4 +7882,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.4QHGLE55.js.map
+//# sourceMappingURL=pos.bundle.ANNTJJ3C.js.map
