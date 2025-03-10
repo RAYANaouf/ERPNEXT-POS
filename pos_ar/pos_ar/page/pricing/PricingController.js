@@ -1431,14 +1431,20 @@ pos_ar.Pricing.PricingController = class {
                             // Find the button element first, then traverse up to find the price cell
                             const $editButton = $(`.edit-price[data-name="${itemPriceName}"]`);
                             if ($editButton.length) {
-                                // Find the price-value div and update its text content
-                                const $priceValue = $editButton.closest('.price-value');
-                                if ($priceValue.length) {
-                                    // Update the price text while preserving the edit button
+                                // Find the price cell and completely replace its content
+                                const $priceCell = $editButton.closest('.price-cell');
+                                if ($priceCell.length) {
                                     const formattedPrice = frappe.format(values.new_price, { fieldtype: 'Currency' });
-                                    $priceValue.contents().filter(function() {
-                                        return this.nodeType === 3; // Text nodes only
-                                    }).first().replaceWith(formattedPrice);
+                                    $priceCell.html(`
+                                        <div class="price-value">
+                                            ${formattedPrice}
+                                            <button class="btn btn-xs btn-default edit-price" 
+                                                data-name="${itemPriceName}"
+                                                title="Edit Price">
+                                                <i class="fa fa-pencil"></i>
+                                            </button>
+                                        </div>
+                                    `);
                                 }
                             }
                         }

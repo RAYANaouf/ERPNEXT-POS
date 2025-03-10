@@ -1516,12 +1516,19 @@
               });
               const $editButton = $(`.edit-price[data-name="${itemPriceName}"]`);
               if ($editButton.length) {
-                const $priceValue = $editButton.closest(".price-value");
-                if ($priceValue.length) {
+                const $priceCell = $editButton.closest(".price-cell");
+                if ($priceCell.length) {
                   const formattedPrice = frappe.format(values.new_price, { fieldtype: "Currency" });
-                  $priceValue.contents().filter(function() {
-                    return this.nodeType === 3;
-                  }).first().replaceWith(formattedPrice);
+                  $priceCell.html(`
+                                        <div class="price-value">
+                                            ${formattedPrice}
+                                            <button class="btn btn-xs btn-default edit-price" 
+                                                data-name="${itemPriceName}"
+                                                title="Edit Price">
+                                                <i class="fa fa-pencil"></i>
+                                            </button>
+                                        </div>
+                                    `);
                 }
               }
             }
@@ -7948,4 +7955,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.VHUPDE2G.js.map
+//# sourceMappingURL=pos.bundle.3DSZSY7B.js.map
