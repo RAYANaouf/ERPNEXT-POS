@@ -331,6 +331,15 @@ pos_ar.PointOfSale.Controller = class {
 				in_list_view: 1,
 				default: 0,
 				onchange: function () {
+					console.log("on change")
+					const total = dialog.fields_dict.denomination_details.grid.get_data().reduce((sum, row) => {
+						return sum + (parseInt(row.denomination) * (row.quantity || 0));
+					}, 0);
+					dialog.fields_dict.total_amount.set_value(total);
+				},
+				onblur: function () {  // Trigger when leaving the cell
+					
+					console.log("on blur")
 					const total = dialog.fields_dict.denomination_details.grid.get_data().reduce((sum, row) => {
 						return sum + (parseInt(row.denomination) * (row.quantity || 0));
 					}, 0);
@@ -415,8 +424,38 @@ pos_ar.PointOfSale.Controller = class {
 			},
 			primary_action_label: __("Submit"),
 		});
-	
+		
+
+
+
+		
 		dialog.show();
+
+
+		dialog.get_field("denomination_details").grid.wrapper.on("keydown", "input[data-fieldname='quantity']", (e) => {
+			console.log("Keydown event outside => ", e.key  ,  "which : " , e.which);
+			if (e.which === 40 || e.which === 38) {  // 40 = ArrowDown, 38 = ArrowUp
+				console.log("Keydown event:", e.key);
+
+				const grid = dialog.get_field("denomination_details").grid;
+				const row = $(e.target).closest(".grid-row");
+				const doc = grid.get_row(row.attr("data-idx") - 1).doc;
+				const value = parseInt(e.target.value) || 0;
+		
+				console.log("Saving value:", value, "for denomination:", doc.denomination);
+		
+				// Directly update the doc and refresh field to save the value
+				doc.quantity = value;
+				grid.refresh_field("quantity");  // Force-save the current field value
+		
+				// Update the total amount immediately
+				const total = grid.get_data().reduce((sum, row) => {
+					return sum + (parseInt(row.denomination) * (row.quantity || 0));
+				}, 0);
+				dialog.fields_dict.total_amount.set_value(total);
+			}
+		});
+		
 	
 		// Fetch default payment method immediately after dialog is shown
 		fetch_default_payment_method();

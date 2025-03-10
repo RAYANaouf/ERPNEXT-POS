@@ -2199,6 +2199,14 @@
           in_list_view: 1,
           default: 0,
           onchange: function() {
+            console.log("on change");
+            const total = dialog.fields_dict.denomination_details.grid.get_data().reduce((sum, row) => {
+              return sum + parseInt(row.denomination) * (row.quantity || 0);
+            }, 0);
+            dialog.fields_dict.total_amount.set_value(total);
+          },
+          onblur: function() {
+            console.log("on blur");
             const total = dialog.fields_dict.denomination_details.grid.get_data().reduce((sum, row) => {
               return sum + parseInt(row.denomination) * (row.quantity || 0);
             }, 0);
@@ -2278,6 +2286,23 @@
         primary_action_label: __("Submit")
       });
       dialog.show();
+      dialog.get_field("denomination_details").grid.wrapper.on("keydown", "input[data-fieldname='quantity']", (e) => {
+        console.log("Keydown event outside => ", e.key, "which : ", e.which);
+        if (e.which === 40 || e.which === 38) {
+          console.log("Keydown event:", e.key);
+          const grid = dialog.get_field("denomination_details").grid;
+          const row = $(e.target).closest(".grid-row");
+          const doc = grid.get_row(row.attr("data-idx") - 1).doc;
+          const value = parseInt(e.target.value) || 0;
+          console.log("Saving value:", value, "for denomination:", doc.denomination);
+          doc.quantity = value;
+          grid.refresh_field("quantity");
+          const total = grid.get_data().reduce((sum, row2) => {
+            return sum + parseInt(row2.denomination) * (row2.quantity || 0);
+          }, 0);
+          dialog.fields_dict.total_amount.set_value(total);
+        }
+      });
       fetch_default_payment_method();
     }
     set_right_and_left_sections() {
@@ -7919,4 +7944,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.IQXWEDZM.js.map
+//# sourceMappingURL=pos.bundle.M7D4FYW6.js.map
