@@ -2141,108 +2141,144 @@
     }
     create_opening_voucher() {
       const me = this;
-      const table_fields = [
+      const denominations = [5, 10, 20, 50, 100, 200, 500, 1e3, 2e3];
+      const default_company = frappe.defaults.get_default("company");
+      const default_pos_profile = frappe.defaults.get_default("pos_profile");
+      let default_payment_method = null;
+      const fetch_default_payment_method = () => {
+        if (!default_pos_profile) {
+          frappe.msgprint({
+            title: __("Error"),
+            message: __("Default POS Profile is not set."),
+            indicator: "red"
+          });
+          return;
+        }
+        frappe.db.get_doc("POS Profile", default_pos_profile).then(({ payments }) => {
+          console.log("Available payment methods:", payments);
+          if (!payments || payments.length === 0) {
+            frappe.msgprint({
+              title: __("No Payment Methods"),
+              message: __("No payment methods found for the default POS Profile."),
+              indicator: "orange"
+            });
+            return;
+          }
+          const default_method = payments.find((pay) => pay.default);
+          if (default_method) {
+            default_payment_method = default_method.mode_of_payment;
+            console.log("Default payment method:", default_payment_method);
+          } else {
+            frappe.msgprint({
+              title: __("Error"),
+              message: __("No default payment method is set."),
+              indicator: "red"
+            });
+          }
+        }).catch((err) => {
+          console.error("Error fetching POS Profile:", err);
+          frappe.msgprint({
+            title: __("Error"),
+            message: __("Failed to fetch payment methods. Please try again."),
+            indicator: "red"
+          });
+        });
+      };
+      const denomination_fields = [
         {
-          fieldname: "mode_of_payment",
-          fieldtype: "Link",
+          fieldname: "denomination",
+          fieldtype: "Data",
+          label: "Denomination (DA)",
           in_list_view: 1,
-          label: "Mode of Payment",
-          options: "Mode of Payment",
-          reqd: 1
+          read_only: 1
         },
         {
-          fieldname: "opening_amount",
-          fieldtype: "Currency",
+          fieldname: "quantity",
+          fieldtype: "Int",
+          label: "Quantity",
           in_list_view: 1,
-          label: "Opening Amount",
-          options: "company:company_currency",
-          change: function() {
-            dialog.fields_dict.balance_details.df.data.some((d) => {
-              if (d.idx == this.doc.idx) {
-                d.opening_amount = this.value;
-                dialog.fields_dict.balance_details.grid.refresh();
-                return true;
-              }
-            });
+          default: 0,
+          onchange: function() {
+            const total = dialog.fields_dict.denomination_details.grid.get_data().reduce((sum, row) => {
+              return sum + parseInt(row.denomination) * (row.quantity || 0);
+            }, 0);
+            dialog.fields_dict.total_amount.set_value(total);
           }
         }
       ];
-      const fetch_pos_payment_methods = () => {
-        const pos_profile = dialog.fields_dict.pos_profile.get_value();
-        if (!pos_profile)
-          return;
-        frappe.db.get_doc("POS Profile", pos_profile).then(({ payments }) => {
-          dialog.fields_dict.balance_details.df.data = [];
-          this.payment_methods = payments;
-          payments.forEach((pay) => {
-            const { mode_of_payment } = pay;
-            dialog.fields_dict.balance_details.df.data.push({ mode_of_payment, opening_amount: "0" });
-          });
-          dialog.fields_dict.balance_details.grid.refresh();
-        });
-      };
       const dialog = new frappe.ui.Dialog({
         title: __("Create POS Opening Entry"),
         static: true,
         fields: [
           {
-            fieldtype: "Link",
-            label: __("Company"),
-            default: frappe.defaults.get_default("company"),
-            options: "Company",
-            fieldname: "company",
-            reqd: 1
-          },
-          {
-            fieldtype: "Link",
-            label: __("POS Profile"),
-            options: "POS Profile",
-            fieldname: "pos_profile",
-            reqd: 1,
-            get_query: () => pos_profile_query(),
-            onchange: () => fetch_pos_payment_methods()
-          },
-          {
-            fieldname: "balance_details",
+            fieldname: "denomination_details",
             fieldtype: "Table",
-            label: "Opening Balance Details",
+            label: "Denomination Details",
             cannot_add_rows: false,
             in_place_edit: true,
             reqd: 1,
-            data: [],
-            fields: table_fields
+            data: denominations.map((denom) => ({
+              denomination: denom.toString(),
+              quantity: 0
+            })),
+            fields: denomination_fields
+          },
+          {
+            fieldtype: "Currency",
+            fieldname: "total_amount",
+            label: "Total Amount",
+            read_only: 1,
+            default: 0
           }
         ],
-        primary_action: async function({ company, pos_profile, balance_details }) {
-          if (!balance_details.length) {
+        primary_action: async function() {
+          const total_amount = dialog.fields_dict.total_amount.get_value();
+          if (!default_payment_method) {
+            frappe.msgprint({
+              title: __("Error"),
+              message: __("No default payment method set. Please configure it in POS Profile."),
+              indicator: "red"
+            });
+            return;
+          }
+          if (total_amount <= 0) {
             frappe.show_alert({
-              message: __("Please add Mode of payments and opening balance details."),
+              message: __("Please enter quantities for denominations."),
               indicator: "red"
             });
             return frappe.utils.play_sound("error");
           }
-          balance_details = balance_details.filter((d) => d.mode_of_payment);
+          const balance_details = [{
+            mode_of_payment: default_payment_method,
+            opening_amount: total_amount
+          }];
           const method = "erpnext.selling.page.point_of_sale.point_of_sale.create_opening_voucher";
           const res = await frappe.call({
             method,
-            args: { pos_profile, company, balance_details },
+            args: {
+              pos_profile: default_pos_profile,
+              company: default_company,
+              balance_details
+            },
             freeze: true
           });
-          !res.exc && me.prepare_app_data(res.message);
-          Object.assign(me.POSOpeningEntry, { "name": res.message.name, "pos_profile": res.message.pos_profile, "period_start_date": res.message.period_start_date, "company": res.message.company });
-          me.db.updateCheckInOutSync(me.POSOpeningEntry.period_start_date);
-          me.check_in_out_cart.getAllCheckInOut();
-          dialog.hide();
+          if (!res.exc) {
+            me.prepare_app_data(res.message);
+            Object.assign(me.POSOpeningEntry, {
+              "name": res.message.name,
+              "pos_profile": res.message.pos_profile,
+              "period_start_date": res.message.period_start_date,
+              "company": res.message.company
+            });
+            me.db.updateCheckInOutSync(me.POSOpeningEntry.period_start_date);
+            me.check_in_out_cart.getAllCheckInOut();
+            dialog.hide();
+          }
         },
         primary_action_label: __("Submit")
       });
       dialog.show();
-      const pos_profile_query = () => {
-        return {
-          query: "erpnext.accounts.doctype.pos_profile.pos_profile.pos_profile_query",
-          filters: { company: dialog.fields_dict.company.get_value() }
-        };
-      };
+      fetch_default_payment_method();
     }
     set_right_and_left_sections() {
       this.$components_wrapper.append('<div id="LeftSection" class="columnBoxReverse"></div>');
@@ -7883,4 +7919,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.NEEYMUOY.js.map
+//# sourceMappingURL=pos.bundle.IQXWEDZM.js.map
