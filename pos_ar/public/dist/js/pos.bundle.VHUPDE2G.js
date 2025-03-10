@@ -1514,11 +1514,15 @@
                 message: __("Price updated successfully"),
                 indicator: "green"
               });
-              const company = this.wrapper.find(".company-filter").val();
-              if (this.current_screen === "fixing") {
-                this.load_fixing_data(company);
-              } else {
-                this.load_pricing_data(company);
+              const $editButton = $(`.edit-price[data-name="${itemPriceName}"]`);
+              if ($editButton.length) {
+                const $priceValue = $editButton.closest(".price-value");
+                if ($priceValue.length) {
+                  const formattedPrice = frappe.format(values.new_price, { fieldtype: "Currency" });
+                  $priceValue.contents().filter(function() {
+                    return this.nodeType === 3;
+                  }).first().replaceWith(formattedPrice);
+                }
               }
             }
           });
@@ -7944,4 +7948,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.M7D4FYW6.js.map
+//# sourceMappingURL=pos.bundle.VHUPDE2G.js.map

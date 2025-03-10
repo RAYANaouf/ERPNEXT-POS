@@ -1428,12 +1428,18 @@ pos_ar.Pricing.PricingController = class {
                                 indicator: 'green'
                             });
 
-                            // Refresh the pricing data
-                            const company = this.wrapper.find('.company-filter').val();
-                            if (this.current_screen === 'fixing') {
-                                this.load_fixing_data(company);
-                            } else {
-                                this.load_pricing_data(company);
+                            // Find the button element first, then traverse up to find the price cell
+                            const $editButton = $(`.edit-price[data-name="${itemPriceName}"]`);
+                            if ($editButton.length) {
+                                // Find the price-value div and update its text content
+                                const $priceValue = $editButton.closest('.price-value');
+                                if ($priceValue.length) {
+                                    // Update the price text while preserving the edit button
+                                    const formattedPrice = frappe.format(values.new_price, { fieldtype: 'Currency' });
+                                    $priceValue.contents().filter(function() {
+                                        return this.nodeType === 3; // Text nodes only
+                                    }).first().replaceWith(formattedPrice);
+                                }
                             }
                         }
                     });
