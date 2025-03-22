@@ -11,7 +11,10 @@
   "section_break_ofbf",
   "item",
   "column_break_yfkz",
-  "qty"
+  "type",
+  "column_break_klnv",
+  "qty",
+  "amended_from"
  ],
  "fields": [
   {
@@ -48,11 +51,32 @@
   {
    "fieldname": "column_break_xzc9",
    "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "type",
+   "fieldtype": "Select",
+   "label": "Type",
+   "options": "In\nOut"
+  },
+  {
+   "fieldname": "column_break_klnv",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "CTN-BOX Transaction",
+   "print_hide": 1,
+   "read_only": 1,
+   "search_index": 1
   }
  ],
  "index_web_pages_for_search": 1,
+ "is_submittable": 1,
  "links": [],
- "modified": "2025-03-22 03:09:24.015488",
+ "modified": "2025-03-22 19:17:42.347039",
  "modified_by": "Administrator",
  "module": "POS AR",
  "name": "CTN-BOX Transaction",

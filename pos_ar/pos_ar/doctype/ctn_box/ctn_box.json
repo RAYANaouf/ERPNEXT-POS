@@ -1,0 +1,106 @@
+{
+ "actions": [],
+ "allow_import": 1,
+ "allow_rename": 1,
+ "autoname": "format:{ref}-{ctn_num}",
+ "creation": "2025-03-22 02:35:26.276176",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "ref",
+  "column_break_re5v",
+  "ctn_num",
+  "column_break_tfew",
+  "place",
+  "column_break_t3pk",
+  "status",
+  "section_break_o9lm",
+  "items",
+  "section_break_mokt",
+  "transactions_html"
+ ],
+ "fields": [
+  {
+   "fieldname": "ref",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Ref",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_re5v",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "ctn_num",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "CTN Num",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_tfew",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "place",
+   "fieldtype": "Data",
+   "label": "place"
+  },
+  {
+   "fieldname": "column_break_t3pk",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "Closed",
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "status",
+   "options": "Opened\nClosed"
+  },
+  {
+   "fieldname": "section_break_o9lm",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "items",
+   "fieldtype": "Table",
+   "label": "items",
+   "options": "CTN Item"
+  },
+  {
+   "fieldname": "section_break_mokt",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "transactions_html",
+   "fieldtype": "HTML",
+   "label": "Transaction"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2025-03-22 18:56:14.005660",
+ "modified_by": "Administrator",
+ "module": "POS AR",
+ "name": "CTN-BOX",
+ "naming_rule": "Expression",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
