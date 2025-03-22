@@ -256,7 +256,7 @@ fixtures = [
     },
     {
         'dt': 'Client Script',
-        'filters': [['dt', '=', 'POS Closing Entry']]
+        'filters': [['dt', 'in', ['POS Closing Entry','CTN-BOX']]]
     }
 ]
 
