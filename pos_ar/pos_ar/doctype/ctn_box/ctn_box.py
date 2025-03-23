@@ -20,3 +20,23 @@ def get_transactions(ctn_box_name):
         filters={"ctn": ctn_box_name, "docstatus": 1},
         fields=["*"]  # specify what fields you need
     )
+    
+    
+    
+    
+@frappe.whitelist()
+def get_ctn_items(ctn_box_name):
+    """
+    Return a list of item codes from the child table (e.g. "CTN Items")
+    of the given CTN-BOX doc.
+    """
+    
+    print("DEBUG: ctn_box_name =", ctn_box_name)
+    
+    result = frappe.get_doc("CTN-BOX", ctn_box_name).get("items")
+    
+    items_list = [d.item for d in result]
+    
+    print("DEBUG: items_list =", items_list)
+    
+    return items_list

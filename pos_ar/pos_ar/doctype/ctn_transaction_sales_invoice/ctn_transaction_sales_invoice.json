@@ -1,0 +1,59 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "CTN-Transaction-{name}-{####}",
+ "creation": "2025-03-23 01:52:54.271043",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "ctn",
+  "column_break_xahp",
+  "item",
+  "column_break_uizk",
+  "qty"
+ ],
+ "fields": [
+  {
+   "fieldname": "item",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "item",
+   "options": "Item"
+  },
+  {
+   "fieldname": "column_break_uizk",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "qty",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Qty"
+  },
+  {
+   "fieldname": "ctn",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "CTN",
+   "options": "CTN-BOX"
+  },
+  {
+   "fieldname": "column_break_xahp",
+   "fieldtype": "Column Break"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2025-03-23 01:59:08.627490",
+ "modified_by": "Administrator",
+ "module": "POS AR",
+ "name": "CTN Transaction Sales Invoice",
+ "naming_rule": "Expression (old style)",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
