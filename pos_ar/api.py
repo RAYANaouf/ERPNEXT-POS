@@ -114,3 +114,27 @@ def update_all_customers_debt(doc, method):
         frappe.logger().error(f"Error updating debts for all customers: {str(e)}")
 
 
+
+
+
+def manage_related_ctn_transactions(doc, method):
+    """
+    Create related CTN Transactions whenever a Sales Invoice is submitted.
+    """
+    # Only run for 'on_submit' if you also hooked it into other events.
+    if method == "on_submit":
+        
+        
+        for item in doc.custom_ctn_transaction:
+            # create a new "CTN Transaction" doc
+            ctn_trn = frappe.new_doc("CTN-BOX Transaction")
+            ctn_trn.name = doc.name + "-" + item.ctn + "-" + item.item
+            ctn_trn.item = item.item
+            ctn_trn.qty  = item.qty
+            ctn_trn.ctn  = item.ctn
+            ctn_trn.sales_invoice = doc.name
+            ctn_trn.insert()
+            ctn_trn.submit()
+
+        print(f"CTN Transaction {ctn_trn.name} created for {doc}.")
+

@@ -133,7 +133,7 @@ app_include_js = ["/assets/pos_ar/js/pos.bundle.js","https://cdnjs.cloudflare.co
 
 doc_events = {
     "Sales Invoice": {
-        "on_submit": "pos_ar.api.update_customer_debt_on_invoice",
+        "on_submit": ["pos_ar.api.update_customer_debt_on_invoice" , "pos_ar.api.manage_related_ctn_transactions"],
         "on_cancel": "pos_ar.api.update_customer_debt_on_invoice",
     },
     "POS Invoice": {
