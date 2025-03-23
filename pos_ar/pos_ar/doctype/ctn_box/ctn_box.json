@@ -17,9 +17,9 @@
   "section_break_o9lm",
   "items",
   "section_break_mokt",
-  "transactions_html",
+  "ctn_status_html",
   "section_break_ucys",
-  "ctn_status_html"
+  "transactions_html"
  ],
  "fields": [
   {
@@ -72,7 +72,8 @@
   },
   {
    "fieldname": "section_break_mokt",
-   "fieldtype": "Section Break"
+   "fieldtype": "Section Break",
+   "label": "Transactions"
   },
   {
    "fieldname": "transactions_html",
@@ -81,7 +82,8 @@
   },
   {
    "fieldname": "section_break_ucys",
-   "fieldtype": "Section Break"
+   "fieldtype": "Section Break",
+   "label": "CTN Status"
   },
   {
    "fieldname": "ctn_status_html",
@@ -91,7 +93,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-03-23 11:39:37.936602",
+ "modified": "2025-03-23 17:37:32.586733",
  "modified_by": "Administrator",
  "module": "POS AR",
  "name": "CTN-BOX",
