@@ -7,6 +7,10 @@
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
+  "company",
+  "column_break_noz9",
+  "warehouse",
+  "section_break_ounx",
   "ref",
   "column_break_re5v",
   "ctn_num",
@@ -89,11 +93,31 @@
    "fieldname": "ctn_status_html",
    "fieldtype": "HTML",
    "label": "CTN status"
+  },
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "label": "company",
+   "options": "Company"
+  },
+  {
+   "fieldname": "column_break_noz9",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "warehouse",
+   "fieldtype": "Link",
+   "label": "warehouse",
+   "options": "Warehouse"
+  },
+  {
+   "fieldname": "section_break_ounx",
+   "fieldtype": "Section Break"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-03-23 17:37:32.586733",
+ "modified": "2025-03-25 09:59:58.413723",
  "modified_by": "Administrator",
  "module": "POS AR",
  "name": "CTN-BOX",
