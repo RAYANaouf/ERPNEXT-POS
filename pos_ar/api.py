@@ -136,5 +136,4 @@ def manage_related_ctn_transactions(doc, method):
             ctn_trn.insert()
             ctn_trn.submit()
 
-        print(f"CTN Transaction {ctn_trn.name} created for {doc}.")
 
