@@ -16,8 +16,6 @@
   "ctn_num",
   "column_break_tfew",
   "place",
-  "column_break_vrnl",
-  "place_2",
   "column_break_t3pk",
   "status",
   "section_break_o9lm",
@@ -52,8 +50,9 @@
   },
   {
    "fieldname": "place",
-   "fieldtype": "Data",
-   "label": "place"
+   "fieldtype": "Link",
+   "label": "place",
+   "options": "CTN-Place"
   },
   {
    "fieldname": "column_break_t3pk",
@@ -115,21 +114,11 @@
   {
    "fieldname": "section_break_ounx",
    "fieldtype": "Section Break"
-  },
-  {
-   "fieldname": "column_break_vrnl",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "place_2",
-   "fieldtype": "Link",
-   "label": "place 2",
-   "options": "CTN-Place"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-03-27 14:37:22.009339",
+ "modified": "2025-03-27 15:06:45.110020",
  "modified_by": "Administrator",
  "module": "POS AR",
  "name": "CTN-BOX",
