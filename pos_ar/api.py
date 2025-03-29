@@ -145,7 +145,7 @@ from frappe.utils import get_url
 @frappe.whitelist()
 def export_item_prices():
     prices = frappe.get_all("Item Price",
-        filters={"price_list": "Standard Selling"},
+        filters={"price_list": "JOE - OPTILENS ALGER"},
         fields=["item_code", "price_list_rate"]
     )
 
