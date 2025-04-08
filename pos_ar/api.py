@@ -1,6 +1,12 @@
 
-import frappe
+
 from datetime import datetime
+
+import frappe
+import csv
+import os
+from frappe.utils import get_url
+
 
 def update_customer_debt_on_invoice(doc, method):
     """
@@ -137,10 +143,49 @@ def manage_related_ctn_transactions(doc, method):
 
 
 
-import frappe
-import csv
-import os
-from frappe.utils import get_url
+@frappe.whitelist()
+def get_item_sold(start, end, company=None):
+    if not start or not end:
+        frappe.throw(_("Start and End dates are required"))
+
+    query = """
+        SELECT 
+            sii.item_name,
+            SUM(sii.qty) AS total_qty
+        FROM 
+            `tabSales Invoice Item` sii
+        INNER JOIN 
+            `tabSales Invoice` si ON sii.parent = si.name
+        WHERE 
+            si.posting_date BETWEEN %s AND %s
+            AND si.docstatus = 1
+    """
+    filters = [start, end]
+
+    if company:
+        query += " AND si.company = %s"
+        filters.append(company)
+
+    query += " GROUP BY sii.item_code, sii.item_name"
+
+    items = frappe.db.sql(query, filters, as_dict=True)
+
+    return items
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#i do that for export_item_prices form the database and download it as xlsx
 
 @frappe.whitelist()
 def export_item_prices():
