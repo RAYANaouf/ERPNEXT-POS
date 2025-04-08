@@ -39,7 +39,7 @@
   },
   {
    "fieldname": "ctn_num",
-   "fieldtype": "Int",
+   "fieldtype": "Data",
    "in_list_view": 1,
    "label": "CTN Num",
    "reqd": 1
@@ -118,7 +118,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-03-29 17:10:42.296222",
+ "modified": "2025-04-08 14:48:45.774424",
  "modified_by": "Administrator",
  "module": "POS AR",
  "name": "CTN-BOX",
