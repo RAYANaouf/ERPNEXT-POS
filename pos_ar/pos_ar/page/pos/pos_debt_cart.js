@@ -8,6 +8,7 @@ pos_ar.PointOfSale.pos_debt_cart = class{
 	){
 		this.wrapper              = wrapper
 		this.app_data             = appData
+		this.openingEntry         = openingEntry
 		this.refresh_check_in_out = refreshCheckInOut 
 
 		//local vars
@@ -273,8 +274,9 @@ pos_ar.PointOfSale.pos_debt_cart = class{
 		try {
 			this.show_waiting();
 
+			console.log("seeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee payment amount : " , this.openingEntry)
 			// Call the server method to update the invoice payment
-			const result = await this.app_data.update_invoice_payment(invoice.name, this.payment_amount);
+			const result = await this.app_data.update_invoice_payment(invoice.name, this.payment_amount , this.openingEntry);
 
 			// Update the payment amount and UI
 			this.payment_amount = result.remaining;

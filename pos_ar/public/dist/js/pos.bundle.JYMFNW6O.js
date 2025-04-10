@@ -6616,6 +6616,7 @@
     constructor(wrapper, appData, openingEntry, refreshCheckInOut) {
       this.wrapper = wrapper;
       this.app_data = appData;
+      this.openingEntry = openingEntry;
       this.refresh_check_in_out = refreshCheckInOut;
       this._filtredClientList = this.app_data.appData.customers;
       this.selected_client = {};
@@ -6809,7 +6810,8 @@
       }
       try {
         this.show_waiting();
-        const result = await this.app_data.update_invoice_payment(invoice.name, this.payment_amount);
+        console.log("seeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee payment amount : ", this.openingEntry);
+        const result = await this.app_data.update_invoice_payment(invoice.name, this.payment_amount, this.openingEntry);
         this.payment_amount = result.remaining;
         this.leftContainer.find("#debt_paymentAmount").val(result.remaining);
         await this.refreshClientDebtPart(this.selected_client);
@@ -7443,8 +7445,8 @@
     async fetchCustomerDebt(customerName) {
       return await this.api_handler.fetchCustomerDebt(customerName);
     }
-    async update_invoice_payment(invoiceName, amount) {
-      const rest = await this.api_handler.update_invoice_payment(invoiceName, amount);
+    async update_invoice_payment(invoiceName, amount, openingEntry) {
+      const rest = await this.api_handler.update_invoice_payment(invoiceName, amount, openingEntry);
       await this.getPosInvoices();
       this.appData.pos_invoices.forEach((invoice) => {
         if (invoice.real_name == invoiceName) {
@@ -7773,11 +7775,11 @@
         frappe.msgprint(__("Error fetching debts."));
       }
     }
-    async update_invoice_payment(invoice_name, payment_amount) {
+    async update_invoice_payment(invoice_name, payment_amount, openingEntry) {
       try {
         const response = await frappe.call({
           method: "pos_ar.pos_ar.doctype.pos_info.pos_info.update_invoice_payment",
-          args: { invoice_name, payment_amount }
+          args: { invoice_name, payment_amount, openingEntry }
         });
         if (response.message && !response.message.error) {
           return response.message;
@@ -7956,4 +7958,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.LJDEAYQP.js.map
+//# sourceMappingURL=pos.bundle.JYMFNW6O.js.map

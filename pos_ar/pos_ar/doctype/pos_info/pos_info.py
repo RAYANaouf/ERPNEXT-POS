@@ -139,7 +139,7 @@ def check_opening_entry(user , posProfile):
         open_vouchers = frappe.db.get_all(
                 "POS Opening Entry",
                 filters={"user": user, "pos_closing_entry": ["in", ["", None]], "docstatus": 1 , "pos_profile" : posProfile},
-                fields=["name", "company", "pos_profile", "period_start_date"],
+                fields=["*"],
                 order_by="period_start_date desc",
         )
 
@@ -165,16 +165,28 @@ def get_mode_of_payments():
 
 
 @frappe.whitelist()
-def update_invoice_payment(invoice_name, payment_amount):
+def update_invoice_payment(invoice_name, payment_amount , openingEntry):
+    
+        
+	# Fetch the POS Invoice by its name
+	if isinstance(openingEntry, str):
+	    openingEntry = json.loads(openingEntry)
+
+
+
+        
 	# Fetch the POS Invoice by its name
 	pos_invoice = frappe.get_doc('POS Invoice', invoice_name)
 
 	# Create a new POS Invoice by duplicating the old one
 	new_pos_invoice = frappe.copy_doc(pos_invoice)
- 
- new_pos_invoice.owner = frappe.session.user
-new_pos_invoice.user = frappe.session.user
-    
+
+
+	new_pos_invoice.owner = openingEntry["owner"]
+	new_pos_invoice.user = openingEntry["user"]
+	new_pos_invoice.pos_profile = openingEntry["pos_profile"]
+
+
 	#override date to keep the old one
 	new_pos_invoice.posting_date = pos_invoice.posting_date
 

@@ -339,11 +339,11 @@ pos_ar.PointOfSale.FetchHandler = class FetchHandler{
 
 
 
-	async update_invoice_payment(invoice_name , payment_amount) {
+	async update_invoice_payment(invoice_name , payment_amount , openingEntry ) {
 		try {
 			const response = await frappe.call({
 				method: "pos_ar.pos_ar.doctype.pos_info.pos_info.update_invoice_payment",
-				args: { invoice_name , payment_amount },
+				args: { invoice_name , payment_amount , openingEntry },
 			});
 			if (response.message && !response.message.error) {
 				return response.message
