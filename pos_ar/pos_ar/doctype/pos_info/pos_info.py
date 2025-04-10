@@ -171,6 +171,10 @@ def update_invoice_payment(invoice_name, payment_amount):
 
 	# Create a new POS Invoice by duplicating the old one
 	new_pos_invoice = frappe.copy_doc(pos_invoice)
+ 
+ new_pos_invoice.owner = frappe.session.user
+new_pos_invoice.user = frappe.session.user
+    
 	#override date to keep the old one
 	new_pos_invoice.posting_date = pos_invoice.posting_date
 

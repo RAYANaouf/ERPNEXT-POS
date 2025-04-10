@@ -2460,6 +2460,7 @@
       this.debt_cart = new pos_ar.PointOfSale.pos_debt_cart(
         this.wrapper,
         this.appData,
+        this.POSOpeningEntry,
         () => {
           this.check_in_out_cart.getAllCheckInOut();
         }
@@ -6612,7 +6613,7 @@
 
   // ../pos_ar/pos_ar/pos_ar/page/pos/pos_debt_cart.js
   pos_ar.PointOfSale.pos_debt_cart = class {
-    constructor(wrapper, appData, refreshCheckInOut) {
+    constructor(wrapper, appData, openingEntry, refreshCheckInOut) {
       this.wrapper = wrapper;
       this.app_data = appData;
       this.refresh_check_in_out = refreshCheckInOut;
@@ -7955,4 +7956,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.3DSZSY7B.js.map
+//# sourceMappingURL=pos.bundle.LJDEAYQP.js.map

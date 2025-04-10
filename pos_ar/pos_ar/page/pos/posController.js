@@ -7,9 +7,9 @@ pos_ar.PointOfSale.Controller = class {
 
 		this.selectedItemMaps = new Map()
 
-		this.selectedItem = { "name": "" }
-		this.selectedField = { "field_name": "" }
-		this.selectedTab = { "tabName": "" }
+		this.selectedItem    = { "name": "" }
+		this.selectedField   = { "field_name": "" }
+		this.selectedTab     = { "tabName": "" }
 		this.selectedPaymentMethod = { "methodName": "" }
 		this.defaultCustomer = { "name": "", "customer_name": "" }
 		this.defaultPriceList = { "name": "" }
@@ -621,6 +621,7 @@ pos_ar.PointOfSale.Controller = class {
 		this.debt_cart = new pos_ar.PointOfSale.pos_debt_cart(
 			this.wrapper,
 			this.appData,
+			this.POSOpeningEntry,
 			() => {
 				this.check_in_out_cart.getAllCheckInOut();
 			}

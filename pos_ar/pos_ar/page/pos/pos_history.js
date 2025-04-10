@@ -446,6 +446,9 @@ pos_ar.PointOfSale.pos_history = class {
 		this.refreshData();
 	}
 
+
+
+	
 	 async print_receipt(pos) {
 		try {
 			if (!pos) {

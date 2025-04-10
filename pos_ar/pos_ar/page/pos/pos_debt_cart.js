@@ -3,6 +3,7 @@ pos_ar.PointOfSale.pos_debt_cart = class{
 	constructor(
 		wrapper,
 		appData,
+		openingEntry,
 		refreshCheckInOut
 	){
 		this.wrapper              = wrapper
