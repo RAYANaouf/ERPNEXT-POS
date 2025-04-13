@@ -449,14 +449,14 @@ pos_ar.PointOfSale.pos_history = class {
 
 
 	
-	 async print_receipt(pos) {
+	async print_receipt(pos) {
 		try {
 			if (!pos) {
 				console.error("No POS data provided");
 				frappe.throw(__("Error: No POS data available for printing"));
 				return;
 			}
-
+	
 			// Initialize totals
 			const totals = {
 				netTotal: 0,
@@ -465,7 +465,7 @@ pos_ar.PointOfSale.pos_history = class {
 				totalQty: 0,
 				totalItems: 0
 			};
-
+	
 			// Format number helper
 			const formatNumber = (num) => {
 				return new Intl.NumberFormat('fr-DZ', {
@@ -473,20 +473,20 @@ pos_ar.PointOfSale.pos_history = class {
 					maximumFractionDigits: 0
 				}).format(num);
 			};
-
+	
 			// Get customer data
-			const customer = this.app_data.appData.customers.find(customer => customer.name == pos.customer);
+			const customer = this.app_data.appData.customers.find(c => c.name === pos.customer);
 			if (!customer) {
 				console.error("Customer not found:", pos.customer);
 				frappe.throw(__("Error: Customer information not found"));
 				return;
 			}
-
-			let ancien_sold = customer.custom_debt;
+	
+			let previous_balance = customer.custom_debt;
 			if (this.app_settings.settings.onlineDebt) {
-				ancien_sold = await this.app_data.fetchCustomerDebt(customer.name);
+				previous_balance = await this.app_data.fetchCustomerDebt(customer.name);
 			}
-
+	
 			// Parse creation time
 			const creation_time = pos.creation_time || pos.creation;
 			if (!creation_time) {
@@ -495,17 +495,30 @@ pos_ar.PointOfSale.pos_history = class {
 				return;
 			}
 			const [date, time] = creation_time.split(' ');
-
+	
 			// Generate CSS styles
 			const styles = `
 				<style>
 					@media print {
+						display: table-row-group !important;
 						@page {
 							margin: 0;
 							size: 80mm auto;
 						}
 						body {
 							margin: 1mm;
+						}
+						div.table-header {
+							display: table-header-group;
+						}
+						tbody {
+							page-break-before: auto;
+						}
+						tr {
+							page-break-inside: avoid;
+						}
+						.receipt-footer {
+							page-break-before: avoid;
 						}
 					}
 					body {
@@ -520,11 +533,10 @@ pos_ar.PointOfSale.pos_history = class {
 					}
 					.logo-container {
 						text-align: center;
-						margin-bottom: 10px;
-						margin-top: 10px;
+						margin: 10px 0;
 					}
 					.logo-container img {
-						width:90%;
+						width: 90%;
 						height: auto;
 					}
 					.company-name {
@@ -578,13 +590,13 @@ pos_ar.PointOfSale.pos_history = class {
 					}
 				</style>
 			`;
-
+	
 			// Generate receipt HTML
 			let receiptHTML = `
 				${styles}
 				<div class="receipt-container">
 					<div class="logo-container">
-						<img src="/assets/pos_ar/images/logo.jpg" alt="Company Logo">
+						<img src="/assets/pos_ar/images/logo.jpg" alt="Company Logo" onerror="this.style.display='none';">
 					</div>
 					<div class="company-name">${this.company.company_name}</div>
 					
@@ -596,26 +608,26 @@ pos_ar.PointOfSale.pos_history = class {
 							<div style="font-size:10px;">Heure: ${time}</div>
 						</div>
 					</div>
-
+	
 					<table class="receipt-table">
-						<thead>
+						<div class="table-header">
 							<tr>
 								<th>Article</th>
 								<th class="text-right">Qté</th>
 								<th class="text-right">Prix</th>
 								<th class="text-right">Total</th>
 							</tr>
-						</thead>
+						</div>
 						<tbody>
 			`;
-
-			// Add items to receipt
+	
+			// Add items
 			pos.items.forEach(item => {
 				const itemTotal = item.rate * item.qty;
 				totals.netTotal += itemTotal;
 				totals.totalQty += item.qty;
 				totals.totalItems += 1;
-
+	
 				receiptHTML += `
 					<tr>
 						<td>${item.item_name}</td>
@@ -625,63 +637,62 @@ pos_ar.PointOfSale.pos_history = class {
 					</tr>
 				`;
 			});
-
-			// Calculate final totals
-			const discount = pos.additional_discount_percentage ? (totals.netTotal * pos.additional_discount_percentage) : 0;
+	
+			// Calculate totals
+			const discount = pos.additional_discount_percentage
+				? (totals.netTotal * pos.additional_discount_percentage / 100)
+				: 0;
 			totals.grandTotal = totals.netTotal - discount;
-
-
-
-
+	
 			// Add totals section
 			receiptHTML += `
 						</tbody>
 					</table>
-
-					<div class="totals" style="text-align:left;">
+	
+					<div class="totals">
 						<div>Quantité Totale: ${totals.totalQty}</div>
-						 <div>Remise: ${formatNumber(discount)} DA</div>
-						<div style="margin-top:15px; text-align:left;">
+						<div>Remise: ${formatNumber(discount)} DA</div>
+						<div style="margin-top:15px;">
 							<div class="bold" style="display:flex; align-items:center; font-size:18px;">
-								<div style="width:120px; font-size:18px;">Total:</div>
-								<div style="flex-grow:1; text-align:center; font-size:18px;">${formatNumber(totals.grandTotal)} DA</div>
+								<div style="width:120px;">Total:</div>
+								<div style="flex-grow:1; text-align:center;">${formatNumber(totals.grandTotal)} DA</div>
 							</div>
 							<div style="display:flex; align-items:center; font-size:14px;">
-								<div style="width:120px; font-size:14px;">Total Solde:</div>
-								<div style="flex-grow:1; text-align:center; font-size:14px;">${formatNumber(ancien_sold)} DA</div>
+								<div style="width:120px;">Total Solde:</div>
+								<div style="flex-grow:1; text-align:center;">${formatNumber(previous_balance)} DA</div>
 							</div>
 						</div>
 					</div>
-
+	
 					<div class="receipt-footer">
 						<div>Merci de votre visite!</div>
 						<div>${this.company.company_name}</div>
 					</div>
 				</div>
 			`;
-
+	
 			// Print the receipt
 			const printWindow = window.open('', '_blank');
 			if (!printWindow) {
 				frappe.throw(__("Error: Popup blocked. Please allow popups for printing."));
 				return;
 			}
-
+	
 			printWindow.document.write(receiptHTML);
 			printWindow.document.close();
-
-			// Wait for images to load before printing
+	
 			printWindow.onload = () => {
 				setTimeout(() => {
 					printWindow.focus();
 					printWindow.print();
 					printWindow.close();
-				}, 250); // Small delay to ensure styles are applied
+				}, 250);
 			};
-
+	
 		} catch (error) {
 			console.error("Error printing receipt:", error);
 			frappe.throw(__("Error printing receipt. Please try again."));
 		}
 	}
+	
 }
