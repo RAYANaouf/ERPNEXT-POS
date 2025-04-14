@@ -160,6 +160,7 @@ pos_ar.PointOfSale.pos_item_selector = class {
 	clearSearchField(){
 		const itemInput = document.getElementById("ItemInput");
 		itemInput.value = '';
+		this.setItemInFlow(this.item_list);
 	}
 
 

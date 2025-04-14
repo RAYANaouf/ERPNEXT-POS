@@ -2379,6 +2379,7 @@
           this.onSelectedItemClick(item);
         },
         (tab) => {
+          this.item_selector.clearSearchField();
           this.screenManager.navigate("home");
         },
         (action, key) => {
@@ -3425,6 +3426,7 @@
     clearSearchField() {
       const itemInput = document.getElementById("ItemInput");
       itemInput.value = "";
+      this.setItemInFlow(this.item_list);
     }
     showCart() {
       this.selectorBox.css("display", "flex");
@@ -7985,4 +7987,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.HMAPAK6S.js.map
+//# sourceMappingURL=pos.bundle.3UGS3IER.js.map

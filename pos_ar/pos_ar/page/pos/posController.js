@@ -534,6 +534,7 @@ pos_ar.PointOfSale.Controller = class {
 				this.onSelectedItemClick(item)
 			},
 			tab => {
+				this.item_selector.clearSearchField();
 				this.screenManager.navigate('home')
 			},
 			(action, key) => {
