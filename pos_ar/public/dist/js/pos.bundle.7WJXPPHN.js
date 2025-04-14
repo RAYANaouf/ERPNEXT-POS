@@ -4408,10 +4408,11 @@
     resetItemRateBaseOnPriceList() {
       this.selected_item_maps.get(this.selected_tab.tabName).items.forEach((item) => {
         if (item.manually_edited == false) {
-          item.rate = this.get_item_price(item, this.selected_item_maps.get(this.selected_tab.tabName).priceList);
-          item.discount_percentage = 0;
-          item.discount_amount = 0;
+          return;
         }
+        item.rate = this.get_item_price(item, this.selected_item_maps.get(this.selected_tab.tabName).priceList);
+        item.discount_percentage = 0;
+        item.discount_amount = 0;
       });
     }
     makeItemHighlight(itemElement) {
@@ -7990,4 +7991,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.A6POXPMQ.js.map
+//# sourceMappingURL=pos.bundle.7WJXPPHN.js.map
