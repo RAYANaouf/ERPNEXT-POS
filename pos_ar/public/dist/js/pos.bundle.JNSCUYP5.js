@@ -3342,9 +3342,14 @@
       this.selectorBox.append('<div id="selectorBoxHeader" class="rowBox header"></div>');
       this.header = this.selectorBox.find("#selectorBoxHeader");
       this.header.append('<h4 class="CartTitle">Items</h4>');
-      this.header.append('<div id="inputsBox" class="rowBox align_center"></div>');
+      this.header.append('<div id="inputsBox" class="rowBox align_center"  style="flex-grow: 1; "></div>');
       this.inputBox = this.header.find("#inputsBox");
-      this.inputBox.append('<input type="text" autocomplete="off"  maxlength="140" placeholder="Search by item code, item name or barcode" id="ItemInput" name="item" placeHolder="Enter the customer">');
+      this.inputBox.append(`
+			<div class="input-with-clear">
+			  <input type="text" autocomplete="off" maxlength="140" placeholder="Search by item code, item name or barcode" id="ItemInput" name="item">
+			  <span class="clear-btn" id="ClearItemInput">\xD7</span>
+			</div>
+		  `);
       this.inputBox.append('<input list="ItemGroupList"  id="ItemGroupInput" name="ItemGroup" placeHolder="Item Group">');
       this.inputBox.append('<datalist id="ItemGroupList"></datalist>');
       this.itemGroupList = this.inputBox.find("#ItemGroupList");
@@ -3430,6 +3435,11 @@
       const itemInput = document.getElementById("ItemInput");
       itemInput.addEventListener("input", (event2) => {
         this.setItemInFlow(this.filterListByItemData(event2.target.value));
+      });
+      const clearItemInput = document.getElementById("ClearItemInput");
+      clearItemInput.addEventListener("click", () => {
+        itemInput.value = "";
+        this.setItemInFlow(this.item_list);
       });
     }
     filterListByItemData(value) {
@@ -7970,4 +7980,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.XCHNUQZ5.js.map
+//# sourceMappingURL=pos.bundle.JNSCUYP5.js.map

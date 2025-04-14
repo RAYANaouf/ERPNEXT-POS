@@ -17,7 +17,7 @@
     border-bottom: 1px solid #e5e7eb;
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: start;
     gap: 16px;
 }
 
@@ -29,14 +29,14 @@
     white-space: nowrap;
 }
 
-#LeftSection #SelectorBox .header #inputsBox {
+#LeftSection #SelectorBox .header #input-with-clear {
     display: flex;
     align-items: center;
     gap: 12px;
     flex: 1;
 }
 
-#LeftSection #SelectorBox .header #ItemInput {
+#LeftSection #SelectorBox .header #input-with-clear {
     flex: 1;
     height: 36px;
     padding: 0 12px;
@@ -46,6 +46,71 @@
     background: #f9fafb;
     transition: all 0.2s ease;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.input-with-clear {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+  }
+
+  .input-with-clear input {
+    padding-right: 25px;
+  }
+
+  .clear-btn {
+    position: absolute;
+    right: 10px;
+    cursor: pointer;
+    font-size: 22px;
+    color: red;
+    user-select: none;
+  }
+
+  .clear-btn:hover {
+    color: #333;
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 #LeftSection #SelectorBox .header #ItemGroupInput {
     width: 160px;
