@@ -2595,6 +2595,7 @@
       this.screenManager.navigate("home");
     }
     createNewTab(counter) {
+      this.item_selector.clearSearchField();
       let new_pos_invoice = frappe.model.get_new_doc("POS Invoice");
       new_pos_invoice.customer = this.defaultCustomer.name;
       new_pos_invoice.pos_profile = this.appData.appData.pos_profile.name;
@@ -3420,6 +3421,10 @@
 				</div>
 			`);
       }
+    }
+    clearSearchField() {
+      const itemInput = document.getElementById("ItemInput");
+      itemInput.value = "";
     }
     showCart() {
       this.selectorBox.css("display", "flex");
@@ -7980,4 +7985,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.JNSCUYP5.js.map
+//# sourceMappingURL=pos.bundle.HMAPAK6S.js.map

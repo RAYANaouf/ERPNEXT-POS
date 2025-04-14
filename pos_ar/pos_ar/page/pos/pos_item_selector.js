@@ -156,6 +156,12 @@ pos_ar.PointOfSale.pos_item_selector = class {
 		}
 	}
 
+	//clean the search field
+	clearSearchField(){
+		const itemInput = document.getElementById("ItemInput");
+		itemInput.value = '';
+	}
+
 
 	//show and hide
 	showCart(){

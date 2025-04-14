@@ -806,6 +806,9 @@ pos_ar.PointOfSale.Controller = class {
 
 	createNewTab(counter) {
 
+		//clean the search field on item_selector
+		this.item_selector.clearSearchField();
+
 		let new_pos_invoice = frappe.model.get_new_doc('POS Invoice');
 		new_pos_invoice.customer = this.defaultCustomer.name
 		new_pos_invoice.pos_profile = this.appData.appData.pos_profile.name
