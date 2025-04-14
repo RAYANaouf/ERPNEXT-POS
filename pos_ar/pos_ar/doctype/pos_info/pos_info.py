@@ -396,15 +396,37 @@ def get_item_prices(company=None):
     Returns both price lists and item prices for easier rendering.
     """
     try:
-        # Filter price lists for the specified company or with no company set
+        
+            
+        print("==========>1" )
+
+        allowed_price_lists = frappe.get_all(
+            "User Permission",
+            filters={
+                "user": frappe.session.user,
+                "allow": "Price List"
+            },
+            fields=["for_value"]
+        )
+            
+        print("==========>2" + str(allowed_price_lists))
+        
+        allowed_price_lists = [row["for_value"] for row in allowed_price_lists]
+
+
+
+            
+        print("==========>3" + str(allowed_price_lists))
+
+        # Filter price lists that are both enabled, belong to the right company, and user is permitted to see
         price_lists = frappe.get_all(
             "Price List",
-            filters=[
-                ["enabled", "=", 1],  # Ensure price list is enabled
-                ["custom_company", "in", [company, "", None]]  # Match company or no company set
-            ],
-            fields=["name"],
-            user_permissions=True
+            filters={
+                "enabled": 1,
+                "custom_company": ["in", [company, "", None]],
+                "name": ["in", allowed_price_lists]  # ✅ manually restrict using user permissions
+            },
+            fields=["name"]
         )
 
         # Filter item prices by the price lists fetched
