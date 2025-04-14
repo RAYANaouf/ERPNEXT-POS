@@ -535,7 +535,7 @@ pos_ar.PointOfSale.Controller = class {
 			},
 			tab => {
 				this.item_selector.clearSearchField();
-				this.screenManager.navigate('home')
+				this.screenManager.navigate('home');
 			},
 			(action, key) => {
 				this.onKeyPressed(action, key)
@@ -1802,6 +1802,7 @@ pos_ar.PointOfSale.Controller = class {
 		items.forEach(item => {
 			if (item.name == itemName) {
 				item.rate = rate
+				item.manually_edited = true
 			}
 		})
 	}
