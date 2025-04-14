@@ -724,7 +724,7 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 
 	resetItemRateBaseOnPriceList(){
 		this.selected_item_maps.get(this.selected_tab.tabName).items.forEach( item  => {
-			if(item.manually_edited == false){
+			if(item.manually_edited == true){
 				return
 			}
 			item.rate                = this.get_item_price(item , this.selected_item_maps.get(this.selected_tab.tabName).priceList)
