@@ -182,7 +182,7 @@ def update_invoice_payment(invoice_name, payment_amount , openingEntry):
 	new_pos_invoice = frappe.copy_doc(pos_invoice)
 
 
-	new_pos_invoice.owner = openingEntry["owner"]
+	new_pos_invoice.owner = openingEntry["user"]
 	new_pos_invoice.user = openingEntry["user"]
 	new_pos_invoice.pos_profile = openingEntry["pos_profile"]
 
