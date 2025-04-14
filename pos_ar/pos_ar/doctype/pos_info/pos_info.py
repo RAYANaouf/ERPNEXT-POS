@@ -403,7 +403,8 @@ def get_item_prices(company=None):
                 ["enabled", "=", 1],  # Ensure price list is enabled
                 ["custom_company", "in", [company, "", None]]  # Match company or no company set
             ],
-            fields=["name"]
+            fields=["name"],
+            user_permissions=True
         )
 
         # Filter item prices by the price lists fetched
