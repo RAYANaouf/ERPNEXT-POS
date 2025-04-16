@@ -266,7 +266,7 @@ pos_ar.PointOfSale.pos_debt_cart = class{
 
 		// Ensure the payment amount is a valid float
 		const paymentAmount = parseFloat(this.payment_amount) || 0;
-		if(this.paymentAmount <= 0){
+		if(paymentAmount <= 0){
 			frappe.msgprint(__('The paid amount should be grant than 0'));
 			return;
 		}
@@ -274,9 +274,8 @@ pos_ar.PointOfSale.pos_debt_cart = class{
 		try {
 			this.show_waiting();
 
-			console.log("seeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee payment amount : " , this.openingEntry)
 			// Call the server method to update the invoice payment
-			const result = await this.app_data.update_invoice_payment(invoice.name, this.payment_amount , this.openingEntry);
+			const result = await this.app_data.update_invoice_payment(invoice.name, paymentAmount , this.openingEntry);
 
 			// Update the payment amount and UI
 			this.payment_amount = result.remaining;
@@ -312,7 +311,7 @@ pos_ar.PointOfSale.pos_debt_cart = class{
 			const result = await this.app_data.update_sales_invoice_payment(invoice.name, paymentAmount);
 
 			// add check in to the voucher.
-			const check_in_amount  = this.payment_amount - result.remaining;
+			const check_in_amount    = paymentAmount - result.remaining;
 			const checkInOut         = frappe.model.get_new_doc('check_in_out')
 			checkInOut.creation_time = frappe.datetime.now_datetime();
 			checkInOut.user          = frappe.session.user;

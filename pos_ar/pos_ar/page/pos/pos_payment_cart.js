@@ -306,8 +306,6 @@ pos_ar.PointOfSale.pos_payment_cart = class{
 
 
 
-			console.log(this.selected_item_map.get(this.selected_tab.tabName))
-
 			var paidAmount = 0;
 			var cost       = 0;
 			this.selected_item_map.get(this.selected_tab.tabName).items.forEach(item =>{

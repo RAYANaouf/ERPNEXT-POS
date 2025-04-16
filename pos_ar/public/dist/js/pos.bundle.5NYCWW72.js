@@ -4977,7 +4977,6 @@
       this.cart_footer.find("#completeOrderBtn").on("click", (event2) => {
         let error_message = "";
         let popover_title = "";
-        console.log(this.selected_item_map.get(this.selected_tab.tabName));
         var paidAmount = 0;
         var cost = 0;
         this.selected_item_map.get(this.selected_tab.tabName).items.forEach((item) => {
@@ -6894,14 +6893,13 @@
     }
     async payPosInvoice(invoice) {
       const paymentAmount = parseFloat(this.payment_amount) || 0;
-      if (this.paymentAmount <= 0) {
+      if (paymentAmount <= 0) {
         frappe.msgprint(__("The paid amount should be grant than 0"));
         return;
       }
       try {
         this.show_waiting();
-        console.log("seeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee payment amount : ", this.openingEntry);
-        const result = await this.app_data.update_invoice_payment(invoice.name, this.payment_amount, this.openingEntry);
+        const result = await this.app_data.update_invoice_payment(invoice.name, paymentAmount, this.openingEntry);
         this.payment_amount = result.remaining;
         this.leftContainer.find("#debt_paymentAmount").val(result.remaining);
         await this.refreshClientDebtPart(this.selected_client);
@@ -6921,7 +6919,7 @@
           return;
         }
         const result = await this.app_data.update_sales_invoice_payment(invoice.name, paymentAmount);
-        const check_in_amount = this.payment_amount - result.remaining;
+        const check_in_amount = paymentAmount - result.remaining;
         const checkInOut = frappe.model.get_new_doc("check_in_out");
         checkInOut.creation_time = frappe.datetime.now_datetime();
         checkInOut.user = frappe.session.user;
@@ -8048,4 +8046,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.OJWC7SRR.js.map
+//# sourceMappingURL=pos.bundle.5NYCWW72.js.map
