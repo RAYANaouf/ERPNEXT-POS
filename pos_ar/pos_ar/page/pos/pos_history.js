@@ -43,7 +43,6 @@ pos_ar.PointOfSale.pos_history = class {
 				return false;
 			}
 		})
-		console.log("log init data : ", this.filtered_pos_list)
 		if (this.filtered_pos_list.length == 0) {
 			this.selected_pos = null
 		} else {

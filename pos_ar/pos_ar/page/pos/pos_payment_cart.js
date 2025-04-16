@@ -41,6 +41,59 @@ pos_ar.PointOfSale.pos_payment_cart = class{
 	}
 
 	prepare_payment_cart(){
+
+
+
+
+
+		// Add popover element
+		this.wrapper.append(`
+			<div id="AlertPopover" popover>
+				<div class="AlertPopover-header">
+					<h2>Notice</h2>
+				</div>
+				<div class="AlertPopover-content">
+					<!-- Content will go here -->
+					<p></p>
+				</div>
+				<div class="AlertPopover-footer">
+					<button class="btn btn-primary" id="AlertPopoverConfirmBtn">Done</button>
+				</div>
+			</div>
+		`)
+
+
+/*		// 2. THEN attach the event listener (now it exists in the DOM)
+		const btn = document.querySelector('#AlertPopoverConfirmBtn');
+		btn.addEventListener('click', () => {
+			console.log("confirm btn clicked");
+			// Optional: Hide the popover
+			document.getElementById("AlertPopover").hidePopover?.(); // Use optional chaining to avoid errors
+		});
+*/
+		
+		// Add styles for the invoice popup
+		const style = document.createElement('style');
+		style.textContent = `
+			#AlertPopover {
+				min-width: 600px !important;
+				max-width: 80vw !important;
+			}
+			#AlertPopover-content {
+				width: 100%;
+				padding: 0;
+			}
+		`;
+		document.head.appendChild(style);
+
+
+
+
+
+
+
+
+
 		this.wrapper.append('<div id="paymentMethodCart" class="columnBox align_center"></div>')
 		this.paymentCart = this.wrapper.find('#paymentMethodCart')
 
@@ -241,15 +294,49 @@ pos_ar.PointOfSale.pos_payment_cart = class{
 		*/
 
 
-		this.cart_footer.find("#completeOrderBtn").on('click' , (event)=>{
+		
+		const popover = document.getElementById('AlertPopover');
 
-			frappe.confirm('Submit the invoice ?',
-			()=>{/*yes*/
-				this.on_complete()
-			},()=>{
 
-			})
-		})
+		const btn = document.querySelector('#AlertPopoverConfirmBtn');
+
+		// 💡 Now attach the event listener AFTER the element is added
+		btn.addEventListener('click', () => {
+			console.log("confirm btn clicked");
+			document.getElementById("AlertPopover").hidePopover(); // if native popover
+		});
+
+
+		this.cart_footer.find("#completeOrderBtn").on('click', (event) => {
+
+
+			let error_message = "";
+			let popover_title = "";
+
+			this.selected_item_map.get(this.selected_tab.tabName).items.forEach(item => {
+				if (item.qty == 0) {
+					error_message = "You have an item with quantity 0.";
+					popover_title = "Quantity Alert";
+				}
+				if (item.rate == 0) {
+					error_message = "You have an item with rate 0.";
+					popover_title = "Rate Alert";
+				}
+			});
+
+			if (error_message !== "") {
+				this.wrapper.find(".AlertPopover-header h2").text(popover_title);
+				this.wrapper.find(".AlertPopover-content").html(`<p>${error_message}</p>`);
+				popover.togglePopover();
+			} else {
+				frappe.confirm('Submit the invoice ?',
+					() => { this.on_complete(); },
+					() => { /* cancelled */ }
+				);
+			}
+		});
+
+
 
 
 	}

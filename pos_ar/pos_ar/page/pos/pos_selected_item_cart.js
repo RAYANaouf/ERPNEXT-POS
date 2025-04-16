@@ -106,6 +106,7 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 		this.wrapper.append('<div id="CartBox" class="columnBox"></div>')
 
 
+
 		this.tabs_bar       = this.wrapper.find("#tabs")
 		this.tabs_container = this.tabs_bar.find('#tabs_container')
 		this.cartBox        = this.wrapper.find("#CartBox")
@@ -581,6 +582,8 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 	}
 
 	setListener(){
+
+
 
 		this.add_tab_button.on('mousedown' , (event)=>{
 			this.createNewTab()

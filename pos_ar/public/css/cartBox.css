@@ -579,3 +579,134 @@ div.tab:hover img{
     background: #059669 !important;
     transform: translateY(-1px);
 }
+
+
+
+
+
+
+/******************************* popup   ******************************/
+
+
+/* Modern Popover Styles */
+#AlertPopover {
+    padding: 0;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px #2D6B61;
+    border: none;
+    background: white;
+    width: 450px;
+    position: fixed;
+    top: 50vh;
+    left: 50vw;
+    transform: translate(-50%, -50%);
+    z-index: 9999;
+    overflow: hidden;
+    margin: 0;
+}
+
+#AlertPopover[popover] {
+    display: none;
+}
+
+#AlertPopover[popover]:popover-open {
+    display: block;
+    animation: popoverFadeIn 0.2s ease;
+}
+
+@keyframes popoverFadeIn {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -48%);
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, -50%);
+    }
+}
+
+#AlertPopover::backdrop {
+    background: rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(2px);
+    animation: backdropFadeIn 0.2s ease;
+    position: fixed;
+    inset: 0;
+}
+
+#AlertPopover .AlertPopover-header {
+    padding: 20px 25px;
+    background: #204d45;
+    color: white;
+}
+
+#AlertPopover .AlertPopover-header h2 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 500;
+    color: white;
+}
+
+#AlertPopover .AlertPopover-content {
+    padding: 25px;
+    min-height: 120px;
+}
+
+#AlertPopover .AlertPopover-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    padding: 20px 25px;
+    background: #efefef;
+    border-top: 1px solid #e0e0e0;
+}
+
+#AlertPopover .btn {
+    padding: 8px 20px;
+    border-radius: 6px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+#AlertPopover .btn-default {
+    background: #f0f0f0;
+    color: #666;
+    border: none;
+}
+
+#AlertPopover .btn-default:hover {
+    background: #e5e5e5;
+}
+
+#AlertPopover .btn-primary {
+    background: #44A292;
+    color: white;
+    border: none;
+}
+
+#AlertPopover .btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px #44A292;
+}
+
+
+#AlertPopover .error-alert {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	background: #fff3cd;
+	color: #856404;
+	border: 1px solid #ffeeba;
+	border-radius: 8px;
+	padding: 16px;
+	font-size: 15px;
+	font-weight: 500;
+	box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+#AlertPopover .error-icon {
+	font-size: 22px;
+}
+
+#AlertPopover .error-text {
+	flex: 1;
+}

@@ -1977,12 +1977,6 @@
       this.invoiceData = { netTotal: 0, grandTotal: 0, paidAmount: 0, toChange: 0, discount: 0 };
       this.db = null;
       this.syncInput = false;
-      frappe.db.get_list("Customer", {
-        filters: { custom_company: "Optilens BISKRA" },
-        fields: ["name"]
-      }).then((record) => {
-        console.log(" customers ::: ", record);
-      });
       this.start_app();
     }
     async start_app() {
@@ -4837,6 +4831,32 @@
       this.setListeners();
     }
     prepare_payment_cart() {
+      this.wrapper.append(`
+			<div id="AlertPopover" popover>
+				<div class="AlertPopover-header">
+					<h2>Notice</h2>
+				</div>
+				<div class="AlertPopover-content">
+					<!-- Content will go here -->
+					<p></p>
+				</div>
+				<div class="AlertPopover-footer">
+					<button class="btn btn-primary" id="AlertPopoverConfirmBtn">Done</button>
+				</div>
+			</div>
+		`);
+      const style = document.createElement("style");
+      style.textContent = `
+			#AlertPopover {
+				min-width: 600px !important;
+				max-width: 80vw !important;
+			}
+			#AlertPopover-content {
+				width: 100%;
+				padding: 0;
+			}
+		`;
+      document.head.appendChild(style);
       this.wrapper.append('<div id="paymentMethodCart" class="columnBox align_center"></div>');
       this.paymentCart = this.wrapper.find("#paymentMethodCart");
       this.paymentCart.append(
@@ -4948,15 +4968,39 @@
         me.updatePaidAmount();
         me.updateToChange();
       });
+      const popover = document.getElementById("AlertPopover");
+      const btn = document.querySelector("#AlertPopoverConfirmBtn");
+      btn.addEventListener("click", () => {
+        console.log("confirm btn clicked");
+        document.getElementById("AlertPopover").hidePopover();
+      });
       this.cart_footer.find("#completeOrderBtn").on("click", (event2) => {
-        frappe.confirm(
-          "Submit the invoice ?",
-          () => {
-            this.on_complete();
-          },
-          () => {
+        let error_message = "";
+        let popover_title = "";
+        this.selected_item_map.get(this.selected_tab.tabName).items.forEach((item) => {
+          if (item.qty == 0) {
+            error_message = "You have an item with quantity 0.";
+            popover_title = "Quantity Alert";
           }
-        );
+          if (item.rate == 0) {
+            error_message = "You have an item with rate 0.";
+            popover_title = "Rate Alert";
+          }
+        });
+        if (error_message !== "") {
+          this.wrapper.find(".AlertPopover-header h2").text(popover_title);
+          this.wrapper.find(".AlertPopover-content").html(`<p>${error_message}</p>`);
+          popover.togglePopover();
+        } else {
+          frappe.confirm(
+            "Submit the invoice ?",
+            () => {
+              this.on_complete();
+            },
+            () => {
+            }
+          );
+        }
       });
     }
     handleInput(key) {
@@ -5057,7 +5101,6 @@
           return false;
         }
       });
-      console.log("log init data : ", this.filtered_pos_list);
       if (this.filtered_pos_list.length == 0) {
         this.selected_pos = null;
       } else {
@@ -7992,4 +8035,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.2AMBEYIC.js.map
+//# sourceMappingURL=pos.bundle.4JTOKCV5.js.map

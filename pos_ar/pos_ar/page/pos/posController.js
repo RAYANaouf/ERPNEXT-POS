@@ -26,14 +26,6 @@ pos_ar.PointOfSale.Controller = class {
 		this.syncInput = false
 
 
-		frappe.db.get_list('Customer', {
-			filters: { custom_company: 'Optilens BISKRA' },
-			fields: ['name'],
-		}).then(record => {
-			console.log(" customers ::: ", record)
-		})
-
-
 
 		this.start_app();
 	}
