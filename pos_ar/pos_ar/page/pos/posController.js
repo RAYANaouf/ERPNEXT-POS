@@ -1264,8 +1264,6 @@ pos_ar.PointOfSale.Controller = class {
 		if (status == 'Unpaid') {
 			pos.synced = true
 
-			console.log("debuging rayan :::: " , pos)
-
 			frappe.db.insert(
 				pos
 			).then(r => {
@@ -1288,9 +1286,12 @@ pos_ar.PointOfSale.Controller = class {
 				//if there are still tabs it will just set the first as selected
 				//otherwise it will create one using the selected_item_cart class and set it as selected
 				if (tabs.length > 0) {
+					this.selected_item_cart.createNewTab();
+					/*
 					this.selectedTab.tabName = tabs[0]
 					this.selected_item_cart.refreshTabs();
 					this.selected_item_cart.refreshSelectedItem();
+					*/
 				}
 				else {
 					this.selected_item_cart.createNewTab();
@@ -1319,9 +1320,12 @@ pos_ar.PointOfSale.Controller = class {
 			//if there are still tabs it will just set the first as selected
 			//otherwise it will create one using the selected_item_cart class and set it as selected
 			if (tabs.length > 0) {
+				this.selected_item_cart.createNewTab();
+				/*
 				this.selectedTab.tabName = tabs[0]
 				this.selected_item_cart.refreshTabs();
 				this.selected_item_cart.refreshSelectedItem();
+				*/
 			}
 			else {
 				this.selected_item_cart.createNewTab();

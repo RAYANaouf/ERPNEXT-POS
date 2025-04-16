@@ -2893,7 +2893,6 @@
       pos.custom_is_shared = this.settings_data.settings.sendInvoiceToOtherPos ? 1 : 0;
       if (status == "Unpaid") {
         pos.synced = true;
-        console.log("debuging rayan :::: ", pos);
         frappe.db.insert(
           pos
         ).then((r) => {
@@ -2905,9 +2904,7 @@
           this.selectedItemMaps.delete(this.selectedTab.tabName);
           let tabs = Array.from(this.selectedItemMaps.keys());
           if (tabs.length > 0) {
-            this.selectedTab.tabName = tabs[0];
-            this.selected_item_cart.refreshTabs();
-            this.selected_item_cart.refreshSelectedItem();
+            this.selected_item_cart.createNewTab();
           } else {
             this.selected_item_cart.createNewTab();
           }
@@ -2923,9 +2920,7 @@
         this.selectedItemMaps.delete(this.selectedTab.tabName);
         let tabs = Array.from(this.selectedItemMaps.keys());
         if (tabs.length > 0) {
-          this.selectedTab.tabName = tabs[0];
-          this.selected_item_cart.refreshTabs();
-          this.selected_item_cart.refreshSelectedItem();
+          this.selected_item_cart.createNewTab();
         } else {
           this.selected_item_cart.createNewTab();
         }
@@ -8038,4 +8033,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.K3BYVO2Q.js.map
+//# sourceMappingURL=pos.bundle.OAA3AUPT.js.map
