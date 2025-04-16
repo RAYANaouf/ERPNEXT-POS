@@ -118,8 +118,6 @@ pos_ar.PointOfSale.pos_check_in_out = class {
 			type_img.style.height    = '35px'
 			type_img.style.transform = checkInOut.check_type === 'In' ? 'rotate(180deg)' : ''
 
-			console.log("checkInOut.check_type : " , checkInOut.check_type === 'In' ? 'rotate(180deg);' : '')
-
 			//type div value
 			const type_value_div       = document.createElement('div')
 			type_value_div.textContent = checkInOut.check_type

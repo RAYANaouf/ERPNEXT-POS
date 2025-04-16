@@ -39,7 +39,6 @@ pos_ar.PointOfSale.Controller = class {
 			//api fetch handler
 			this.dataHandler = new pos_ar.PointOfSale.FetchHandler()
 
-			console.log("warehouse ::::::::", await this.dataHandler.fetchStockBalance())
 			//local app data
 			this.appData = new pos_ar.PointOfSale.posAppData(this.db, this.dataHandler)
 			await this.appData.getAllData()
@@ -501,7 +500,10 @@ pos_ar.PointOfSale.Controller = class {
 			this.defaultPriceList,
 			this.getItemPrice.bind(this),
 			this.auto_select.bind(this),
-			item => { this.itemClick_selector(item) }
+			item => { 
+				this.item_selector.clearSearchField();
+				this.itemClick_selector(item)
+			}
 		)
 
 		this.screenManager.registerScreen("item_selector", this.item_selector);
@@ -738,7 +740,6 @@ pos_ar.PointOfSale.Controller = class {
 
 	savePosInvoice(saveWithZeroRate) {
 		this.selectedItemMaps.get(this.selectedTab.tabName).synced = false;
-		console.log("savePosInvoice : ", this.selectedItemMaps.get(this.selectedTab.tabName))
 		this.appData.savePosInvoice(this.selectedItemMaps.get(this.selectedTab.tabName))
 
 	}

@@ -1984,7 +1984,6 @@
         this.db = await pos_ar.PointOfSale.pos_db.openDatabase();
         this.settings_data = new pos_ar.PointOfSale.posSettingsData(this.db);
         this.dataHandler = new pos_ar.PointOfSale.FetchHandler();
-        console.log("warehouse ::::::::", await this.dataHandler.fetchStockBalance());
         this.appData = new pos_ar.PointOfSale.posAppData(this.db, this.dataHandler);
         await this.appData.getAllData();
         this.screenManager = new pos_ar.PointOfSale.ScreenManager(this.settings_data);
@@ -2349,6 +2348,7 @@
         this.getItemPrice.bind(this),
         this.auto_select.bind(this),
         (item) => {
+          this.item_selector.clearSearchField();
           this.itemClick_selector(item);
         }
       );
@@ -2545,7 +2545,6 @@
     }
     savePosInvoice(saveWithZeroRate) {
       this.selectedItemMaps.get(this.selectedTab.tabName).synced = false;
-      console.log("savePosInvoice : ", this.selectedItemMaps.get(this.selectedTab.tabName));
       this.appData.savePosInvoice(this.selectedItemMaps.get(this.selectedTab.tabName));
     }
     auto_select(item) {
@@ -4173,7 +4172,6 @@
       this.calculateGrandTotal();
     }
     scrollToBottom() {
-      console.log("scrolling");
       this.selectedItemContainer.scrollTop(this.selectedItemContainer[0].scrollHeight);
     }
     createNewTab() {
@@ -4522,7 +4520,6 @@
       warehouse.textContent = "Warehouse : " + this.warehouse;
       itemGroup.textContent = "Item Group : " + item.item_group;
       priceListRate.value = this.getItemPrice(item.name) + "DA";
-      console.log("end ref");
       this.makeSelectedFieldHighlighted();
     }
     show_cart() {
@@ -6594,7 +6591,6 @@
         type_img.style.width = "35px";
         type_img.style.height = "35px";
         type_img.style.transform = checkInOut.check_type === "In" ? "rotate(180deg)" : "";
-        console.log("checkInOut.check_type : ", checkInOut.check_type === "In" ? "rotate(180deg);" : "");
         const type_value_div = document.createElement("div");
         type_value_div.textContent = checkInOut.check_type;
         const creationTimeDiv = document.createElement("div");
@@ -7303,7 +7299,6 @@
               sendInvoiceToOtherPos: false
             };
           }
-          console.log("test result : ", this.settings);
         },
         (err) => {
           console.log("error when trying to get the setting from local, so we use the default.");
@@ -7438,7 +7433,6 @@
     async getItems() {
       const localItems = [];
       const updatedItems = await this.api_handler.fetchItems(this.since);
-      console.log("here is the items ::::: ", updatedItems);
       await this.db.saveItemList(updatedItems);
       this.appData.items = this.combineLocalAndUpdated(localItems, updatedItems);
     }
@@ -7924,10 +7918,8 @@
       this.screens.set(screenId, screenComponent);
     }
     navigate(screenId) {
-      console.log("debuging 1 ", screenId);
       switch (screenId) {
         case "history_cart":
-          console.log("history_cart");
           this.history_cart.show_cart();
           this.customer_box.showHomeBar();
           this.payment_cart.hideCart();
@@ -8046,4 +8038,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.5NYCWW72.js.map
+//# sourceMappingURL=pos.bundle.C6G5AYRS.js.map

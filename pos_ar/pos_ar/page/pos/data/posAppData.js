@@ -86,8 +86,6 @@ pos_ar.PointOfSale.posAppData = class {
 		const localItems   = [];
 		//get remote
 		const updatedItems = await this.api_handler.fetchItems(this.since)
-		console.log("here is the items ::::: " , updatedItems)
-		
 		//save new items
 		await this.db.saveItemList(updatedItems)
 

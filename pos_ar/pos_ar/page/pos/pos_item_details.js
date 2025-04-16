@@ -157,9 +157,6 @@ pos_ar.PointOfSale.pos_item_details = class{
 		priceListRate.value = this.getItemPrice(item.name) + "DA"
 
 
-		console.log("end ref")
-
-
 		//hightlited fields
 		this.makeSelectedFieldHighlighted()
 	}

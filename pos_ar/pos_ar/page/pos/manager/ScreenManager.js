@@ -12,11 +12,9 @@ pos_ar.PointOfSale.ScreenManager  = class {
     }
 
     navigate(screenId) {
-        console.log("debuging 1 " , screenId)
 
         switch (screenId) {
             case 'history_cart':
-                console.log("history_cart")
                 //show
 			    this.history_cart.show_cart()
                 this.customer_box.showHomeBar();

@@ -41,8 +41,6 @@ pos_ar.PointOfSale.posSettingsData = class{
 					}
 				}
 
-				console.log("test result : " , this.settings)
-
 			},
 			(err)=>{
 				console.log("error when trying to get the setting from local, so we use the default.")

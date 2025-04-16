@@ -418,7 +418,6 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 
 
 	scrollToBottom(){
-		console.log("scrolling")
 		this.selectedItemContainer.scrollTop(this.selectedItemContainer[0].scrollHeight);
 	}
 
