@@ -62,15 +62,6 @@ pos_ar.PointOfSale.pos_payment_cart = class{
 			</div>
 		`)
 
-
-/*		// 2. THEN attach the event listener (now it exists in the DOM)
-		const btn = document.querySelector('#AlertPopoverConfirmBtn');
-		btn.addEventListener('click', () => {
-			console.log("confirm btn clicked");
-			// Optional: Hide the popover
-			document.getElementById("AlertPopover").hidePopover?.(); // Use optional chaining to avoid errors
-		});
-*/
 		
 		// Add styles for the invoice popup
 		const style = document.createElement('style');
@@ -312,6 +303,25 @@ pos_ar.PointOfSale.pos_payment_cart = class{
 
 			let error_message = "";
 			let popover_title = "";
+
+
+
+			console.log(this.selected_item_map.get(this.selected_tab.tabName))
+
+			var paidAmount = 0;
+			var cost       = 0;
+			this.selected_item_map.get(this.selected_tab.tabName).items.forEach(item =>{
+				cost += item.rate * item.qty;
+			})
+			this.selected_item_map.get(this.selected_tab.tabName).payments.forEach(mode =>{
+				paidAmount += mode.amount;
+			})
+
+			if(paidAmount < cost && this.selected_item_map.get(this.selected_tab.tabName).customer.toLowerCase().includes("public")){
+				error_message = "Public customer can't pay less than cost.";
+				popover_title = "Payment Error";
+			}
+
 
 			this.selected_item_map.get(this.selected_tab.tabName).items.forEach(item => {
 				if (item.qty == 0) {

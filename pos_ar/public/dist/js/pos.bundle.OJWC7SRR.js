@@ -4977,6 +4977,19 @@
       this.cart_footer.find("#completeOrderBtn").on("click", (event2) => {
         let error_message = "";
         let popover_title = "";
+        console.log(this.selected_item_map.get(this.selected_tab.tabName));
+        var paidAmount = 0;
+        var cost = 0;
+        this.selected_item_map.get(this.selected_tab.tabName).items.forEach((item) => {
+          cost += item.rate * item.qty;
+        });
+        this.selected_item_map.get(this.selected_tab.tabName).payments.forEach((mode) => {
+          paidAmount += mode.amount;
+        });
+        if (paidAmount < cost && this.selected_item_map.get(this.selected_tab.tabName).customer.toLowerCase().includes("public")) {
+          error_message = "Public customer can't pay less than cost.";
+          popover_title = "Payment Error";
+        }
         this.selected_item_map.get(this.selected_tab.tabName).items.forEach((item) => {
           if (item.qty == 0) {
             error_message = "You have an item with quantity 0.";
@@ -8035,4 +8048,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.4JTOKCV5.js.map
+//# sourceMappingURL=pos.bundle.OJWC7SRR.js.map
