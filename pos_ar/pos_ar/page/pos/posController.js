@@ -1579,10 +1579,10 @@ pos_ar.PointOfSale.Controller = class {
 				// Ignore keydown events if the user is typing in a field
 				if (isInputFocused) return;
 
-				if (event.key == "q") {
+				if (event.key == "q" || event.key == "Q") {
 					this.selectedField.field_name = "quantity"
 					this.selected_item_cart.makeSelectedButtonHighlighted();
-				} else if (event.key == "p") {
+				} else if (event.key == "p" || event.key == "P") {
 					this.selectedField.field_name = "rate"
 					this.selected_item_cart.makeSelectedButtonHighlighted();
 				} else if (event.key == "Delete") {

@@ -3110,10 +3110,10 @@
           const isInputFocused = activeElement.tagName === "INPUT" || activeElement.tagName === "TEXTAREA" || activeElement.isContentEditable;
           if (isInputFocused)
             return;
-          if (event2.key == "q") {
+          if (event2.key == "q" || event2.key == "Q") {
             this.selectedField.field_name = "quantity";
             this.selected_item_cart.makeSelectedButtonHighlighted();
-          } else if (event2.key == "p") {
+          } else if (event2.key == "p" || event2.key == "P") {
             this.selectedField.field_name = "rate";
             this.selected_item_cart.makeSelectedButtonHighlighted();
           } else if (event2.key == "Delete") {
@@ -8038,4 +8038,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.C6G5AYRS.js.map
+//# sourceMappingURL=pos.bundle.K3BYVO2Q.js.map
