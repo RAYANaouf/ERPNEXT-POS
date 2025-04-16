@@ -189,6 +189,7 @@ pos_ar.PointOfSale.pos_item_selector = class {
 		clearItemInput.addEventListener('click' , ()=>{
 			itemInput.value = '';
 			this.setItemInFlow(this.item_list);
+			itemInput.focus();
 		})
 	}
 

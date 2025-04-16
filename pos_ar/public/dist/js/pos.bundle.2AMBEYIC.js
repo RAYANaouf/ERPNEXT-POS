@@ -3448,6 +3448,7 @@
       clearItemInput.addEventListener("click", () => {
         itemInput.value = "";
         this.setItemInFlow(this.item_list);
+        itemInput.focus();
       });
     }
     filterListByItemData(value) {
@@ -7991,4 +7992,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.OUCZ734G.js.map
+//# sourceMappingURL=pos.bundle.2AMBEYIC.js.map
