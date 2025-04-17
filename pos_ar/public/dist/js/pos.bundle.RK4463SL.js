@@ -2348,7 +2348,6 @@
         this.getItemPrice.bind(this),
         this.auto_select.bind(this),
         (item) => {
-          this.item_selector.clearSearchField();
           this.itemClick_selector(item);
         }
       );
@@ -8033,4 +8032,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.OAA3AUPT.js.map
+//# sourceMappingURL=pos.bundle.RK4463SL.js.map

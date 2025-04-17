@@ -223,25 +223,50 @@ def export_item_prices():
 
 
 
-
 @frappe.whitelist()
 def export_stock_value():
-    prices = frappe.get_all("Item Price",
-        filters={"price_list": "TP - Alger"},
-        fields=["item_code", "price_list_rate"]
-    )
+    
+    
+    print("Exporting stock value..................................................")
+    import frappe, csv, os
+    from frappe.utils import get_url
+    from frappe.model.document import Document
 
-    if not prices:
-        return "No prices found."
+    # Get all items
+    items = frappe.get_all("Item", fields=["item_code"])
+
+    if not items:
+        return "No items found."
 
     file_path = "/tmp/stock_value.csv"
 
-    # Write CSV using built-in csv module
+    # Write CSV
     with open(file_path, mode="w", newline='') as f:
         writer = csv.writer(f)
-        writer.writerow(["Item", "Price"])  # Header
-        for row in prices:
-            writer.writerow([row["item_code"], row["price_list_rate"]])
+        writer.writerow(["Item", "Price (TP - Alger)", "Qty (Magasin - OA)"])  # Header
+
+        for item in items:
+            item_code = item["item_code"]
+
+            # Get price from price list
+            price_doc = frappe.db.get_value(
+                "Item Price",
+                {"item_code": item_code, "price_list": "TP - Alger"},
+                "price_list_rate"
+            )
+
+            # Get stock quantity from warehouse
+            qty = frappe.db.get_value(
+                "Bin",
+                {"item_code": item_code, "warehouse": "Magasins - OA"},
+                "actual_qty"
+            )
+
+            writer.writerow([
+                item_code,
+                price_doc or 0.0,
+                qty or 0.0
+            ])
 
     # Save file into Frappe's File DocType
     with open(file_path, "rb") as f:
