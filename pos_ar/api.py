@@ -219,3 +219,40 @@ def export_item_prices():
     os.remove(file_path)
 
     return get_url(file.file_url)
+
+
+
+
+
+@frappe.whitelist()
+def export_stock_value():
+    prices = frappe.get_all("Item Price",
+        filters={"price_list": "TP - Alger"},
+        fields=["item_code", "price_list_rate"]
+    )
+
+    if not prices:
+        return "No prices found."
+
+    file_path = "/tmp/stock_value.csv"
+
+    # Write CSV using built-in csv module
+    with open(file_path, mode="w", newline='') as f:
+        writer = csv.writer(f)
+        writer.writerow(["Item", "Price"])  # Header
+        for row in prices:
+            writer.writerow([row["item_code"], row["price_list_rate"]])
+
+    # Save file into Frappe's File DocType
+    with open(file_path, "rb") as f:
+        file = frappe.get_doc({
+            "doctype": "File",
+            "file_name": "stock_value.csv",
+            "is_private": 1,
+            "content": f.read()
+        })
+        file.save()
+
+    os.remove(file_path)
+
+    return get_url(file.file_url)

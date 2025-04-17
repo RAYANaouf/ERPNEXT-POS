@@ -501,7 +501,6 @@ pos_ar.PointOfSale.Controller = class {
 			this.getItemPrice.bind(this),
 			this.auto_select.bind(this),
 			item => { 
-				this.item_selector.clearSearchField();
 				this.itemClick_selector(item)
 			}
 		)

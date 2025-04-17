@@ -167,13 +167,9 @@ def get_mode_of_payments():
 @frappe.whitelist()
 def update_invoice_payment(invoice_name, payment_amount , openingEntry):
     
-        
-
 	# Fetch the POS Invoice by its name
 	if isinstance(openingEntry, str):
 		openingEntry = json.loads(openingEntry)
-
-    	
 
 	# Create a new POS Invoice by duplicating the old one
 	pos_invoice = frappe.get_doc('POS Invoice', invoice_name)
