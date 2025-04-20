@@ -288,8 +288,7 @@ def export_stock_value():
 
 @frappe.whitelist()
 def export_items_without_price():
-    import frappe, os
-    import xlsxwriter
+    import frappe, csv, os
     from frappe.utils import get_url
 
     # Get all active items
@@ -308,29 +307,24 @@ def export_items_without_price():
     if not result:
         return "All items have a price in the Public Price List."
 
-    file_path = "/tmp/items_without_price.xlsx"
+    file_path = "/tmp/items_without_price.csv"
 
-    # Create XLSX
-    workbook = xlsxwriter.Workbook(file_path)
-    worksheet = workbook.add_worksheet("No Price")
+    # Write to CSV
+    with open(file_path, mode="w", newline='') as f:
+        writer = csv.writer(f)
+        writer.writerow(["Item Code", "Item Name"])  # Header row
 
-    # Header
-    headers = ["Item Code", "Item Name"]
-    for col, header in enumerate(headers):
-        worksheet.write(0, col, header)
-
-    # Write data
-    for row_num, item in enumerate(result, start=1):
-        worksheet.write(row_num, 0, item["item_code"])
-        worksheet.write(row_num, 1, item["item_name"])
-
-    workbook.close()
+        for item in result:
+            writer.writerow([
+                item["item_code"],
+                item["item_name"]
+            ])
 
     # Save to File Doctype
     with open(file_path, "rb") as f:
         file = frappe.get_doc({
             "doctype": "File",
-            "file_name": "items_without_price.xlsx",
+            "file_name": "items_without_price.csv",
             "is_private": 1,
             "content": f.read()
         })
