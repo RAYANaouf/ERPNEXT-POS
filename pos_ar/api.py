@@ -227,7 +227,6 @@ def export_item_prices():
 def export_stock_value():
     
     
-    print("Exporting stock value..................................................")
     import frappe, csv, os
     from frappe.utils import get_url
     from frappe.model.document import Document
@@ -273,6 +272,65 @@ def export_stock_value():
         file = frappe.get_doc({
             "doctype": "File",
             "file_name": "stock_value.csv",
+            "is_private": 1,
+            "content": f.read()
+        })
+        file.save()
+
+    os.remove(file_path)
+
+    return get_url(file.file_url)
+
+
+
+
+
+
+@frappe.whitelist()
+def export_items_without_price():
+    import frappe, os
+    import xlsxwriter
+    from frappe.utils import get_url
+
+    # Get all active items
+    items = frappe.get_all("Item", filters={"disabled": 0}, fields=["item_code", "item_name"])
+
+    # Filter items without price in Public Price List
+    result = []
+    for item in items:
+        has_price = frappe.db.exists("Item Price", {
+            "item_code": item["item_code"],
+            "price_list": "Public Price List"
+        })
+        if not has_price:
+            result.append(item)
+
+    if not result:
+        return "All items have a price in the Public Price List."
+
+    file_path = "/tmp/items_without_price.xlsx"
+
+    # Create XLSX
+    workbook = xlsxwriter.Workbook(file_path)
+    worksheet = workbook.add_worksheet("No Price")
+
+    # Header
+    headers = ["Item Code", "Item Name"]
+    for col, header in enumerate(headers):
+        worksheet.write(0, col, header)
+
+    # Write data
+    for row_num, item in enumerate(result, start=1):
+        worksheet.write(row_num, 0, item["item_code"])
+        worksheet.write(row_num, 1, item["item_name"])
+
+    workbook.close()
+
+    # Save to File Doctype
+    with open(file_path, "rb") as f:
+        file = frappe.get_doc({
+            "doctype": "File",
+            "file_name": "items_without_price.xlsx",
             "is_private": 1,
             "content": f.read()
         })
