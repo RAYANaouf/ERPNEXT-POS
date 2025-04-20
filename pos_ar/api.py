@@ -285,14 +285,17 @@ def export_stock_value():
 
 
 
-
 @frappe.whitelist()
 def export_items_without_price():
     import frappe, csv, os
     from frappe.utils import get_url
 
-    # Get all active items
-    items = frappe.get_all("Item", filters={"disabled": 0}, fields=["item_code", "item_name"])
+    # Get all active items with brand
+    items = frappe.get_all(
+        "Item",
+        filters={"disabled": 0},
+        fields=["item_code", "item_name", "brand"]
+    )
 
     # Filter items without price in Public Price List
     result = []
@@ -307,17 +310,21 @@ def export_items_without_price():
     if not result:
         return "All items have a price in the Public Price List."
 
+    # Sort result by brand
+    result.sort(key=lambda x: (x["brand"] or "").lower())
+
     file_path = "/tmp/items_without_price.csv"
 
     # Write to CSV
     with open(file_path, mode="w", newline='') as f:
         writer = csv.writer(f)
-        writer.writerow(["Item Code", "Item Name"])  # Header row
+        writer.writerow(["Item Code", "Item Name", "Brand"])  # Header row
 
         for item in result:
             writer.writerow([
                 item["item_code"],
-                item["item_name"]
+                item["item_name"],
+                item.get("brand", "")
             ])
 
     # Save to File Doctype
