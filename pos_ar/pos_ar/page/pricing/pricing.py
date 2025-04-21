@@ -66,19 +66,59 @@ def get_all_item_prices(company=None):
             "prices": []
         }
 
+#@frappe.whitelist()
+#def fix_prices(brand, price_list, new_price):
+#    try:
+#        # Update all item prices for this brand and price list
+#        frappe.db.sql("""
+#            UPDATE `tabItem Price`
+#            SET price_list_rate = %s
+#            WHERE brand = %s AND price_list = %s
+#        """, (new_price, brand, price_list))
+        
+#        frappe.db.commit()
+#        return True
+        
+#    except Exception as e:
+#        frappe.log_error(f"Error fixing prices: {str(e)}")
+#        frappe.throw(_("Failed to update prices. Please check the error log."))
+
+
+
+
 @frappe.whitelist()
 def fix_prices(brand, price_list, new_price):
     try:
-        # Update all item prices for this brand and price list
+        # Step 1: Update existing item prices
         frappe.db.sql("""
             UPDATE `tabItem Price`
             SET price_list_rate = %s
             WHERE brand = %s AND price_list = %s
         """, (new_price, brand, price_list))
-        
+
+        # Step 2: Find items with the brand that don't have an Item Price in the specified price list
+        items_without_price = frappe.db.sql("""
+            SELECT name FROM `tabItem`
+            WHERE brand = %s
+            AND name NOT IN (
+                SELECT item_code FROM `tabItem Price`
+                WHERE price_list = %s
+            )
+        """, (brand, price_list), as_dict=True)
+
+        # Step 3: Create Item Price entries for missing items
+        for item in items_without_price:
+            doc = frappe.get_doc({
+                "doctype": "Item Price",
+                "item_code": item.name,
+                "price_list": price_list,
+                "price_list_rate": new_price
+            })
+            doc.insert(ignore_permissions=True)
+
         frappe.db.commit()
         return True
-        
+
     except Exception as e:
         frappe.log_error(f"Error fixing prices: {str(e)}")
         frappe.throw(_("Failed to update prices. Please check the error log."))
