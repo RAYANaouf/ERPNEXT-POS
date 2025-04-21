@@ -294,6 +294,10 @@ pos_ar.PointOfSale.posAppData = class {
 		return await this.db.getAllOpenedPosInvoice()
 	}
 
+	async getAndDeleteAllOpenedPosInvoice(){
+		return await this.db.getAndDeleteAllOpenedPosInvoice()
+	}
+
 	async deletePosInvoice_callback(invoiceName,onSuccess,onFailure){
 		this.db.deletePosInvoice_callback(
 			invoiceName,

@@ -59,7 +59,7 @@ pos_ar.PointOfSale.Controller = class {
 			this.checkUnSyncedPos();
 			this.setListeners();
 
-			const openedPos = await this.appData.getAllOpenedPosInvoice()
+			const openedPos = await this.appData.getAndDeleteAllOpenedPosInvoice()
 			this.restorePosInvoices(openedPos)
 
 		} catch (err) {
@@ -743,9 +743,12 @@ pos_ar.PointOfSale.Controller = class {
 	savePosInvoice(saveWithZeroRate) {
 		this.selectedItemMaps.get(this.selectedTab.tabName).synced = false;
 		this.appData.savePosInvoice(this.selectedItemMaps.get(this.selectedTab.tabName))
-
 	}
 
+	saveThatPosInvoice(pos_invoice) {
+		pos_invoice.synced = false;
+		this.appData.savePosInvoice(pos_invoice)
+	}
 
 	auto_select(item) {
 		this.itemClick_selector(item)
@@ -829,6 +832,7 @@ pos_ar.PointOfSale.Controller = class {
 			this.selectedItemMaps.set(`C${tab}`, new_pos_invoice)
 			this.selectedTab.tabName = `C${tab}`
 
+			this.saveThatPosInvoice(new_pos_invoice)
 		})
 		this.screenManager.navigate('home')
 	}

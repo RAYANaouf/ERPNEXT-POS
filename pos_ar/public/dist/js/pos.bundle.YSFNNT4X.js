@@ -1994,7 +1994,7 @@
         await this.prepare_components();
         this.checkUnSyncedPos();
         this.setListeners();
-        const openedPos = await this.appData.getAllOpenedPosInvoice();
+        const openedPos = await this.appData.getAndDeleteAllOpenedPosInvoice();
         this.restorePosInvoices(openedPos);
       } catch (err) {
         console.error("halfware POS Err ==> ", err);
@@ -2546,6 +2546,10 @@
       this.selectedItemMaps.get(this.selectedTab.tabName).synced = false;
       this.appData.savePosInvoice(this.selectedItemMaps.get(this.selectedTab.tabName));
     }
+    saveThatPosInvoice(pos_invoice) {
+      pos_invoice.synced = false;
+      this.appData.savePosInvoice(pos_invoice);
+    }
     auto_select(item) {
       this.itemClick_selector(item);
       this.item_selector.refresh();
@@ -2608,6 +2612,7 @@
         new_pos_invoice.custom_cach_name = new_pos_invoice.refNum;
         this.selectedItemMaps.set(`C${tab}`, new_pos_invoice);
         this.selectedTab.tabName = `C${tab}`;
+        this.saveThatPosInvoice(new_pos_invoice);
       });
       this.screenManager.navigate("home");
     }
@@ -6032,6 +6037,28 @@
         };
       });
     }
+    async getAndDeleteAllOpenedPosInvoice() {
+      try {
+        const transaction = this.db.transaction(["POS Invoice"], "readwrite");
+        const store = transaction.objectStore("POS Invoice");
+        const openedInvoices = await new Promise((resolve, reject) => {
+          const request = store.getAll();
+          request.onsuccess = () => resolve(request.result.filter((pos) => pos.opened === 1));
+          request.onerror = (event2) => reject(event2.target.error);
+        });
+        await Promise.all(openedInvoices.map(
+          (pos) => new Promise((resolve, reject) => {
+            const deleteRequest = store.delete(pos.name);
+            deleteRequest.onsuccess = () => resolve();
+            deleteRequest.onerror = (event2) => reject(event2.target.error);
+          })
+        ));
+        return openedInvoices;
+      } catch (err) {
+        console.error("Error during get-and-delete:", err);
+        throw err;
+      }
+    }
     getAllPosInvoice_callback(onSuccess, onFailure) {
       const transaction = this.db.transaction(["POS Invoice"], "readwrite");
       const store = transaction.objectStore("POS Invoice");
@@ -7605,6 +7632,9 @@
     async getAllOpenedPosInvoice() {
       return await this.db.getAllOpenedPosInvoice();
     }
+    async getAndDeleteAllOpenedPosInvoice() {
+      return await this.db.getAndDeleteAllOpenedPosInvoice();
+    }
     async deletePosInvoice_callback(invoiceName, onSuccess, onFailure) {
       this.db.deletePosInvoice_callback(
         invoiceName,
@@ -8065,4 +8095,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.BSDIWB2K.js.map
+//# sourceMappingURL=pos.bundle.YSFNNT4X.js.map

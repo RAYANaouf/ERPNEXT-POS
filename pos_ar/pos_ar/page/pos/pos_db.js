@@ -565,6 +565,8 @@ pos_ar.PointOfSale.pos_db  = class POSDatabase {
 			const transaction = this.db.transaction(['POS Invoice'] , "readwrite");
 			const store       = transaction.objectStore('POS Invoice');
 			const result      = store.getAll()
+			
+			
 			result.onsuccess = (event) => {
 				const value = event.target.result
 				resolve(value.filter(pos => pos.opened == 1));
@@ -574,6 +576,37 @@ pos_ar.PointOfSale.pos_db  = class POSDatabase {
 			}
 		})
 	}
+
+
+	async getAndDeleteAllOpenedPosInvoice() {
+		try {
+			const transaction = this.db.transaction(['POS Invoice'], 'readwrite');
+			const store = transaction.objectStore('POS Invoice');
+	
+			// Step 1: Get all invoices
+			const openedInvoices = await new Promise((resolve, reject) => {
+				const request = store.getAll();
+				request.onsuccess = () => resolve(request.result.filter(pos => pos.opened === 1));
+				request.onerror = (event) => reject(event.target.error);
+			});
+	
+			// Step 2: Delete each opened invoice by its key (assuming `name` is the keyPath)
+			await Promise.all(openedInvoices.map(pos =>
+				new Promise((resolve, reject) => {
+					const deleteRequest = store.delete(pos.name); // adjust if keyPath is different
+					deleteRequest.onsuccess = () => resolve();
+					deleteRequest.onerror = (event) => reject(event.target.error);
+				})
+			));
+	
+			// Step 3: Return the filtered (opened) invoices
+			return openedInvoices;
+		} catch (err) {
+			console.error('Error during get-and-delete:', err);
+			throw err;
+		}
+	}
+	
 	
 
 	//callBack version
