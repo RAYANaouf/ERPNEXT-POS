@@ -302,7 +302,7 @@ def export_items_without_price():
     for item in items:
         has_price = frappe.db.exists("Item Price", {
             "item_code": item["item_code"],
-            "price_list": "Public Price List"
+            "price_list": "Public - Alger"
         })
         if not has_price:
             result.append(item)

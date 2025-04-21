@@ -92,8 +92,12 @@ pos_ar.PointOfSale.posAppData = class {
 		this.appData.items = this.combineLocalAndUpdated(localItems,updatedItems)
 	}
 	async getPosProfiles(){
-		this.appData.pos_profile  =  await this.api_handler.fetchPosProfile(this.since)
+		const posProfile = frappe.defaults.get_default("POS Profile");
+		// Fetch POS Profile details
+		this.appData.pos_profile = await frappe.db.get_doc('POS Profile' , posProfile);
 	}
+
+	
 	async getPosProfileModeOfPayments(posProfile){
 		let modeOfPaymentsIds = []
 		posProfile.payments.forEach(modeId=>{

@@ -2582,7 +2582,31 @@
     restorePosInvoices(posInvoices) {
       posInvoices.forEach((pos) => {
         const tab = this.selected_item_cart.createTabForEditPOS();
-        this.selectedItemMaps.set(`C${tab}`, pos);
+        let new_pos_invoice = frappe.model.get_new_doc("POS Invoice");
+        new_pos_invoice.customer = pos.customer;
+        new_pos_invoice.pos_profile = this.appData.appData.pos_profile.name;
+        new_pos_invoice.items = pos.items;
+        new_pos_invoice.taxes_and_charges = pos.taxes_and_charges;
+        new_pos_invoice.additional_discount_percentage = pos.additional_discount_percentage;
+        new_pos_invoice.paid_amount = pos.paid_amount;
+        new_pos_invoice.base_paid_amount = pos.base_paid_amount;
+        new_pos_invoice.creation_time = pos.creation_time;
+        new_pos_invoice.payments = pos.payments;
+        new_pos_invoice.is_pos = 1;
+        new_pos_invoice.update_stock = 1;
+        new_pos_invoice.docstatus = 0;
+        new_pos_invoice.synced = false;
+        new_pos_invoice.status = "Draft";
+        new_pos_invoice.priceList = pos.priceList;
+        new_pos_invoice.opened = 1;
+        const date = new Date();
+        const [year, month, day] = date.toISOString().split("T")[0].split("-");
+        const hour = date.getHours();
+        const minutes = date.getMinutes();
+        const seconds = date.getMilliseconds();
+        new_pos_invoice.refNum = this.appData.appData.pos_profile.name + "-" + year + "-" + month + "-" + day + "-" + hour + minutes + seconds;
+        new_pos_invoice.custom_cach_name = new_pos_invoice.refNum;
+        this.selectedItemMaps.set(`C${tab}`, new_pos_invoice);
         this.selectedTab.tabName = `C${tab}`;
       });
       this.screenManager.navigate("home");
@@ -7431,7 +7455,8 @@
       this.appData.items = this.combineLocalAndUpdated(localItems, updatedItems);
     }
     async getPosProfiles() {
-      this.appData.pos_profile = await this.api_handler.fetchPosProfile(this.since);
+      const posProfile = frappe.defaults.get_default("POS Profile");
+      this.appData.pos_profile = await frappe.db.get_doc("POS Profile", posProfile);
     }
     async getPosProfileModeOfPayments(posProfile) {
       let modeOfPaymentsIds = [];
@@ -8032,4 +8057,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.RK4463SL.js.map
+//# sourceMappingURL=pos.bundle.7BT4OGBO.js.map

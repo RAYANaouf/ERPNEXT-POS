@@ -573,8 +573,8 @@ pos_ar.PointOfSale.pos_db  = class POSDatabase {
 				reject(err)
 			}
 		})
-
 	}
+	
 
 	//callBack version
 	getAllPosInvoice_callback(onSuccess,onFailure){
