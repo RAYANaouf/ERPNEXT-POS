@@ -7632,6 +7632,10 @@
     async fetchCustomers(since) {
       try {
         const filter = { disabled: 0 };
+        const company = frappe.defaults.get_default("Company");
+        if (company) {
+          filter.custom_company = company;
+        }
         return await frappe.db.get_list("Customer", {
           fields: ["name", "customer_name", "custom_debt", "default_price_list"],
           filters: filter,
@@ -7747,6 +7751,10 @@
     async fetchPriceList(since) {
       try {
         const filter = { selling: 1, enabled: 1 };
+        const company = frappe.defaults.get_default("Company");
+        if (company) {
+          filter.custom_company = company;
+        }
         return await frappe.db.get_list("Price List", {
           fields: ["name", "price_list_name", "currency"],
           filters: filter,
@@ -8057,4 +8065,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.7BT4OGBO.js.map
+//# sourceMappingURL=pos.bundle.BSDIWB2K.js.map

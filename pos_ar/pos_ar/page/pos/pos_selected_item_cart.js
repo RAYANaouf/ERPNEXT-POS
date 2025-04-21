@@ -332,6 +332,7 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 		//refresh customer list:
 		this.customerInput.val(this.selected_item_maps.get(this.selected_tab.tabName).customer)
 
+		
 		const selectedItemsContainer = document.getElementById("selectedItemsContainer");
 		selectedItemsContainer.innerHTML = "";
 

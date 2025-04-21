@@ -8,10 +8,17 @@ pos_ar.PointOfSale.FetchHandler = class FetchHandler{
 
 	async fetchCustomers(since) {
 		try {
+
 			const filter = { disabled : 0}
+			const company = frappe.defaults.get_default("Company");
+			if(company){
+				filter.custom_company = company
+			}
 			/*if(since){
 				filter.modified = ['>',since]
 			}*/
+
+
 			return await frappe.db.get_list('Customer', {
                 fields: ['name' , 'customer_name' , 'custom_debt' , 'default_price_list' ],
 				filters: filter,
@@ -170,6 +177,10 @@ pos_ar.PointOfSale.FetchHandler = class FetchHandler{
 	async fetchPriceList(since) {
 		try {
 			const filter = {selling : 1 , enabled : 1}
+			const company = frappe.defaults.get_default("Company");
+			if(company){
+				filter.custom_company = company
+			}
 			/*if(since){
 				filter.modified = ['>',since]
 			}*/
