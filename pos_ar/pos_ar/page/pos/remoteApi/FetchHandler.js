@@ -165,7 +165,7 @@ pos_ar.PointOfSale.FetchHandler = class FetchHandler{
 			return await frappe.db.get_list('Item Price', {
 				fields: ['name', 'item_code' , 'item_name' , 'price_list', 'price_list_rate' , 'brand'],
 				filters: filter,
-				limit : 100000
+				limit : 1000000000
 			})
 		} catch (error) {
 			console.error('Error fetching Item Group :', error);

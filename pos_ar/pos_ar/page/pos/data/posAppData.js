@@ -143,10 +143,11 @@ pos_ar.PointOfSale.posAppData = class {
 		const localItemPrices = [];
 		//get remote
 		const updateItemPrices = await this.api_handler.fetchItemPrice(this.since)
+		console.log("the length  : " , updateItemPrices.length , "updateItemPrices : " , updateItemPrices)
 		await this.db.saveItemPriceList(updateItemPrices);
 
-		this.appData.item_prices = this.combineLocalAndUpdated(localItemPrices,updateItemPrices)
-		console.log()
+		//this.appData.item_prices = this.combineLocalAndUpdated(localItemPrices,updateItemPrices)
+		this.appData.item_prices = updateItemPrices
 	}
 	async getItemGroups(){
 		//get local

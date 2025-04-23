@@ -7513,6 +7513,7 @@
     async getItemPrices() {
       const localItemPrices = [];
       const updateItemPrices = await this.api_handler.fetchItemPrice(this.since);
+      console.log("updateItemPrices : ", updateItemPrices);
       await this.db.saveItemPriceList(updateItemPrices);
       this.appData.item_prices = this.combineLocalAndUpdated(localItemPrices, updateItemPrices);
       console.log();
@@ -7771,7 +7772,7 @@
         return await frappe.db.get_list("Item Price", {
           fields: ["name", "item_code", "item_name", "price_list", "price_list_rate", "brand"],
           filters: filter,
-          limit: 1e5
+          limit: 1e9
         });
       } catch (error) {
         console.error("Error fetching Item Group :", error);
@@ -8095,4 +8096,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.YSFNNT4X.js.map
+//# sourceMappingURL=pos.bundle.UCVS6GVG.js.map
