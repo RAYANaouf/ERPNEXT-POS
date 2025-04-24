@@ -2744,12 +2744,8 @@
         const newValue = parseFloat(this.selectedItem.qty) * -1;
         this.selectedItem.qty = parseFloat(newValue);
         this.editPosItemQty(this.selectedItem.name, this.selectedItem.qty);
-        this.selected_item_cart.refreshSelectedItem();
       } else if (action == "print") {
         this.history_cart.print_receipt(structuredClone(this.selectedItemMaps.get(this.selectedTab.tabName)));
-        this.selected_item_cart.refreshSelectedItem();
-        this.item_details.refreshDate(this.selectedItem);
-        this.savePosInvoice();
         return;
       } else if (action == "remove") {
         this.syncInput = false;
@@ -2760,6 +2756,7 @@
             const oldValue = parseFloat(this.selectedItem.qty);
             const newValue2 = `${oldValue}`.slice(0, -1);
             this.selectedItem.qty = parseFloat(newValue2) || 0;
+            this.editPosItemQty(this.selectedItem.name, this.selectedItem.qty);
           } else if (this.selectedField.field_name == "rate") {
             const oldValue = parseFloat(this.selectedItem.rate);
             const newValue2 = `${oldValue}`.slice(0, -1);
@@ -2769,7 +2766,6 @@
             let montant = oldRate * (persont / 100);
             this.selectedItem.discount_percentage = persont;
             this.selectedItem.discount_amount = montant;
-            this.editPosItemDiscountAmount(this.selectedItem.name, this.selectedItem.discount_amount);
             this.editPosItemRate(this.selectedItem.name, this.selectedItem.rate);
           } else if (this.selectedField.field_name == "discount_percentage") {
             let oldRate = this.selectedItem.rate;
@@ -2783,27 +2779,28 @@
             let newRate = oldRate - montant;
             this.selectedItem.discount_percentage = discount_percentage;
             this.selectedItem.discount_amount = montant;
+            this.editPosItemDiscountAmount(this.selectedItem.name, this.selectedItem.discount_amount);
+            this.editPosItemRate(this.selectedItem.name, this.selectedItem.rate);
           }
         }
         let newValue = parseFloat(this.item_details.deleteCharacter());
         if (this.selectedField.field_name == "quantity") {
           this.selectedItem.qty = newValue;
+          this.editPosItemQty(this.selectedItem.name, this.selectedItem.qty);
         } else if (this.selectedField.field_name == "rate") {
           this.selectedItem.rate = newValue;
           let oldRate = this.selectedItem.rate;
           let persont = this.selectedItem.discount_percentage;
           let montant = oldRate * (persont / 100);
           this.selectedItem.discount_amount = montant;
+          this.editPosItemRate(this.selectedItem.name, this.selectedItem.rate);
         } else if (this.selectedField.field_name == "discount_percentage") {
           let oldRate = this.selectedItem.rate;
           let montant = oldRate * (newValue / 100);
           this.selectedItem.discount_percentage = newValue;
           this.selectedItem.discount_amount = montant;
-        } else if (this.selectedField.field_name == "discount_percentage") {
-          let oldRate = this.selectedItem.rate;
-          let montant = oldRate * (newValue / 100);
-          this.selectedItem.discount_percentage = newValue;
-          this.selectedItem.discount_rate = montant;
+          this.editPosItemDiscountAmount(this.selectedItem.name, this.selectedItem.discount_amount);
+          this.editPosItemRate(this.selectedItem.name, this.selectedItem.rate);
         } else if (this.selectedField.field_name == "cash") {
           this.payment_cart.deleteKeyPress();
         }
@@ -2821,6 +2818,7 @@
             }
             const newValue = `${oldValue}` + key;
             this.selectedItem.qty = parseFloat(newValue);
+            this.editPosItemQty(this.selectedItem.name, this.selectedItem.qty);
           } else if (this.selectedField.field_name == "rate") {
             let lastValue = 0;
             if (!this.syncInput) {
@@ -2850,12 +2848,12 @@
             let newRate = oldRate - montant;
             this.selectedItem.discount_percentage = discount_percentage;
             this.selectedItem.discount_amount = montant;
+            this.editPosItemDiscountAmount(this.selectedItem.name, this.selectedItem.discount_amount);
+            this.editPosItemRate(this.selectedItem.name, this.selectedItem.rate);
           }
         }
       }
       this.editPosItemDiscountAmount(this.selectedItem.name, this.selectedItem.discount_amount);
-      this.editPosItemRate(this.selectedItem.name, this.selectedItem.rate);
-      this.editPosItemQty(this.selectedItem.name, this.selectedItem.qty);
       this.selected_item_cart.refreshSelectedItem();
       this.item_details.refreshDate(this.selectedItem);
       this.savePosInvoice();
@@ -7513,10 +7511,8 @@
     async getItemPrices() {
       const localItemPrices = [];
       const updateItemPrices = await this.api_handler.fetchItemPrice(this.since);
-      console.log("updateItemPrices : ", updateItemPrices);
       await this.db.saveItemPriceList(updateItemPrices);
-      this.appData.item_prices = this.combineLocalAndUpdated(localItemPrices, updateItemPrices);
-      console.log();
+      this.appData.item_prices = updateItemPrices;
     }
     async getItemGroups() {
       const localItemGroups = [];
@@ -8096,4 +8092,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.UCVS6GVG.js.map
+//# sourceMappingURL=pos.bundle.YRUIR5UU.js.map
