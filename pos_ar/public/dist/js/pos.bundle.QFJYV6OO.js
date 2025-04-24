@@ -5502,9 +5502,8 @@
 						font-size: 12px;
 					}
 					.receipt-table td {
-						padding: 5px;
+						padding: 1px 5px;
 						font-size: 12px;
-						border-bottom: 1px dotted #ccc;
 					}
 					.totals {
 						margin: 10px 0;
@@ -8092,4 +8091,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.YRUIR5UU.js.map
+//# sourceMappingURL=pos.bundle.QFJYV6OO.js.map

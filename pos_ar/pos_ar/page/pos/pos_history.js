@@ -565,9 +565,8 @@ pos_ar.PointOfSale.pos_history = class {
 						font-size: 12px;
 					}
 					.receipt-table td {
-						padding: 5px;
+						padding: 1px 5px;
 						font-size: 12px;
-						border-bottom: 1px dotted #ccc;
 					}
 					.totals {
 						margin: 10px 0;
