@@ -1510,8 +1510,6 @@ pos_ar.PointOfSale.Controller = class {
 		voucher.pos_profile = this.POSOpeningEntry.pos_profile;
 		voucher.company = this.POSOpeningEntry.company;
 		voucher.user = frappe.session.user;
-		voucher.posting_date = frappe.datetime.now_date();
-		voucher.posting_time = frappe.datetime.now_time();
 
 		//to test
 		//voucher.save();

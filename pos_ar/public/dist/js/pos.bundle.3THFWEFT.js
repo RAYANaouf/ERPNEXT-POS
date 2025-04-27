@@ -3059,8 +3059,6 @@
       voucher.pos_profile = this.POSOpeningEntry.pos_profile;
       voucher.company = this.POSOpeningEntry.company;
       voucher.user = frappe.session.user;
-      voucher.posting_date = frappe.datetime.now_date();
-      voucher.posting_time = frappe.datetime.now_time();
       const unsyncedChecks = this.check_in_out_cart.checkList.filter((check) => check.is_sync === 0);
       unsyncedChecks.forEach((check) => {
         let child = frappe.model.add_child(voucher, "check_in_out", "custom_check_in_out");
@@ -7777,7 +7775,7 @@
         const filter = { selling: 1, enabled: 1 };
         const company = frappe.defaults.get_default("Company");
         if (company) {
-          filter.custom_company = company;
+          filter.custom_company = ["in", [company, ""]];
         }
         return await frappe.db.get_list("Price List", {
           fields: ["name", "price_list_name", "currency"],
@@ -8106,4 +8104,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.3HOVUAW6.js.map
+//# sourceMappingURL=pos.bundle.3THFWEFT.js.map

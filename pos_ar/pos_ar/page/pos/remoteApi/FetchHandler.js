@@ -168,11 +168,12 @@ pos_ar.PointOfSale.FetchHandler = class FetchHandler{
 			const filter = {selling : 1 , enabled : 1}
 			const company = frappe.defaults.get_default("Company");
 			if(company){
-				filter.custom_company = company
+				filter.custom_company = ['in', [company , ""]];
 			}
 			/*if(since){
 				filter.modified = ['>',since]
 			}*/
+
 			return await frappe.db.get_list('Price List', {
 				fields: ['name', 'price_list_name' , 'currency' ],
 				filters: filter,
