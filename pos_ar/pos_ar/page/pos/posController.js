@@ -1369,8 +1369,19 @@ pos_ar.PointOfSale.Controller = class {
 
 
 	onSync() {
+		
+		if (this.isSyncing) {
+			console.warn('Sync already in progress.');
+			return;
+		}
+
+		this.isSyncing = true; // LOCK
+
+
+
 		if (this.POSOpeningEntry.name == '') {
 			this.checkForPOSEntry();
+			this.isSyncing = false; // UNLOCK
 			return;
 		}
 
@@ -1382,6 +1393,7 @@ pos_ar.PointOfSale.Controller = class {
 				indicator: 'green',
 				message: __('All data is already synchronized.')
 			});
+			this.isSyncing = false; // UNLOCK
 			return;
 		}
 
@@ -1409,6 +1421,7 @@ pos_ar.PointOfSale.Controller = class {
 						if (counter == allUnsyncedPos.length) {
 							frappe.hide_progress();
 							this.customer_box.setSynced();
+							this.isSyncing = false; // UNLOCK
 							this.unsyncedPos = 0;
 						}
 					}).catch(err => {
@@ -1419,6 +1432,7 @@ pos_ar.PointOfSale.Controller = class {
 						if (counter == allUnsyncedPos.length) {
 							frappe.hide_progress();
 							this.customer_box.setSynced();
+							this.isSyncing = false; // UNLOCK
 							this.unsyncedPos = 0;
 						}
 
@@ -1427,6 +1441,7 @@ pos_ar.PointOfSale.Controller = class {
 			},
 			(err) => {
 				console.log("cant get the unseced POS from local")
+				this.isSyncing = false; // UNLOCK
 			}
 		);
 

@@ -72,8 +72,9 @@ pos_ar.PointOfSale.posAppData = class {
 		//save new customers
 		await this.db.saveCustomerList(updatedCustomers)
 
-		this.appData.customers = this.combineLocalAndUpdated(localCustomers,updatedCustomers)
+		//this.appData.customers = this.combineLocalAndUpdated(localCustomers,updatedCustomers)
 
+		this.appData.customers = updatedCustomers
 	}
 	async getBrands(){
 		//get local
@@ -133,20 +134,26 @@ pos_ar.PointOfSale.posAppData = class {
 		//get remote
 		const updatedPriceList = await this.api_handler.fetchPriceList(this.since)
 		//save new price list
-		await this.db.savePriceLists(updatedPriceList)
+		//await this.db.savePriceLists(updatedPriceList)
 
-		this.appData.price_lists = this.combineLocalAndUpdated(localPriceLists,updatedPriceList)
+		//this.appData.price_lists = this.combineLocalAndUpdated(localPriceLists,updatedPriceList)
+
+		this.appData.price_lists = updatedPriceList
+		console.log("price lists : " , this.appData.price_lists)
 	}
+
+
 	async getItemPrices(){
 		//get local
 		//const localItemPrices = await this.db.getAllItemPrice();
 		const localItemPrices = [];
 		//get remote
-		const updateItemPrices = await this.api_handler.fetchItemPrice(this.since)
+		const updateItemPrices = await this.api_handler.fetchItemPrice(this.since , this.appData.price_lists)
 		await this.db.saveItemPriceList(updateItemPrices);
 
 		//this.appData.item_prices = this.combineLocalAndUpdated(localItemPrices,updateItemPrices)
 		this.appData.item_prices = updateItemPrices
+		console.log("item prices : " , this.appData.item_prices)
 	}
 	async getItemGroups(){
 		//get local

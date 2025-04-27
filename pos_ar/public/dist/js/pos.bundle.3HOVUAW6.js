@@ -2959,8 +2959,14 @@
       }
     }
     onSync() {
+      if (this.isSyncing) {
+        console.warn("Sync already in progress.");
+        return;
+      }
+      this.isSyncing = true;
       if (this.POSOpeningEntry.name == "") {
         this.checkForPOSEntry();
+        this.isSyncing = false;
         return;
       }
       if (this.unsyncedPos <= 0) {
@@ -2969,6 +2975,7 @@
           indicator: "green",
           message: __("All data is already synchronized.")
         });
+        this.isSyncing = false;
         return;
       }
       let counter = 0;
@@ -2989,6 +2996,7 @@
               if (counter == allUnsyncedPos.length) {
                 frappe.hide_progress();
                 this.customer_box.setSynced();
+                this.isSyncing = false;
                 this.unsyncedPos = 0;
               }
             }).catch((err) => {
@@ -2997,6 +3005,7 @@
               if (counter == allUnsyncedPos.length) {
                 frappe.hide_progress();
                 this.customer_box.setSynced();
+                this.isSyncing = false;
                 this.unsyncedPos = 0;
               }
             });
@@ -3004,6 +3013,7 @@
         },
         (err) => {
           console.log("cant get the unseced POS from local");
+          this.isSyncing = false;
         }
       );
     }
@@ -7467,7 +7477,7 @@
       const localCustomers = [];
       const updatedCustomers = await this.api_handler.fetchCustomers(this.since);
       await this.db.saveCustomerList(updatedCustomers);
-      this.appData.customers = this.combineLocalAndUpdated(localCustomers, updatedCustomers);
+      this.appData.customers = updatedCustomers;
     }
     async getBrands() {
       this.appData.brands = await this.api_handler.fetchBrands(this.since);
@@ -7504,14 +7514,15 @@
     async getPriceLists() {
       const localPriceLists = [];
       const updatedPriceList = await this.api_handler.fetchPriceList(this.since);
-      await this.db.savePriceLists(updatedPriceList);
-      this.appData.price_lists = this.combineLocalAndUpdated(localPriceLists, updatedPriceList);
+      this.appData.price_lists = updatedPriceList;
+      console.log("price lists : ", this.appData.price_lists);
     }
     async getItemPrices() {
       const localItemPrices = [];
-      const updateItemPrices = await this.api_handler.fetchItemPrice(this.since);
+      const updateItemPrices = await this.api_handler.fetchItemPrice(this.since, this.appData.price_lists);
       await this.db.saveItemPriceList(updateItemPrices);
       this.appData.item_prices = updateItemPrices;
+      console.log("item prices : ", this.appData.item_prices);
     }
     async getItemGroups() {
       const localItemGroups = [];
@@ -7761,19 +7772,6 @@
         return [];
       }
     }
-    async fetchItemPrice(since) {
-      try {
-        const filter = {};
-        return await frappe.db.get_list("Item Price", {
-          fields: ["name", "item_code", "item_name", "price_list", "price_list_rate", "brand"],
-          filters: filter,
-          limit: 1e9
-        });
-      } catch (error) {
-        console.error("Error fetching Item Group :", error);
-        return [];
-      }
-    }
     async fetchPriceList(since) {
       try {
         const filter = { selling: 1, enabled: 1 };
@@ -7785,6 +7783,23 @@
           fields: ["name", "price_list_name", "currency"],
           filters: filter,
           limit: 1e5
+        });
+      } catch (error) {
+        console.error("Error fetching Item Group :", error);
+        return [];
+      }
+    }
+    async fetchItemPrice(since, priceLists) {
+      try {
+        const filter = {};
+        const priceListNames = priceLists.map((pl) => pl.name);
+        if (priceListNames && priceListNames.length > 0) {
+          filter.price_list = ["in", priceListNames];
+        }
+        return await frappe.db.get_list("Item Price", {
+          fields: ["name", "item_code", "item_name", "price_list", "price_list_rate", "brand"],
+          filters: filter,
+          limit: 1e9
         });
       } catch (error) {
         console.error("Error fetching Item Group :", error);
@@ -8091,4 +8106,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.QFJYV6OO.js.map
+//# sourceMappingURL=pos.bundle.3HOVUAW6.js.map

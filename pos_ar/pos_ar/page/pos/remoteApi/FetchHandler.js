@@ -156,22 +156,11 @@ pos_ar.PointOfSale.FetchHandler = class FetchHandler{
 
 
 
-	async fetchItemPrice(since) {
-		try {
-			const filter = {}
-			/*if(since){
-				filter.modified = ['>',since]
-			}*/
-			return await frappe.db.get_list('Item Price', {
-				fields: ['name', 'item_code' , 'item_name' , 'price_list', 'price_list_rate' , 'brand'],
-				filters: filter,
-				limit : 1000000000
-			})
-		} catch (error) {
-			console.error('Error fetching Item Group :', error);
-			return []
-		}
-	}
+
+
+
+
+
 
 
 	async fetchPriceList(since) {
@@ -194,6 +183,38 @@ pos_ar.PointOfSale.FetchHandler = class FetchHandler{
 			return []
 		}
 	}
+
+
+
+
+
+
+	async fetchItemPrice(since , priceLists) {
+		try {
+			const filter = {}
+			/*if(since){
+				filter.modified = ['>',since]
+			}*/
+
+
+			const priceListNames = priceLists.map(pl => pl.name);
+
+			if (priceListNames && priceListNames.length > 0) {
+				filter.price_list = ['in', priceListNames];
+			}
+			return await frappe.db.get_list('Item Price', {
+				fields: ['name', 'item_code' , 'item_name' , 'price_list', 'price_list_rate' , 'brand'],
+				filters: filter,
+				limit : 1000000000
+			})
+		} catch (error) {
+			console.error('Error fetching Item Group :', error);
+			return []
+		}
+	}
+
+
+
 
 
 	async fetchWarehouseList(since){
