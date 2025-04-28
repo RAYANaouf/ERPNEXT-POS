@@ -232,54 +232,55 @@ pos_ar.PointOfSale.pos_debt_cart = class{
 		})
 
 
+		const me = this
 		
 
 		result2.forEach(invoice => {
 			total_debt += invoice.outstanding_amount;
 		
-			// Main container (still flex-row)
+			// Main container
 			const customerBox = $(`
 				<div style="${invoiceStyle}; overflow:hidden; flex-direction: column; transition:0.3s;" 
 					 class="rowBox C_A_Center invoiceBox" data-invoice-name="${invoice.name}">
 				</div>
-			`)
+			`);
 		
-			// Inside it: a flex-row for invoice info
+			// Invoice row
 			const invoiceRow = $(`
 				<div class="rowBox C_A_Center" style="width: 100%;">
 				</div>
-			`)
+			`);
 		
-			invoiceRow.append(`<input type="checkbox" style="margin:0px 16px;" data-invoice-type="Sales Invoice" data-invoice-name="${invoice.name}" data-outstanding-amount="${invoice.outstanding_amount}">`)
-			invoiceRow.append(`<div style="flex-grow:1;">${invoice.name}</div>`)
-			invoiceRow.append(`<div style="flex-grow:1;">${invoice.outstanding_amount} DA</div>`)
-			invoiceRow.append(`<div style="flex-grow:1;">${invoice.posting_date}</div>`)
-			invoiceRow.append(`<div style="flex-grow:1;">Sales Invoice</div>`)
+			invoiceRow.append(`<input type="checkbox" style="margin:0px 16px;" data-invoice-type="Sales Invoice" data-invoice-name="${invoice.name}" data-outstanding-amount="${invoice.outstanding_amount}">`);
+			invoiceRow.append(`<div style="flex-grow:1;">${invoice.name}</div>`);
+			invoiceRow.append(`<div style="flex-grow:1;">${invoice.outstanding_amount} DA</div>`);
+			invoiceRow.append(`<div style="flex-grow:1;">${invoice.posting_date}</div>`);
+			invoiceRow.append(`<div style="flex-grow:1;">Sales Invoice</div>`);
 		
-			// ➡ Expand Icon
+			// Expand Icon
 			invoiceRow.append(`
 				<div style="flex-grow:1; display:flex; justify-content:center; align-items:center;">
 					<svg class="expandIcon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="black" viewBox="0 0 24 24" style="cursor:pointer; transition:0.3s;">
 						<path d="M7 10l5 5 5-5H7z"/>		
 					</svg>
 				</div>
-			`)
+			`);
 		
 			// Pay Button
-			invoiceRow.append(`<div class="rowBox centerItem payBtn" style="${payBtnStyle}">Pay</div>`)
+			invoiceRow.append(`<div class="rowBox centerItem payBtn" style="${payBtnStyle}">Pay</div>`);
 		
-			// ➡ Hidden loading text (added separately, under invoiceRow)
-			const loadingText = $(`
-				<div class="loadingText" style="width:100%; text-align:center; padding:10px; display:none; color:#555;">
-					Loading facteur PDV
+			// Expandable container
+			const expandableContent = $(`
+				<div class="expandableContent" style="width:100%; text-align:center; padding:10px; display:none; color:#555;">
+					Loading facteur PDV...
 				</div>
 			`);
 		
-			// Now assemble:
+			// Assemble
 			customerBox.append(invoiceRow);
-			customerBox.append(loadingText);
+			customerBox.append(expandableContent);
 		
-			// Hover effect on arrow
+			// Hover effect on expandIcon
 			customerBox.find('.expandIcon').hover(
 				function() {
 					$(this).css('fill', 'green');
@@ -290,15 +291,37 @@ pos_ar.PointOfSale.pos_debt_cart = class{
 			);
 		
 			// Click to expand/collapse
-			customerBox.find('.expandIcon').on('click', function () {
+			customerBox.find('.expandIcon').on('click', async function () {
 				const isExpanded = customerBox.hasClass('expanded');
 		
 				if (!isExpanded) {
-					loadingText.slideDown(200);
+					expandableContent.slideDown(200);
 					customerBox.addClass('expanded');
 					$(this).css('transform', 'rotate(180deg)');
+		
+					// --- FETCH POS Invoices here ---
+					try {
+						const posInvoices = await me.fetchPosInvoices(invoice.name); 
+						const matchingPOS = posInvoices.filter(pos => pos.consolidated_invoice === invoice.name);
+		
+						if (matchingPOS.length > 0) {
+							// Build a list
+							let html = '<div style="margin-top:10px;">';
+							matchingPOS.forEach(pos => {
+								html += `<div style="padding:4px 0;">• ${pos.name} (${pos.outstanding_amount} DA)</div>`;
+							});
+							html += '</div>';
+							expandableContent.html(html);
+						} else {
+							expandableContent.html(`<div style="margin-top:10px;">No POS Factures found for this invoice.</div>`);
+						}
+					} catch (error) {
+						console.error('Error fetching POS invoices:', error);
+						expandableContent.html(`<div style="margin-top:10px; color:red;">Error loading POS invoices.</div>`);
+					}
+		
 				} else {
-					loadingText.slideUp(200);
+					expandableContent.slideUp(200);
 					customerBox.removeClass('expanded');
 					$(this).css('transform', 'rotate(0deg)');
 				}
@@ -311,6 +334,7 @@ pos_ar.PointOfSale.pos_debt_cart = class{
 		
 			this.debtList.append(customerBox);
 		});
+		
 		
 
 
@@ -468,6 +492,27 @@ pos_ar.PointOfSale.pos_debt_cart = class{
 		}
 	}
 
+
+
+
+
+	async fetchPosInvoices(_sales_invoice) {
+		console.log("Fetching POS invoices for sales invoice:", _sales_invoice);
+		// Fetch only POS invoices related to the given Sales Invoice
+		const response = await frappe.call({
+			method: "frappe.client.get_list",
+			args: {
+				doctype: "POS Invoice",
+				fields: ["name", "outstanding_amount", "consolidated_invoice"],
+				filters: {
+					consolidated_invoice: _sales_invoice  // 🔥 Filter directly on the server
+				},
+				limit_page_length: 1000
+			}
+		});
+		return response.message || [];
+	}
+	
 
 
 
