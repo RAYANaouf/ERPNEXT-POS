@@ -6971,13 +6971,19 @@
             $(this).css("transform", "rotate(180deg)");
             try {
               const posInvoices = await me.fetchPosInvoices(invoice.name);
-              const matchingPOS = posInvoices.filter((pos) => pos.consolidated_invoice === invoice.name);
-              if (matchingPOS.length > 0) {
-                let html = '<div style="margin-top:10px;">';
-                matchingPOS.forEach((pos) => {
-                  html += `<div style="padding:4px 0;">\u2022 ${pos.name} (${pos.outstanding_amount} DA)</div>`;
+              console.log("we are heeeeeer :: ", posInvoices);
+              if (posInvoices.length > 0) {
+                let html = `
+								<div style="margin-top:10px; display:flex; flex-direction:column; gap:8px;">`;
+                posInvoices.forEach((pos) => {
+                  html += `
+									<div style="display:flex; justify-content:space-between; align-items:center; 
+												padding:8px 12px; border:1px solid #ccc; border-radius:8px; background:#f9f9f9;">
+										<div style="flex:2; font-weight:bold;">${pos.name}</div>
+										<div style="flex:1; color:#333;">${pos.outstanding_amount} DA</div>
+									</div>`;
                 });
-                html += "</div>";
+                html += `</div>`;
                 expandableContent.html(html);
               } else {
                 expandableContent.html(`<div style="margin-top:10px;">No POS Factures found for this invoice.</div>`);
@@ -7096,18 +7102,15 @@
     }
     async fetchPosInvoices(_sales_invoice) {
       console.log("Fetching POS invoices for sales invoice:", _sales_invoice);
-      const response = await frappe.call({
-        method: "frappe.client.get_list",
-        args: {
-          doctype: "POS Invoice",
-          fields: ["name", "outstanding_amount", "consolidated_invoice"],
-          filters: {
-            consolidated_invoice: _sales_invoice
-          },
-          limit_page_length: 1e3
-        }
+      const response = await frappe.db.get_list("POS Invoice", {
+        fields: ["name", "outstanding_amount", "currency"],
+        filters: {
+          consolidated_invoice: _sales_invoice
+        },
+        limit: 1e5
       });
-      return response.message || [];
+      console.log("Fetched POS invoices:", response);
+      return response || [];
     }
   };
 
@@ -8181,4 +8184,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.WDA5OOIP.js.map
+//# sourceMappingURL=pos.bundle.OMY6RQ6S.js.map
