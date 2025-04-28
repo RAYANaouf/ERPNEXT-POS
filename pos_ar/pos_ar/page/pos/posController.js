@@ -1733,6 +1733,17 @@ pos_ar.PointOfSale.Controller = class {
 		if (mode == 'brand') {
 			if (item.brand == null)
 				return 0;
+			else if (item.brand == "19"){
+				const found = this.appData.appData.item_prices.find( itemPrice => itemPrice.item_code == item.name)
+				console.log( "accessory :::: " , found)
+				return  found ? found.item_price || 99 : 0
+			} 	
+			else if (item.brand == "ACCESSOIRES"){ 
+				const found = this.appData.appData.item_prices.find( itemPrice => itemPrice.item_code == item.name)
+				console.log( "accessory : " , found)
+				return  found ? found.item_price || 99 : 0
+			} 
+				
 			const price = this.appData.appData.item_prices.find(itemPrice => itemPrice.brand == item.brand && itemPrice.price_list == priceList)
 			return price ? price.price_list_rate : 0
 		} else if (mode == 'priceList') {
