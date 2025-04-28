@@ -1733,16 +1733,10 @@ pos_ar.PointOfSale.Controller = class {
 		if (mode == 'brand') {
 			if (item.brand == null)
 				return 0;
-			else if (item.brand == "19"){
+			else if (item.brand == "19" || item.brand == "ACCESSOIRES" || item.brand == "22" || item.brand == "PRODUIT"){
 				const found = this.appData.appData.item_prices.find( itemPrice => itemPrice.item_code == item.name)
-				console.log( "accessory :::: " , found)
-				return  found ? found.item_price || 99 : 0
-			} 	
-			else if (item.brand == "ACCESSOIRES"){ 
-				const found = this.appData.appData.item_prices.find( itemPrice => itemPrice.item_code == item.name)
-				console.log( "accessory : " , found)
-				return  found ? found.item_price || 99 : 0
-			} 
+				return  found ? found.price_list_rate	|| 0 : 0
+			}
 				
 			const price = this.appData.appData.item_prices.find(itemPrice => itemPrice.brand == item.brand && itemPrice.price_list == priceList)
 			return price ? price.price_list_rate : 0
