@@ -6925,15 +6925,55 @@
       });
       result2.forEach((invoice) => {
         total_debt += invoice.outstanding_amount;
-        const customerBox = $(
-          `<div  style="${invoiceStyle}" class="rowBox C_A_Center invoiceBox" data-invoice-name="${invoice.name}"></div>`
+        const customerBox = $(`
+				<div style="${invoiceStyle}; overflow:hidden; flex-direction: column; transition:0.3s;" 
+					 class="rowBox C_A_Center invoiceBox" data-invoice-name="${invoice.name}">
+				</div>
+			`);
+        const invoiceRow = $(`
+				<div class="rowBox C_A_Center" style="width: 100%;">
+				</div>
+			`);
+        invoiceRow.append(`<input type="checkbox" style="margin:0px 16px;" data-invoice-type="Sales Invoice" data-invoice-name="${invoice.name}" data-outstanding-amount="${invoice.outstanding_amount}">`);
+        invoiceRow.append(`<div style="flex-grow:1;">${invoice.name}</div>`);
+        invoiceRow.append(`<div style="flex-grow:1;">${invoice.outstanding_amount} DA</div>`);
+        invoiceRow.append(`<div style="flex-grow:1;">${invoice.posting_date}</div>`);
+        invoiceRow.append(`<div style="flex-grow:1;">Sales Invoice</div>`);
+        invoiceRow.append(`
+				<div style="flex-grow:1; display:flex; justify-content:center; align-items:center;">
+					<svg class="expandIcon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="black" viewBox="0 0 24 24" style="cursor:pointer; transition:0.3s;">
+						<path d="M7 10l5 5 5-5H7z"/>		
+					</svg>
+				</div>
+			`);
+        invoiceRow.append(`<div class="rowBox centerItem payBtn" style="${payBtnStyle}">Pay</div>`);
+        const loadingText = $(`
+				<div class="loadingText" style="width:100%; text-align:center; padding:10px; display:none; color:#555;">
+					Loading facteur PDV
+				</div>
+			`);
+        customerBox.append(invoiceRow);
+        customerBox.append(loadingText);
+        customerBox.find(".expandIcon").hover(
+          function() {
+            $(this).css("fill", "green");
+          },
+          function() {
+            $(this).css("fill", "black");
+          }
         );
-        customerBox.append(`<input type="checkbox" style="margin:0px 16px;" data-invoice-type="Sales Invoice" data-invoice-name="${invoice.name}" data-outstanding-amount="${invoice.outstanding_amount}" ></input>`);
-        customerBox.append(`<div style="flex-grow:1;">${invoice.name}</div>`);
-        customerBox.append(`<div style="flex-grow:1;">${invoice.outstanding_amount} DA</div>`);
-        customerBox.append(`<div style="flex-grow:1;">${invoice.posting_date}</div>`);
-        customerBox.append(`<div style="flex-grow:1;">Sales Invoice</div>`);
-        customerBox.append(`<div class="rowBox centerItem payBtn" style="${payBtnStyle}">Pay</div>`);
+        customerBox.find(".expandIcon").on("click", function() {
+          const isExpanded = customerBox.hasClass("expanded");
+          if (!isExpanded) {
+            loadingText.slideDown(200);
+            customerBox.addClass("expanded");
+            $(this).css("transform", "rotate(180deg)");
+          } else {
+            loadingText.slideUp(200);
+            customerBox.removeClass("expanded");
+            $(this).css("transform", "rotate(0deg)");
+          }
+        });
         customerBox.find(".payBtn").on("click", async () => {
           await this.paySalesInvoice(invoice);
         });
@@ -8108,4 +8148,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.DWHXCG4A.js.map
+//# sourceMappingURL=pos.bundle.DE5N4YQ7.js.map

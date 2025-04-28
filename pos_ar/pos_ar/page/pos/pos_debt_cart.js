@@ -231,35 +231,95 @@ pos_ar.PointOfSale.pos_debt_cart = class{
 			this.debtList.append(customerBox)
 		})
 
-		result2.forEach(invoice=>{
-			total_debt += invoice.outstanding_amount ;
 
-			const customerBox = $(
-				`<div  style="${invoiceStyle}" class="rowBox C_A_Center invoiceBox" data-invoice-name="${invoice.name}"></div>`
-			)
-			customerBox.append(`<input type="checkbox" style="margin:0px 16px;" data-invoice-type="Sales Invoice" data-invoice-name="${invoice.name}" data-outstanding-amount="${invoice.outstanding_amount}" ></input>`)
-			customerBox.append(`<div style="flex-grow:1;">${invoice.name}</div>`)
-			customerBox.append(`<div style="flex-grow:1;">${invoice.outstanding_amount} DA</div>`)
-			customerBox.append(`<div style="flex-grow:1;">${invoice.posting_date}</div>`)
-			customerBox.append(`<div style="flex-grow:1;">Sales Invoice</div>`)
-			customerBox.append(`<div class="rowBox centerItem payBtn" style="${payBtnStyle}">Pay</div>`)
+		
 
-			 // Set up the click event listener for the Pay button
+		result2.forEach(invoice => {
+			total_debt += invoice.outstanding_amount;
+		
+			// Main container (still flex-row)
+			const customerBox = $(`
+				<div style="${invoiceStyle}; overflow:hidden; flex-direction: column; transition:0.3s;" 
+					 class="rowBox C_A_Center invoiceBox" data-invoice-name="${invoice.name}">
+				</div>
+			`)
+		
+			// Inside it: a flex-row for invoice info
+			const invoiceRow = $(`
+				<div class="rowBox C_A_Center" style="width: 100%;">
+				</div>
+			`)
+		
+			invoiceRow.append(`<input type="checkbox" style="margin:0px 16px;" data-invoice-type="Sales Invoice" data-invoice-name="${invoice.name}" data-outstanding-amount="${invoice.outstanding_amount}">`)
+			invoiceRow.append(`<div style="flex-grow:1;">${invoice.name}</div>`)
+			invoiceRow.append(`<div style="flex-grow:1;">${invoice.outstanding_amount} DA</div>`)
+			invoiceRow.append(`<div style="flex-grow:1;">${invoice.posting_date}</div>`)
+			invoiceRow.append(`<div style="flex-grow:1;">Sales Invoice</div>`)
+		
+			// ➡ Expand Icon
+			invoiceRow.append(`
+				<div style="flex-grow:1; display:flex; justify-content:center; align-items:center;">
+					<svg class="expandIcon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="black" viewBox="0 0 24 24" style="cursor:pointer; transition:0.3s;">
+						<path d="M7 10l5 5 5-5H7z"/>		
+					</svg>
+				</div>
+			`)
+		
+			// Pay Button
+			invoiceRow.append(`<div class="rowBox centerItem payBtn" style="${payBtnStyle}">Pay</div>`)
+		
+			// ➡ Hidden loading text (added separately, under invoiceRow)
+			const loadingText = $(`
+				<div class="loadingText" style="width:100%; text-align:center; padding:10px; display:none; color:#555;">
+					Loading facteur PDV
+				</div>
+			`);
+		
+			// Now assemble:
+			customerBox.append(invoiceRow);
+			customerBox.append(loadingText);
+		
+			// Hover effect on arrow
+			customerBox.find('.expandIcon').hover(
+				function() {
+					$(this).css('fill', 'green');
+				},
+				function() {
+					$(this).css('fill', 'black');
+				}
+			);
+		
+			// Click to expand/collapse
+			customerBox.find('.expandIcon').on('click', function () {
+				const isExpanded = customerBox.hasClass('expanded');
+		
+				if (!isExpanded) {
+					loadingText.slideDown(200);
+					customerBox.addClass('expanded');
+					$(this).css('transform', 'rotate(180deg)');
+				} else {
+					loadingText.slideUp(200);
+					customerBox.removeClass('expanded');
+					$(this).css('transform', 'rotate(0deg)');
+				}
+			});
+		
+			// Pay button logic
 			customerBox.find('.payBtn').on('click', async () => {
-				// Get the invoice name from the customerBox
-				//const invoiceName = customerBox.data('invoice-name');
-				// Proceed to pay the invoice with a predefined payment amount (e.g., 1000 DA)
 				await this.paySalesInvoice(invoice);
 			});
-			this.debtList.append(customerBox)
-		})
+		
+			this.debtList.append(customerBox);
+		});
+		
 
 
 
-		this.refreshTotal( total_debt );
+
+			this.refreshTotal( total_debt );
 
 
-	}
+		}
 
 
 	async payPosInvoice(invoice) {
