@@ -710,6 +710,9 @@ pos_ar.PointOfSale.Controller = class {
 		this.selectedField.field_name = "quantity"
 		this.selected_item_cart.makeSelectedButtonHighlighted();
 
+		
+		console.log("selected item :: ", this.selectedItem)
+
 		this.screenManager.navigate("item_details");
 
 		//refresh data
@@ -885,7 +888,24 @@ pos_ar.PointOfSale.Controller = class {
 			this.selectedTab.tabName = `C${tab}`
 
 			this.screenManager.navigate('home')
+
 		} else if (event == 'duplicate') {
+			//clean the search field on item_selector
+			this.item_selector.clearSearchField();
+
+			const tab = this.selected_item_cart.createNewTab()
+
+			this.selectedItemMaps.get(this.selectedTab.tabName).items = message.items;
+
+			console.log("message :: " , message)
+
+			console.log( "see here ",this.selectedItemMaps.get(this.selectedTab.tabName) , "selected tab ",this.selectedTab.tabName )
+
+
+			this.screenManager.navigate('home')
+
+
+			/*
 			const tab = this.selected_item_cart.createTabForEditPOS()
 
 			message.name = frappe.model.get_new_doc('POS Invoice').name;
@@ -907,6 +927,7 @@ pos_ar.PointOfSale.Controller = class {
 			this.selectedTab.tabName = `C${tab}`
 
 			this.screenManager.navigate('home')
+			*/
 		}
 		else if (event == 'return') {
 			const tab = this.selected_item_cart.createTabForEditPOS()
@@ -1221,6 +1242,7 @@ pos_ar.PointOfSale.Controller = class {
 			)
 			return;
 		}
+
 		let items = []
 		let is_return = 1;
 
@@ -1243,7 +1265,7 @@ pos_ar.PointOfSale.Controller = class {
 			}
 			items.push(newItem)
 			if (item.qty > 0)
-				is_return = 0
+				is_return = 0 
 		})
 
 		this.selectedItemMaps.get(this.selectedTab.tabName).is_return = is_return
@@ -1311,11 +1333,6 @@ pos_ar.PointOfSale.Controller = class {
 				//otherwise it will create one using the selected_item_cart class and set it as selected
 				if (tabs.length > 0) {
 					this.selected_item_cart.createNewTab();
-					/*
-					this.selectedTab.tabName = tabs[0]
-					this.selected_item_cart.refreshTabs();
-					this.selected_item_cart.refreshSelectedItem();
-					*/
 				}
 				else {
 					this.selected_item_cart.createNewTab();
@@ -1325,7 +1342,6 @@ pos_ar.PointOfSale.Controller = class {
 
 
 			}).catch(err => {
-				console.log("debuging rayan 22222222 :::: " , pos)
 				this.payment_cart.hide_waiting()
 				console.log("cant push pos invoice : ", err);
 			})
@@ -1333,7 +1349,7 @@ pos_ar.PointOfSale.Controller = class {
 		else {
 
 			this.payment_cart.hide_waiting()
-			/*** START : deleting pos when finishing **/
+			/*** START  **/
 			//print the pos
 			this.history_cart.print_receipt(pos)
 
@@ -1345,19 +1361,13 @@ pos_ar.PointOfSale.Controller = class {
 			//otherwise it will create one using the selected_item_cart class and set it as selected
 			if (tabs.length > 0) {
 				this.selected_item_cart.createNewTab();
-				/*
-				this.selectedTab.tabName = tabs[0]
-				this.selected_item_cart.refreshTabs();
-				this.selected_item_cart.refreshSelectedItem();
-				*/
 			}
 			else {
 				this.selected_item_cart.createNewTab();
 			}
 			this.screenManager.navigate('home')
-			/*** END : deleting pos when finishing **/
 
-
+			/*** END : close pos invoice when finishing  (opened == 0) **/
 			pos.synced = false;
 			pos.opened = 0;
 			this.appData.updatePosInvoice(pos)

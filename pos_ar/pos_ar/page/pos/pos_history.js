@@ -414,7 +414,12 @@ pos_ar.PointOfSale.pos_history = class {
 		})
 
 		this.duplicateBtn.on('click', (event) => {
+			//make errors on selected pos invoice map on the selected item carts 
+			this.selected_pos.items.forEach(item => {
+				item.name = item.item_name
+			})
 			this.on_click('duplicate', this.selected_pos);
+			console.log("duplicate invoice : ", this.selected_pos)
 		})
 
 	}
@@ -423,7 +428,6 @@ pos_ar.PointOfSale.pos_history = class {
 
 
 	filterList(search, filter) {
-		console.log("log : ", this.filtered_pos_list)
 		this.filtered_pos_list = this.localPosInvoice.pos_invoices.filter(pos => {
 
 

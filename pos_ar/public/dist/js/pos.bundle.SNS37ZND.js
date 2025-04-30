@@ -2522,6 +2522,7 @@
       Object.assign(this.selectedItem, clonedItem);
       this.selectedField.field_name = "quantity";
       this.selected_item_cart.makeSelectedButtonHighlighted();
+      console.log("selected item :: ", this.selectedItem);
       this.screenManager.navigate("item_details");
       this.item_details.refreshDate(item);
     }
@@ -2653,22 +2654,11 @@
         this.selectedTab.tabName = `C${tab}`;
         this.screenManager.navigate("home");
       } else if (event2 == "duplicate") {
-        const tab = this.selected_item_cart.createTabForEditPOS();
-        message.name = frappe.model.get_new_doc("POS Invoice").name;
-        message.pos_profile = this.appData.appData.pos_profile.name;
-        message.taxes_and_charges = this.appData.appData.pos_profile.taxes_and_charges;
-        message.creation_time = frappe.datetime.now_datetime();
-        message.payments = this.getPaymentMethods();
-        message.priceList = this.defaultPriceList.name;
-        const date = new Date();
-        const [year, month, day] = date.toISOString().split("T")[0].split("-");
-        const hour = date.getHours();
-        const minutes = date.getMinutes();
-        const seconds = date.getMilliseconds();
-        message.refNum = this.appData.appData.pos_profile.name + "-" + year + "-" + month + "-" + day + "-" + hour + minutes + seconds;
-        message.custom_cach_name = message.refNum;
-        this.selectedItemMaps.set(`C${tab}`, message);
-        this.selectedTab.tabName = `C${tab}`;
+        this.item_selector.clearSearchField();
+        const tab = this.selected_item_cart.createNewTab();
+        this.selectedItemMaps.get(this.selectedTab.tabName).items = message.items;
+        console.log("message :: ", message);
+        console.log("see here ", this.selectedItemMaps.get(this.selectedTab.tabName), "selected tab ", this.selectedTab.tabName);
         this.screenManager.navigate("home");
       } else if (event2 == "return") {
         const tab = this.selected_item_cart.createTabForEditPOS();
@@ -2936,7 +2926,6 @@
           }
           this.screenManager.navigate("home");
         }).catch((err) => {
-          console.log("debuging rayan 22222222 :::: ", pos);
           this.payment_cart.hide_waiting();
           console.log("cant push pos invoice : ", err);
         });
@@ -5387,11 +5376,14 @@
         this.print_receipt(this.selected_pos);
       });
       this.duplicateBtn.on("click", (event2) => {
+        this.selected_pos.items.forEach((item) => {
+          item.name = item.item_name;
+        });
         this.on_click("duplicate", this.selected_pos);
+        console.log("duplicate invoice : ", this.selected_pos);
       });
     }
     filterList(search, filter) {
-      console.log("log : ", this.filtered_pos_list);
       this.filtered_pos_list = this.localPosInvoice.pos_invoices.filter((pos) => {
         const matchesCustomer = (pos.customer || "").toLowerCase().includes(search.toLowerCase());
         const matchesRefNum = (pos.refNum || "").toLowerCase().includes(search.toLowerCase());
@@ -8184,4 +8176,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.OMY6RQ6S.js.map
+//# sourceMappingURL=pos.bundle.SNS37ZND.js.map
