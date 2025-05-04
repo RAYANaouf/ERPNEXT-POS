@@ -388,8 +388,8 @@ def CA_FRD_generator():
 
     
     return {
-        "needed_ctns": needed_ctns,
-        "count": len(needed_ctns)
+        "needed_ctns": list(set(needed_ctns)),
+        "count": len(set(needed_ctns))
     }
 
 
