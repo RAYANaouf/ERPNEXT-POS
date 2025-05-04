@@ -53,5 +53,16 @@
   "name": "get_messing_product",
   "script": "frappe.ui.form.on('Purchase Order', {\r\n    custom_start(frm) {\r\n        fetch_sold_items_if_ready(frm);\r\n    },\r\n\r\n    custom_end(frm) {\r\n        fetch_sold_items_if_ready(frm);\r\n    },\r\n\r\n    company(frm) {\r\n        fetch_sold_items_if_ready(frm);\r\n    }\r\n});\r\n\r\n\r\n\r\nfunction fetch_sold_items_if_ready(frm) {\r\n    const start = frm.doc.custom_start;\r\n    const end = frm.doc.custom_end;\r\n    const company = frm.doc.company;\r\n\r\n    if (start && end && company) {\r\n        frappe.call({\r\n            method: \"pos_ar.api.get_item_sold\",\r\n            args: { start, end, company },\r\n            callback: function(r) {\r\n                if (r.message) {\r\n                    // Clear current items table\r\n                    frm.clear_table(\"items\");\r\n                    // Add returned sold items to items table\r\n                    r.message.forEach(row => {\r\n                        const item = frm.add_child(\"items\");\r\n                        item.item_code = row.item_name;\r\n                        item.item_name = row.item_name;\r\n                        item.qty = row.total_qty;\r\n                    });\r\n\r\n                    frm.refresh_field(\"items\");\r\n                }\r\n            }\r\n        });\r\n    } else {\r\n        console.log(\"Waiting for all fields to be filled (start, end, company)\");\r\n    }\r\n}\r\n",
   "view": "Form"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Client Script",
+  "dt": "CA-FRD",
+  "enabled": 1,
+  "modified": "2025-05-04 07:09:55.279966",
+  "module": "POS AR",
+  "name": "CA-FRD-BTN-CLK",
+  "script": "frappe.ui.form.on('CA-FRD', {\n\trefresh(frm) {\n\t\t// your code here\n\t\t\n\t},\n\t\n\tgeneratebtn(frm){\n\t    frappe.msgprint(__('Generate button clicked!'));\n\t    //CA_FRD_generator\n\t    frappe.call({\n            method: \"pos_ar.api.CA_FRD_generator\",\n            callback: function(r) {\n                console.log(\"result : \" , r)\n                if (r.message) {\n                    // Clear current items table\n                    frm.clear_table(\"ca_frd_item\");\n                    // Add returned sold items to items table\n                    r.message.missing_items.forEach(row => {\n                        const item = frm.add_child(\"ca_frd_item\");\n                        item.item  = row;\n                        item.qty   = 10 ;\n                    });\n\n                    frm.refresh_field(\"ca_frd_item\");\n                }\n            }\n        });\n\t}\n})",
+  "view": "Form"
  }
 ]
