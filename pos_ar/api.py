@@ -346,20 +346,30 @@ def export_items_without_price():
 
 
 
-@frappe.whitelist()
-def CA_FRD_generator( ref = None , max_count = None):
 
+
+
+
+
+
+
+
+
+
+
+
+@frappe.whitelist()
+def CA_FRD_generator(ref=None, max_count=None):
+    if not ref:
+        frappe.throw("Ref is required")
 
     if max_count:
         try:
             max_count = int(max_count)
         except ValueError:
             frappe.throw("max_count must be an integer")
-            
-    if not ref:
-        frappe.throw("Ref is required")
-    
-    # Step 1: Get CTN-BOXES with ref 24019 from CA (beaulieu alger - OC)
+
+    # Step 1: Get CTN-BOXES with given ref from CA (beaulieu alger - OC)
     ctn_boxes = frappe.get_all(
         "CTN-BOX",
         filters={"ref": ref, "warehouse": "beaulieu alger - OC"},
@@ -392,22 +402,24 @@ def CA_FRD_generator( ref = None , max_count = None):
     
     alger_item_codes = set(row.item_code for row in alger_stock if row.actual_qty > 0)
 
-    # Step 4: Determine needed CTNs
-    needed_ctns_set = set()
-    for ctn, items in ctn_to_items.items():
+    # Step 4: Determine needed CTNs (ordered list)
+    needed_ctns = []
+    for ctn in ctn_names:  # preserve order from fetched CTNs
+        items = ctn_to_items.get(ctn, [])
         for item in items:
             if item["item"] not in alger_item_codes:
-                needed_ctns_set.add(ctn)
-                break
+                needed_ctns.append(ctn)
+                break  # Only one missing item needed
 
+    # Apply max_count limit
+    if max_count:
+        needed_ctns = needed_ctns[:max_count]
 
     # Filter ctn_to_items to only keep needed CTNs
-    needed_ctn_details = {ctn: ctn_to_items[ctn] for ctn in needed_ctns_set}
+    needed_ctn_details = {ctn: ctn_to_items[ctn] for ctn in needed_ctns}
 
     return {
-        "needed_ctns": list(needed_ctns_set),
-        "count": len(needed_ctns_set),
+        "needed_ctns": needed_ctns,
+        "count": len(needed_ctns),
         "ctn_details": needed_ctn_details
     }
-
-
