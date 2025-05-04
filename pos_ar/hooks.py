@@ -248,15 +248,15 @@ doc_events = {
 fixtures = [
     {
         'dt': 'DocType',
-        'filters': [['name', 'in', ['check_in_out' , 'money' , 'CTN Item' , 'CTN-BOX' , 'CTN-BOX Transaction' , 'CA-FRD' , 'CA-FRD-ITEM' , 'CA-FRD-CTNS' ]]]
+        'filters': [['name', 'in', ['check_in_out' , 'money' , 'CTN Item' , 'CTN-BOX' , 'CTN-BOX Transaction' , 'CA-FRD' , 'CA-FRD-ITEM' , 'CA-FRD-CTNS'  ]]]
     },
     {
         'dt': 'Custom Field',
-        'filters': [['dt', 'in', ['POS Invoice', 'Customer' , 'POS Closing Entry' ,'Sales Invoice','Purchase Order','Item']]]
+        'filters': [['dt', 'in', ['POS Invoice', 'Customer' , 'POS Closing Entry' ,'Sales Invoice','Purchase Order','Item' , 'Stock Entry']]]
     },
     {
         'dt': 'Client Script',
-        'filters': [['dt', 'in', ['POS Closing Entry','CTN-BOX','Sales Invoice','Purchase Order','CA-FRD']]]
+        'filters': [['dt', 'in', ['POS Closing Entry','CTN-BOX','Sales Invoice','Purchase Order','CA-FRD' , 'Stock Entry']]]
     }
 ]
 
