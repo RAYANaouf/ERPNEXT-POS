@@ -190,7 +190,7 @@ def get_item_sold(start, end, company=None):
 @frappe.whitelist()
 def export_item_prices():
     prices = frappe.get_all("Item Price",
-        filters={"price_list": "JOE - OPTILENS ALGER"},
+        filters={"price_list": "TP - Alger"},
         fields=["item_code", "price_list_rate"]
     )
 
@@ -302,13 +302,13 @@ def export_items_without_price():
     for item in items:
         has_price = frappe.db.exists("Item Price", {
             "item_code": item["item_code"],
-            "price_list": "Public - Alger"
+            "price_list": "TP - Alger"
         })
         if not has_price:
             result.append(item)
 
     if not result:
-        return "All items have a price in the Public Price List."
+        return "All items have a price in the TP - Alger Price List."
 
     # Sort result by brand
     result.sort(key=lambda x: (x["brand"] or "").lower())
@@ -340,3 +340,46 @@ def export_items_without_price():
     os.remove(file_path)
 
     return get_url(file.file_url)
+
+
+
+
+
+
+    
+@frappe.whitelist()
+def CA_FRD_generator():
+    # Step 1: Get all items in MAGASIN of CA
+    ca_items = frappe.db.get_all(
+        "Bin",
+        filters={"warehouse": "beaulieu alger - OC"},
+        fields=["item_code"]
+    )
+    ca_item_codes = set(item.item_code for item in ca_items)
+
+    # Step 2: Get quantities of items in FORDLO of ALGER
+    fordlo_bins = frappe.db.get_all(
+        "Bin",
+        filters={"warehouse": "Bordj el kiffen - OA"},
+        fields=["item_code", "actual_qty"]
+    )
+
+    # Map item_code → actual_qty
+    fordlo_qty_map = {bin.item_code: bin.actual_qty for bin in fordlo_bins}
+
+    # Step 3: Filter out items that are missing or have qty <= 0
+    real_items = []
+    for item_code in ca_item_codes:
+        qty = fordlo_qty_map.get(item_code, 0)
+        if qty > 0:
+            real_items.append(item_code)
+            
+
+    missing_items = list(ca_item_codes - set(real_items))
+    
+    return {
+        "missing_items": missing_items,
+        "count": len(missing_items)
+    }
+
+
