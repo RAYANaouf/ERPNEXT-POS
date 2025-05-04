@@ -346,7 +346,6 @@ def export_items_without_price():
 
 
 
-    
 @frappe.whitelist()
 def CA_FRD_generator():
     # Step 1: Get CTN-BOXES with ref 24019 from CA (beaulieu alger - OC)
@@ -356,17 +355,22 @@ def CA_FRD_generator():
         fields=["name"]
     )
     
-    # Step 2: Get items inside those CTN-BOXES
+    ctn_names = [box.name for box in ctn_boxes]
+
+    # Step 2: Get items inside those CTN-BOXES (with qty)
     ctn_items = frappe.get_all(
         "CTN Item",  
-        filters={"parent": ["in", [box.name for box in ctn_boxes]]},
-        fields=["parent", "item"]
+        filters={"parent": ["in", ctn_names]},
+        fields=["parent", "item", "qty"]
     )
     
-    # Map: CTN → [item_code...]
+    # Map: CTN → [{item, qty}]
     ctn_to_items = {}
     for row in ctn_items:
-        ctn_to_items.setdefault(row.parent, []).append(row.item)
+        ctn_to_items.setdefault(row.parent, []).append({
+            "item": row.item,
+            "qty": row.qty
+        })
 
     # Step 3: Get current stock in ALGER (Bordj el kiffen - OA)
     alger_stock = frappe.get_all(
@@ -375,21 +379,23 @@ def CA_FRD_generator():
         fields=["item_code", "actual_qty"]
     )
     
-    # Set of items ALGER already has
     alger_item_codes = set(row.item_code for row in alger_stock if row.actual_qty > 0)
- 
-     # Step 4: Determine needed items (present in CTNs, but not in ALGER stock)
-    needed_ctns = []
+
+    # Step 4: Determine needed CTNs
+    needed_ctns_set = set()
     for ctn, items in ctn_to_items.items():
         for item in items:
-            if item not in alger_item_codes:
-                needed_ctns.append(ctn)
-                break  # Only need one missing item to include the CTN
+            if item["item"] not in alger_item_codes:
+                needed_ctns_set.add(ctn)
+                break
 
-    
+    # Filter ctn_to_items to only keep needed CTNs
+    needed_ctn_details = {ctn: ctn_to_items[ctn] for ctn in needed_ctns_set}
+
     return {
-        "needed_ctns": list(set(needed_ctns)),
-        "count": len(set(needed_ctns))
+        "needed_ctns": list(needed_ctns_set),
+        "count": len(needed_ctns_set),
+        "ctn_details": needed_ctn_details
     }
 
 
