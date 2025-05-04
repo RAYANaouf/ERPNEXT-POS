@@ -248,7 +248,7 @@ doc_events = {
 fixtures = [
     {
         'dt': 'DocType',
-        'filters': [['name', 'in', ['check_in_out' , 'money' , 'CTN Item' , 'CTN-BOX' , 'CTN-BOX Transaction' , 'CA-FRD' , 'CA-FRD-ITEM' ]]]
+        'filters': [['name', 'in', ['check_in_out' , 'money' , 'CTN Item' , 'CTN-BOX' , 'CTN-BOX Transaction' , 'CA-FRD' , 'CA-FRD-ITEM' , 'CA-FRD-CTNS' ]]]
     },
     {
         'dt': 'Custom Field',
