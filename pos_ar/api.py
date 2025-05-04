@@ -349,37 +349,47 @@ def export_items_without_price():
     
 @frappe.whitelist()
 def CA_FRD_generator():
-    # Step 1: Get all items in MAGASIN of CA
-    ca_items = frappe.db.get_all(
-        "Bin",
-        filters={"warehouse": "beaulieu alger - OC"},
-        fields=["item_code"]
+    # Step 1: Get CTN-BOXES with ref 24019 from CA (beaulieu alger - OC)
+    ctn_boxes = frappe.get_all(
+        "CTN-BOX",
+        filters={"ref": "24019", "warehouse": "beaulieu alger - OC"},
+        fields=["name"]
     )
-    ca_item_codes = set(item.item_code for item in ca_items)
+    
+    # Step 2: Get items inside those CTN-BOXES
+    ctn_items = frappe.get_all(
+        "CTN Item",  
+        filters={"parent": ["in", [box.name for box in ctn_boxes]]},
+        fields=["parent", "item"]
+    )
+    
+    # Map: CTN → [item_code...]
+    ctn_to_items = {}
+    for row in ctn_items:
+        ctn_to_items.setdefault(row.parent, []).append(row.item)
 
-    # Step 2: Get quantities of items in FORDLO of ALGER
-    fordlo_bins = frappe.db.get_all(
+    # Step 3: Get current stock in ALGER (Bordj el kiffen - OA)
+    alger_stock = frappe.get_all(
         "Bin",
         filters={"warehouse": "Bordj el kiffen - OA"},
         fields=["item_code", "actual_qty"]
     )
+    
+    # Set of items ALGER already has
+    alger_item_codes = set(row.item_code for row in alger_stock if row.actual_qty > 0)
+ 
+     # Step 4: Determine needed items (present in CTNs, but not in ALGER stock)
+    needed_ctns = []
+    for ctn, items in ctn_to_items.items():
+        for item in items:
+            if item not in alger_item_codes:
+                needed_ctns.append(ctn)
+                break  # Only need one missing item to include the CTN
 
-    # Map item_code → actual_qty
-    fordlo_qty_map = {bin.item_code: bin.actual_qty for bin in fordlo_bins}
-
-    # Step 3: Filter out items that are missing or have qty <= 0
-    real_items = []
-    for item_code in ca_item_codes:
-        qty = fordlo_qty_map.get(item_code, 0)
-        if qty > 0:
-            real_items.append(item_code)
-            
-
-    missing_items = list(ca_item_codes - set(real_items))
     
     return {
-        "missing_items": missing_items,
-        "count": len(missing_items)
+        "needed_ctns": needed_ctns,
+        "count": len(needed_ctns)
     }
 
 
