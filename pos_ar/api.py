@@ -347,11 +347,22 @@ def export_items_without_price():
 
 
 @frappe.whitelist()
-def CA_FRD_generator():
+def CA_FRD_generator( ref = None , max_count = None):
+
+
+    if max_count:
+        try:
+            max_count = int(max_count)
+        except ValueError:
+            frappe.throw("max_count must be an integer")
+            
+    if not ref:
+        frappe.throw("Ref is required")
+    
     # Step 1: Get CTN-BOXES with ref 24019 from CA (beaulieu alger - OC)
     ctn_boxes = frappe.get_all(
         "CTN-BOX",
-        filters={"ref": "24019", "warehouse": "beaulieu alger - OC"},
+        filters={"ref": ref, "warehouse": "beaulieu alger - OC"},
         fields=["name"]
     )
     
@@ -388,6 +399,7 @@ def CA_FRD_generator():
             if item["item"] not in alger_item_codes:
                 needed_ctns_set.add(ctn)
                 break
+
 
     # Filter ctn_to_items to only keep needed CTNs
     needed_ctn_details = {ctn: ctn_to_items[ctn] for ctn in needed_ctns_set}
