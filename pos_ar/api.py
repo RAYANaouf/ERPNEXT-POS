@@ -372,7 +372,7 @@ def CA_FRD_generator(ref=None, max_count=None):
     # Step 1: Get CTN-BOXES with given ref from CA (beaulieu alger - OC)
     ctn_boxes = frappe.get_all(
         "CTN-BOX",
-        filters={"ref": ref, "warehouse": "Stores - ow"},
+        filters={"ref": ref, "warehouse": "beaulieu alger - OC"},
         fields=["name"]
     )
     
@@ -396,7 +396,7 @@ def CA_FRD_generator(ref=None, max_count=None):
     # Step 3: Get current stock in ALGER (Bordj el kiffen - OA)
     alger_stock = frappe.get_all(
         "Bin",
-        filters={"warehouse": "Stores - Tz"},
+        filters={"warehouse": "Bordj el kiffen - OA"},
         fields=["item_code", "actual_qty"]
     )
     
