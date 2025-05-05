@@ -359,7 +359,13 @@ def export_items_without_price():
 
 
 @frappe.whitelist()
-def CA_FRD_generator(ref=None, max_count=None):
+def CA_FRD_generator( ref = None, max_count = None , from_warehouse = None , to_warehouse = None):
+    
+    print(ref)
+    print(max_count)
+    print(from_warehouse)
+    print(to_warehouse)
+    
     if not ref:
         frappe.throw("Ref is required")
 
@@ -372,12 +378,14 @@ def CA_FRD_generator(ref=None, max_count=None):
     # Step 1: Get CTN-BOXES with given ref from CA (beaulieu alger - OC)
     ctn_boxes = frappe.get_all(
         "CTN-BOX",
-        filters={"ref": ref, "warehouse": "beaulieu alger - OC"},
+        filters={"ref": ref, "warehouse": from_warehouse},
         fields=["name"]
     )
     
+    print(ctn_boxes)
     ctn_names = [box.name for box in ctn_boxes]
 
+    print(ctn_names)
     # Step 2: Get items inside those CTN-BOXES (with qty)
     ctn_items = frappe.get_all(
         "CTN Item",  
@@ -396,7 +404,7 @@ def CA_FRD_generator(ref=None, max_count=None):
     # Step 3: Get current stock in ALGER (Bordj el kiffen - OA)
     alger_stock = frappe.get_all(
         "Bin",
-        filters={"warehouse": "Bordj el kiffen - OA"},
+        filters={"warehouse": to_warehouse},
         fields=["item_code", "actual_qty"]
     )
     
