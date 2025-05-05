@@ -381,14 +381,23 @@ def get_items_from_ctns(ctn_list):
     if isinstance(ctn_list, str):
         ctn_list = json.loads(ctn_list)  # Deserialize from string to Python list if needed
 
-    print("the CTN list : " + str(ctn_list))
-
     for ctn_name in ctn_list:
-        print("fetch CTN : " + ctn_name)
         ctn = frappe.get_doc("CTN-BOX", ctn_name)
+        
         for row in ctn.items:
             item = frappe.get_doc("Item", row.item)
             uom = item.stock_uom or (item.uoms[0].uom if item.uoms else "")
+            conversion_factor = 1.0
+            
+            
+            # Find the conversion factor if stock_uom is not default
+            if item.uoms:
+                for uom_row in item.uoms:
+                    if uom_row.uom == uom:
+                        conversion_factor = uom_row.conversion_factor or 1.0
+                        break
+                    
+                    
             key = (row.item, uom, ctn.warehouse)
 
                 
@@ -404,6 +413,7 @@ def get_items_from_ctns(ctn_list):
                         "item_code": row.item,
                         "qty": 0,
                         "uom": uom,
+                        "conversion_factor": conversion_factor,
                         "s_warehouse": ctn.warehouse
                     }
                     
