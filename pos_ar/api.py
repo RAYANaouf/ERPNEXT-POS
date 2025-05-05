@@ -8,67 +8,6 @@ import os
 from frappe.utils import get_url
 
 
-def update_customer_debt_on_invoice(doc, method):
-    """
-    Updates the custom_debt and debt_date fields in the Customer Doctype when a Sales Invoice, POS Invoice,
-    or Payment Entry is created or submitted.
-
-    Args:
-        doc (Document): The document triggering the event.
-        method (str): The trigger method (e.g., 'on_submit', 'on_cancel').
-    """
-    try:
-        customer = None
-
-        # Determine the customer based on document type
-        if doc.doctype == "Payment Entry" and doc.party_type == "Customer":
-            customer = doc.party
-        else:
-            customer = getattr(doc, "customer", None)
-
-        if not customer:
-            frappe.logger().info(f"No customer found for document {doc.name}. Skipping.")
-            return
-
-        # Determine the appropriate query based on whether this is a POS invoice
-        if doc.doctype == "Sales Invoice" and getattr(doc, "is_pos", 0) == 1:
-            # POS Sales Invoice
-            total_outstanding = frappe.db.sql("""
-                SELECT SUM(outstanding_amount)
-                FROM `tabSales Invoice`
-                WHERE customer = %s AND docstatus = 1
-            """, (customer,))[0][0] or 0
-        else:
-            # Regular Sales Invoice or other document types
-            total_outstanding = frappe.db.sql("""
-                SELECT SUM(outstanding_amount)
-                FROM (
-                    SELECT outstanding_amount
-                    FROM `tabSales Invoice`
-                    WHERE customer = %s AND docstatus = 1
-
-                    UNION ALL
-
-                    SELECT outstanding_amount
-                    FROM `tabPOS Invoice`
-                    WHERE customer = %s AND docstatus = 1 AND consolidated_invoice IS NULL AND outstanding_amount > 0
-                ) AS combined
-            """, (customer, customer))[0][0] or 0
-
-        # Update the custom_debt and debt_date fields in the Customer Doctype
-        frappe.db.set_value("Customer", customer, {
-            "custom_debt": total_outstanding,
-            "custom_debt_date": datetime.now()
-        })
-
-        frappe.logger().info(f"Customer {customer}'s debt updated to {total_outstanding} on {datetime.now()}.")
-
-    except Exception as e:
-        frappe.logger().error(f"Error updating debt for document {doc.name}: {str(e)}")
-
-
-
-
 
 
 
@@ -360,11 +299,7 @@ def export_items_without_price():
 
 @frappe.whitelist()
 def CA_FRD_generator( ref = None, max_count = None , from_warehouse = None , to_warehouse = None):
-    
-    print(ref)
-    print(max_count)
-    print(from_warehouse)
-    print(to_warehouse)
+
     
     if not ref:
         frappe.throw("Ref is required")
@@ -431,3 +366,128 @@ def CA_FRD_generator( ref = None, max_count = None , from_warehouse = None , to_
         "count": len(needed_ctns),
         "ctn_details": needed_ctn_details
     }
+
+
+
+
+
+#################################################### event functions ####################################################
+
+
+
+
+
+
+
+
+#sales invoice , POS invoice , payment entry event
+#on submit , on cancel
+def update_customer_debt_on_invoice(doc, method):
+    """
+    Updates the custom_debt and debt_date fields in the Customer Doctype when a Sales Invoice, POS Invoice,
+    or Payment Entry is created or submitted.
+
+    Args:
+        doc (Document): The document triggering the event.
+        method (str): The trigger method (e.g., 'on_submit', 'on_cancel').
+    """
+    try:
+        customer = None
+
+        # Determine the customer based on document type
+        if doc.doctype == "Payment Entry" and doc.party_type == "Customer":
+            customer = doc.party
+        else:
+            customer = getattr(doc, "customer", None)
+
+        if not customer:
+            frappe.logger().info(f"No customer found for document {doc.name}. Skipping.")
+            return
+
+        # Determine the appropriate query based on whether this is a POS invoice
+        if doc.doctype == "Sales Invoice" and getattr(doc, "is_pos", 0) == 1:
+            # POS Sales Invoice
+            total_outstanding = frappe.db.sql("""
+                SELECT SUM(outstanding_amount)
+                FROM `tabSales Invoice`
+                WHERE customer = %s AND docstatus = 1
+            """, (customer,))[0][0] or 0
+        else:
+            # Regular Sales Invoice or other document types
+            total_outstanding = frappe.db.sql("""
+                SELECT SUM(outstanding_amount)
+                FROM (
+                    SELECT outstanding_amount
+                    FROM `tabSales Invoice`
+                    WHERE customer = %s AND docstatus = 1
+
+                    UNION ALL
+
+                    SELECT outstanding_amount
+                    FROM `tabPOS Invoice`
+                    WHERE customer = %s AND docstatus = 1 AND consolidated_invoice IS NULL AND outstanding_amount > 0
+                ) AS combined
+            """, (customer, customer))[0][0] or 0
+
+        # Update the custom_debt and debt_date fields in the Customer Doctype
+        frappe.db.set_value("Customer", customer, {
+            "custom_debt": total_outstanding,
+            "custom_debt_date": datetime.now()
+        })
+
+        frappe.logger().info(f"Customer {customer}'s debt updated to {total_outstanding} on {datetime.now()}.")
+
+    except Exception as e:
+        frappe.logger().error(f"Error updating debt for document {doc.name}: {str(e)}")
+
+
+
+
+
+#sales invoice event
+#on submit , on cancel
+def manage_related_ctn_transactions(doc, method):
+    """
+    Create related CTN Transactions whenever a Sales Invoice is submitted.
+    """
+    # Only run for 'on_submit' if you also hooked it into other events.
+    if method == "on_submit":
+        
+        
+        for item in doc.custom_ctn_transaction:
+            # create a new "CTN Transaction" doc
+            ctn_trn = frappe.new_doc("CTN-BOX Transaction")
+            ctn_trn.name = doc.name + "-" + item.ctn + "-" + item.item
+            ctn_trn.item = item.item
+            ctn_trn.qty  = item.qty
+            ctn_trn.ctn  = item.ctn
+            ctn_trn.sales_invoice = doc.name
+            ctn_trn.insert()
+            ctn_trn.submit()
+
+
+
+
+#Stock Entry  event
+#type = "Material Transfer"
+#on submit , on cancel
+def update_ctn_box_warehouse(doc, method):
+    """
+    Update CTN Box warehouse on submit or cancel of Material Transfer.
+    """
+    if doc.stock_entry_type != "Material Transfer":
+        return
+
+    if not doc.get("custom_ctn_boxs"):
+        return
+
+    if method == "on_submit":
+        target_warehouse = doc.items[0].t_warehouse  # Assumes uniform target
+    elif method == "on_cancel":
+        target_warehouse = doc.items[0].s_warehouse  # Reset to source or set to None if needed
+    else:
+        return
+
+    for row in doc.custom_ctn_boxs:
+        frappe.db.set_value("CTN-BOX", row.ctn, "warehouse", target_warehouse)
+

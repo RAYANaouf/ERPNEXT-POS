@@ -143,6 +143,10 @@ doc_events = {
     "Payment Entry": {
         "on_submit": "pos_ar.api.update_customer_debt_on_invoice",
         "on_cancel": "pos_ar.api.update_customer_debt_on_invoice",
+    },
+    "Stock Entry": {
+        "on_submit": "pos_ar.api.update_ctn_box_warehouse",
+        "on_cancel": "pos_ar.api.update_ctn_box_warehouse",
     }
 }
 
@@ -248,7 +252,7 @@ doc_events = {
 fixtures = [
     {
         'dt': 'DocType',
-        'filters': [['name', 'in', ['check_in_out' , 'money' , 'CTN Item' , 'CTN-BOX' , 'CTN-BOX Transaction' , 'CA-FRD' , 'CA-FRD-ITEM' , 'CA-FRD-CTNS' , 'Stock Transfer CTN'  ]]]
+        'filters': [['name', 'in', ['check_in_out' , 'money' , 'CTN Item' , 'CTN-BOX' , 'CTN-BOX Transaction' ,  'CTN Transfer' , 'CTN Transfer Item' ,  'Stock Transfer CTN'  ]]]
     },
     {
         'dt': 'Custom Field',
@@ -256,7 +260,7 @@ fixtures = [
     },
     {
         'dt': 'Client Script',
-        'filters': [['dt', 'in', ['POS Closing Entry','CTN-BOX','Sales Invoice','Purchase Order','CA-FRD' , 'Stock Entry']]]
+        'filters': [['dt', 'in', ['POS Closing Entry','CTN-BOX','Sales Invoice','Purchase Order','CTN Transfer' , 'Stock Entry']]]
     }
 ]
 
