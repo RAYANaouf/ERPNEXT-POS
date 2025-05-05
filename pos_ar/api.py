@@ -6,7 +6,7 @@ import frappe
 import csv
 import os
 from frappe.utils import get_url
-
+import json
 
 
 
@@ -367,7 +367,49 @@ def CA_FRD_generator( ref = None, max_count = None , from_warehouse = None , to_
         "ctn_details": needed_ctn_details
     }
 
+################################################### user on client script ##############################################
 
+
+@frappe.whitelist()
+def get_items_from_ctns(ctn_list):
+    """
+    Accepts a list of CTN-BOX names.
+    Returns a list of item the ctn contain with item_code, qty, uom, s_warehouse (gotten from the CTN warehouse).
+    """
+    item_map = {}
+    
+    if isinstance(ctn_list, str):
+        ctn_list = json.loads(ctn_list)  # Deserialize from string to Python list if needed
+
+    print("the CTN list : " + str(ctn_list))
+
+    for ctn_name in ctn_list:
+        print("fetch CTN : " + ctn_name)
+        ctn = frappe.get_doc("CTN-BOX", ctn_name)
+        for row in ctn.items:
+            item = frappe.get_doc("Item", row.item)
+            uom = item.stock_uom or (item.uoms[0].uom if item.uoms else "")
+            key = (row.item, uom, ctn.warehouse)
+
+                
+            if key not in item_map:
+                if not uom:
+                    item_map[key] = {
+                        "item_code": row.item,
+                        "qty": 0,
+                        "s_warehouse": ctn.warehouse
+                    }
+                else:
+                    item_map[key] = {
+                        "item_code": row.item,
+                        "qty": 0,
+                        "uom": uom,
+                        "s_warehouse": ctn.warehouse
+                    }
+                    
+            item_map[key]["qty"] += row.qty
+
+    return list(item_map.values())
 
 
 
