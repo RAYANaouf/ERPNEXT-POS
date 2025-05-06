@@ -543,3 +543,65 @@ def update_ctn_box_warehouse(doc, method):
     for row in doc.custom_ctn_boxs:
         frappe.db.set_value("CTN-BOX", row.ctn, "warehouse", target_warehouse)
 
+# Stock Entry event
+# type = "Material Transfer"
+# on submit, on cancel
+
+def remove_ctn(doc, method):
+    """
+    If the type = "Material Issue", remove all the CTN related to it on submit
+    and restore them on cancel.
+    """
+    if doc.stock_entry_type != "Material Issue":
+        return
+
+    # If there are no CTN boxes, exit
+    if not doc.get("custom_ctn_boxs"):
+        return
+
+    # On submit: Delete the CTN-Box records and backup them
+    if method == "on_submit":
+        for row in doc.custom_ctn_boxs:
+            if row.ctn:  # Check if there is a CTN
+                try:
+                    # Get the CTN-BOX document by its name (row.ctn)
+                    ctn_box = frappe.get_doc("CTN-BOX", row.ctn)
+                    print("ctn_box items ==============> : ", ctn_box.items)
+
+                    for item in ctn_box.items : 
+                        print("item - - - -  -==== >>>>>>>>>>>> " , item )
+                    
+                    print("ctn_box items ==============> : ", ctn_box.items)
+                    # Now, we have access to the full CTN-BOX document
+                    # Proceed with the logic to backup and delete
+                    backup_data = {
+                        "company"         : ctn_box.company,
+                        "warehouse"       : ctn_box.warehouse,
+                        "ref"             : ctn_box.ref,
+                        "ctn_num"         : ctn_box.ctn_num,
+                        "box_place"       : ctn_box.box_place,
+                        "status"          : ctn_box.status,
+                        "items"           : ctn_box.items
+                    }
+                    
+                    # Debugging: Display backup data in the UI
+                    frappe.msgprint(f"ctn_box items : {ctn_box.items}")
+                    
+                    # Debugging: Display backup data in the UI
+                    frappe.msgprint(f"Backup Data: {backup_data}")
+                    
+                    # Create a backup document for the CTN-Box
+                    frappe.get_doc({
+                        "doctype": "CTN-Box Backup",
+                        "ctn": row.ctn,
+                        "backup_data": backup_data  # Store the data as JSON
+                    }).insert()
+                    # Delete the CTN-Box document after backup
+                    frappe.delete_doc("CTN-BOX", row.ctn, force=1)
+                    frappe.msgprint(f"Deleted CTN-BOX: {row.ctn}")
+                except frappe.DoesNotExistError:
+                    frappe.msgprint(f"CTN-BOX {row.ctn} not found, skipping.")
+                except Exception as e:
+                    frappe.log_error(frappe.get_traceback(), f"Error deleting CTN-BOX {row.ctn}")
+                
+
