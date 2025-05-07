@@ -543,10 +543,12 @@ def update_ctn_box_warehouse(doc, method):
     for row in doc.custom_ctn_boxs:
         frappe.db.set_value("CTN-BOX", row.ctn, "warehouse", target_warehouse)
 
+
+
+
 # Stock Entry event
 # type = "Material Transfer"
 # on submit, on cancel
-
 def remove_ctn(doc, method):
     """
     If the type = "Material Issue", remove all the CTN related to it on submit
