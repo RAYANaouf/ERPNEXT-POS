@@ -10,10 +10,10 @@ pos_ar.PointOfSale.FetchHandler = class FetchHandler{
 		try {
 
 			const filter = { disabled : 0}
-			const company = frappe.defaults.get_default("Company");
+			/*const company = frappe.defaults.get_default("Company");
 			if(company){
 				filter.custom_company = company
-			}
+			}*/
 			/*if(since){
 				filter.modified = ['>',since]
 			}*/

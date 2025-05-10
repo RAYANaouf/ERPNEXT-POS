@@ -423,6 +423,19 @@ def get_items_from_ctns(ctn_list):
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
 #################################################### event functions ####################################################
 
 
@@ -607,3 +620,114 @@ def remove_ctn(doc, method):
                     frappe.log_error(frappe.get_traceback(), f"Error deleting CTN-BOX {row.ctn}")
                 
 
+
+
+
+def sync_customer_permissions_from_user_permission(doc, method=None):
+    if doc.allow != "Company":
+        return
+
+    # Get all customers and see which ones should now be accessible
+    customers = frappe.get_all("Customer", fields=["name"])
+    for customer in customers:
+        customer_doc = frappe.get_doc("Customer", customer.name)
+        update_customer_user_permissions(customer_doc)
+
+
+
+@frappe.whitelist()
+def update_customer_user_permissions(doc, method=None):
+    customer_name = doc.name
+    companies = [row.company for row in doc.custom_companies]
+    
+    print("companies ==============> : ", companies)
+    
+    
+    #  Step 1: Delete all user permissions for this customer
+    frappe.db.delete("User Permission", {
+        "allow": "Customer",
+        "for_value": customer_name
+    })
+
+
+    for user in frappe.get_all("User", filters={"enabled": 1}, fields=["name"]):
+        user_name = user.name
+
+        # Get user's company restrictions
+        allowed_companies = frappe.get_all(
+            "User Permission",
+            filters={"user": user_name, "allow": "Company"},
+            pluck="for_value"
+        )
+
+        # If user has no restriction on companies, skip permission creation (they can see all)
+        if not allowed_companies:
+            continue
+
+        # Check if user's companies match customer companies
+        if any(company in allowed_companies for company in companies):
+            # Allow access to this customer
+            add_user_permission_if_not_exists(user_name, "Customer", customer_name)
+            
+            for company in companies :
+                #if the user has global access to it or access to it on the customer doctype
+                if company not in allowed_companies :
+                    add_company_permission_for_customer(user_name, company, customer_name)
+            
+            
+        else:
+            # Remove access if previously allowed
+            remove_user_permission_if_exists(user_name, "Customer", customer_name)
+
+
+def add_user_permission_if_not_exists(user, doctype, for_value):
+    if not frappe.db.exists("User Permission", {"user": user, "allow": doctype, "for_value": for_value}):
+        frappe.get_doc({
+            "doctype": "User Permission",
+            "user": user,
+            "allow": doctype,
+            "for_value": for_value,
+        }).insert(ignore_permissions=True)
+
+
+def remove_user_permission_if_exists(user, doctype, for_value):
+    perms = frappe.get_all("User Permission", filters={
+        "user": user,
+        "allow": doctype,
+        "for_value": for_value
+    })
+
+    for perm in perms:
+        frappe.delete_doc("User Permission", perm.name, ignore_permissions=True)
+
+
+        
+def add_company_permission_for_customer(user_name, company, customer_name):
+    #Customer doctype
+    # Check if the user already has a global Company permission (apply_to_all_doctypes = 1)
+    if frappe.db.exists("User Permission", {
+        "user": user_name,
+        "allow": "Company",
+        "for_value": company,
+        "apply_to_all_doctypes": 1,  # If apply_to_all_doctypes = 1, it's a global permission, we want to avoid it
+    }):
+        # Avoid granting the permission globally if already set
+        return
+
+    # Add a user permission for this user for the given company, scoped only to the Customer doctype
+    if not frappe.db.exists("User Permission", {
+        "user": user_name,                        # Checking for the specific user
+        "allow": "Company",                       # Permission is for the "Company" doctype
+        "for_value": company,                     # The specific company (not global)
+        "apply_to_all_doctypes": 0,               # Apply only to the Customer doctype
+        "applicable_for": "Customer"              # This ensures the permission is scoped to Customer only
+    }):
+        # If permission doesn't exist, create a new User Permission document
+        frappe.get_doc({
+            "doctype": "User Permission",
+            "user": user_name,                    # The user receiving the permission
+            "allow": "Company",                   # Allow permission for the Company doctype
+            "for_value": company,                 # Specific company to which access is given
+            "apply_to_all_doctypes": 0,           # Only for the Customer doctype
+            "applicable_for": "Customer"          # Scoped specifically to the Customer doctype
+        }).insert(ignore_permissions=True)  # Insert without requiring permission checks
