@@ -323,7 +323,7 @@ pos_ar.PointOfSale.pos_db  = class POSDatabase {
 			priceLists.forEach(priceList => {
 				const request = store.put(priceList)
 				request.onerror = (err)=>{
-					console.error("db => error saving Price List : " ,itemPrice ,  "err : " , err)
+					console.error("db => error saving Price List : " ,priceList ,  "err : " , err)
 					reject(err)
 				}
 			})

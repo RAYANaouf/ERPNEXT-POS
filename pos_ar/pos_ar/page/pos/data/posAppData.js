@@ -8,7 +8,10 @@ pos_ar.PointOfSale.posAppData = class {
 		this.api_handler = apiHandler;
 
 		this.since     = localStorage.getItem('lastTime');
-		this.since_bin = localStorage.getItem('lastTime-Bin');
+
+		//optimisation
+		this.since_bin   = localStorage.getItem('lastTime-Bin');
+		this.since_price = localStorage.getItem('lastTime-Price');
 		//this.since = undefined
 
 
@@ -146,21 +149,27 @@ pos_ar.PointOfSale.posAppData = class {
 		//this.appData.price_lists = this.combineLocalAndUpdated(localPriceLists,updatedPriceList)
 
 		this.appData.price_lists = updatedPriceList
-		console.log("price lists : " , this.appData.price_lists)
 	}
 
 
 	async getItemPrices(){
 		//get local
-		//const localItemPrices = await this.db.getAllItemPrice();
-		const localItemPrices = [];
+		const localItemPrices = await this.db.getAllItemPrice();
 		//get remote
-		const updateItemPrices = await this.api_handler.fetchItemPrice(this.since , this.appData.price_lists)
+		console.log("====> since_price : " , this.since_price)
+		const updateItemPrices = await this.api_handler.fetchItemPrice(this.since_price , this.appData.price_lists)
+		console.log("====> updateItemPrices : " , updateItemPrices)
+		//save the new
 		await this.db.saveItemPriceList(updateItemPrices);
-
-		//this.appData.item_prices = this.combineLocalAndUpdated(localItemPrices,updateItemPrices)
-		this.appData.item_prices = updateItemPrices
-		console.log("item prices : " , this.appData.item_prices)
+        //update since the latest modification
+		const latestItemPriceModified = this.getLatestModifiedDate(updateItemPrices)
+		console.log("====> latestItemPriceModified : " , latestItemPriceModified)
+		if(latestItemPriceModified){
+			this.since_price = latestItemPriceModified;
+			localStorage.setItem('lastTime-Price', latestItemPriceModified);
+		}
+		this.appData.item_prices = this.combineLocalAndUpdated(localItemPrices,updateItemPrices)
+		console.log("====> item prices : " , this.appData.item_prices)
 	}
 	async getItemGroups(){
 		//get local

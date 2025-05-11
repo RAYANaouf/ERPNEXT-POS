@@ -3215,13 +3215,13 @@
         if (item.brand == null)
           return 0;
         else if (item.brand == "19" || item.brand == "ACCESSOIRES" || item.brand == "22" || item.brand == "PRODUIT") {
-          const found = this.appData.appData.item_prices.find((itemPrice2) => itemPrice2.item_code == item.name);
+          const found = this.appData.appData.item_prices.find((itemPrice) => itemPrice.item_code == item.name);
           return found ? found.price_list_rate || 0 : 0;
         }
-        const price = this.appData.appData.item_prices.find((itemPrice2) => itemPrice2.brand == item.brand && itemPrice2.price_list == priceList);
+        const price = this.appData.appData.item_prices.find((itemPrice) => itemPrice.brand == item.brand && itemPrice.price_list == priceList);
         return price ? price.price_list_rate : 0;
       } else if (mode == "priceList") {
-        const price = this.appData.appData.item_prices.find((itemPrice2) => itemPrice2.item_code == item.item_name && itemPrice2.price_list == priceList);
+        const price = this.appData.appData.item_prices.find((itemPrice) => itemPrice.item_code == item.item_name && itemPrice.price_list == priceList);
         return price ? price.price_list_rate : 0;
       }
     }
@@ -3518,6 +3518,7 @@
       this.app_data.bins.forEach((bin) => {
         if (bin.item_code == item.name) {
           qty = bin.actual_qty;
+          qty -= bin.pos_invoice_qty || 0;
         }
       });
       return qty;
@@ -4156,7 +4157,7 @@
         const rightGroup = document.createElement("div");
         const itemName = document.createElement("h5");
         const itemQuantity = document.createElement("div");
-        const itemPrice2 = document.createElement("div");
+        const itemPrice = document.createElement("div");
         if (!this.settings_data.settings.showItemImage) {
         } else if (item.image) {
           const itemImage = document.createElement("img");
@@ -4179,14 +4180,14 @@
         itemQuantity.style.fontSize = "18px";
         itemQuantity.style.fontWeight = "600";
         rightGroup.appendChild(itemQuantity);
-        itemPrice2.textContent = item.rate - item.discount_amount + " DA";
-        itemPrice2.classList.add("itemPrice");
-        itemPrice2.style.fontSize = "18px";
-        itemPrice2.style.fontWeight = "600";
-        itemPrice2.style.width = "90px";
-        itemPrice2.style.display = "flex";
-        itemPrice2.style.flexDirection = "row-reverse";
-        rightGroup.appendChild(itemPrice2);
+        itemPrice.textContent = item.rate - item.discount_amount + " DA";
+        itemPrice.classList.add("itemPrice");
+        itemPrice.style.fontSize = "18px";
+        itemPrice.style.fontWeight = "600";
+        itemPrice.style.width = "90px";
+        itemPrice.style.display = "flex";
+        itemPrice.style.flexDirection = "row-reverse";
+        rightGroup.appendChild(itemPrice);
         leftGroup.classList.add("rowBox", "align_center", "leftGroup");
         itemElement.appendChild(leftGroup);
         rightGroup.classList.add("rowBox", "align_center", "rightGroup");
@@ -4831,7 +4832,7 @@
       });
     }
     getItemPrice(itemId) {
-      const price = this.item_prices.find((itemPrice2) => itemPrice2.item_code == itemId);
+      const price = this.item_prices.find((itemPrice) => itemPrice.item_code == itemId);
       return price ? price.price_list_rate : 0;
     }
     getQtyInWarehouse(itemId, warehouseId) {
@@ -5858,7 +5859,7 @@
         priceLists.forEach((priceList) => {
           const request = store.put(priceList);
           request.onerror = (err) => {
-            console.error("db => error saving Price List : ", itemPrice, "err : ", err);
+            console.error("db => error saving Price List : ", priceList, "err : ", err);
             reject(err);
           };
         });
@@ -5889,10 +5890,10 @@
       return new Promise((resolve, reject) => {
         const transaction = this.db.transaction(["Item Price"], "readwrite");
         const store = transaction.objectStore("Item Price");
-        itemPriceList.forEach((itemPrice2) => {
-          const request = store.put(itemPrice2);
+        itemPriceList.forEach((itemPrice) => {
+          const request = store.put(itemPrice);
           request.onerror = (err) => {
-            console.error("db => error saving Item Price : ", itemPrice2, "err : ", err);
+            console.error("db => error saving Item Price : ", itemPrice, "err : ", err);
             reject(err);
           };
         });
@@ -7515,6 +7516,7 @@
       this.api_handler = apiHandler;
       this.since = localStorage.getItem("lastTime");
       this.since_bin = localStorage.getItem("lastTime-Bin");
+      this.since_price = localStorage.getItem("lastTime-Price");
       this.appData = {};
     }
     async getAllData() {
@@ -7605,14 +7607,21 @@
       const localPriceLists = [];
       const updatedPriceList = await this.api_handler.fetchPriceList(this.since);
       this.appData.price_lists = updatedPriceList;
-      console.log("price lists : ", this.appData.price_lists);
     }
     async getItemPrices() {
-      const localItemPrices = [];
-      const updateItemPrices = await this.api_handler.fetchItemPrice(this.since, this.appData.price_lists);
+      const localItemPrices = await this.db.getAllItemPrice();
+      console.log("====> since_price : ", this.since_price);
+      const updateItemPrices = await this.api_handler.fetchItemPrice(this.since_price, this.appData.price_lists);
+      console.log("====> updateItemPrices : ", updateItemPrices);
       await this.db.saveItemPriceList(updateItemPrices);
-      this.appData.item_prices = updateItemPrices;
-      console.log("item prices : ", this.appData.item_prices);
+      const latestItemPriceModified = this.getLatestModifiedDate(updateItemPrices);
+      console.log("====> latestItemPriceModified : ", latestItemPriceModified);
+      if (latestItemPriceModified) {
+        this.since_price = latestItemPriceModified;
+        localStorage.setItem("lastTime-Price", latestItemPriceModified);
+      }
+      this.appData.item_prices = this.combineLocalAndUpdated(localItemPrices, updateItemPrices);
+      console.log("====> item prices : ", this.appData.item_prices);
     }
     async getItemGroups() {
       const localItemGroups = [];
@@ -7884,12 +7893,16 @@
     async fetchItemPrice(since, priceLists) {
       try {
         const filter = {};
+        if (since) {
+          filter.modified = [">", since];
+          console.log("===> since inside if : ", since);
+        }
         const priceListNames = priceLists.map((pl) => pl.name);
         if (priceListNames && priceListNames.length > 0) {
           filter.price_list = ["in", priceListNames];
         }
         return await frappe.db.get_list("Item Price", {
-          fields: ["name", "item_code", "item_name", "price_list", "price_list_rate", "brand"],
+          fields: ["name", "item_code", "item_name", "price_list", "price_list_rate", "brand", "modified"],
           filters: filter,
           limit: 1e9
         });
@@ -7955,21 +7968,17 @@
       }
     }
     async fetchBinList(since, warehouse) {
-      console.log("==> warehouse : ", warehouse);
-      console.log("==> since : ", since);
       try {
         const filter = {};
         if (since) {
           filter.modified = [">", since];
         }
-        if (warehouse) {
-          filter.warehouse = warehouse, filter.actual_qty = ["!=", 0];
-        }
-        return await frappe.db.get_list("Bin", {
-          fields: ["name", "actual_qty", "item_code", "warehouse", "modified"],
-          filters: filter,
-          limit: 1e6
+        const response = await frappe.call({
+          method: "pos_ar.api.get_all_item_qty",
+          args: { warehouse, since }
         });
+        console.log("==> response : ", response);
+        return response.message;
       } catch (error) {
         console.error("Error fetching Bin list : ", error);
         return [];
@@ -8206,4 +8215,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.GY75HOV5.js.map
+//# sourceMappingURL=pos.bundle.UWYXFORZ.js.map

@@ -66,37 +66,24 @@ def get_all_item_prices(company=None):
             "prices": []
         }
 
-#@frappe.whitelist()
-#def fix_prices(brand, price_list, new_price):
-#    try:
-#        # Update all item prices for this brand and price list
-#        frappe.db.sql("""
-#            UPDATE `tabItem Price`
-#            SET price_list_rate = %s
-#            WHERE brand = %s AND price_list = %s
-#        """, (new_price, brand, price_list))
-        
-#        frappe.db.commit()
-#        return True
-        
-#    except Exception as e:
-#        frappe.log_error(f"Error fixing prices: {str(e)}")
-#        frappe.throw(_("Failed to update prices. Please check the error log."))
-
 
 
 
 @frappe.whitelist()
 def fix_prices(brand, price_list, new_price):
     try:
-        # Step 1: Update existing item prices
-        frappe.db.sql("""
-            UPDATE `tabItem Price`
-            SET price_list_rate = %s
-            WHERE brand = %s AND price_list = %s
-        """, (new_price, brand, price_list))
+        # Step 1: Update existing item prices using ORM so `modified` is updated
+        existing_prices = frappe.get_all("Item Price",
+            filters={"brand": brand, "price_list": price_list},
+            fields=["name"]
+        )
 
-        # Step 2: Find items with the brand that don't have an Item Price in the specified price list
+        for price in existing_prices:
+            doc = frappe.get_doc("Item Price", price.name)
+            doc.price_list_rate = new_price
+            doc.save(ignore_permissions=True)
+
+        # Step 2: Find items that don’t have a price in the given price list
         items_without_price = frappe.db.sql("""
             SELECT name FROM `tabItem`
             WHERE brand = %s
@@ -106,7 +93,7 @@ def fix_prices(brand, price_list, new_price):
             )
         """, (brand, price_list), as_dict=True)
 
-        # Step 3: Create Item Price entries for missing items
+        # Step 3: Create new item prices for missing items
         for item in items_without_price:
             doc = frappe.get_doc({
                 "doctype": "Item Price",

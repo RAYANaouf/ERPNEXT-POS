@@ -192,19 +192,21 @@ pos_ar.PointOfSale.FetchHandler = class FetchHandler{
 
 	async fetchItemPrice(since , priceLists) {
 		try {
-			const filter = {}
-			/*if(since){
-				filter.modified = ['>',since]
-			}*/
 
+			const filter = {}
+			if(since){
+				filter.modified = ['>',since]
+				console.log("===> since inside if : " , since)
+			}
 
 			const priceListNames = priceLists.map(pl => pl.name);
 
 			if (priceListNames && priceListNames.length > 0) {
 				filter.price_list = ['in', priceListNames];
 			}
+
 			return await frappe.db.get_list('Item Price', {
-				fields: ['name', 'item_code' , 'item_name' , 'price_list', 'price_list_rate' , 'brand'],
+				fields: ['name', 'item_code' , 'item_name' , 'price_list', 'price_list_rate' , 'brand' , 'modified'],
 				filters: filter,
 				limit : 1000000000
 			})
@@ -296,22 +298,18 @@ pos_ar.PointOfSale.FetchHandler = class FetchHandler{
 	}
 
 	async fetchBinList(since , warehouse){
-		console.log("==> warehouse : " , warehouse)
-		console.log("==> since : " , since)
 		try{
 			const filter = {}
 			if(since){
 				filter.modified = ['>',since]
 			}
-			if(warehouse){
-				filter.warehouse = warehouse,
-				filter.actual_qty = ['!=', 0]
-			}
-			return await frappe.db.get_list('Bin' , {
-				fields  : ['name' , 'actual_qty' , 'item_code' , 'warehouse' , 'modified'],
-				filters : filter,
-				limit   : 1000000
+
+			const response = await frappe.call({
+				method: 'pos_ar.api.get_all_item_qty',
+				args: { warehouse , since }
 			})
+			console.log("==> response : " , response)
+			return response.message;
 		}
 		catch(error){
 			console.error('Error fetching Bin list : ' , error)
