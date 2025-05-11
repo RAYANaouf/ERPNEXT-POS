@@ -6897,8 +6897,10 @@
       const payBtnStyle = "width:80px;height:35px;color:white;background:green;border-radius:12px;margin:0px 20px;cursor:pointer;";
       let total_debt = 0;
       this.debtList.html("");
-      const result = await this.app_data.fetchDebts(customer.name);
-      const result2 = await this.app_data.fetchDebtsSalesInvoices(customer.name);
+      console.log("the company : ", this.app_data.appData.pos_profile.company);
+      console.log("the profile : ", this.app_data.appData.pos_profile);
+      const result = await this.app_data.fetchDebts(customer.name, this.app_data.appData.pos_profile.company);
+      const result2 = await this.app_data.fetchDebtsSalesInvoices(customer.name, this.app_data.appData.pos_profile.company);
       result.forEach((invoice) => {
         total_debt += invoice.outstanding_amount;
         const customerBox = $(
@@ -7641,8 +7643,8 @@
         }
       );
     }
-    async fetchDebts(customerName) {
-      return await this.api_handler.fetchDebts(customerName);
+    async fetchDebts(customerName, company) {
+      return await this.api_handler.fetchDebts(customerName, company);
     }
     async fetchDebtsSalesInvoices(customerName) {
       return await this.api_handler.fetchDebtsSalesInvoices(customerName);
@@ -7958,11 +7960,11 @@
       }
       return [];
     }
-    async fetchDebts(customer_name) {
+    async fetchDebts(customer_name, company) {
       try {
         const response = await frappe.call({
           method: "pos_ar.pos_ar.doctype.pos_info.pos_info.get_customer_debts",
-          args: { customer_name }
+          args: { customer_name, company }
         });
         if (response.message && !response.message.error) {
           return response.message;
@@ -8172,4 +8174,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.R64RQHMZ.js.map
+//# sourceMappingURL=pos.bundle.FXPP4MZG.js.map

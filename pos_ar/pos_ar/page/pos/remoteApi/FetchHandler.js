@@ -332,11 +332,11 @@ pos_ar.PointOfSale.FetchHandler = class FetchHandler{
 	}
 
 
-	async fetchDebts(customer_name) {
+	async fetchDebts(customer_name , company) {
 		try {
 			const response = await frappe.call({
 				method: "pos_ar.pos_ar.doctype.pos_info.pos_info.get_customer_debts",
-				args: { customer_name },
+				args: { customer_name , company },
 			});
 
 			if (response.message && !response.message.error) {

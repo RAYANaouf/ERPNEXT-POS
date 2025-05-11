@@ -201,8 +201,10 @@ pos_ar.PointOfSale.pos_debt_cart = class{
 		let total_debt = 0 ;
 
 		this.debtList.html('')
-		const result  = await this.app_data.fetchDebts(customer.name)
-		const result2 = await this.app_data.fetchDebtsSalesInvoices(customer.name)
+		console.log("the company : " , this.app_data.appData.pos_profile.company)
+		console.log("the profile : " , this.app_data.appData.pos_profile)
+		const result  = await this.app_data.fetchDebts(customer.name , this.app_data.appData.pos_profile.company)
+		const result2 = await this.app_data.fetchDebtsSalesInvoices(customer.name , this.app_data.appData.pos_profile.company)
 
 		result.forEach(invoice=>{
 

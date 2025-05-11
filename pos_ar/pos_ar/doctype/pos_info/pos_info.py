@@ -84,12 +84,13 @@ def update_all_customers_debt():
 
 
 @frappe.whitelist()
-def get_customer_debts(customer_name):
+def get_customer_debts(customer_name , company):
 	invoices = frappe.get_all(
 		'POS Invoice',  # DocType
 		fields=['name' , 'outstanding_amount' , 'posting_date'],  # Required fields
                 filters={
 		     	'customer'             : customer_name ,  # Filter by customer name
+                'company'              : company,
 		     	'outstanding_amount'   : ['>', 0]      ,  # Only unpaid invoices
 		     	'docstatus'            : 1             ,  # not the canceled ones
 		     	'consolidated_invoice' : ''

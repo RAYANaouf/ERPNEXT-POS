@@ -213,8 +213,8 @@ pos_ar.PointOfSale.posAppData = class {
 	}
 
 
-	async fetchDebts(customerName){
-		return await this.api_handler.fetchDebts(customerName)
+	async fetchDebts(customerName , company){
+		return await this.api_handler.fetchDebts(customerName , company)
 	}
 	async fetchDebtsSalesInvoices(customerName){
 		return await this.api_handler.fetchDebtsSalesInvoices(customerName)
