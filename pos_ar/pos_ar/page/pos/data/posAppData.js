@@ -125,6 +125,12 @@ pos_ar.PointOfSale.posAppData = class {
 		}
 
 		this.appData.bins = this.combineLocalAndUpdated(localBins,updatedBins)
+
+		this.appData.bins.forEach(b =>{
+			if(b.item_code == "1.56 BB BLEU -0.00 -0.00"){
+				console.log("check it here : " , b)
+			}
+		})
 		
 	}
 	async getWarehouses(){

@@ -457,7 +457,7 @@ def get_all_item_qty(warehouse=None, since=None):
         SELECT pii.item_code, SUM(pii.qty) AS pos_invoice_qty
         FROM `tabPOS Invoice Item` pii
         JOIN `tabPOS Invoice` pi ON pi.name = pii.parent
-        WHERE pi.consolidated_invoice IS NULL
+        WHERE pi.consolidated_invoice IS ""
         AND pii.warehouse = %s
         AND pii.item_code IN ({placeholders})
         GROUP BY pii.item_code

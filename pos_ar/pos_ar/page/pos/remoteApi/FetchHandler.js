@@ -309,6 +309,7 @@ pos_ar.PointOfSale.FetchHandler = class FetchHandler{
 				args: { warehouse , since }
 			})
 			console.log("==> response : " , response)
+
 			return response.message;
 		}
 		catch(error){
