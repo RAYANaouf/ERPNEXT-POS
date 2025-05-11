@@ -300,14 +300,24 @@ pos_ar.PointOfSale.FetchHandler = class FetchHandler{
 	async fetchBinList(since , warehouse){
 		try{
 			const filter = {}
+
+			console.log("====> since :::: " , since)
+
+			let response = null;
 			if(since){
-				filter.modified = ['>',since]
+				console.log("====> since inside if oww :::: " , since)
+				response = await frappe.call({
+					method: 'pos_ar.api.get_all_item_qty',
+					args: { warehouse , since }
+				})
+			}else {
+				console.log("====> since inside else oww :::: ")
+				response = await frappe.call({
+					method: 'pos_ar.api.get_all_item_qty',
+					args: { warehouse  }
+				})
 			}
 
-			const response = await frappe.call({
-				method: 'pos_ar.api.get_all_item_qty',
-				args: { warehouse , since }
-			})
 			console.log("==> response : " , response)
 
 			return response.message;

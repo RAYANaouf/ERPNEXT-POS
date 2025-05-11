@@ -434,16 +434,30 @@ def get_all_item_qty(warehouse=None, since=None):
     """
     if not warehouse:
         frappe.throw(_("Warehouse is required"))
-
-    # Get item stock info (excluding actual_qty == 0)
-    bins = frappe.get_all("Bin",
-        filters={
-            "warehouse": warehouse,
-            "actual_qty": ["!=", 0],
-            "modified": [">", since] if since else ["!=", ""]
-        },
+        
+    if since == None : 
+        print("====> since inside if oww :::: " , since)
+        # Get item stock info (excluding actual_qty == 0)
+        bins = frappe.get_all("Bin",
+            filters={
+                "warehouse": warehouse,
+                "actual_qty": ["!=", 0],
+            },
+        fields=['name', 'actual_qty', 'item_code', 'warehouse', 'modified']
+        )
+    else : 
+        print("====> since inside else oww :::: " , since)
+        # Get item stock info (excluding actual_qty == 0)
+        bins = frappe.get_all("Bin",
+            filters={
+                "warehouse": warehouse,
+                "actual_qty": ["!=", 0],
+                "modified": [">", since]
+            },
         fields=['name', 'actual_qty', 'item_code', 'warehouse', 'modified']
     )
+
+    
 
     item_codes = [bin["item_code"] for bin in bins]
     if not item_codes:
@@ -457,7 +471,7 @@ def get_all_item_qty(warehouse=None, since=None):
         SELECT pii.item_code, SUM(pii.qty) AS pos_invoice_qty
         FROM `tabPOS Invoice Item` pii
         JOIN `tabPOS Invoice` pi ON pi.name = pii.parent
-        WHERE pi.consolidated_invoice IS ""
+        WHERE pi.consolidated_invoice IS NULL
         AND pii.warehouse = %s
         AND pii.item_code IN ({placeholders})
         GROUP BY pii.item_code
