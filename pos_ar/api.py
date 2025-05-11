@@ -422,11 +422,15 @@ def get_items_from_ctns(ctn_list):
     return list(item_map.values())
 
 
+
+
+
+
 @frappe.whitelist()
 def get_all_item_qty(warehouse=None, since=None):
     """
     Returns list of all items in a warehouse with their actual quantities (non-zero),
-    and total quantity sold in POS invoices (non-consolidated only).
+    and total quantity sold in POS invoices (non-consolidated only) for that warehouse.
     """
     if not warehouse:
         frappe.throw(_("Warehouse is required"))
@@ -448,17 +452,21 @@ def get_all_item_qty(warehouse=None, since=None):
     # Create placeholders for item_code list
     placeholders = ', '.join(['%s'] * len(item_codes))
 
-    # SQL query to get POS invoice quantities for non-consolidated invoices
+    # SQL query to get POS invoice quantities for non-consolidated invoices, filtered by warehouse
     query = f"""
         SELECT pii.item_code, SUM(pii.qty) AS pos_invoice_qty
         FROM `tabPOS Invoice Item` pii
         JOIN `tabPOS Invoice` pi ON pi.name = pii.parent
         WHERE pi.consolidated_invoice IS NULL
+        AND pii.warehouse = %s
         AND pii.item_code IN ({placeholders})
         GROUP BY pii.item_code
     """
 
-    pos_data = frappe.db.sql(query, tuple(item_codes), as_dict=True)
+    # Combine warehouse and item_codes for the query parameters
+    query_params = tuple([warehouse] + item_codes)
+
+    pos_data = frappe.db.sql(query, query_params, as_dict=True)
 
     # Map POS quantities to item codes
     pos_map = {row["item_code"]: row["pos_invoice_qty"] for row in pos_data}
