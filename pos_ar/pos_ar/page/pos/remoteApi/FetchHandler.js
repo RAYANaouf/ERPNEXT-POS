@@ -295,16 +295,22 @@ pos_ar.PointOfSale.FetchHandler = class FetchHandler{
 		}
 	}
 
-	async fetchBinList(since){
+	async fetchBinList(since , warehouse){
+		console.log("==> warehouse : " , warehouse)
+		console.log("==> since : " , since)
 		try{
 			const filter = {}
-			/*if(since){
+			if(since){
 				filter.modified = ['>',since]
-			}*/
+			}
+			if(warehouse){
+				filter.warehouse = warehouse,
+				filter.actual_qty = ['!=', 0]
+			}
 			return await frappe.db.get_list('Bin' , {
-				fields  : ['name' , 'actual_qty' , 'item_code' , 'warehouse'],
+				fields  : ['name' , 'actual_qty' , 'item_code' , 'warehouse' , 'modified'],
 				filters : filter,
-				limit   : 1
+				limit   : 1000000
 			})
 		}
 		catch(error){

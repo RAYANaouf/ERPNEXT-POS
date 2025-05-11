@@ -2,6 +2,7 @@ pos_ar.PointOfSale.pos_item_selector = class {
 
 	constructor(
 		wrapper           ,
+		appData           ,
 		item_list         ,
 		itemBarcodes      ,
 		item_group_list   ,
@@ -13,6 +14,7 @@ pos_ar.PointOfSale.pos_item_selector = class {
 		onItemClick
 	){
 		this.wrapper             = wrapper           ;
+		this.app_data             = appData           ;
 		this.item_list           = item_list         ;
 		this.item_barcodes       = itemBarcodes      ;
 		this.item_group_list     = item_group_list   ;
@@ -142,6 +144,7 @@ pos_ar.PointOfSale.pos_item_selector = class {
 				<img class="itemImage" src="${imageUrl}" alt="${item.item_name}" onerror="this.src='/assets/pos_ar/images/no_image.png'">
 				<div class="itemTitle">${item.item_name}</div>
 				<div class="itemPrice">${price} DA</div>
+				<div class="itemQty">${this.getQty(item)}</div>
 			`;
 
                 	itemsContainer_html.appendChild(itemBox);
@@ -259,5 +262,15 @@ pos_ar.PointOfSale.pos_item_selector = class {
 
 
 		return filtredItemList ;
+	}
+
+	getQty(item){
+		let qty = 0;
+		this.app_data.bins.forEach(bin => {
+			if(bin.item_code == item.name){
+				qty = bin.actual_qty;
+			}
+		})
+		return qty;
 	}
 }

@@ -495,6 +495,7 @@ pos_ar.PointOfSale.Controller = class {
 
 		this.item_selector = new pos_ar.PointOfSale.pos_item_selector(
 			this.$leftSection,
+			this.appData.appData,
 			this.appData.appData.items,
 			this.appData.appData.item_barcodes,
 			this.appData.appData.item_groups,

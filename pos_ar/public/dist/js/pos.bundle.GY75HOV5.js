@@ -2339,6 +2339,7 @@
     init_item_selector() {
       this.item_selector = new pos_ar.PointOfSale.pos_item_selector(
         this.$leftSection,
+        this.appData.appData,
         this.appData.appData.items,
         this.appData.appData.item_barcodes,
         this.appData.appData.item_groups,
@@ -3325,8 +3326,9 @@
 
   // ../pos_ar/pos_ar/pos_ar/page/pos/pos_item_selector.js
   pos_ar.PointOfSale.pos_item_selector = class {
-    constructor(wrapper, item_list, itemBarcodes, item_group_list, item_prices, settingsData, selectedPriceList, getItemPrice, autoSelect, onItemClick) {
+    constructor(wrapper, appData, item_list, itemBarcodes, item_group_list, item_prices, settingsData, selectedPriceList, getItemPrice, autoSelect, onItemClick) {
       this.wrapper = wrapper;
+      this.app_data = appData;
       this.item_list = item_list;
       this.item_barcodes = itemBarcodes;
       this.item_group_list = item_group_list;
@@ -3428,6 +3430,7 @@
 				<img class="itemImage" src="${imageUrl}" alt="${item.item_name}" onerror="this.src='/assets/pos_ar/images/no_image.png'">
 				<div class="itemTitle">${item.item_name}</div>
 				<div class="itemPrice">${price} DA</div>
+				<div class="itemQty">${this.getQty(item)}</div>
 			`;
         itemsContainer_html.appendChild(itemBox);
       }
@@ -3509,6 +3512,15 @@
         getFiltredItems(group);
       });
       return filtredItemList;
+    }
+    getQty(item) {
+      let qty = 0;
+      this.app_data.bins.forEach((bin) => {
+        if (bin.item_code == item.name) {
+          qty = bin.actual_qty;
+        }
+      });
+      return qty;
     }
   };
 
@@ -7502,6 +7514,7 @@
       this.db = db;
       this.api_handler = apiHandler;
       this.since = localStorage.getItem("lastTime");
+      this.since_bin = localStorage.getItem("lastTime-Bin");
       this.appData = {};
     }
     async getAllData() {
@@ -7516,7 +7529,7 @@
         await this.getPosProfiles();
         frappe.show_progress("Please Wait", 4, 12, "loading mode of payment");
         await this.getPosProfileModeOfPayments(this.appData.pos_profile);
-        await this.getBins();
+        await this.getBins(this.since, this.appData.pos_profile.warehouse);
         frappe.show_progress("Please Wait", 5, 12, "loading warehouses");
         await this.getWarehouses();
         frappe.show_progress("Please Wait", 6, 12, "loading price lists");
@@ -7572,9 +7585,14 @@
       this.appData.posProfileModeOfPayments = await this.api_handler.fetchPosProfileModeOfPayments(modeOfPaymentsIds, posProfile.company);
     }
     async getBins() {
-      const localBins = [];
-      const updatedBins = await this.api_handler.fetchBinList(this.since);
+      const localBins = await this.db.getAllBin();
+      const updatedBins = await this.api_handler.fetchBinList(this.since_bin, this.appData.pos_profile.warehouse);
       await this.db.saveBinList(updatedBins);
+      const latestBinModified = this.getLatestModifiedDate(updatedBins);
+      if (latestBinModified) {
+        this.since_bin = latestBinModified;
+        localStorage.setItem("lastTime-Bin", latestBinModified);
+      }
       this.appData.bins = this.combineLocalAndUpdated(localBins, updatedBins);
     }
     async getWarehouses() {
@@ -7730,6 +7748,12 @@
         combinedMap.set(updatedItem.name, updatedItem);
       });
       return Array.from(combinedMap.values());
+    }
+    getLatestModifiedDate(list) {
+      if (!list || list.length === 0)
+        return null;
+      const sorted = list.sort((a, b) => new Date(b.modified) - new Date(a.modified));
+      return sorted[0].modified;
     }
   };
 
@@ -7930,13 +7954,21 @@
         return [];
       }
     }
-    async fetchBinList(since) {
+    async fetchBinList(since, warehouse) {
+      console.log("==> warehouse : ", warehouse);
+      console.log("==> since : ", since);
       try {
         const filter = {};
+        if (since) {
+          filter.modified = [">", since];
+        }
+        if (warehouse) {
+          filter.warehouse = warehouse, filter.actual_qty = ["!=", 0];
+        }
         return await frappe.db.get_list("Bin", {
-          fields: ["name", "actual_qty", "item_code", "warehouse"],
+          fields: ["name", "actual_qty", "item_code", "warehouse", "modified"],
           filters: filter,
-          limit: 1
+          limit: 1e6
         });
       } catch (error) {
         console.error("Error fetching Bin list : ", error);
@@ -8174,4 +8206,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.FXPP4MZG.js.map
+//# sourceMappingURL=pos.bundle.GY75HOV5.js.map

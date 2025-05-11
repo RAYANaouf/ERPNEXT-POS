@@ -7,7 +7,9 @@ pos_ar.PointOfSale.posAppData = class {
 		this.db          = db;
 		this.api_handler = apiHandler;
 
-		this.since = localStorage.getItem('lastTime');
+		this.since     = localStorage.getItem('lastTime');
+		this.since_bin = localStorage.getItem('lastTime-Bin');
+		//this.since = undefined
 
 
 		this.appData = {} ;
@@ -26,7 +28,7 @@ pos_ar.PointOfSale.posAppData = class {
 			await this.getPosProfiles();
 			frappe.show_progress('Please Wait', 4, 12, 'loading mode of payment');
 			await this.getPosProfileModeOfPayments(this.appData.pos_profile)
-			await this.getBins();
+			await this.getBins(this.since , this.appData.pos_profile.warehouse);
 			frappe.show_progress('Please Wait', 5, 12, 'loading warehouses');
 			await this.getWarehouses();
 			frappe.show_progress('Please Wait', 6, 12, 'loading price lists');
@@ -50,15 +52,12 @@ pos_ar.PointOfSale.posAppData = class {
 			this.since = frappe.datetime.now_datetime()
 			localStorage.setItem('lastTime', frappe.datetime.now_datetime());
 
-
 			console.log("app data : " , this.appData)
 		}catch(err){
 			console.error("appData Class Error  : " , err)
 			frappe.hide_progress();
 		}
 			frappe.hide_progress();
-
-
 	}
 
 
@@ -108,14 +107,22 @@ pos_ar.PointOfSale.posAppData = class {
 	}
 	async getBins(){
 		//get local
-		//const localBins   = await this.db.getAllBin();
-		const localBins   = [];
+		const localBins   = await this.db.getAllBin()
 		//get remote
-		const updatedBins = await this.api_handler.fetchBinList(this.since)
+		const updatedBins = await this.api_handler.fetchBinList(this.since_bin , this.appData.pos_profile.warehouse)
 		//save new bins
 		await this.db.saveBinList(updatedBins)
 
+		// Update since with the latest modification
+		const latestBinModified = this.getLatestModifiedDate(updatedBins);
+		
+		if (latestBinModified) {
+			this.since_bin = latestBinModified;
+			localStorage.setItem('lastTime-Bin', latestBinModified);
+		}
+
 		this.appData.bins = this.combineLocalAndUpdated(localBins,updatedBins)
+		
 	}
 	async getWarehouses(){
 		//get local
@@ -325,6 +332,17 @@ pos_ar.PointOfSale.posAppData = class {
 		})
 
 		return Array.from(combinedMap.values())
+	}
+
+
+
+
+	getLatestModifiedDate(list) {
+		if (!list || list.length === 0) return null;
+	
+		// Sort descending by modified date
+		const sorted = list.sort((a, b) => new Date(b.modified) - new Date(a.modified));
+		return sorted[0].modified;
 	}
 
 }

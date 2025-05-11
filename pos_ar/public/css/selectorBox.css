@@ -208,6 +208,20 @@
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
+
+#LeftSection #SelectorBox #itemsContainer .itemBox .itemQty {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    background: #6b7280;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
 /* Empty state */
 .no-items-found {
     width: 100%;
