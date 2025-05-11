@@ -7975,22 +7975,19 @@
     async fetchBinList(since, warehouse) {
       try {
         const filter = {};
-        console.log("====> since :::: ", since);
         let response = null;
+        since = null;
         if (since) {
-          console.log("====> since inside if oww :::: ", since);
           response = await frappe.call({
             method: "pos_ar.api.get_all_item_qty",
             args: { warehouse, since }
           });
         } else {
-          console.log("====> since inside else oww :::: ");
           response = await frappe.call({
             method: "pos_ar.api.get_all_item_qty",
             args: { warehouse }
           });
         }
-        console.log("==> response : ", response);
         return response.message;
       } catch (error) {
         console.error("Error fetching Bin list : ", error);
@@ -8228,4 +8225,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.QGJKSGPR.js.map
+//# sourceMappingURL=pos.bundle.FVNFPMO2.js.map

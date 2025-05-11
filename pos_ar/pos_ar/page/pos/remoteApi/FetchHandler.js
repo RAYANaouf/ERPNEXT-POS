@@ -301,24 +301,21 @@ pos_ar.PointOfSale.FetchHandler = class FetchHandler{
 		try{
 			const filter = {}
 
-			console.log("====> since :::: " , since)
-
 			let response = null;
+			//avoid since on bin because of the pos invoice changes untill update python code logic
+			since = null ;
+
 			if(since){
-				console.log("====> since inside if oww :::: " , since)
 				response = await frappe.call({
 					method: 'pos_ar.api.get_all_item_qty',
 					args: { warehouse , since }
 				})
 			}else {
-				console.log("====> since inside else oww :::: ")
 				response = await frappe.call({
 					method: 'pos_ar.api.get_all_item_qty',
 					args: { warehouse  }
 				})
 			}
-
-			console.log("==> response : " , response)
 
 			return response.message;
 		}

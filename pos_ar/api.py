@@ -473,6 +473,7 @@ def get_all_item_qty(warehouse=None, since=None):
         JOIN `tabPOS Invoice` pi ON pi.name = pii.parent
         WHERE pi.consolidated_invoice IS NULL
         AND pii.warehouse = %s
+        AND pi.docstatus = 1
         AND pii.item_code IN ({placeholders})
         GROUP BY pii.item_code
     """
