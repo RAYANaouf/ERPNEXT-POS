@@ -422,12 +422,11 @@ def get_items_from_ctns(ctn_list):
     return list(item_map.values())
 
 
-    
 @frappe.whitelist()
-def get_all_item_qty(warehouse = None , since = None):
+def get_all_item_qty(warehouse=None, since=None):
     """
     Returns list of all items in a warehouse with their actual quantities (non-zero),
-    and total quantity sold in POS invoices.
+    and total quantity sold in POS invoices (non-consolidated only).
     """
     if not warehouse:
         frappe.throw(_("Warehouse is required"))
@@ -437,20 +436,29 @@ def get_all_item_qty(warehouse = None , since = None):
         filters={
             "warehouse": warehouse,
             "actual_qty": ["!=", 0],
-            "modified" : [">", since]
+            "modified": [">", since] if since else ["!=", ""]
         },
-        fields=['name' , 'actual_qty' , 'item_code' , 'warehouse' , 'modified']
-    )          
+        fields=['name', 'actual_qty', 'item_code', 'warehouse', 'modified']
+    )
 
     item_codes = [bin["item_code"] for bin in bins]
+    if not item_codes:
+        return bins  # No items to query for POS sales
 
-    # Get POS Invoice quantities per item_code
-    pos_data = frappe.db.get_all(
-        "POS Invoice Item",
-        filters={"item_code": ["in", item_codes]},
-        fields=["item_code", "SUM(qty) as pos_invoice_qty"],
-        group_by="item_code"
-    )
+    # Create placeholders for item_code list
+    placeholders = ', '.join(['%s'] * len(item_codes))
+
+    # SQL query to get POS invoice quantities for non-consolidated invoices
+    query = f"""
+        SELECT pii.item_code, SUM(pii.qty) AS pos_invoice_qty
+        FROM `tabPOS Invoice Item` pii
+        JOIN `tabPOS Invoice` pi ON pi.name = pii.parent
+        WHERE pi.consolidated_invoice IS NULL
+        AND pii.item_code IN ({placeholders})
+        GROUP BY pii.item_code
+    """
+
+    pos_data = frappe.db.sql(query, tuple(item_codes), as_dict=True)
 
     # Map POS quantities to item codes
     pos_map = {row["item_code"]: row["pos_invoice_qty"] for row in pos_data}
