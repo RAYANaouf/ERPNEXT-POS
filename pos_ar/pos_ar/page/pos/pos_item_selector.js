@@ -78,7 +78,7 @@ pos_ar.PointOfSale.pos_item_selector = class {
 		this.itemGroupList.append('<option>fetching Item Groups ...</option>')
 
 		if(!this.settings_data.search_by_group){
-			console.log(" see settings " , this.settings_data)
+			//console.log(" see settings " , this.settings_data)
 			this.inputBox.find("#ItemGroupInput").hide();
 		}
 
@@ -143,9 +143,9 @@ pos_ar.PointOfSale.pos_item_selector = class {
             itemBox.innerHTML = `
 				<img class="itemImage" src="${imageUrl}" alt="${item.item_name}" onerror="this.src='/assets/pos_ar/images/no_image.png'">
 				<div class="itemTitle">${item.item_name}</div>
-				<div class="itemPrice">${price} DA</div>
-				<div class="itemQty">${this.getQty(item)}</div>
-			`;
+				<div class="itemPrice">${price} DA</div>`;
+				//<div class="itemQty">${this.getQty(item)}</div>
+			//`;
 
                 	itemsContainer_html.appendChild(itemBox);
 		}
