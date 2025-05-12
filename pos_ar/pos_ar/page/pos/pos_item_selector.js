@@ -266,12 +266,12 @@ pos_ar.PointOfSale.pos_item_selector = class {
 
 	getQty(item){
 		let qty = 0;
-		this.app_data.bins.forEach(bin => {
+		/*this.app_data.bins.forEach(bin => {
 			if(bin.item_code == item.name){
 				qty = bin.actual_qty;
 				qty -= (bin.pos_invoice_qty || 0) 
 			}
-		})
-		return qty;
+		})*/
+		return 0;
 	}
 }
