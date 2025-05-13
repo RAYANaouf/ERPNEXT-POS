@@ -736,40 +736,23 @@ def update_customer_user_permissions(doc, method=None):
 
         if has_common:
             # Add permission to view this customer
-            add_user_permission_if_not_exists(user_name, "Customer", customer_name)
+            add_user_permission(user_name, "Customer", customer_name)
 
             for company in companies:
                 # If user doesn’t already have access to this company
                 if company not in allowed_companies:
                     add_company_permission_for_customer(user_name, company, customer_name)
-        else:
-            # Ensure any existing customer access is removed
-            remove_user_permission_if_exists(user_name, "Customer", customer_name)
 
 
-def add_user_permission_if_not_exists(user, doctype, for_value):
-    if not frappe.db.exists("User Permission", {
+def add_user_permission(user, doctype, for_value):
+    frappe.get_doc({
+        "doctype": "User Permission",
         "user": user,
         "allow": doctype,
-        "for_value": for_value
-    }):
-        frappe.get_doc({
-            "doctype": "User Permission",
-            "user": user,
-            "allow": doctype,
-            "for_value": for_value,
-        }).insert(ignore_permissions=True)
+        "for_value": for_value,
+    }).insert(ignore_permissions=True)
 
 
-def remove_user_permission_if_exists(user, doctype, for_value):
-    perms = frappe.get_all("User Permission", filters={
-        "user": user,
-        "allow": doctype,
-        "for_value": for_value
-    }, pluck="name")
-
-    for perm_name in perms:
-        frappe.delete_doc("User Permission", perm_name, ignore_permissions=True)
 
 
 def add_company_permission_for_customer(user_name, company, customer_name):
