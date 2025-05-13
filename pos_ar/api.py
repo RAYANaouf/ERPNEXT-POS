@@ -773,28 +773,12 @@ def remove_user_permission_if_exists(user, doctype, for_value):
 
 
 def add_company_permission_for_customer(user_name, company, customer_name):
-    # Skip if user has global access to this company
-    if frappe.db.exists("User Permission", {
-        "user": user_name,
-        "allow": "Company",
-        "for_value": company,
-        "apply_to_all_doctypes": 1
-    }):
-        return
-
-    # Check if already exists (scoped to Customer)
-    if not frappe.db.exists("User Permission", {
+    frappe.get_doc({
+        "doctype": "User Permission",
         "user": user_name,
         "allow": "Company",
         "for_value": company,
         "apply_to_all_doctypes": 0,
         "applicable_for": "Customer"
-    }):
-        frappe.get_doc({
-            "doctype": "User Permission",
-            "user": user_name,
-            "allow": "Company",
-            "for_value": company,
-            "apply_to_all_doctypes": 0,
-            "applicable_for": "Customer"
-        }).insert(ignore_permissions=True)
+    }).insert(ignore_permissions=True)
+

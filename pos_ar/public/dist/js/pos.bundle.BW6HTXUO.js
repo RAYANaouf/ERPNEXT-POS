@@ -3375,7 +3375,6 @@
       this.itemGroupList = this.inputBox.find("#ItemGroupList");
       this.itemGroupList.append("<option>fetching Item Groups ...</option>");
       if (!this.settings_data.search_by_group) {
-        console.log(" see settings ", this.settings_data);
         this.inputBox.find("#ItemGroupInput").hide();
       }
       this.selectorBox.append('<div id="itemsContainer" class="rowBox row_wrap"></div>');
@@ -3413,7 +3412,7 @@
 			`;
         return;
       }
-      for (let i = 0; i < filtered_item_list.length && i < 300; i++) {
+      for (let i = 0; i < filtered_item_list.length && i < 50; i++) {
         let item = filtered_item_list[i];
         const itemBox = document.createElement("div");
         itemBox.classList.add("itemBox");
@@ -3429,9 +3428,7 @@
         itemBox.innerHTML = `
 				<img class="itemImage" src="${imageUrl}" alt="${item.item_name}" onerror="this.src='/assets/pos_ar/images/no_image.png'">
 				<div class="itemTitle">${item.item_name}</div>
-				<div class="itemPrice">${price} DA</div>
-				<div class="itemQty">${this.getQty(item)}</div>
-			`;
+				<div class="itemPrice">${price} DA</div>`;
         itemsContainer_html.appendChild(itemBox);
       }
       if (filtered_item_list.length >= 700) {
@@ -3515,13 +3512,7 @@
     }
     getQty(item) {
       let qty = 0;
-      this.app_data.bins.forEach((bin) => {
-        if (bin.item_code == item.name) {
-          qty = bin.actual_qty;
-          qty -= bin.pos_invoice_qty || 0;
-        }
-      });
-      return qty;
+      return 0;
     }
   };
 
@@ -8225,4 +8216,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.FVNFPMO2.js.map
+//# sourceMappingURL=pos.bundle.BW6HTXUO.js.map
