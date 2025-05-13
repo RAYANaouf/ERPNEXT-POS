@@ -151,10 +151,10 @@ doc_events = {
     "Customer" : {
         "on_update" : ["pos_ar.api.update_customer_user_permissions"]
     },
-    "User Permission": {
-        "on_update": ["pos_ar.api.sync_customer_permissions_from_user_permission"],
-        "on_trash": ["pos_ar.api.sync_customer_permissions_from_user_permission"]
-    }
+#    "User Permission": {
+#       "on_update": ["pos_ar.api.sync_customer_permissions_from_user_permission"],
+#       "on_trash": ["pos_ar.api.sync_customer_permissions_from_user_permission"]
+#   }
 }
 
 
