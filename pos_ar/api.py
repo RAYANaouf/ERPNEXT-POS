@@ -719,13 +719,6 @@ def update_customer_user_permissions(doc, method=None):
         "for_value": customer_name
     })
 
-    # Step 1: Delete all user permissions for this customer
-    frappe.db.delete("User Permission", {
-        "allow": "Company",
-        "apply_to_all_doctypes": 0,
-        "applicable_for": "Customer",
-        "for_value": customer_name
-    })
 
 
 
