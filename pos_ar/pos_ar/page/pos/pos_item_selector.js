@@ -9,7 +9,6 @@ pos_ar.PointOfSale.pos_item_selector = class {
 		item_prices       ,
 		settingsData      ,
 		selectedPriceList ,
-		getItemPrice      ,
 		autoSelect        ,
 		onItemClick
 	){
@@ -21,7 +20,6 @@ pos_ar.PointOfSale.pos_item_selector = class {
 		this.item_prices         = item_prices       ;
 		this.settings_data       = settingsData      ;
 		this.selected_price_list = selectedPriceList ;
-		this.get_item_price      = getItemPrice      ;
 		this.auto_select         = autoSelect        ;
 		this.on_item_click       = onItemClick       ;
 
@@ -138,7 +136,13 @@ pos_ar.PointOfSale.pos_item_selector = class {
 
 			const imageUrl = item.image || '/assets/pos_ar/images/no_image.png';
 			console.log("selected prce list : " , this.selected_price_list.name)
-			const price = this.get_item_price(item, frappe.defaults.get_default("Price List"));
+			//const price = this.get_item_price(item, frappe.defaults.get_default("Price List"));
+			console.log("the item : " , item)
+			console.log("the item prices : " , item.prices)
+			console.log("the selected price list : " , this.selected_price_list)
+			
+			const price = item.prices.find(price => price.price_list == this.selected_price_list.name)?.price_list_rate || 0;
+
 
             itemBox.innerHTML = `
 				<img class="itemImage" src="${imageUrl}" alt="${item.item_name}" onerror="this.src='/assets/pos_ar/images/no_image.png'">

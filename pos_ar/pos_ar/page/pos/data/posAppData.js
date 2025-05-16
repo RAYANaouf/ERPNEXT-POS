@@ -25,9 +25,13 @@ pos_ar.PointOfSale.posAppData = class {
 			await this.getDeletedDocs()
 			frappe.show_progress('Please Wait', 1, 12, 'loading customers...');
 			await this.getCustomers();
+
+			console.log("we are here *****************")
+
 			frappe.show_progress('Please Wait', 2, 12, 'loading items...');
 			await this.getItems();
 			frappe.show_progress('Please Wait', 3, 12, 'loading pos profiles');
+
 			await this.getPosProfiles();
 			frappe.show_progress('Please Wait', 4, 12, 'loading mode of payment');
 			await this.getPosProfileModeOfPayments(this.appData.pos_profile)
@@ -37,7 +41,7 @@ pos_ar.PointOfSale.posAppData = class {
 			frappe.show_progress('Please Wait', 6, 12, 'loading price lists');
 			await this.getPriceLists();
 			frappe.show_progress('Please Wait', 7, 12, 'loading item prices');
-			await this.getItemPrices();
+			//await this.getItemPrices();
 			frappe.show_progress('Please Wait', 8, 12, 'loading item groups');
 			await this.getItemGroups();
 			frappe.show_progress('Please Wait', 9, 12, 'loading invoices');
@@ -88,11 +92,17 @@ pos_ar.PointOfSale.posAppData = class {
 		//const localItems   = await this.db.getAllItems();
 		const localItems   = [];
 		//get remote
-		const updatedItems = await this.api_handler.fetchItems(this.since)
-		//save new items
-		await this.db.saveItemList(updatedItems)
+		let updatedItems = await this.api_handler.fetchItems(this.since)
 
-		this.appData.items = this.combineLocalAndUpdated(localItems,updatedItems)
+		console.log("we are here .............. " , updatedItems.message)
+
+		console.log("updatedItems.length : " , updatedItems.length)
+		//updatedItems = [];
+
+		//save new items
+		await this.db.saveItemList(updatedItems.message)
+
+		this.appData.items = this.combineLocalAndUpdated(localItems,updatedItems.message)
 	}
 	async getPosProfiles(){
 		const posProfile = frappe.defaults.get_default("POS Profile");
@@ -157,7 +167,7 @@ pos_ar.PointOfSale.posAppData = class {
 		this.appData.price_lists = updatedPriceList
 	}
 
-
+/*
 	async getItemPrices(){
 		//get local
 		const localItemPrices = await this.db.getAllItemPrice();
@@ -177,6 +187,9 @@ pos_ar.PointOfSale.posAppData = class {
 		this.appData.item_prices = this.combineLocalAndUpdated(localItemPrices,updateItemPrices)
 		console.log("====> item prices : " , this.appData.item_prices)
 	}
+*/
+
+
 	async getItemGroups(){
 		//get local
 		//const localItemGroups = await this.db.getAllItemGroup();

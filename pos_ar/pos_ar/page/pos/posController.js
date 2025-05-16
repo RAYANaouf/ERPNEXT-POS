@@ -502,7 +502,6 @@ pos_ar.PointOfSale.Controller = class {
 			this.appData.appData.item_prices,
 			this.settings_data.settings,
 			this.defaultPriceList,
-			this.getItemPrice.bind(this),
 			this.auto_select.bind(this),
 			item => { 
 				this.itemClick_selector(item)
@@ -526,7 +525,6 @@ pos_ar.PointOfSale.Controller = class {
 			this.selectedTab,
 			this.selectedItem,
 			this.selectedField,
-			this.getItemPrice.bind(this),
 			item => {
 				this.onSelectedItemClick(item)
 			},
@@ -1737,25 +1735,6 @@ pos_ar.PointOfSale.Controller = class {
 	}
 
 
-	getItemPrice(item, priceList) {
-		//check the mode
-		const mode = this.settings_data.settings.itemPriceBasedOn
-
-		if (mode == 'brand') {
-			if (item.brand == null)
-				return 0;
-			else if (item.brand == "19" || item.brand == "ACCESSOIRES" || item.brand == "22" || item.brand == "PRODUIT"){
-				const found = this.appData.appData.item_prices.find( itemPrice => itemPrice.item_code == item.name)
-				return  found ? found.price_list_rate	|| 0 : 0
-			}
-				
-			const price = this.appData.appData.item_prices.find(itemPrice => itemPrice.brand == item.brand && itemPrice.price_list == priceList)
-			return price ? price.price_list_rate : 0
-		} else if (mode == 'priceList') {
-			const price = this.appData.appData.item_prices.find(itemPrice => itemPrice.item_code == item.item_name && itemPrice.price_list == priceList)
-			return price ? price.price_list_rate : 0
-		}
-	}
 
 	checkServiceWorker() {
 
@@ -1825,7 +1804,8 @@ pos_ar.PointOfSale.Controller = class {
 			clonedItem.discount_amount = 0;
 			clonedItem.discount_percentage = 0;
 			clonedItem.qty = 1;
-			clonedItem.rate = this.getItemPrice(clickedItem, this.selectedItemMaps.get(this.selectedTab.tabName).priceList);
+			//note ==> i wanna to delete that property just rely on prices property.
+			clonedItem.rate = clonedItem.prices.find(price => price.price_list == this.selectedItemMaps.get(this.selectedTab.tabName).priceList)?.price_list_rate || 0;
 			posItems.push(clonedItem)
 
 			const clone = structuredClone(clonedItem)

@@ -2346,7 +2346,6 @@
         this.appData.appData.item_prices,
         this.settings_data.settings,
         this.defaultPriceList,
-        this.getItemPrice.bind(this),
         this.auto_select.bind(this),
         (item) => {
           this.itemClick_selector(item);
@@ -2368,7 +2367,6 @@
         this.selectedTab,
         this.selectedItem,
         this.selectedField,
-        this.getItemPrice.bind(this),
         (item) => {
           this.onSelectedItemClick(item);
         },
@@ -3209,22 +3207,6 @@
         });
       }
     }
-    getItemPrice(item, priceList) {
-      const mode = this.settings_data.settings.itemPriceBasedOn;
-      if (mode == "brand") {
-        if (item.brand == null)
-          return 0;
-        else if (item.brand == "19" || item.brand == "ACCESSOIRES" || item.brand == "22" || item.brand == "PRODUIT") {
-          const found = this.appData.appData.item_prices.find((itemPrice) => itemPrice.item_code == item.name);
-          return found ? found.price_list_rate || 0 : 0;
-        }
-        const price = this.appData.appData.item_prices.find((itemPrice) => itemPrice.brand == item.brand && itemPrice.price_list == priceList);
-        return price ? price.price_list_rate : 0;
-      } else if (mode == "priceList") {
-        const price = this.appData.appData.item_prices.find((itemPrice) => itemPrice.item_code == item.item_name && itemPrice.price_list == priceList);
-        return price ? price.price_list_rate : 0;
-      }
-    }
     checkServiceWorker() {
       if (!("serviceWorker" in navigator)) {
         return;
@@ -3253,6 +3235,7 @@
       );
     }
     addItemToPosInvoice(clickedItem) {
+      var _a;
       let clonedItem = structuredClone(clickedItem);
       const posInvoice = this.selectedItemMaps.get(this.selectedTab.tabName);
       const posItems = posInvoice.items;
@@ -3270,7 +3253,7 @@
         clonedItem.discount_amount = 0;
         clonedItem.discount_percentage = 0;
         clonedItem.qty = 1;
-        clonedItem.rate = this.getItemPrice(clickedItem, this.selectedItemMaps.get(this.selectedTab.tabName).priceList);
+        clonedItem.rate = ((_a = clonedItem.prices.find((price) => price.price_list == this.selectedItemMaps.get(this.selectedTab.tabName).priceList)) == null ? void 0 : _a.price_list_rate) || 0;
         posItems.push(clonedItem);
         const clone = structuredClone(clonedItem);
         Object.assign(this.selectedItem, clone);
@@ -3326,7 +3309,7 @@
 
   // ../pos_ar/pos_ar/pos_ar/page/pos/pos_item_selector.js
   pos_ar.PointOfSale.pos_item_selector = class {
-    constructor(wrapper, appData, item_list, itemBarcodes, item_group_list, item_prices, settingsData, selectedPriceList, getItemPrice, autoSelect, onItemClick) {
+    constructor(wrapper, appData, item_list, itemBarcodes, item_group_list, item_prices, settingsData, selectedPriceList, autoSelect, onItemClick) {
       this.wrapper = wrapper;
       this.app_data = appData;
       this.item_list = item_list;
@@ -3335,7 +3318,6 @@
       this.item_prices = item_prices;
       this.settings_data = settingsData;
       this.selected_price_list = selectedPriceList;
-      this.get_item_price = getItemPrice;
       this.auto_select = autoSelect;
       this.on_item_click = onItemClick;
       this.barcode_map = {};
@@ -3397,6 +3379,7 @@
       this.setItemInFlow(this.getItemByItemGroup(groupItemListInput.value));
     }
     setItemInFlow(filtered_item_list) {
+      var _a;
       const itemsContainer_html = document.getElementById("itemsContainer");
       itemsContainer_html.innerHTML = "";
       const itemInput = document.getElementById("ItemInput");
@@ -3424,7 +3407,10 @@
         });
         const imageUrl = item.image || "/assets/pos_ar/images/no_image.png";
         console.log("selected prce list : ", this.selected_price_list.name);
-        const price = this.get_item_price(item, frappe.defaults.get_default("Price List"));
+        console.log("the item : ", item);
+        console.log("the item prices : ", item.prices);
+        console.log("the selected price list : ", this.selected_price_list);
+        const price = ((_a = item.prices.find((price2) => price2.price_list == this.selected_price_list.name)) == null ? void 0 : _a.price_list_rate) || 0;
         itemBox.innerHTML = `
 				<img class="itemImage" src="${imageUrl}" alt="${item.item_name}" onerror="this.src='/assets/pos_ar/images/no_image.png'">
 				<div class="itemTitle">${item.item_name}</div>
@@ -3931,7 +3917,7 @@
 
   // ../pos_ar/pos_ar/pos_ar/page/pos/pos_selected_item_cart.js
   pos_ar.PointOfSale.pos_selected_item_cart = class {
-    constructor(wrapper, settingsData, selectedItemMaps, priceLists, customerList, brandList, salesTaxes, invoiceData, selectedTab, selectedItem, selectedField, getItemPrice, onSelectedItemClick, onTabClick, onKeyPressed, createNewTab, onCheckoutClick, savePosInvoice, db) {
+    constructor(wrapper, settingsData, selectedItemMaps, priceLists, customerList, brandList, salesTaxes, invoiceData, selectedTab, selectedItem, selectedField, onSelectedItemClick, onTabClick, onKeyPressed, createNewTab, onCheckoutClick, savePosInvoice, db) {
       this.wrapper = wrapper;
       this.settings_data = settingsData;
       this.selected_item_maps = selectedItemMaps;
@@ -3943,7 +3929,6 @@
       this.selected_tab = selectedTab;
       this.selected_item = selectedItem;
       this.selected_field = selectedField;
-      this.get_item_price = getItemPrice;
       this.on_key_pressed = onKeyPressed;
       this.on_checkout_click = onCheckoutClick;
       this.on_selected_item_click = onSelectedItemClick;
@@ -4426,10 +4411,12 @@
     }
     resetItemRateBaseOnPriceList() {
       this.selected_item_maps.get(this.selected_tab.tabName).items.forEach((item) => {
+        var _a;
+        console.log("item ", item);
         if (item.manually_edited == true) {
           return;
         }
-        item.rate = this.get_item_price(item, this.selected_item_maps.get(this.selected_tab.tabName).priceList);
+        item.rate = ((_a = item.prices.find((price) => price.price_list == this.selected_item_maps.get(this.selected_tab.tabName).priceList)) == null ? void 0 : _a.price_list_rate) || 0;
         item.discount_percentage = 0;
         item.discount_amount = 0;
       });
@@ -4545,7 +4532,6 @@
       priceList.value = this.price_lists[0].price_list_name;
       warehouse.textContent = "Warehouse : " + this.warehouse;
       itemGroup.textContent = "Item Group : " + item.item_group;
-      priceListRate.value = this.getItemPrice(item.name) + "DA";
       this.makeSelectedFieldHighlighted();
     }
     show_cart() {
@@ -4821,10 +4807,6 @@
       this.discountMontantInput.on("blur", (event2) => {
         this.on_input("blur", "discount_amount", null);
       });
-    }
-    getItemPrice(itemId) {
-      const price = this.item_prices.find((itemPrice) => itemPrice.item_code == itemId);
-      return price ? price.price_list_rate : 0;
     }
     getQtyInWarehouse(itemId, warehouseId) {
       const bin = this.bin_list.find((bin2) => bin2.item_code == itemId && bin2.warehouse == warehouseId);
@@ -7516,6 +7498,7 @@
         await this.getDeletedDocs();
         frappe.show_progress("Please Wait", 1, 12, "loading customers...");
         await this.getCustomers();
+        console.log("we are here *****************");
         frappe.show_progress("Please Wait", 2, 12, "loading items...");
         await this.getItems();
         frappe.show_progress("Please Wait", 3, 12, "loading pos profiles");
@@ -7528,7 +7511,6 @@
         frappe.show_progress("Please Wait", 6, 12, "loading price lists");
         await this.getPriceLists();
         frappe.show_progress("Please Wait", 7, 12, "loading item prices");
-        await this.getItemPrices();
         frappe.show_progress("Please Wait", 8, 12, "loading item groups");
         await this.getItemGroups();
         frappe.show_progress("Please Wait", 9, 12, "loading invoices");
@@ -7562,9 +7544,11 @@
     }
     async getItems() {
       const localItems = [];
-      const updatedItems = await this.api_handler.fetchItems(this.since);
-      await this.db.saveItemList(updatedItems);
-      this.appData.items = this.combineLocalAndUpdated(localItems, updatedItems);
+      let updatedItems = await this.api_handler.fetchItems(this.since);
+      console.log("we are here .............. ", updatedItems.message);
+      console.log("updatedItems.length : ", updatedItems.length);
+      await this.db.saveItemList(updatedItems.message);
+      this.appData.items = this.combineLocalAndUpdated(localItems, updatedItems.message);
     }
     async getPosProfiles() {
       const posProfile = frappe.defaults.get_default("POS Profile");
@@ -7603,21 +7587,6 @@
       const localPriceLists = [];
       const updatedPriceList = await this.api_handler.fetchPriceList(this.since);
       this.appData.price_lists = updatedPriceList;
-    }
-    async getItemPrices() {
-      const localItemPrices = await this.db.getAllItemPrice();
-      console.log("====> since_price : ", this.since_price);
-      const updateItemPrices = await this.api_handler.fetchItemPrice(this.since_price, this.appData.price_lists);
-      console.log("====> updateItemPrices : ", updateItemPrices);
-      await this.db.saveItemPriceList(updateItemPrices);
-      const latestItemPriceModified = this.getLatestModifiedDate(updateItemPrices);
-      console.log("====> latestItemPriceModified : ", latestItemPriceModified);
-      if (latestItemPriceModified) {
-        this.since_price = latestItemPriceModified;
-        localStorage.setItem("lastTime-Price", latestItemPriceModified);
-      }
-      this.appData.item_prices = this.combineLocalAndUpdated(localItemPrices, updateItemPrices);
-      console.log("====> item prices : ", this.appData.item_prices);
     }
     async getItemGroups() {
       const localItemGroups = [];
@@ -7821,12 +7790,10 @@
     }
     async fetchItems(since) {
       try {
-        const filter = { disabled: 0 };
-        return await frappe.db.get_list("Item", {
-          fields: ["name", "item_name", "image", "brand", "item_group", "description", "stock_uom"],
-          filters: filter,
-          limit: 1e5,
-          order_by: "item_name ASC"
+        const priceLists = await this.fetchPriceList();
+        return await frappe.call({
+          method: "pos_ar.pos_ar.doctype.pos_info.pos_info.get_item",
+          args: { priceLists }
         });
       } catch (error) {
         console.error("Error fetching Item Group :", error);
@@ -8216,4 +8183,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.BW6HTXUO.js.map
+//# sourceMappingURL=pos.bundle.FNSR7SQL.js.map

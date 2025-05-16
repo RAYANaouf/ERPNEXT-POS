@@ -154,7 +154,7 @@ pos_ar.PointOfSale.pos_item_details = class{
 		itemGroup.textContent = "Item Group : " + item.item_group
 
 		//priceListRate
-		priceListRate.value = this.getItemPrice(item.name) + "DA"
+		//priceListRate.value = this.getItemPrice(item.name) + "DA"
 
 
 		//hightlited fields
@@ -574,11 +574,6 @@ else if(keyContent == "." && !selectedField.value.includes(".")){
 
 
 	/*************************** funs  ************************************/
-
-	getItemPrice(itemId){
-		const price = this.item_prices.find(itemPrice => itemPrice.item_code == itemId)
-		return price ? price.price_list_rate  : 0
-	}
 
 
 	getQtyInWarehouse(itemId , warehouseId){

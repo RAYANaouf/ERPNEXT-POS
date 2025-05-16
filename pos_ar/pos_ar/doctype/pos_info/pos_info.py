@@ -598,9 +598,7 @@ def get_stock_availability(item_code, warehouse):
 
 
 @frappe.whitelist()
-def get_items(warehouse):
-            
-            
+def get_items(warehouse):      
         filters_item = {
             "disabled": 0,
         }
@@ -613,5 +611,66 @@ def get_items(warehouse):
             get_stock_availability(item.name, warehouse)
         
         return items
+    
+    
+@frappe.whitelist()
+def get_item(priceLists=None):
+
+    import json
+
+    # Convert priceLists from JSON string to Python list (because passed from JS)
+    if isinstance(priceLists, str):
+        priceLists = json.loads(priceLists)
+        
+    priceListsNames = [priceList["name"] for priceList in priceLists] 
+
+    # Item filters
+    filters_item = {
+        "disabled": 0
+    }
+    
+    # Fetch items
+    items = frappe.get_all(
+        "Item",
+        fields=['name', 'item_name' , 'image' , 'brand' ,'item_group' , 'description' , 'stock_uom'   ],
+        filters=filters_item,
+        limit_page_length=100000,
+        order_by="item_name ASC"
+    )
+    
+    # Get list of item codes
+    item_codes = [item["name"] for item in items]
+
+    # Prepare price filters
+    price_filters = {}
+
+    # Add price list filter if priceLists is provided
+    if priceListsNames:
+        price_filters["price_list"] = ["in", priceListsNames]
+        
+        
+    print("price_filters ===============>" , price_filters)
+
+    # Fetch prices
+    prices = frappe.get_all(
+        "Item Price",
+        fields=["item_code", "price_list", "price_list_rate", "currency", "modified"],
+        filters=price_filters,
+        limit_page_length=100000
+    )
+    
+    # Group prices by item_code
+    price_map = {}
+    for price in prices:
+        price_map.setdefault(price["item_code"], []).append(price)
+
+    # Add prices to each item
+    for item in items:
+        item["prices"] = price_map.get(item["name"], [])
+    
+    
+    return items
+    
+    
             
              

@@ -95,15 +95,16 @@ pos_ar.PointOfSale.FetchHandler = class FetchHandler{
 
 	async fetchItems(since) {
 		try {
-			const filter = {disabled : 0}
+
+			const priceLists = await this.fetchPriceList()
+
+			
 			/*if(since){
 				filter.modified = ['>',since]
 			}*/
-			return await frappe.db.get_list('Item', {
-				fields: ['name', 'item_name' , 'image' , 'brand' ,'item_group' , 'description' , 'stock_uom'   ],
-				filters: filter,
-				limit : 100000,
-				order_by: 'item_name ASC',
+			return await frappe.call({
+				method : "pos_ar.pos_ar.doctype.pos_info.pos_info.get_item",
+				args : { priceLists }
 			})
 		} catch (error) {
 			console.error('Error fetching Item Group :', error);
@@ -173,6 +174,7 @@ pos_ar.PointOfSale.FetchHandler = class FetchHandler{
 			/*if(since){
 				filter.modified = ['>',since]
 			}*/
+
 
 			return await frappe.db.get_list('Price List', {
 				fields: ['name', 'price_list_name' , 'currency' ],

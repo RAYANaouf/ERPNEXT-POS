@@ -13,7 +13,6 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 		selectedTab        ,
 		selectedItem       ,
 		selectedField      ,
-		getItemPrice       ,
 		onSelectedItemClick,
 		onTabClick         ,
 		onKeyPressed       ,
@@ -35,7 +34,6 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 		this.selected_tab            = selectedTab     ;
 		this.selected_item           = selectedItem    ;
 		this.selected_field          = selectedField   ;
-		this.get_item_price          = getItemPrice    ;
 		this.on_key_pressed          = onKeyPressed    ;
 		this.on_checkout_click       = onCheckoutClick ;
 		this.on_selected_item_click  = onSelectedItemClick;
@@ -727,10 +725,12 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 
 	resetItemRateBaseOnPriceList(){
 		this.selected_item_maps.get(this.selected_tab.tabName).items.forEach( item  => {
+			console.log("item " , item)
 			if(item.manually_edited == true){
 				return
 			}
-			item.rate                = this.get_item_price(item , this.selected_item_maps.get(this.selected_tab.tabName).priceList)
+			//item.rate                = this.get_item_price(item , this.selected_item_maps.get(this.selected_tab.tabName).priceList)
+			item.rate = item.prices.find(price => price.price_list == this.selected_item_maps.get(this.selected_tab.tabName).priceList)?.price_list_rate || 0;
 			item.discount_percentage = 0.00
 			item.discount_amount     = 0.00
 		})
