@@ -553,7 +553,6 @@ pos_ar.PointOfSale.Controller = class {
 			this.appData.appData.pos_profile.warehouse,
 			this.appData.appData.price_lists,
 			this.appData.appData.item_prices,
-			this.appData.appData.bins,
 			this.selectedItem,
 			this.selectedField,
 			(event, field, value) => {

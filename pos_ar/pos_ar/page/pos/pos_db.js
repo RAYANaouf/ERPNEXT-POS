@@ -51,9 +51,6 @@ pos_ar.PointOfSale.pos_db  = class POSDatabase {
 				if (!db.objectStoreNames.contains('POS Profile')) {
 					db.createObjectStore('POS Profile', { keyPath: 'name' });
 				}
-				if (!db.objectStoreNames.contains('Bin')) {
-					db.createObjectStore('Bin', { keyPath: 'name' });
-				}
 
 				//pos invoice
 				if (!db.objectStoreNames.contains('POS Invoice')) {
@@ -213,51 +210,6 @@ pos_ar.PointOfSale.pos_db  = class POSDatabase {
 			result.onerror = (err) => {
 				const value = event.target.result
 				reject(value);
-			}
-		})
-	}
-
-
-
-	/*********************************       Bin      ***********************************/
-	/************************************************************************************/
-	/************************************************************************************/
-
-	saveBinList( binList ){
-		return new Promise((resolve,reject)=>{
-			const transaction = this.db.transaction(['Bin'] , "readwrite");
-			const store       = transaction.objectStore('Bin')
-			// Loop through the list of bin  and add each one to the store
-			binList.forEach(bin => {
-				const request = store.put(bin)
-				request.onerror = (err)=>{
-					console.error("db => error saving Bin : " , bin ,  "err : " , err)
-					reject(err)
-				}
-			})
-			// Transaction's oncomplete event will be triggered
-			//once all requests in this transaction complete successfully
-			transaction.oncomplete = () => {
-				resolve()
-			};
-			transaction.onerror = (err) => {
-				console.error("db => error saving Bin.")
-				reject(err)
-			};
-		})
-	}
-
-	getAllBin(){
-		return new Promise((resolve,reject)=>{
-			const transaction = this.db.transaction(['Bin'] , "readwrite");
-			const store       = transaction.objectStore('Bin');
-			const result      = store.getAll()
-			result.onsuccess = (event) => {
-				const value = event.target.result
-				resolve(value);
-			}
-			result.onerror = (err)=> {
-				reject(err);
 			}
 		})
 	}

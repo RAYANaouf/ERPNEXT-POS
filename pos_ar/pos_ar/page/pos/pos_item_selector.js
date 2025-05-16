@@ -135,11 +135,6 @@ pos_ar.PointOfSale.pos_item_selector = class {
 			});
 
 			const imageUrl = item.image || '/assets/pos_ar/images/no_image.png';
-			console.log("selected prce list : " , this.selected_price_list.name)
-			//const price = this.get_item_price(item, frappe.defaults.get_default("Price List"));
-			console.log("the item : " , item)
-			console.log("the item prices : " , item.prices)
-			console.log("the selected price list : " , this.selected_price_list)
 			
 			const price = item.prices.find(price => price.price_list == this.selected_price_list.name)?.price_list_rate || 0;
 
@@ -147,9 +142,9 @@ pos_ar.PointOfSale.pos_item_selector = class {
             itemBox.innerHTML = `
 				<img class="itemImage" src="${imageUrl}" alt="${item.item_name}" onerror="this.src='/assets/pos_ar/images/no_image.png'">
 				<div class="itemTitle">${item.item_name}</div>
-				<div class="itemPrice">${price} DA</div>`;
-				//<div class="itemQty">${this.getQty(item)}</div>
-			//`;
+				<div class="itemPrice">${price} DA</div>
+				<div class="itemQty">${item.stock_qty}</div>
+			`;
 
                 	itemsContainer_html.appendChild(itemBox);
 		}
@@ -268,14 +263,4 @@ pos_ar.PointOfSale.pos_item_selector = class {
 		return filtredItemList ;
 	}
 
-	getQty(item){
-		let qty = 0;
-		/*this.app_data.bins.forEach(bin => {
-			if(bin.item_code == item.name){
-				qty = bin.actual_qty;
-				qty -= (bin.pos_invoice_qty || 0) 
-			}
-		})*/
-		return 0;
-	}
 }

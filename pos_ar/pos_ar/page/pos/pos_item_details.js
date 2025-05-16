@@ -5,7 +5,6 @@ pos_ar.PointOfSale.pos_item_details = class{
 		warehouse,
 		priceLists,
 		itemPrices,
-		binList,
 		selectedItem,
 		selectedField,
 		onInput,
@@ -19,7 +18,6 @@ pos_ar.PointOfSale.pos_item_details = class{
 		this.selected_field = selectedField;
 		this.on_input       = onInput;
 		this.on_close_cart  = onClose;
-		this.bin_list       = binList;
 
 		this.start_the_work();
 	}
@@ -574,12 +572,6 @@ else if(keyContent == "." && !selectedField.value.includes(".")){
 
 
 	/*************************** funs  ************************************/
-
-
-	getQtyInWarehouse(itemId , warehouseId){
-		const bin = this.bin_list.find(bin => bin.item_code == itemId && bin.warehouse == warehouseId)
-		return bin ? bin.actual_qty : 0
-	}
 
 
 }

@@ -10,7 +10,6 @@ pos_ar.PointOfSale.posAppData = class {
 		this.since     = localStorage.getItem('lastTime');
 
 		//optimisation
-		this.since_bin   = localStorage.getItem('lastTime-Bin');
 		this.since_price = localStorage.getItem('lastTime-Price');
 		//this.since = undefined
 
@@ -28,14 +27,14 @@ pos_ar.PointOfSale.posAppData = class {
 
 			console.log("we are here *****************")
 
+			await this.getPosProfiles();
+			
 			frappe.show_progress('Please Wait', 2, 12, 'loading items...');
-			await this.getItems();
+			await this.getItems(this.appData.pos_profile.warehouse);
 			frappe.show_progress('Please Wait', 3, 12, 'loading pos profiles');
 
-			await this.getPosProfiles();
 			frappe.show_progress('Please Wait', 4, 12, 'loading mode of payment');
 			await this.getPosProfileModeOfPayments(this.appData.pos_profile)
-			await this.getBins(this.since , this.appData.pos_profile.warehouse);
 			frappe.show_progress('Please Wait', 5, 12, 'loading warehouses');
 			await this.getWarehouses();
 			frappe.show_progress('Please Wait', 6, 12, 'loading price lists');
@@ -87,12 +86,12 @@ pos_ar.PointOfSale.posAppData = class {
 		//get remote
 		this.appData.brands = await this.api_handler.fetchBrands(this.since)
 	}
-	async getItems(){
+	async getItems(warehouse){
 		//get local
 		//const localItems   = await this.db.getAllItems();
 		const localItems   = [];
 		//get remote
-		let updatedItems = await this.api_handler.fetchItems(this.since)
+		let updatedItems = await this.api_handler.fetchItems(warehouse)
 
 		//save new items
 		//await this.db.saveItemList(updatedItems.message)
@@ -116,31 +115,8 @@ pos_ar.PointOfSale.posAppData = class {
 		})
 		this.appData.posProfileModeOfPayments = await this.api_handler.fetchPosProfileModeOfPayments(modeOfPaymentsIds , posProfile.company)
 	}
-	async getBins(){
-		//get local
-		const localBins   = await this.db.getAllBin()
-		//get remote
-		const updatedBins = await this.api_handler.fetchBinList(this.since_bin , this.appData.pos_profile.warehouse)
-		//save new bins
-		await this.db.saveBinList(updatedBins)
 
-		// Update since with the latest modification
-		const latestBinModified = this.getLatestModifiedDate(updatedBins);
-		
-		if (latestBinModified) {
-			this.since_bin = latestBinModified;
-			localStorage.setItem('lastTime-Bin', latestBinModified);
-		}
 
-		this.appData.bins = this.combineLocalAndUpdated(localBins,updatedBins)
-
-		this.appData.bins.forEach(b =>{
-			if(b.item_code == "1.56 BB BLEU -0.00 -0.00"){
-				console.log("check it here : " , b)
-			}
-		})
-		
-	}
 	async getWarehouses(){
 		//get local
 		//const localWarehouses   = await this.db.getAllWarehouse();

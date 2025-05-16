@@ -93,7 +93,7 @@ pos_ar.PointOfSale.FetchHandler = class FetchHandler{
 	}
 
 
-	async fetchItems(since) {
+	async fetchItems(warehouse) {
 		try {
 
 			const priceLists = await this.fetchPriceList()
@@ -104,7 +104,7 @@ pos_ar.PointOfSale.FetchHandler = class FetchHandler{
 			}*/
 			return await frappe.call({
 				method : "pos_ar.pos_ar.doctype.pos_info.pos_info.get_item",
-				args : { priceLists }
+				args : { priceLists , warehouse }
 			})
 		} catch (error) {
 			console.error('Error fetching Item Group :', error);
@@ -299,33 +299,7 @@ pos_ar.PointOfSale.FetchHandler = class FetchHandler{
 		}
 	}
 
-	async fetchBinList(since , warehouse){
-		try{
-			const filter = {}
 
-			let response = null;
-			//avoid since on bin because of the pos invoice changes untill update python code logic
-			since = null ;
-
-			if(since){
-				response = await frappe.call({
-					method: 'pos_ar.api.get_all_item_qty',
-					args: { warehouse , since }
-				})
-			}else {
-				response = await frappe.call({
-					method: 'pos_ar.api.get_all_item_qty',
-					args: { warehouse  }
-				})
-			}
-
-			return response.message;
-		}
-		catch(error){
-			console.error('Error fetching Bin list : ' , error)
-			return [];
-		}
-	}
 
 	async fetchDeletedDocs(since) {
 		try {
