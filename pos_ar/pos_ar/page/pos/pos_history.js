@@ -593,6 +593,13 @@ pos_ar.PointOfSale.pos_history = class {
 				</style>
 			`;
 	
+			let logo = ''
+			if(this.company.name == "OPTILENS TIZIOUZOU"){
+				logo = '/assets/pos_ar/images/nacimolens.jpg'
+			}else{
+				logo = '/assets/pos_ar/images/logo.jpg'
+			}
+
 			// Generate receipt HTML
 			let receiptHTML = `
 				${styles}
