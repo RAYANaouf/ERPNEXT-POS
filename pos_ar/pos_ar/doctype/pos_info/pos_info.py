@@ -651,8 +651,18 @@ def get_item(priceLists=None, warehouse=None):
         "Item Price",
         fields=["item_code", "price_list", "price_list_rate", "currency", "modified"],
         filters=price_filters,
-        limit_page_length=100000
+        limit_page_length=10000000
     )
+    
+    frappe.log_error(
+        title="Debug: get_item() Info",
+        message=f"""
+            Total Item Prices fetched: {len(prices)}
+            Item Codes with 'FREIN' in Price List:
+            {[p['item_code'] for p in prices if 'FREIN' in p['item_code'].upper()]}
+        """
+    )
+
 
     # Group prices by item_code
     price_map = {}

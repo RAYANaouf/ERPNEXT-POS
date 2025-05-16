@@ -10,7 +10,7 @@ pos_ar.PointOfSale.posAppData = class {
 		this.since     = localStorage.getItem('lastTime');
 
 		//optimisation
-		this.since_price = localStorage.getItem('lastTime-Price');
+		//this.since_price = localStorage.getItem('lastTime-Price');
 		//this.since = undefined
 
 
@@ -23,16 +23,11 @@ pos_ar.PointOfSale.posAppData = class {
 			frappe.show_progress('Please Wait', 0, 12, 'loading deleted documents');
 			await this.getDeletedDocs()
 			frappe.show_progress('Please Wait', 1, 12, 'loading customers...');
-			await this.getCustomers();
-
-			console.log("we are here *****************")
-
+			await this.getCustomers();			
+			frappe.show_progress('Please Wait', 2, 12, 'loading pos profiles');
 			await this.getPosProfiles();
-			
-			frappe.show_progress('Please Wait', 2, 12, 'loading items...');
+			frappe.show_progress('Please Wait', 3, 12, 'loading items...');
 			await this.getItems(this.appData.pos_profile.warehouse);
-			frappe.show_progress('Please Wait', 3, 12, 'loading pos profiles');
-
 			frappe.show_progress('Please Wait', 4, 12, 'loading mode of payment');
 			await this.getPosProfileModeOfPayments(this.appData.pos_profile)
 			frappe.show_progress('Please Wait', 5, 12, 'loading warehouses');
@@ -56,9 +51,7 @@ pos_ar.PointOfSale.posAppData = class {
 			frappe.hide_progress();
 
 			this.since = frappe.datetime.now_datetime()
-			localStorage.setItem('lastTime', frappe.datetime.now_datetime());
-
-			console.log("app data : " , this.appData)
+			//localStorage.setItem('lastTime', frappe.datetime.now_datetime());
 		}catch(err){
 			console.error("appData Class Error  : " , err)
 			frappe.hide_progress();
@@ -141,28 +134,6 @@ pos_ar.PointOfSale.posAppData = class {
 		this.appData.price_lists = updatedPriceList
 	}
 
-/*
-	async getItemPrices(){
-		//get local
-		const localItemPrices = await this.db.getAllItemPrice();
-		//get remote
-		console.log("====> since_price : " , this.since_price)
-		const updateItemPrices = await this.api_handler.fetchItemPrice(this.since_price , this.appData.price_lists)
-		console.log("====> updateItemPrices : " , updateItemPrices)
-		//save the new
-		await this.db.saveItemPriceList(updateItemPrices);
-        //update since the latest modification
-		const latestItemPriceModified = this.getLatestModifiedDate(updateItemPrices)
-		console.log("====> latestItemPriceModified : " , latestItemPriceModified)
-		if(latestItemPriceModified){
-			this.since_price = latestItemPriceModified;
-			localStorage.setItem('lastTime-Price', latestItemPriceModified);
-		}
-		this.appData.item_prices = this.combineLocalAndUpdated(localItemPrices,updateItemPrices)
-		console.log("====> item prices : " , this.appData.item_prices)
-	}
-*/
-
 
 	async getItemGroups(){
 		//get local
@@ -174,6 +145,8 @@ pos_ar.PointOfSale.posAppData = class {
 
 		this.appData.item_groups = this.combineLocalAndUpdated(localItemGroups,updatedItemGroups)
 	}
+
+	
 	async getItemBarcodes(){
 		this.appData.item_barcodes = await this.api_handler.fetchItemBarCodes()
 	}
