@@ -100,7 +100,7 @@ pos_ar.PointOfSale.posAppData = class {
 		//this.appData.items = this.combineLocalAndUpdated(localItems,updatedItems.message)
 
 
-		this.appData.items = updatedItems
+		this.appData.items = updatedItems.message
 	}
 	async getPosProfiles(){
 		const posProfile = frappe.defaults.get_default("POS Profile");
