@@ -605,7 +605,7 @@ pos_ar.PointOfSale.pos_history = class {
 				${styles}
 				<div class="receipt-container">
 					<div class="logo-container">
-						<img src="/assets/pos_ar/images/logo.jpg" alt="Company Logo" onerror="this.style.display='none';">
+						<img src="${logo}" alt="Company Logo" onerror="this.style.display='none';">
 					</div>
 					<div class="company-name">${this.company.company_name}</div>
 					

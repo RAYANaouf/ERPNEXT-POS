@@ -5503,11 +5503,17 @@
 					}
 				</style>
 			`;
+        let logo = "";
+        if (this.company.name == "OPTILENS TIZIOUZOU") {
+          logo = "/assets/pos_ar/images/nacimolens.jpg";
+        } else {
+          logo = "/assets/pos_ar/images/logo.jpg";
+        }
         let receiptHTML = `
 				${styles}
 				<div class="receipt-container">
 					<div class="logo-container">
-						<img src="/assets/pos_ar/images/logo.jpg" alt="Company Logo" onerror="this.style.display='none';">
+						<img src="${logo}" alt="Company Logo" onerror="this.style.display='none';">
 					</div>
 					<div class="company-name">${this.company.company_name}</div>
 					
@@ -8087,4 +8093,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.H3P6GD5O.js.map
+//# sourceMappingURL=pos.bundle.I3RAYSOL.js.map
