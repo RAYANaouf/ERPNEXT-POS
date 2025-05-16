@@ -7545,9 +7545,6 @@
     async getItems() {
       const localItems = [];
       let updatedItems = await this.api_handler.fetchItems(this.since);
-      console.log("we are here .............. ", updatedItems.message);
-      console.log("updatedItems.length : ", updatedItems.length);
-      await this.db.saveItemList(updatedItems.message);
       this.appData.items = this.combineLocalAndUpdated(localItems, updatedItems.message);
     }
     async getPosProfiles() {
@@ -8183,4 +8180,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.FNSR7SQL.js.map
+//# sourceMappingURL=pos.bundle.5VPOYH3W.js.map

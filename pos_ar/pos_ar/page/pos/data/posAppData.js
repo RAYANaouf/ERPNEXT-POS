@@ -94,15 +94,13 @@ pos_ar.PointOfSale.posAppData = class {
 		//get remote
 		let updatedItems = await this.api_handler.fetchItems(this.since)
 
-		console.log("we are here .............. " , updatedItems.message)
-
-		console.log("updatedItems.length : " , updatedItems.length)
-		//updatedItems = [];
-
 		//save new items
-		await this.db.saveItemList(updatedItems.message)
+		//await this.db.saveItemList(updatedItems.message)
 
-		this.appData.items = this.combineLocalAndUpdated(localItems,updatedItems.message)
+		//this.appData.items = this.combineLocalAndUpdated(localItems,updatedItems.message)
+
+
+		this.appData.items = updatedItems
 	}
 	async getPosProfiles(){
 		const posProfile = frappe.defaults.get_default("POS Profile");
