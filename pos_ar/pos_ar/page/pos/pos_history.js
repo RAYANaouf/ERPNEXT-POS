@@ -606,9 +606,15 @@ pos_ar.PointOfSale.pos_history = class {
 				<div class="receipt-container">
 					<div class="logo-container">
 						<img src="${logo}" alt="Company Logo" onerror="this.style.display='none';">
-					</div>
-					<div class="company-name">${this.company.company_name}</div>
-					
+					</div>`
+
+			if(this.company.name != "OPTILENS TIZIOUZOU"){
+				receiptHTML +=		
+					`<div class="company-name">${this.company.company_name}</div>`
+			}
+
+			receiptHTML +=	
+					`
 					<div class="receipt-header">
 						<div class="customer-info">
 							<div class="bold">Client: ${pos.customer}</div>
@@ -674,9 +680,13 @@ pos_ar.PointOfSale.pos_history = class {
 					</div>
 	
 					<div class="receipt-footer">
-						<div>Merci de votre visite!</div>
-						<div>${this.company.company_name}</div>
-					</div>
+						<div>Merci de votre visite!</div>`
+
+			if(this.company.name != "OPTILENS TIZIOUZOU"){
+				receiptHTML += 	`<div>${this.company.company_name}</div>`
+			}
+
+			receiptHTML += 		`</div>
 				</div>
 			`;
 	
