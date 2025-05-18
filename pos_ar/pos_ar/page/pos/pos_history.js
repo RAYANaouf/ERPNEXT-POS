@@ -621,7 +621,7 @@ pos_ar.PointOfSale.pos_history = class {
 							<div style="font-size:10px;">Commande: ${pos.refNum}</div>
 							<div style="font-size:10px;">Date: ${date}</div>
 							<div style="font-size:10px;">Heure: ${time}</div>
-							${this.company.name != "OPTILENS TIZIOUZOU" ? `<div style="font-size:10px;" >026124922</div>` : ''}
+							${this.company.name == "OPTILENS TIZIOUZOU" ? `<div style="font-size:10px;" >026124922</div>` : ''}
 						</div>
 					</div>
 	
