@@ -267,7 +267,7 @@ pos_ar.myaccessories.AccessoriesController = class {
                 .html(`
                     <div class="item-col name">${frappe.utils.escape_html(itemName)}</div>
                     <div class="item-col qty">${item.qty}</div>
-                    <div class="item-col total">${this.formatCurrency(item.rate * item.qty)}</div>
+                    <div class="item-col total">${this.formatCurrency(item.rate)}</div>
                 `)
                 .appendTo(container);
         });
