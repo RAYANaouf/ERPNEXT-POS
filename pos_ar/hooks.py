@@ -268,6 +268,10 @@ fixtures = [
     {
         'dt': 'Client Script',
         'filters': [['dt', 'in', ['POS Closing Entry','CTN-BOX','Sales Invoice','Purchase Order','CTN Transfer' , 'Stock Entry' , 'Company']]]
+    },
+    {
+        'dt': 'Server Script',
+        'filters': [['reference_doctype', 'in', ['Purchase Order']]]
     }
 ]
 

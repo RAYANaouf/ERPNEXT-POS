@@ -1,0 +1,21 @@
+[
+ {
+  "allow_guest": 0,
+  "api_method": null,
+  "cron_format": null,
+  "disabled": 0,
+  "docstatus": 0,
+  "doctype": "Server Script",
+  "doctype_event": "After Submit",
+  "enable_rate_limit": 0,
+  "event_frequency": "All",
+  "modified": "2025-05-24 15:01:39.389840",
+  "module": "POS AR",
+  "name": "auto-order",
+  "rate_limit_count": 5,
+  "rate_limit_seconds": 86400,
+  "reference_doctype": "Purchase Order",
+  "script": "# Get Supplier info\r\nsupplier_doc = frappe.get_doc(\"Supplier\", doc.supplier)\r\n\r\n# Proceed only if it's an internal supplier with a target company\r\nif supplier_doc.is_internal_supplier and supplier_doc.represents_company:\r\n    target_company = supplier_doc.represents_company  # The selling company\r\n    buying_company = doc.company                      # The buying company\r\n\r\n    # Get the internal customer representing the buying company\r\n    customer_name = frappe.db.get_value(\r\n        \"Customer\",\r\n        {\r\n            \"is_internal_customer\": 1,\r\n            \"represents_company\": buying_company\r\n        },\r\n        \"name\"\r\n    )\r\n\r\n    if not customer_name:\r\n        frappe.throw(f\"No internal customer found representing company '{buying_company}'.\")\r\n\r\n    # Get default warehouse from target company (if set)\r\n    default_warehouse = frappe.db.get_value(\"Company\", target_company, \"custom_default_warehouse\")\r\n\r\n    # Create the Sales Order\r\n    sales_order = frappe.new_doc(\"Sales Order\")\r\n    sales_order.customer = customer_name\r\n    sales_order.company = target_company\r\n    sales_order.transaction_date = doc.transaction_date\r\n    sales_order.delivery_date = frappe.utils.add_days(doc.transaction_date, 7)\r\n\r\n    for item in doc.items:\r\n        item_data = {\r\n            \"item_code\": item.item_code,\r\n            \"item_name\": item.item_name,\r\n            \"description\": item.description,\r\n            \"qty\": item.qty,\r\n            \"uom\": item.uom,\r\n            \"rate\": item.rate\r\n        }\r\n\r\n        # Only set warehouse if default_warehouse is defined\r\n        if default_warehouse:\r\n            item_data[\"warehouse\"] = default_warehouse\r\n\r\n        sales_order.append(\"items\", item_data)\r\n\r\n    sales_order.insert(ignore_permissions=True)\r\n    # Leave it as draft for manual review\r\n    frappe.msgprint(f\"Draft Sales Order {sales_order.name} created for internal customer {customer_name} in {target_company}.\")\r\n",
+  "script_type": "DocType Event"
+ }
+]
