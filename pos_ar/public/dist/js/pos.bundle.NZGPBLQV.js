@@ -204,7 +204,7 @@
         $('<div class="item-row">').html(`
                     <div class="item-col name">${frappe.utils.escape_html(itemName)}</div>
                     <div class="item-col qty">${item.qty}</div>
-                    <div class="item-col total">${this.formatCurrency(item.rate * item.qty)}</div>
+                    <div class="item-col total">${this.formatCurrency(item.rate)}</div>
                 `).appendTo(container);
       });
       $('<div class="item-row grand-total">').html(`
@@ -5525,6 +5525,7 @@
 							<div style="font-size:10px;">Commande: ${pos.refNum}</div>
 							<div style="font-size:10px;">Date: ${date}</div>
 							<div style="font-size:10px;">Heure: ${time}</div>
+							${this.company.name == "OPTILENS TIZIOUZOU" ? `<div style="font-size:10px;" >Num\xE9ro: 026124922</div>` : ""}
 						</div>
 					</div>
 	
@@ -8097,4 +8098,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.TWSUK2YB.js.map
+//# sourceMappingURL=pos.bundle.NZGPBLQV.js.map
