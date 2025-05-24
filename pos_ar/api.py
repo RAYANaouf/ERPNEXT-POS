@@ -80,8 +80,6 @@ def manage_related_ctn_transactions(doc, method):
 
 
 
-
-
 @frappe.whitelist()
 def get_item_sold(start, end, company=None):
     if not start or not end:
@@ -89,12 +87,16 @@ def get_item_sold(start, end, company=None):
 
     query = """
         SELECT 
+            sii.item_code,
             sii.item_name,
-            SUM(sii.qty) AS total_qty
+            SUM(sii.qty) AS total_qty,
+            i.stock_uom
         FROM 
             `tabSales Invoice Item` sii
         INNER JOIN 
             `tabSales Invoice` si ON sii.parent = si.name
+        INNER JOIN 
+            `tabItem` i ON sii.item_code = i.name
         WHERE 
             si.posting_date BETWEEN %s AND %s
             AND si.docstatus = 1
@@ -105,13 +107,10 @@ def get_item_sold(start, end, company=None):
         query += " AND si.company = %s"
         filters.append(company)
 
-    query += " GROUP BY sii.item_code, sii.item_name"
+    query += " GROUP BY sii.item_code, sii.item_name, i.stock_uom"
     query += " HAVING total_qty > 0"
 
-    items = frappe.db.sql(query, filters, as_dict=True)
-
-    return items
-
+    return frappe.db.sql(query, filters, as_dict=True)
 
 
 
