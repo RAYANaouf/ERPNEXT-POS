@@ -42,8 +42,8 @@ pos_ar.Pricing.PricingController = class {
                     </div>
                     <div class="top-bar-right">
                         <button class="btn btn-primary">New Price</button>
-                        <button class="btn btn-default">Import</button>
-                        <button class="btn btn-default">Export</button>
+                        <button class="btn btn-default" style="display: none;">Import</button>
+                        <button class="btn btn-default" style="display: none;">Export</button>
                     </div>
                 </div>
 

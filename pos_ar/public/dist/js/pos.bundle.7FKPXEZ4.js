@@ -204,7 +204,9 @@
         $('<div class="item-row">').html(`
                     <div class="item-col name">${frappe.utils.escape_html(itemName)}</div>
                     <div class="item-col qty">${item.qty}</div>
-                    <div class="item-col total">${this.formatCurrency(item.rate)}</div>
+                    <div class="item-col total">${this.formatCurrency(
+          item.rate
+        )}</div>
                 `).appendTo(container);
       });
       $('<div class="item-row grand-total">').html(`
@@ -289,8 +291,8 @@
                     </div>
                     <div class="top-bar-right">
                         <button class="btn btn-primary">New Price</button>
-                        <button class="btn btn-default">Import</button>
-                        <button class="btn btn-default">Export</button>
+                        <button class="btn btn-default" style="display: none;">Import</button>
+                        <button class="btn btn-default" style="display: none;">Export</button>
                     </div>
                 </div>
 
@@ -8098,4 +8100,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.NZGPBLQV.js.map
+//# sourceMappingURL=pos.bundle.7FKPXEZ4.js.map

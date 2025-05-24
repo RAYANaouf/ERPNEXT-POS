@@ -106,6 +106,7 @@ def get_item_sold(start, end, company=None):
         filters.append(company)
 
     query += " GROUP BY sii.item_code, sii.item_name"
+    query += " HAVING total_qty > 0"
 
     items = frappe.db.sql(query, filters, as_dict=True)
 
