@@ -4,6 +4,7 @@ pos_ar.PointOfSale.pos_customer_box = class{
 		wrapper          ,
 		customersList    ,
 		selectedCustomer ,
+		appSettings      ,
 		backHome         ,
 		onSync           ,
 		saveCheckInOut   ,
@@ -14,6 +15,7 @@ pos_ar.PointOfSale.pos_customer_box = class{
 		this.wrapper           = wrapper          ;
 		this.customers_list    = customersList    ;
 		this.selected_customer = selectedCustomer ;
+		this.app_settings      = appSettings      ;
 		this.back_home         = backHome         ;
 		this.on_sync           = onSync           ;
 		this.on_menu_click     = onMenuClick      ;
@@ -74,10 +76,15 @@ pos_ar.PointOfSale.pos_customer_box = class{
 			</div>
 		`)
 
+		if(this.app_settings.receiveInvoiceFromOtherPos){
+			console.log("see me here")
+			document.getElementById('popupBtn').style.display = 'flex';
+		}
+
 		// Check company and show button if it's OPTILENS TIZIOUZOU
 		frappe.db.get_value('Company', frappe.defaults.get_default('company'), 'name')
 			.then(r => {
-				if (r.message.name === "OPTILENS TIZIOUZOU" || r.message.name === "Tizi" ) {
+				if (r.message.name === "OPTILENS TIZIOUZOU" || r.message.name === "Tizi"  ) {
 					document.getElementById('popupBtn').style.display = 'flex';
 				}
 			});

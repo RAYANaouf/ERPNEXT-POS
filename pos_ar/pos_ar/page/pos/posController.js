@@ -472,6 +472,7 @@ pos_ar.PointOfSale.Controller = class {
 			this.$leftSection,
 			this.appData.appData.customers,
 			this.defaultCustomer,
+			this.settings_data.settings,
 			() => {
 				this.screenManager.navigate("home");
 			},

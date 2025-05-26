@@ -9,15 +9,16 @@ pos_ar.PointOfSale.posSettingsData = class{
 		this.keyboard_styles = ['primery' , 'secondary']
 
 		const defaults = {
-			itemPriceBasedOn  : 'brand'     ,
-			keyboardStyle     : 'secondary' ,
-			showItemDetails   : false       ,
-			showItemImage     : false       ,
-			showDiscountField : false       ,
-			onlineDebt        : true        ,
-			testing           : false,
-			search_by_group   : false,
-			sendInvoiceToOtherPos : false
+			itemPriceBasedOn           : 'brand'     ,
+			keyboardStyle              : 'secondary' ,
+			showItemDetails            : false       ,
+			showItemImage              : false       ,
+			showDiscountField          : false       ,
+			onlineDebt                 : true        ,
+			testing                    : false       ,
+			search_by_group            : false       ,
+			sendInvoiceToOtherPos      : false       ,
+			receiveInvoiceFromOtherPos : false
 		}
 
 
@@ -30,14 +31,15 @@ pos_ar.PointOfSale.posSettingsData = class{
 				}else{
 					//default
 					this.settings = {
-						itemPriceBasedOn  : 'brand'     ,
-						keyboardStyle     : 'secondary' ,
-						showItemDetails   : false       ,
-						showItemImage     : false       ,
-						showDiscountField : false       ,
-						onlineDebt        : true        ,
-						search_by_group   : false,
-						sendInvoiceToOtherPos : false
+						itemPriceBasedOn           : 'brand'     ,
+						keyboardStyle              : 'secondary' ,
+						showItemDetails            : false       ,
+						showItemImage              : false       ,
+						showDiscountField          : false       ,
+						onlineDebt                 : true        ,
+						search_by_group            : false       ,
+						sendInvoiceToOtherPos      : false       ,
+						receiveInvoiceFromOtherPos : false
 					}
 				}
 
@@ -45,14 +47,15 @@ pos_ar.PointOfSale.posSettingsData = class{
 			(err)=>{
 				console.log("error when trying to get the setting from local, so we use the default.")
 				this.settings = {
-					itemPriceBasedOn  : 'brand'     ,
-					keyboardStyle     : 'secondary' ,
-					showItemDetails   : false       ,
-					showItemImage     : false       ,
-					showDiscountField : false       ,
-					onlineDebt        : true        ,
-					search_by_group   : false,
-					sendInvoiceToOtherPos : false
+					itemPriceBasedOn           : 'brand'     ,
+					keyboardStyle              : 'secondary' ,
+					showItemDetails            : false       ,
+					showItemImage              : false       ,
+					showDiscountField          : false       ,
+					onlineDebt                 : true        ,
+					search_by_group            : false       ,
+					sendInvoiceToOtherPos      : false       ,
+					receiveInvoiceFromOtherPos : false
 				}
 
 			}
