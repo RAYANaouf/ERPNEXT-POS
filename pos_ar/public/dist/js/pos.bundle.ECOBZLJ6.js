@@ -2322,6 +2322,7 @@
         this.$leftSection,
         this.appData.appData.customers,
         this.defaultCustomer,
+        this.settings_data.settings,
         () => {
           this.screenManager.navigate("home");
         },
@@ -3499,10 +3500,11 @@
 
   // ../pos_ar/pos_ar/pos_ar/page/pos/pos_customer_box.js
   pos_ar.PointOfSale.pos_customer_box = class {
-    constructor(wrapper, customersList, selectedCustomer, backHome, onSync, saveCheckInOut, onMenuClick, onDebtClick, onPrintPos) {
+    constructor(wrapper, customersList, selectedCustomer, appSettings, backHome, onSync, saveCheckInOut, onMenuClick, onDebtClick, onPrintPos) {
       this.wrapper = wrapper;
       this.customers_list = customersList;
       this.selected_customer = selectedCustomer;
+      this.app_settings = appSettings;
       this.back_home = backHome;
       this.on_sync = onSync;
       this.on_menu_click = onMenuClick;
@@ -3546,6 +3548,10 @@
 				<i class="fa fa-star"></i>
 			</div>
 		`);
+      if (this.app_settings.receiveInvoiceFromOtherPos) {
+        console.log("see me here");
+        document.getElementById("popupBtn").style.display = "flex";
+      }
       frappe.db.get_value("Company", frappe.defaults.get_default("company"), "name").then((r) => {
         if (r.message.name === "OPTILENS TIZIOUZOU" || r.message.name === "Tizi") {
           document.getElementById("popupBtn").style.display = "flex";
@@ -6352,6 +6358,7 @@
       const searchByGroup = this.settings_data.settings.search_by_group ? "checked" : "";
       const onlineDebt = this.settings_data.settings.onlineDebt ? "checked" : "";
       const sendInvoiceToOtherPos = this.settings_data.settings.sendInvoiceToOtherPos ? "checked" : "";
+      const receiveInvoiceFromOtherPos = this.settings_data.settings.receiveInvoiceFromOtherPos ? "checked" : "";
       const keyboardStyle = this.settings_data.settings.keyboard_style;
       console.log("check it here : ", this.settings_data.settings.onlineDebt);
       this.leftContainer.addClass("columnBox");
@@ -6386,6 +6393,8 @@
       this.general_settings_c2.append(`<div class="rowBox align_center" style="height:50px;"><label for="onlineDebtCheckBox" style="margin-right:16px;width:50%;" > online debt: </label> <input type="checkbox"  name="onlineDebtCheckBox" id="onlineDebtCheckBoxCheckBox" ${onlineDebt} ></div>`);
       this.general_settings_c2.append('<div for="sendInvoiceToOtherPosCheckBox" style="font-weight:600;"> Send Invoice To Other POS : </div>');
       this.general_settings_c2.append(`<div class="rowBox align_center" style="height:50px;"><label for="sendInvoiceToOtherPosCheckBox" style="margin-right:16px;width:50%;" > send invoice: </label> <input type="checkbox"  name="sendInvoiceToOtherPosCheckBox" id="sendInvoiceToOtherPosCheckBox" ${sendInvoiceToOtherPos} ></div>`);
+      this.general_settings_c2.append('<div for="receiveInvoiceFromOtherPosCheckBox" style="font-weight:600;"> Receive Invoice From Other POS : </div>');
+      this.general_settings_c2.append(`<div class="rowBox align_center" style="height:50px;"><label for="receiveInvoiceFromOtherPosCheckBox" style="margin-right:16px;width:50%;" > receive invoice: </label> <input type="checkbox"  name="receiveInvoiceFromOtherPosCheckBox" id="receiveInvoiceFromOtherPosCheckBox" ${receiveInvoiceFromOtherPos} ></div>`);
       this.general_settings_c1.append('<div for="showItemDetailsCartCheckBox" style="font-weight:600;"> Item Details Cart : </div>');
       this.general_settings_c1.append(`<div class="rowBox align_center" style="height:50px;"><label for="showItemDetailsCartCheckBox" style="margin-right:16px;width:50%;" > show cart: </label> <input type="checkbox"  name="showItemDetailsCartCheckBox" id="showItemDetailsCartCheckBox" ${showItemDetailsCart} ></div>`);
       this.general_settings_c1.append('<div for="showItemDetailsCartCheckBox" style="font-weight:600;"> Item Image : </div>');
@@ -6483,6 +6492,18 @@
           this.settings_data.settings,
           () => {
             this.on_settings_change("sendInvoiceToOtherPos");
+          },
+          () => {
+            console.error("error to save the settings changes (settings.js)");
+          }
+        );
+      });
+      this.general_settings_c2.find("#receiveInvoiceFromOtherPosCheckBox").on("click", (event2) => {
+        this.settings_data.settings.receiveInvoiceFromOtherPos = $(event2.target).is(":checked");
+        this.settings_data.setSettings(
+          this.settings_data.settings,
+          () => {
+            this.on_settings_change("receiveInvoiceFromOtherPos");
           },
           () => {
             console.error("error to save the settings changes (settings.js)");
@@ -7355,7 +7376,8 @@
         onlineDebt: true,
         testing: false,
         search_by_group: false,
-        sendInvoiceToOtherPos: false
+        sendInvoiceToOtherPos: false,
+        receiveInvoiceFromOtherPos: false
       };
       this.db.getSettings(
         (res) => {
@@ -7370,7 +7392,8 @@
               showDiscountField: false,
               onlineDebt: true,
               search_by_group: false,
-              sendInvoiceToOtherPos: false
+              sendInvoiceToOtherPos: false,
+              receiveInvoiceFromOtherPos: false
             };
           }
         },
@@ -7384,7 +7407,8 @@
             showDiscountField: false,
             onlineDebt: true,
             search_by_group: false,
-            sendInvoiceToOtherPos: false
+            sendInvoiceToOtherPos: false,
+            receiveInvoiceFromOtherPos: false
           };
         }
       );
@@ -8100,4 +8124,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.7FKPXEZ4.js.map
+//# sourceMappingURL=pos.bundle.ECOBZLJ6.js.map

@@ -300,72 +300,106 @@ def export_items_without_price():
 @frappe.whitelist()
 def CA_FRD_generator( ref = None, max_count = None , from_warehouse = None , to_warehouse = None):
 
+    useCTN = True
     
     if not ref:
-        frappe.throw("Ref is required")
+        useCTN = False
 
+    if not max_count:
+        useCTN = False
+        
     if max_count:
         try:
             max_count = int(max_count)
         except ValueError:
             frappe.throw("max_count must be an integer")
 
-    # Step 1: Get CTN-BOXES with given ref from CA (beaulieu alger - OC)
-    ctn_boxes = frappe.get_all(
-        "CTN-BOX",
-        filters={"ref": ref, "warehouse": from_warehouse},
-        fields=["name"]
-    )
+    if useCTN == True :
+        # Step 1: Get CTN-BOXES with given ref from CA (beaulieu alger - OC)
+        ctn_boxes = frappe.get_all(
+            "CTN-BOX",
+            filters={"ref": ref, "warehouse": from_warehouse},
+            fields=["name"]
+        )
     
-    print(ctn_boxes)
-    ctn_names = [box.name for box in ctn_boxes]
+        ctn_names = [box.name for box in ctn_boxes]
 
-    print(ctn_names)
-    # Step 2: Get items inside those CTN-BOXES (with qty)
-    ctn_items = frappe.get_all(
-        "CTN Item",  
-        filters={"parent": ["in", ctn_names]},
-        fields=["parent", "item", "qty"]
-    )
+        # Step 2: Get items inside those CTN-BOXES (with qty)
+        ctn_items = frappe.get_all(
+            "CTN Item",  
+            filters={"parent": ["in", ctn_names]},
+            fields=["parent", "item", "qty"]
+        )
     
-    # Map: CTN → [{item, qty}]
-    ctn_to_items = {}
-    for row in ctn_items:
-        ctn_to_items.setdefault(row.parent, []).append({
-            "item": row.item,
-            "qty": row.qty
-        })
+        # Map: CTN → [{item, qty}]
+        ctn_to_items = {}
+        for row in ctn_items:
+            ctn_to_items.setdefault(row.parent, []).append({
+                "item": row.item,
+                "qty": row.qty
+            })
 
-    # Step 3: Get current stock in ALGER (Bordj el kiffen - OA)
-    alger_stock = frappe.get_all(
-        "Bin",
-        filters={"warehouse": to_warehouse},
-        fields=["item_code", "actual_qty"]
-    )
+        # Step 3: Get current stock in to warehouse
+        alger_stock = frappe.get_all(
+            "Bin",
+            filters={"warehouse": to_warehouse},
+            fields=["item_code", "actual_qty"]
+        )   
     
-    alger_item_codes = set(row.item_code for row in alger_stock if row.actual_qty > 0)
+        alger_item_codes = set(row.item_code for row in alger_stock if row.actual_qty > 0)
 
-    # Step 4: Determine needed CTNs (ordered list)
-    needed_ctns = []
-    for ctn in ctn_names:  # preserve order from fetched CTNs
-        items = ctn_to_items.get(ctn, [])
-        for item in items:
-            if item["item"] not in alger_item_codes:
-                needed_ctns.append(ctn)
-                break  # Only one missing item needed
+        # Step 4: Determine needed CTNs (ordered list)
+        needed_ctns = []
+        for ctn in ctn_names:  # preserve order from fetched CTNs
+            items = ctn_to_items.get(ctn, [])
+            for item in items:
+                if item["item"] not in alger_item_codes:
+                    needed_ctns.append(ctn)
+                    break  # Only one missing item needed
 
-    # Apply max_count limit
-    if max_count:
-        needed_ctns = needed_ctns[:max_count]
+        # Apply max_count limit
+        if max_count:
+           needed_ctns = needed_ctns[:max_count]
 
-    # Filter ctn_to_items to only keep needed CTNs
-    needed_ctn_details = {ctn: ctn_to_items[ctn] for ctn in needed_ctns}
+        # Filter ctn_to_items to only keep needed CTNs
+        needed_ctn_details = {ctn: ctn_to_items[ctn] for ctn in needed_ctns}
 
-    return {
-        "needed_ctns": needed_ctns,
-        "count": len(needed_ctns),
-        "ctn_details": needed_ctn_details
-    }
+        return {
+            "needed_ctns": needed_ctns,
+            "count": len(needed_ctns),
+            "ctn_details": needed_ctn_details
+        }
+    else:
+        # Step 1: Get current stock in from warehouse
+        from_warehouse_stock = frappe.get_all(
+            "Bin",
+            filters={"warehouse": from_warehouse},
+            fields=["item_code", "actual_qty"]
+        )  
+    
+        # Step 2: Get current stock in to warehouse
+        to_warehouse_stock = frappe.get_all(
+            "Bin",
+            filters={"warehouse": to_warehouse},
+            fields=["item_code", "actual_qty"]
+        )   
+    
+        # Convert to dictionaries for faster lookup
+        from_stock_map = {row.item_code: min(row.actual_qty, 100)   for row in from_warehouse_stock if row.actual_qty > 0} # cap to 100
+        to_stock_set = set(row.item_code for row in to_warehouse_stock if row.actual_qty > 0)
+
+        # Step 3: Determine needed items (in from_warehouse but not in to_warehouse)
+        needed_items = [
+            {"item_code": item_code, "qty": qty}
+            for item_code, qty in from_stock_map.items()
+            if item_code not in to_stock_set
+        ]
+
+        return {
+            "needed_items": needed_items,
+            "count": len(needed_items)
+        }
+
 
 ################################################### user on client script ##############################################
 

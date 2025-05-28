@@ -1,0 +1,104 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2025-05-28 09:01:18.156638",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "supplier",
+  "column_break_eaqd",
+  "to_warehouse",
+  "section_break_5tlh",
+  "column_break_twus",
+  "column_break_qvbv",
+  "column_break_01hj",
+  "search",
+  "column_break_8qgm",
+  "column_break_lr8o",
+  "section_break_dcoy",
+  "items"
+ ],
+ "fields": [
+  {
+   "fieldname": "supplier",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Supplier",
+   "options": "Supplier",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_eaqd",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "to_warehouse",
+   "fieldtype": "Link",
+   "label": "to_warehouse",
+   "options": "Warehouse",
+   "reqd": 1
+  },
+  {
+   "fieldname": "section_break_5tlh",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "column_break_twus",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_qvbv",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_01hj",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "search",
+   "fieldtype": "Button",
+   "label": "Search"
+  },
+  {
+   "fieldname": "column_break_8qgm",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_lr8o",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "section_break_dcoy",
+   "fieldtype": "Section Break",
+   "label": "Items"
+  },
+  {
+   "fieldname": "items",
+   "fieldtype": "Table",
+   "options": "buy the need item"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "issingle": 1,
+ "links": [],
+ "modified": "2025-05-28 12:19:16.354289",
+ "modified_by": "Administrator",
+ "module": "POS AR",
+ "name": "Buy The Need",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
