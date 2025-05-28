@@ -6,7 +6,10 @@
  "engine": "InnoDB",
  "field_order": [
   "supplier",
+  "from_company",
+  "warehouse",
   "column_break_eaqd",
+  "company",
   "to_warehouse",
   "section_break_5tlh",
   "column_break_twus",
@@ -16,7 +19,14 @@
   "column_break_8qgm",
   "column_break_lr8o",
   "section_break_dcoy",
-  "items"
+  "items",
+  "section_break_ndti",
+  "column_break_aygo",
+  "column_break_cmup",
+  "column_break_ortl",
+  "generate",
+  "column_break_w545",
+  "column_break_gvjv"
  ],
  "fields": [
   {
@@ -76,12 +86,61 @@
    "fieldname": "items",
    "fieldtype": "Table",
    "options": "buy the need item"
+  },
+  {
+   "fieldname": "section_break_ndti",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "column_break_aygo",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_cmup",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_ortl",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "generate",
+   "fieldtype": "Button",
+   "label": "Generate"
+  },
+  {
+   "fieldname": "column_break_w545",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_gvjv",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "warehouse",
+   "fieldtype": "Link",
+   "label": "Warehouse",
+   "options": "Warehouse",
+   "read_only": 1
+  },
+  {
+   "fieldname": "from_company",
+   "fieldtype": "Link",
+   "label": "From Company",
+   "options": "Company",
+   "read_only": 1
+  },
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "label": "to Company",
+   "options": "Company"
   }
  ],
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2025-05-28 12:19:16.354289",
+ "modified": "2025-05-28 13:08:07.550142",
  "modified_by": "Administrator",
  "module": "POS AR",
  "name": "Buy The Need",
