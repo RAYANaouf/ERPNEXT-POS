@@ -12,6 +12,14 @@
   "company",
   "to_warehouse",
   "section_break_5tlh",
+  "search_by_time",
+  "column_break_l5to",
+  "note",
+  "section_break_gmos",
+  "start",
+  "column_break_mra3",
+  "end",
+  "section_break_do9y",
   "column_break_twus",
   "column_break_qvbv",
   "column_break_01hj",
@@ -135,12 +143,54 @@
    "fieldtype": "Link",
    "label": "to Company",
    "options": "Company"
+  },
+  {
+   "default": "0",
+   "fieldname": "search_by_time",
+   "fieldtype": "Check",
+   "label": "search by time"
+  },
+  {
+   "fieldname": "section_break_gmos",
+   "fieldtype": "Section Break",
+   "label": "Set Period"
+  },
+  {
+   "depends_on": "search_by_time",
+   "fieldname": "start",
+   "fieldtype": "Date",
+   "label": "start"
+  },
+  {
+   "fieldname": "column_break_mra3",
+   "fieldtype": "Column Break"
+  },
+  {
+   "depends_on": "search_by_time",
+   "fieldname": "end",
+   "fieldtype": "Date",
+   "label": "end"
+  },
+  {
+   "fieldname": "section_break_do9y",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "column_break_l5to",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "This option retrieves all items sold during the selected period.",
+   "depends_on": "search_by_time",
+   "fieldname": "note",
+   "fieldtype": "Read Only",
+   "label": "Note"
   }
  ],
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2025-05-28 13:08:07.550142",
+ "modified": "2025-05-28 18:09:58.126703",
  "modified_by": "Administrator",
  "module": "POS AR",
  "name": "Buy The Need",
