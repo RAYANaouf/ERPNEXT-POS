@@ -259,15 +259,15 @@ doc_events = {
 fixtures = [
     {
         'dt': 'DocType',
-        'filters': [['name', 'in', ['check_in_out' , 'money' , 'CTN Item' , 'CTN-BOX' , 'CTN-BOX Transaction' ,  'CTN Transfer' , 'CTN Transfer Item' ,  'Stock Transfer CTN' , "Customer Company" ]]]
+        'filters': [['name', 'in', ['check_in_out' , 'money' , 'CTN Item' , 'CTN-BOX' , 'CTN-BOX Transaction' ,  'CTN Transfer' , 'CTN Transfer Item' ,  'Stock Transfer CTN' , "Customer Company" , "Buy The Need" , "Buy The Need Item"]]]
     },
     {
         'dt': 'Custom Field',
-        'filters': [['dt', 'in', ['POS Invoice', 'Customer' , 'POS Closing Entry' ,'Sales Invoice','Purchase Order','Item' , 'Stock Entry' , 'Company']]]
+        'filters': [['dt', 'in', ['POS Invoice', 'Customer' , 'POS Closing Entry' ,'Sales Invoice','Purchase Order','Item' , 'Stock Entry' , 'Company' , 'Buy The Need']]]
     },
     {
         'dt': 'Client Script',
-        'filters': [['dt', 'in', ['POS Closing Entry','CTN-BOX','Sales Invoice','Purchase Order','CTN Transfer' , 'Stock Entry' , 'Company']]]
+        'filters': [['dt', 'in', ['POS Closing Entry','CTN-BOX','Sales Invoice','Purchase Order','CTN Transfer' , 'Stock Entry' , 'Company' , 'Buy The Need']]]
     },
     {
         'dt': 'Server Script',
