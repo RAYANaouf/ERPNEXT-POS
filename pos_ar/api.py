@@ -746,16 +746,40 @@ def remove_ctn(doc, method):
 
 
 
-
+#Customer filtring.
 
 def sync_customer_permissions_from_user_permission(doc, method=None):
-    if doc.allow != "Company":
+    if doc.allow != "Company" or doc.applicable_for  :
         return
+    print("doc.allow : ", doc.allow)
+    company = doc.for_value
+    user = doc.user
+    
+    #Fetch all Customer linked to this Company
+    customers = frappe.db.sql("""
+        SELECT DISTINCT parent
+        FROM `tabCustomer Company` 
+        WHERE company = %s
+    """, (company,), as_list=True)
+    
+    # Flatten the result into a simple list of names
+    customer_names = [row[0] for row in customers]
+    
+    for customer_name in customer_names:
+        # check if permission already exists
+        exist = frappe.db.exists("User Permission",{
+            "user":user,
+            "allow":"Customer",
+            "for_value":customer_name,
+            "applicable_for": None
+        })
+        if not exist:
+            print("user permission not exist")
+            add_user_permission(user,"Customer",customer_name)
+    
+    
 
-    # Get all customers and update their permissions
-    customers = frappe.get_all("Customer", fields=["name"])
-    for customer in customers:
-        update_customer_user_permissions(frappe.get_doc("Customer", customer.name))
+    
 
 
 @frappe.whitelist()
