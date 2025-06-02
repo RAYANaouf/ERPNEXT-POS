@@ -190,7 +190,7 @@
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2025-05-28 18:09:58.126703",
+ "modified": "2025-06-02 10:22:49.598767",
  "modified_by": "Administrator",
  "module": "POS AR",
  "name": "Buy The Need",
@@ -202,7 +202,7 @@
    "email": 1,
    "print": 1,
    "read": 1,
-   "role": "System Manager",
+   "role": "Purchase Manager",
    "share": 1,
    "write": 1
   }
