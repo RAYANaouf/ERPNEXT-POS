@@ -768,8 +768,13 @@ def update_customer_user_permissions(doc, method=None):
         "allow": "Customer",
         "for_value": customer_name
     })
-
-
+    
+    # Step 2: Delete all 'Company' permissions scoped to this customer
+    frappe.db.delete("User Permission", {
+        "allow": "Company",
+        "applicable_for": "Customer",
+        "applicable_for_value": customer_name
+    })
 
 
     users = frappe.get_all("User", filters={"enabled": 1}, pluck="name")
