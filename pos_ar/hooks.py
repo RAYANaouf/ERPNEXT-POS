@@ -263,7 +263,7 @@ fixtures = [
     },
     {
         'dt': 'Custom Field',
-        'filters': [['dt', 'in', ['POS Invoice', 'Customer' , 'POS Closing Entry' ,'Sales Invoice','Purchase Order','Item' , 'Stock Entry' , 'Company' , 'Buy The Need']]]
+        'filters': [['dt', 'in', ['POS Invoice', 'Customer' , 'POS Closing Entry' ,'Sales Invoice','Purchase Order','Item' , 'Stock Entry' , 'Company' , 'Supplier' ]]]
     },
     {
         'dt': 'Client Script',
