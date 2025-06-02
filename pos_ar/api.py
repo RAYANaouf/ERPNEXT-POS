@@ -531,8 +531,24 @@ def get_all_item_qty(warehouse=None, since=None):
 
 
 
+@frappe.whitelist()
+def get_company_default_warehouse(company=None, ignorePermission=False):
+    if not company:
+        return {"default_warehouse": None}
 
+    # Convert string to boolean (as it comes from JS as string)
+    if isinstance(ignorePermission, str):
+        ignorePermission = ignorePermission.lower() == "true"
 
+    try:
+        if ignorePermission:
+            doc = frappe.get_doc("Company", company).as_dict()
+        else:
+            doc = frappe.get_doc("Company", company)
+    except frappe.DoesNotExistError:
+        return {"default_warehouse": None}
+
+    return {"default_warehouse": doc.get("custom_default_warehouse")}
 
 
 
