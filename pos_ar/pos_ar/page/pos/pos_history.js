@@ -452,13 +452,49 @@ pos_ar.PointOfSale.pos_history = class {
 
 
 	
-	async print_receipt(pos) {
+	async print_receipt(pos , status) {
 		try {
 			if (!pos) {
 				console.error("No POS data provided");
 				frappe.throw(__("Error: No POS data available for printing"));
 				return;
 			}
+
+
+			let paymentStatus = "";
+			let statusStyle = "";
+			const isPaid = pos.outstanding_amount == 0;
+
+			if(status == "" || !status){
+				if(pos.outstanding_amount == 0){
+					paymentStatus = "Payé";
+					statusStyle = `color: green; font-weight: bold; font-size: 12px;`;
+				}else if(pos.outstanding_amount > 0 && pos.paid_amount > 0){
+					paymentStatus = "Partially";
+					statusStyle = `color: orange; font-weight: bold; font-size: 12px;`;
+				}else{
+					paymentStatus = "Non payé";
+					statusStyle = `color: red; font-weight: bold; font-size: 12px;`;
+				}
+			}
+			else if(status == "Paid"){
+				paymentStatus = "Payé";
+				statusStyle = `color: green; font-weight: bold; font-size: 12px;`;
+			}
+			else if(status == "Unpaid"){
+				paymentStatus = "Non payé";
+				statusStyle = `color: red; font-weight: bold; font-size: 12px;`;
+			}else if(status == "Partially"){
+				paymentStatus = "Partially";
+				statusStyle = `color: orange; font-weight: bold; font-size: 12px;`;
+			}else if(status == "Avoid"){
+				statusStyle = `display: none;`;
+			}else{
+				statusStyle = `display: none;`;
+			}
+			
+
+			console.log("paymentStatus : ", paymentStatus, "  pos : " , pos)
 	
 			// Initialize totals
 			const totals = {
@@ -614,18 +650,19 @@ pos_ar.PointOfSale.pos_history = class {
 			}
 
 			receiptHTML +=	
-					`
-					<div class="receipt-header">
-						<div class="customer-info">
-							<div class="bold">Client: ${pos.customer}</div>
-							<div style="font-size:10px;">Commande: ${pos.refNum}</div>
-							<div style="font-size:10px;">Date: ${date}</div>
-							<div style="font-size:10px;">Heure: ${time}</div>
-							${this.company.name == "OPTILENS TIZIOUZOU" ? `<div style="font-size:10px;" >Numéro: 026124922</div>` : ''}
-						</div>
-					</div>
-	
-					<table class="receipt-table">
+			`
+			<div class="receipt-header">
+				<div class="customer-info">
+					<div class="bold">Client: ${pos.customer}</div>
+					<div style="font-size:10px;">Commande: ${pos.refNum}</div>
+					<div style="font-size:10px;">Date: ${date}</div>
+					<div style="font-size:10px;">Heure: ${time}</div>
+					${this.company.name == "OPTILENS TIZIOUZOU" ? `<div style="font-size:10px;" >Numéro: 026124922</div>` : ''}
+					<div style="${statusStyle}">Statut: ${paymentStatus}</div>
+				</div>
+			</div>
+			<table class="receipt-table">
+
 						<div class="table-header">
 							<tr>
 								<th>Article</th>

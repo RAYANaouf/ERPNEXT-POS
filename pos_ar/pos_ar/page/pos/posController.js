@@ -7,23 +7,23 @@ pos_ar.PointOfSale.Controller = class {
 
 		this.selectedItemMaps = new Map()
 
-		this.selectedItem      = { "name": "" }
-		this.selectedField     = { "field_name": "" }
-		this.selectedTab       = { "tabName": "" }
+		this.selectedItem               = { "name": "" }
+		this.selectedField              = { "field_name": "" }
+		this.selectedTab                = { "tabName": "" }
 		this.selectedPaymentMethod      = { "methodName": "" }
-		this.defaultCustomer   = { "name": "", "customer_name": "" }
-		this.defaultPriceList  = { "name": "" }
+		this.defaultCustomer            = { "name": "", "customer_name": "" }
+		this.defaultPriceList           = { "name": "" }
 		this.taxes_and_charges_template = null;
-		this.taxes_and_charges = [];
-		this.payment_methods   = []
+		this.taxes_and_charges          = [];
+		this.payment_methods            = []
 
 		//sell invoice
 		this.POSOpeningEntry   = {}
 
 		this.invoiceData = { netTotal: 0, grandTotal: 0, paidAmount: 0, toChange: 0, discount: 0 }
-		this.db = null;
+		this.db          = null;
 
-		this.syncInput = false
+		this.syncInput   = false
 
 
 
@@ -1046,7 +1046,7 @@ pos_ar.PointOfSale.Controller = class {
 			this.editPosItemQty(this.selectedItem.name, this.selectedItem.qty);
 			}
 		else if (action == "print") {
-			this.history_cart.print_receipt(structuredClone(this.selectedItemMaps.get(this.selectedTab.tabName)))
+			this.history_cart.print_receipt(structuredClone(this.selectedItemMaps.get(this.selectedTab.tabName)) , "Avoid")
 			return
 			//this.item_details.requestFocus("discount_percentage")
 		}
