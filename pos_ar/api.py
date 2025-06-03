@@ -751,11 +751,10 @@ def remove_ctn(doc, method):
 def sync_customer_permissions_from_user_permission(doc, method=None):
     if doc.allow != "Company" or doc.applicable_for  :
         return
-    print("doc.allow : ", doc.allow)
     company = doc.for_value
     user = doc.user
     
-    #Fetch all Customer linked to this Company
+    # Step 1: Get all Customers linked to the granted Company
     customers = frappe.db.sql("""
         SELECT DISTINCT parent
         FROM `tabCustomer Company` 
@@ -766,6 +765,7 @@ def sync_customer_permissions_from_user_permission(doc, method=None):
     customer_names = [row[0] for row in customers]
     
     for customer_name in customer_names:
+        # Step 2: Add Customer permission (if not already there biensur)
         # check if permission already exists
         exist = frappe.db.exists("User Permission",{
             "user":user,
@@ -774,8 +774,30 @@ def sync_customer_permissions_from_user_permission(doc, method=None):
             "applicable_for": None
         })
         if not exist:
-            print("user permission not exist")
             add_user_permission(user,"Customer",customer_name)
+            
+         # Step 3: Use get_doc to fetch companies from custom_companies child table
+        customer_doc = frappe.get_doc("Customer", customer_name)
+        
+        for row in customer_doc.custom_companies:
+            print("row.company : ", row.company)
+            print("customer_name : ", customer_name)
+            linked_company = row.company
+
+            scoped_perm_exists = frappe.db.exists("User Permission", {
+                "user": user,
+                "allow": "Company",
+                "for_value": linked_company,
+                "applicable_for": "Customer"
+            })
+
+            if not scoped_perm_exists:
+                add_company_permission_for_customer(user, linked_company)
+                
+            print("--------scoped_perm_exists : ", scoped_perm_exists)
+
+        
+            
     
     
 
@@ -797,7 +819,7 @@ def update_customer_user_permissions(doc, method=None):
     frappe.db.delete("User Permission", {
         "allow": "Company",
         "applicable_for": "Customer",
-        "applicable_for_value": customer_name
+        "for_value": customer_name
     })
 
 
@@ -823,7 +845,7 @@ def update_customer_user_permissions(doc, method=None):
             for company in companies:
                 # If user doesn’t already have access to this company
                 if company not in allowed_companies:
-                    add_company_permission_for_customer(user_name, company, customer_name)
+                    add_company_permission_for_customer(user_name, company)
 
 
 def add_user_permission(user, doctype, for_value):
@@ -837,7 +859,7 @@ def add_user_permission(user, doctype, for_value):
 
 
 
-def add_company_permission_for_customer(user_name, company, customer_name):
+def add_company_permission_for_customer(user_name, company):
     frappe.get_doc({
         "doctype": "User Permission",
         "user": user_name,
@@ -846,4 +868,37 @@ def add_company_permission_for_customer(user_name, company, customer_name):
         "apply_to_all_doctypes": 0,
         "applicable_for": "Customer"
     }).insert(ignore_permissions=True)
+    
+    
+    
+def remove_user_company_permission(doc , method=None):
+    print("doc.allow : ", doc.allow)
+    print("doc.user : ", doc.user)
+    print("doc.for_value : ", doc.for_value)
+    print("doc.applicable_for : ", doc.applicable_for)
+    if doc.allow != "Company" or doc.applicable_for  :
+        return
+    
+        
+    #Fetch all Customer linked to this Company
+    customers = frappe.db.sql("""
+        SELECT DISTINCT parent
+        FROM `tabCustomer Company` 
+        WHERE company = %s
+    """, (doc.for_value,), as_list=True)
+    
+    # Flatten the result into a simple list of names
+    customer_names = [row[0] for row in customers]
+    
+    #delete all customer access to this company
+    for customer_name in customer_names:
+        # Delete all user permissions for this customer
+        frappe.db.delete("User Permission", {
+            "user": doc.user,
+            "allow": "Customer",
+            "for_value": customer_name
+        })
+        print(f"deleted customer access to this company {customer_name}")
+        
+    
 

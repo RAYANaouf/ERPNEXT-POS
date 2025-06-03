@@ -153,7 +153,7 @@ doc_events = {
     },
     "User Permission": {
        "on_update": ["pos_ar.api.sync_customer_permissions_from_user_permission"],
-#       "on_trash": ["pos_ar.api.sync_customer_permissions_from_user_permission"]
+       "on_trash": ["pos_ar.api.remove_user_company_permission"]
    }
 }
 
