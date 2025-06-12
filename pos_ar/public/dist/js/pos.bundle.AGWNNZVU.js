@@ -2658,8 +2658,6 @@
         this.item_selector.clearSearchField();
         const tab = this.selected_item_cart.createNewTab();
         this.selectedItemMaps.get(this.selectedTab.tabName).items = message.items;
-        console.log("message :: ", message);
-        console.log("see here ", this.selectedItemMaps.get(this.selectedTab.tabName), "selected tab ", this.selectedTab.tabName);
         this.screenManager.navigate("home");
       } else if (event2 == "return") {
         const tab = this.selected_item_cart.createTabForEditPOS();
@@ -3055,6 +3053,7 @@
         child.check_type = check.check_type;
         child.creation_time = check.creation_time;
         child.amount = check.amount;
+        child.is_debt_payment = check.is_debt_payment;
         child.reason_note = check.reason_note;
         child.user = check.owner;
       });
@@ -3691,7 +3690,7 @@
       this.wrapper.append(`
 			<div id="checkInOutDialog">
 				<div class="dialog-header">
-					<h2>Add Transaction</h2>
+					<h2>Add Transaction</h2>F
 				</div>
 				<div id="checkTypeContainer">
 					<div id="checkInType" class="rowBox centerItem checkType selected">
@@ -3715,6 +3714,12 @@
 					<label for="check_in_out_note_textarea">Reason</label>
 					<textarea id="check_in_out_note_textarea" placeholder="Enter reason for transaction"></textarea>
 				</div>
+				<div class="inputGroup">
+					<label>
+						<input type="checkbox" id="is_debt_payment_checkbox">
+						Is Debt Payment
+					</label>
+				</div>
 				<div id="btnsContainers" class="rowBox">
 					<button id="cancelBtn" class="dialogBtn rowBox centerItem">Cancel</button>
 					<button id="confirmBtn" class="dialogBtn rowBox centerItem">Confirm</button>
@@ -3727,6 +3732,7 @@
       this.check_in_box = this.check_type_container.find("#checkInType");
       this.check_out_box = this.check_type_container.find("#checkOutType");
       this.check_in_out_type = "In";
+      this.is_debt_payment_checkbox = this.check_in_out_dialog.find("#is_debt_payment_checkbox");
       this.check_in_out_input = this.check_in_out_dialog.find("#check_in_out_input");
       this.check_in_out_note = this.check_in_out_dialog.find("#check_in_out_note_textarea");
       this.cancel_dialog_btn = this.check_in_out_dialog.find("#cancelBtn");
@@ -3882,6 +3888,15 @@
         this.check_out_box.addClass("selected");
         this.check_in_box.removeClass("selected");
       });
+      this.is_debt_payment_checkbox.on("click", (event2) => {
+        if (this.is_debt_payment_checkbox.is(":checked")) {
+          this.is_debt_payment = 1;
+          console.log("debt  : ", this.is_debt_payment);
+        } else {
+          this.is_debt_payment = 0;
+          console.log("debt  : ", this.is_debt_payment);
+        }
+      });
       this.check_in_out_input.on("input", (event2) => {
       });
       this.cancel_dialog_btn.on("click", (event2) => {
@@ -3892,6 +3907,7 @@
         const checkInOut = frappe.model.get_new_doc("check_in_out");
         checkInOut.creation_time = frappe.datetime.now_datetime();
         checkInOut.user = frappe.session.user;
+        checkInOut.is_debt_payment = this.is_debt_payment;
         checkInOut.check_type = this.check_in_out_type;
         checkInOut.amount = parseFloat(this.check_in_out_input.val());
         checkInOut.reason_note = this.check_in_out_note.val();
@@ -3899,6 +3915,7 @@
           frappe.msgprint("you should fulfilled fileds.");
           return;
         }
+        console.log("the result ::: ", checkInOut);
         this.save_check_in_out(checkInOut);
         this.hideCheckInOutDialog();
         console.log("checkInOut : ", checkInOut);
@@ -8154,4 +8171,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.UDEPINCZ.js.map
+//# sourceMappingURL=pos.bundle.AGWNNZVU.js.map

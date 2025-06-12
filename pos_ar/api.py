@@ -58,25 +58,6 @@ def update_all_customers_debt(doc, method):
 
 
 
-def manage_related_ctn_transactions(doc, method):
-    """
-    Create related CTN Transactions whenever a Sales Invoice is submitted.
-    """
-    # Only run for 'on_submit' if you also hooked it into other events.
-    if method == "on_submit":
-        
-        
-        for item in doc.custom_ctn_transaction:
-            # create a new "CTN Transaction" doc
-            ctn_trn = frappe.new_doc("CTN-BOX Transaction")
-            ctn_trn.name = doc.name + "-" + item.ctn + "-" + item.item
-            ctn_trn.item = item.item
-            ctn_trn.qty  = item.qty
-            ctn_trn.ctn  = item.ctn
-            ctn_trn.sales_invoice = doc.name
-            ctn_trn.insert()
-            ctn_trn.submit()
-
 
 
 
@@ -640,18 +621,23 @@ def manage_related_ctn_transactions(doc, method):
     """
     # Only run for 'on_submit' if you also hooked it into other events.
     if method == "on_submit":
+        type = doc.doctype
+        if type == "Sales Invoice" : 
+            for item in doc.custom_ctn_transaction:
+                # create a new "CTN Transaction" doc
+                ctn_trn          = frappe.new_doc("CTN-BOX Transaction")
+                ctn_trn.name     = doc.name + "-" + item.ctn + "-" + item.item
+                ctn_trn.ref_type = type
+                ctn_trn.item     = item.item
+                ctn_trn.qty      = item.qty
+                ctn_trn.ctn      = item.ctn
+                ctn_trn.ref      = doc.name
+                ctn_trn.insert()
+                ctn_trn.submit()
+        elif type == "Stock Entry" :
+            print("Stock Entry")  
         
         
-        for item in doc.custom_ctn_transaction:
-            # create a new "CTN Transaction" doc
-            ctn_trn = frappe.new_doc("CTN-BOX Transaction")
-            ctn_trn.name = doc.name + "-" + item.ctn + "-" + item.item
-            ctn_trn.item = item.item
-            ctn_trn.qty  = item.qty
-            ctn_trn.ctn  = item.ctn
-            ctn_trn.sales_invoice = doc.name
-            ctn_trn.insert()
-            ctn_trn.submit()
 
 
 
@@ -900,5 +886,23 @@ def remove_user_company_permission(doc , method=None):
         })
         print(f"deleted customer access to this company {customer_name}")
         
+    
+    
+@frappe.whitelist()
+def create_customer(name, type , price_list=None, company=None, companies=None, is_internal=False, represent_company=None, allowed_companies=None):
+    # Bypass permission checks
+    frappe.flags.ignore_permissions = True
+
+    # Create the Customer
+    customer = frappe.get_doc({
+        "doctype": "Customer",
+        "customer_name": name,
+        "customer_type": type,
+        "custom_company": company,
+    })
+
+    customer.insert()
+    frappe.db.commit()
+    return customer.name
     
 

@@ -233,7 +233,7 @@ pos_ar.PointOfSale.pos_customer_box = class{
 		this.wrapper.append(`
 			<div id="checkInOutDialog">
 				<div class="dialog-header">
-					<h2>Add Transaction</h2>
+					<h2>Add Transaction</h2>F
 				</div>
 				<div id="checkTypeContainer">
 					<div id="checkInType" class="rowBox centerItem checkType selected">
@@ -257,6 +257,12 @@ pos_ar.PointOfSale.pos_customer_box = class{
 					<label for="check_in_out_note_textarea">Reason</label>
 					<textarea id="check_in_out_note_textarea" placeholder="Enter reason for transaction"></textarea>
 				</div>
+				<div class="inputGroup">
+					<label>
+						<input type="checkbox" id="is_debt_payment_checkbox">
+						Is Debt Payment
+					</label>
+				</div>
 				<div id="btnsContainers" class="rowBox">
 					<button id="cancelBtn" class="dialogBtn rowBox centerItem">Cancel</button>
 					<button id="confirmBtn" class="dialogBtn rowBox centerItem">Confirm</button>
@@ -270,6 +276,7 @@ pos_ar.PointOfSale.pos_customer_box = class{
 		this.check_in_box  = this.check_type_container.find('#checkInType')
 		this.check_out_box = this.check_type_container.find('#checkOutType')
 		this.check_in_out_type = 'In'
+		this.is_debt_payment_checkbox = this.check_in_out_dialog.find('#is_debt_payment_checkbox')
 		this.check_in_out_input = this.check_in_out_dialog.find('#check_in_out_input');
 		this.check_in_out_note  = this.check_in_out_dialog.find('#check_in_out_note_textarea');
 		this.cancel_dialog_btn = this.check_in_out_dialog.find('#cancelBtn')
@@ -464,6 +471,17 @@ pos_ar.PointOfSale.pos_customer_box = class{
 			this.check_in_box.removeClass('selected');
 		})
 
+		this.is_debt_payment_checkbox.on('click', (event) => {
+			if(this.is_debt_payment_checkbox.is(':checked')){
+				this.is_debt_payment = 1;
+				console.log("debt  : " , this.is_debt_payment)
+			}
+			else{
+				this.is_debt_payment = 0;
+				console.log("debt  : " , this.is_debt_payment)
+			}
+		})
+
 		this.check_in_out_input.on('input' , (event)=>{
 		})
 
@@ -472,17 +490,19 @@ pos_ar.PointOfSale.pos_customer_box = class{
 			this.hideCheckInOutDialog();
 		})
 		this.confirm_dialog_btn.on('click' , (event)=>{
-			const checkInOut         = frappe.model.get_new_doc('check_in_out')
-			checkInOut.creation_time = frappe.datetime.now_datetime();
-			checkInOut.user          = frappe.session.user;
-			checkInOut.check_type    = this.check_in_out_type;
-			checkInOut.amount        = parseFloat(this.check_in_out_input.val());
-			checkInOut.reason_note   = this.check_in_out_note.val()
+			const checkInOut            = frappe.model.get_new_doc('check_in_out')
+			checkInOut.creation_time    = frappe.datetime.now_datetime();
+			checkInOut.user             = frappe.session.user;
+			checkInOut.is_debt_payment  = this.is_debt_payment;
+			checkInOut.check_type       = this.check_in_out_type;
+			checkInOut.amount           = parseFloat(this.check_in_out_input.val());
+			checkInOut.reason_note      = this.check_in_out_note.val()
 			//valid inputs
 			if(parseFloat(this.check_in_out_input.val()) <= 0 || this.check_in_out_note.val() == ''){
 				frappe.msgprint('you should fulfilled fileds.')
 				return;
 			}
+			console.log("the result ::: " , checkInOut)
 			this.save_check_in_out(checkInOut);
 			this.hideCheckInOutDialog();
 			console.log('checkInOut : ' , checkInOut);

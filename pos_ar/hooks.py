@@ -105,9 +105,14 @@ app_include_js = ["/assets/pos_ar/js/pos.bundle.js","https://cdnjs.cloudflare.co
 # 	"Event": "frappe.desk.doctype.event.event.get_permission_query_conditions",
 # }
 #
+
+
 # has_permission = {
 # 	"Event": "frappe.desk.doctype.event.event.has_permission",
 # }
+
+
+
 
 # DocType Class
 # ---------------
@@ -145,8 +150,8 @@ doc_events = {
         "on_cancel": "pos_ar.api.update_customer_debt_on_invoice",
     },
     "Stock Entry": {
-        "on_submit": ["pos_ar.api.update_ctn_box_warehouse" ],
-        "on_cancel": ["pos_ar.api.update_ctn_box_warehouse" ]
+        "on_submit": ["pos_ar.api.update_ctn_box_warehouse"  , "pos_ar.api.manage_related_ctn_transactions"],
+        "on_cancel": ["pos_ar.api.update_ctn_box_warehouse"  , "pos_ar.api.manage_related_ctn_transactions"]
     },
     "Customer" : {
         "on_update" : ["pos_ar.api.update_customer_user_permissions"]

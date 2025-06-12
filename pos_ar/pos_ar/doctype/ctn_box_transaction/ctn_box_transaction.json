@@ -6,7 +6,9 @@
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
-  "sales_invoice",
+  "ref_type",
+  "column_break_wn0w",
+  "ref",
   "column_break_xzc9",
   "ctn",
   "section_break_ofbf",
@@ -19,7 +21,7 @@
   {
    "fieldname": "item",
    "fieldtype": "Link",
-   "label": "item",
+   "label": "Item",
    "options": "Item"
   },
   {
@@ -38,12 +40,6 @@
    "fieldtype": "Column Break"
   },
   {
-   "fieldname": "sales_invoice",
-   "fieldtype": "Link",
-   "label": "Sales Invoice",
-   "options": "Sales Invoice"
-  },
-  {
    "fieldname": "section_break_ofbf",
    "fieldtype": "Section Break"
   },
@@ -60,12 +56,28 @@
    "print_hide": 1,
    "read_only": 1,
    "search_index": 1
+  },
+  {
+   "fieldname": "ref_type",
+   "fieldtype": "Select",
+   "label": "Type",
+   "options": "Sales Invoice\nStock Entry"
+  },
+  {
+   "fieldname": "column_break_wn0w",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "ref",
+   "fieldtype": "Dynamic Link",
+   "label": "Ref",
+   "options": "ref_type"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-03-23 14:39:21.236359",
+ "modified": "2025-06-08 23:46:53.962013",
  "modified_by": "Administrator",
  "module": "POS AR",
  "name": "CTN-BOX Transaction",

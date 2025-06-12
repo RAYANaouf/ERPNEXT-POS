@@ -276,7 +276,7 @@
     font-weight: 500;
 }
 
-.inputGroup input,
+.inputGroup input:not([type="checkbox"]),
 .inputGroup textarea {
     width: 100%;
     padding: 12px;
@@ -293,7 +293,8 @@
     resize: vertical;
 }
 
-.inputGroup input:focus,
+
+.inputGroup input:not([type="checkbox"]):focus,
 .inputGroup textarea:focus {
     outline: none;
     border-color: #3b82f6;

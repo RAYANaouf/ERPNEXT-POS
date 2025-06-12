@@ -895,12 +895,6 @@ pos_ar.PointOfSale.Controller = class {
 			const tab = this.selected_item_cart.createNewTab()
 
 			this.selectedItemMaps.get(this.selectedTab.tabName).items = message.items;
-
-			console.log("message :: " , message)
-
-			console.log( "see here ",this.selectedItemMaps.get(this.selectedTab.tabName) , "selected tab ",this.selectedTab.tabName )
-
-
 			this.screenManager.navigate('home')
 
 
@@ -1529,6 +1523,7 @@ pos_ar.PointOfSale.Controller = class {
 			child.check_type = check.check_type
 			child.creation_time = check.creation_time
 			child.amount = check.amount
+			child.is_debt_payment = check.is_debt_payment
 			child.reason_note = check.reason_note
 			child.user = check.owner
 		})
