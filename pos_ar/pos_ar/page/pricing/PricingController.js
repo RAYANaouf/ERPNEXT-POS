@@ -52,11 +52,11 @@ pos_ar.Pricing.PricingController = class {
                     <!-- Sidebar Navigation -->
                     <div class="pricing-sidebar">
                         <div class="sidebar-nav">
-                            <div class="nav-item active" data-screen="pricing">
+                            <div class="nav-item active"  data-screen="pricing">
                                 <i class="fa fa-tag"></i>
                                 <span>Pricing</span>
                             </div>
-                            <div class="nav-item" data-screen="fixing">
+                            <div class="nav-item" style="display:none;" data-screen="fixing">
                                 <i class="fa fa-wrench"></i>
                                 <span>Fixing</span>
                             </div>
