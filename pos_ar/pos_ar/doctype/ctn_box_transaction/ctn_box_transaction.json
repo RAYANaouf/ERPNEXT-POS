@@ -14,26 +14,30 @@
   "section_break_ofbf",
   "item",
   "column_break_yfkz",
-  "qty",
-  "amended_from"
+  "qty"
  ],
  "fields": [
   {
    "fieldname": "item",
    "fieldtype": "Link",
+   "in_list_view": 1,
    "label": "Item",
-   "options": "Item"
+   "options": "Item",
+   "reqd": 1
   },
   {
    "fieldname": "ctn",
    "fieldtype": "Link",
+   "in_list_view": 1,
    "label": "CTN",
-   "options": "CTN-BOX"
+   "options": "CTN-BOX",
+   "reqd": 1
   },
   {
    "fieldname": "qty",
    "fieldtype": "Int",
-   "label": "Qty"
+   "label": "Qty",
+   "reqd": 1
   },
   {
    "fieldname": "column_break_yfkz",
@@ -48,20 +52,12 @@
    "fieldtype": "Column Break"
   },
   {
-   "fieldname": "amended_from",
-   "fieldtype": "Link",
-   "label": "Amended From",
-   "no_copy": 1,
-   "options": "CTN-BOX Transaction",
-   "print_hide": 1,
-   "read_only": 1,
-   "search_index": 1
-  },
-  {
    "fieldname": "ref_type",
    "fieldtype": "Select",
+   "in_list_view": 1,
    "label": "Type",
-   "options": "Sales Invoice\nStock Entry"
+   "options": "Sales Invoice\nStock Entry",
+   "reqd": 1
   },
   {
    "fieldname": "column_break_wn0w",
@@ -70,14 +66,16 @@
   {
    "fieldname": "ref",
    "fieldtype": "Dynamic Link",
+   "in_list_view": 1,
    "label": "Ref",
-   "options": "ref_type"
+   "options": "ref_type",
+   "reqd": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-06-08 23:46:53.962013",
+ "modified": "2025-06-12 13:53:07.894807",
  "modified_by": "Administrator",
  "module": "POS AR",
  "name": "CTN-BOX Transaction",

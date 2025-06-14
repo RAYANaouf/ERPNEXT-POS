@@ -136,7 +136,8 @@
             docstatus: 1
           },
           fields: ["name", "pos_profile"],
-          limit: 0
+          limit: 0,
+          order_by: "creation desc"
         },
         callback: (response) => {
           if (response.message) {
@@ -8171,4 +8172,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.AGWNNZVU.js.map
+//# sourceMappingURL=pos.bundle.763R6EMA.js.map

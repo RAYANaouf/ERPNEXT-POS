@@ -176,7 +176,8 @@ pos_ar.myaccessories.AccessoriesController = class {
                     docstatus : 1
                 },
                 fields: ['name', 'pos_profile'],
-                limit: 0
+                limit: 0,
+                order_by: 'creation desc'
             },
             callback: (response) => {
                 if (response.message) {
