@@ -1300,115 +1300,104 @@ pos_ar.PointOfSale.Controller = class {
 		// Set custom_is_shared based on sendInvoiceToOtherPos setting
 		pos.custom_is_shared = this.settings_data.settings.sendInvoiceToOtherPos ? 1 : 0;
 
-		if (status == 'Unpaid') {
-			pos.synced = true
-
-			frappe.db.insert(
-				pos
-			).then(r => {
-
-				this.payment_cart.hide_waiting()
-
-				pos.opened = 0;
-				pos.real_name = r.name
-
-				this.history_cart.print_receipt(pos)
-				this.appData.updatePosInvoice(pos)
-
-				/*** START : deleting pos when finishing **/
-				//print the pos
-
-				this.selectedItemMaps.delete(this.selectedTab.tabName)
-
-				//tabs
-				let tabs = Array.from(this.selectedItemMaps.keys())
-				//if there are still tabs it will just set the first as selected
-				//otherwise it will create one using the selected_item_cart class and set it as selected
-				if (tabs.length > 0) {
-					this.selected_item_cart.createNewTab();
-				}
-				else {
-					this.selected_item_cart.createNewTab();
-				}
-				this.screenManager.navigate('home')
-				/*** END   : deleting pos when finishing **/
-
-
-			}).catch(err => {
-				this.payment_cart.hide_waiting()
-				console.log("cant push pos invoice : ", err);
-			})
-		}else{
-			pos.synced = true
-
-			frappe.db.insert(
-				pos
-			).then(r => {
-
-				this.payment_cart.hide_waiting()
-
-				pos.opened = 0;
-				pos.real_name = r.name
-
-				this.history_cart.print_receipt(pos)
-				this.appData.updatePosInvoice(pos)
-
-				/*** START : deleting pos when finishing **/
-				//print the pos
-
-				this.selectedItemMaps.delete(this.selectedTab.tabName)
-
-				//tabs
-				let tabs = Array.from(this.selectedItemMaps.keys())
-				//if there are still tabs it will just set the first as selected
-				//otherwise it will create one using the selected_item_cart class and set it as selected
-				if (tabs.length > 0) {
-					this.selected_item_cart.createNewTab();
-				}
-				else {
-					this.selected_item_cart.createNewTab();
-				}
-				this.screenManager.navigate('home')
-				/*** END   : deleting pos when finishing **/
-
-
-			}).catch(err => {
-				this.payment_cart.hide_waiting()
-				console.log("cant push pos invoice : ", err);
-			})
-		}
-
-
 		//we just freez that logic for the bac exam to make all invoice saved on the cache
-		//else {
+		
+		//if (status == 'Unpaid') {
+		//	pos.synced = true
 
-		//	this.payment_cart.hide_waiting()
+		//	frappe.db.insert(
+		//		pos
+		//	).then(r => {
+
+		//		this.payment_cart.hide_waiting()
+
+		//		pos.opened = 0;
+		//		pos.real_name = r.name
+
+		//		this.history_cart.print_receipt(pos)
+		//		this.appData.updatePosInvoice(pos)
+
+				/*** START : deleting pos when finishing **/
+				//print the pos
+
+		//		this.selectedItemMaps.delete(this.selectedTab.tabName)
+
+				//tabs
+		//		let tabs = Array.from(this.selectedItemMaps.keys())
+				//if there are still tabs it will just set the first as selected
+				//otherwise it will create one using the selected_item_cart class and set it as selected
+		//		if (tabs.length > 0) {
+		//			this.selected_item_cart.createNewTab();
+		//		}
+		//		else {
+		//			this.selected_item_cart.createNewTab();
+		//		}
+		//		this.screenManager.navigate('home')
+				/*** END   : deleting pos when finishing **/
+
+
+		//	}).catch(err => {
+		//		this.payment_cart.hide_waiting()
+		//		console.log("cant push pos invoice : ", err);
+		//	})
+		//}
+		if( status == 'Unpaid'){
+			this.payment_cart.hide_waiting()
 			/*** START  **/
 			//print the pos
-		//	this.history_cart.print_receipt(pos)
+			this.history_cart.print_receipt(pos)
 
-		//	this.selectedItemMaps.delete(this.selectedTab.tabName)
+			this.selectedItemMaps.delete(this.selectedTab.tabName)
 
 			//tabs
-		//	let tabs = Array.from(this.selectedItemMaps.keys())
+			let tabs = Array.from(this.selectedItemMaps.keys())
 			//if there are still tabs it will just set the first as selected
 			//otherwise it will create one using the selected_item_cart class and set it as selected
-		//	if (tabs.length > 0) {
-		//		this.selected_item_cart.createNewTab();
-		//	}
-		//	else {
-		//		this.selected_item_cart.createNewTab();
-		//	}
-		//	this.screenManager.navigate('home')
+			if (tabs.length > 0) {
+				this.selected_item_cart.createNewTab();
+			}
+			else {
+				this.selected_item_cart.createNewTab();
+			}
+			this.screenManager.navigate('home')
 
 			/*** END : close pos invoice when finishing  (opened == 0) **/
-		//	pos.synced = false;
-		//	pos.opened = 0;
-		//	this.appData.updatePosInvoice(pos)
+			pos.synced = false;
+			pos.opened = 0;
+			this.appData.updatePosInvoice(pos)
 
-		//	this.unsyncedPos += 1;
-		//	this.customer_box.setNotSynced(this.unsyncedPos);
-		//}
+			this.unsyncedPos += 1;
+			this.customer_box.setNotSynced(this.unsyncedPos);
+		}
+		else {
+
+			this.payment_cart.hide_waiting()
+			/*** START  **/
+			//print the pos
+			this.history_cart.print_receipt(pos)
+
+			this.selectedItemMaps.delete(this.selectedTab.tabName)
+
+			//tabs
+			let tabs = Array.from(this.selectedItemMaps.keys())
+			//if there are still tabs it will just set the first as selected
+			//otherwise it will create one using the selected_item_cart class and set it as selected
+			if (tabs.length > 0) {
+				this.selected_item_cart.createNewTab();
+			}
+			else {
+				this.selected_item_cart.createNewTab();
+			}
+			this.screenManager.navigate('home')
+
+			/*** END : close pos invoice when finishing  (opened == 0) **/
+			pos.synced = false;
+			pos.opened = 0;
+			this.appData.updatePosInvoice(pos)
+
+			this.unsyncedPos += 1;
+			this.customer_box.setNotSynced(this.unsyncedPos);
+		}
 	}
 
 

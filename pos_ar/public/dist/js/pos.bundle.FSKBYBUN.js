@@ -2908,49 +2908,37 @@
       const pos = structuredClone(this.selectedItemMaps.get(this.selectedTab.tabName));
       pos.custom_is_shared = this.settings_data.settings.sendInvoiceToOtherPos ? 1 : 0;
       if (status == "Unpaid") {
-        pos.synced = true;
-        frappe.db.insert(
-          pos
-        ).then((r) => {
-          this.payment_cart.hide_waiting();
-          pos.opened = 0;
-          pos.real_name = r.name;
-          this.history_cart.print_receipt(pos);
-          this.appData.updatePosInvoice(pos);
-          this.selectedItemMaps.delete(this.selectedTab.tabName);
-          let tabs = Array.from(this.selectedItemMaps.keys());
-          if (tabs.length > 0) {
-            this.selected_item_cart.createNewTab();
-          } else {
-            this.selected_item_cart.createNewTab();
-          }
-          this.screenManager.navigate("home");
-        }).catch((err) => {
-          this.payment_cart.hide_waiting();
-          console.log("cant push pos invoice : ", err);
-        });
+        this.payment_cart.hide_waiting();
+        this.history_cart.print_receipt(pos);
+        this.selectedItemMaps.delete(this.selectedTab.tabName);
+        let tabs = Array.from(this.selectedItemMaps.keys());
+        if (tabs.length > 0) {
+          this.selected_item_cart.createNewTab();
+        } else {
+          this.selected_item_cart.createNewTab();
+        }
+        this.screenManager.navigate("home");
+        pos.synced = false;
+        pos.opened = 0;
+        this.appData.updatePosInvoice(pos);
+        this.unsyncedPos += 1;
+        this.customer_box.setNotSynced(this.unsyncedPos);
       } else {
-        pos.synced = true;
-        frappe.db.insert(
-          pos
-        ).then((r) => {
-          this.payment_cart.hide_waiting();
-          pos.opened = 0;
-          pos.real_name = r.name;
-          this.history_cart.print_receipt(pos);
-          this.appData.updatePosInvoice(pos);
-          this.selectedItemMaps.delete(this.selectedTab.tabName);
-          let tabs = Array.from(this.selectedItemMaps.keys());
-          if (tabs.length > 0) {
-            this.selected_item_cart.createNewTab();
-          } else {
-            this.selected_item_cart.createNewTab();
-          }
-          this.screenManager.navigate("home");
-        }).catch((err) => {
-          this.payment_cart.hide_waiting();
-          console.log("cant push pos invoice : ", err);
-        });
+        this.payment_cart.hide_waiting();
+        this.history_cart.print_receipt(pos);
+        this.selectedItemMaps.delete(this.selectedTab.tabName);
+        let tabs = Array.from(this.selectedItemMaps.keys());
+        if (tabs.length > 0) {
+          this.selected_item_cart.createNewTab();
+        } else {
+          this.selected_item_cart.createNewTab();
+        }
+        this.screenManager.navigate("home");
+        pos.synced = false;
+        pos.opened = 0;
+        this.appData.updatePosInvoice(pos);
+        this.unsyncedPos += 1;
+        this.customer_box.setNotSynced(this.unsyncedPos);
       }
     }
     onSync() {
@@ -8178,4 +8166,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.6X3K7YRJ.js.map
+//# sourceMappingURL=pos.bundle.FSKBYBUN.js.map
