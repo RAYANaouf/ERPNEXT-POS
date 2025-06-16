@@ -622,20 +622,58 @@ def manage_related_ctn_transactions(doc, method):
     # Only run for 'on_submit' if you also hooked it into other events.
     if method == "on_submit":
         type = doc.doctype
+    
+        
         if type == "Sales Invoice" : 
             for item in doc.custom_ctn_transaction:
                 # create a new "CTN Transaction" doc
-                ctn_trn          = frappe.new_doc("CTN-BOX Transaction")
-                ctn_trn.name     = doc.name + "-" + item.ctn + "-" + item.item
-                ctn_trn.ref_type = type
-                ctn_trn.item     = item.item
-                ctn_trn.qty      = item.qty
-                ctn_trn.ctn      = item.ctn
-                ctn_trn.ref      = doc.name
-                ctn_trn.insert()
-                ctn_trn.submit()
+                ctn_trn_si          = frappe.new_doc("CTN-BOX Transaction")
+                ctn_trn_si.name     = doc.name + "-" + item.ctn + "-" + item.item
+                ctn_trn_si.ref_type = type
+                ctn_trn_si.item     = item.item
+                ctn_trn_si.qty      = item.qty
+                ctn_trn_si.ctn      = item.ctn
+                ctn_trn_si.ref      = doc.name
+                ctn_trn_si.insert()
+                ctn_trn_si.submit()
         elif type == "Stock Entry" :
-            print("Stock Entry")  
+            stock_type = doc.stock_entry_type
+            if stock_type == "Material Issue" :
+                for item in doc.custom_ctn_transactions:
+                    # create a new "CTN Transaction" doc
+                    ctn_trn_se          = frappe.new_doc("CTN-BOX Transaction")
+                    ctn_trn_se.name     = doc.name + "-" + item.ctn + "-" + item.item
+                    ctn_trn_se.ref_type = type
+                    ctn_trn_se.item     = item.item
+                    ctn_trn_se.qty      = item.qty
+                    ctn_trn_se.ctn      = item.ctn
+                    ctn_trn_se.ref      = doc.name
+                    ctn_trn_se.insert()
+                    ctn_trn_se.submit()
+            elif stock_type == "Material Receipt" :
+                for item in doc.custom_ctn_transactions:
+                    # create a new "CTN Transaction" doc
+                    ctn_trn_se          = frappe.new_doc("CTN-BOX Transaction")
+                    ctn_trn_se.name     = doc.name + "-" + item.ctn + "-" + item.item
+                    ctn_trn_se.ref_type = type
+                    ctn_trn_se.item     = item.item
+                    ctn_trn_se.qty      = item.qty * -1
+                    ctn_trn_se.ctn      = item.ctn
+                    ctn_trn_se.ref      = doc.name
+                    ctn_trn_se.insert()
+                    ctn_trn_se.submit()
+            elif stock_type == "Material Transfer" :
+                for item in doc.custom_ctn_transactions:
+                    # create a new "CTN Transaction" doc
+                    ctn_trn_se          = frappe.new_doc("CTN-BOX Transaction")
+                    ctn_trn_se.name     = doc.name + "-" + item.ctn + "-" + item.item
+                    ctn_trn_se.ref_type = type
+                    ctn_trn_se.item     = item.item
+                    ctn_trn_se.qty      = item.qty 
+                    ctn_trn_se.ctn      = item.ctn
+                    ctn_trn_se.ref      = doc.name
+                    ctn_trn_se.insert()
+                    ctn_trn_se.submit()
         
         
 

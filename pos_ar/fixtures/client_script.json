@@ -26,8 +26,8 @@
   "doctype": "Client Script",
   "dt": "Sales Invoice",
   "enabled": 1,
-  "modified": "2025-03-23 03:09:38.956216",
-  "module": null,
+  "modified": "2025-06-16 08:21:44.571672",
+  "module": "POS AR",
   "name": "filter item by ctn",
   "script": "frappe.ui.form.on('Sales Invoice', {\n\trefresh(frm) {\n\t\t// your code here\n\t}\n})\n\nfrappe.ui.form.on(\"CTN Transaction Sales Invoice\", {\n  ctn: function(frm, cdt, cdn) {\n    let row = frappe.get_doc(cdt, cdn);\n\n    if (!row.ctn) {\n      frm.fields_dict[\"custom_ctn_transaction\"].grid.get_field(\"item\").get_query = () => ({});\n      return;\n    }\n\n    frappe.call({\n      method: \"pos_ar.pos_ar.doctype.ctn_box.ctn_box.get_ctn_items\",\n      args: {\n        // pass in row.ctn if that’s actually the box name\n        ctn_box_name: row.ctn\n      },\n      callback: function(r) {\n          \n        if (r.message) {\n          \n          let allowed_items = r.message;\n          \n          console.log(allowed_items)\n          \n          frm.fields_dict[\"custom_ctn_transaction\"].grid.get_field(\"item\").get_query = \n            function(doc, cdt2, cdn2) {\n              return { filters: { name: [\"in\", allowed_items] } };\n            };\n\n          if (row.item && !allowed_items.includes(row.item)) {\n            frappe.model.set_value(cdt, cdn, \"item\", null);\n          }\n        }\n      }\n    });\n  }\n});\n",
   "view": "Form"
@@ -48,8 +48,8 @@
   "doctype": "Client Script",
   "dt": "Purchase Order",
   "enabled": 1,
-  "modified": "2025-05-24 17:36:47.537300",
-  "module": null,
+  "modified": "2025-06-16 08:22:01.984582",
+  "module": "POS AR",
   "name": "get_messing_product",
   "script": "frappe.ui.form.on('Purchase Order', {\r\n    custom_start(frm) {\r\n        fetch_sold_items_if_ready(frm);\r\n    },\r\n\r\n    custom_end(frm) {\r\n        fetch_sold_items_if_ready(frm);\r\n    },\r\n\r\n    company(frm) {\r\n        fetch_sold_items_if_ready(frm);\r\n    }\r\n});\r\n\r\n\r\n\r\nfunction fetch_sold_items_if_ready(frm) {\r\n    const start = frm.doc.custom_start;\r\n    const end = frm.doc.custom_end;\r\n    const company = frm.doc.company;\r\n\r\n    if (start && end && company) {\r\n        frappe.call({\r\n            method: \"pos_ar.api.get_item_sold\",\r\n            args: { start, end, company },\r\n            callback: function(r) {\r\n                if (r.message) {\r\n                    // Clear current items table\r\n                    frm.clear_table(\"items\");\r\n                    // Add returned sold items to items table\r\n                    r.message.forEach(row => {\r\n                        const item = frm.add_child(\"items\");\r\n                        item.item_code = row.item_name;\r\n                        item.item_name = row.item_name;\r\n                        item.qty = row.total_qty;\r\n                        item.uom = row.stock_uom;\r\n                    });\r\n\r\n                    frm.refresh_field(\"items\");\r\n                }\r\n            }\r\n        });\r\n    } else {\r\n        console.log(\"Waiting for all fields to be filled (start, end, company)\");\r\n    }\r\n}\r\n",
   "view": "Form"
