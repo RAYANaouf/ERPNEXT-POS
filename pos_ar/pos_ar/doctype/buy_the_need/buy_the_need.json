@@ -8,10 +8,13 @@
   "supplier",
   "from_company",
   "warehouse",
+  "alter_supplier",
+  "alter_from_company",
+  "alter_warehouse",
   "column_break_eaqd",
   "company",
   "to_warehouse",
-  "section_break_5tlh",
+  "section_break_korr",
   "search_by_time",
   "column_break_l5to",
   "note",
@@ -30,11 +33,11 @@
   "items",
   "section_break_ndti",
   "column_break_aygo",
-  "column_break_cmup",
   "column_break_ortl",
+  "column_break_kqgq",
   "generate",
   "column_break_w545",
-  "column_break_gvjv"
+  "column_break_s2ve"
  ],
  "fields": [
   {
@@ -55,10 +58,6 @@
    "label": "to_warehouse",
    "options": "Warehouse",
    "reqd": 1
-  },
-  {
-   "fieldname": "section_break_5tlh",
-   "fieldtype": "Section Break"
   },
   {
    "fieldname": "column_break_twus",
@@ -104,10 +103,6 @@
    "fieldtype": "Column Break"
   },
   {
-   "fieldname": "column_break_cmup",
-   "fieldtype": "Column Break"
-  },
-  {
    "fieldname": "column_break_ortl",
    "fieldtype": "Column Break"
   },
@@ -118,10 +113,6 @@
   },
   {
    "fieldname": "column_break_w545",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "column_break_gvjv",
    "fieldtype": "Column Break"
   },
   {
@@ -187,12 +178,42 @@
    "fieldname": "note",
    "fieldtype": "Read Only",
    "label": "Note"
+  },
+  {
+   "fieldname": "section_break_korr",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "alter_supplier",
+   "fieldtype": "Link",
+   "label": "Alter Supplier",
+   "options": "Supplier"
+  },
+  {
+   "fieldname": "alter_from_company",
+   "fieldtype": "Link",
+   "label": "From Company",
+   "options": "Company"
+  },
+  {
+   "fieldname": "alter_warehouse",
+   "fieldtype": "Link",
+   "label": "Warehouse",
+   "options": "Warehouse"
+  },
+  {
+   "fieldname": "column_break_kqgq",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_s2ve",
+   "fieldtype": "Column Break"
   }
  ],
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2025-06-02 10:57:06.850121",
+ "modified": "2025-06-20 09:47:02.668048",
  "modified_by": "Administrator",
  "module": "POS AR",
  "name": "Buy The Need",

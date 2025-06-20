@@ -216,6 +216,24 @@ pos_ar.PointOfSale.pos_item_selector = class {
 			}
 		}
 
+		/*
+		// If not found, try by trimming the last character
+		if (value.length > 1) {
+			const trimmedValue = value.slice(0, -1);
+			itemIds = this.barcode_map[trimmedValue];
+			if (itemIds && itemIds.length > 0) {
+				const items = this.item_list.filter(item => itemIds.includes(item.name));
+				if (items.length === 1) {
+					this.auto_select(items[0]);
+					const itemInput = document.getElementById("ItemInput");
+					itemInput.value = '';
+					return this.item_list;
+				} else if (items.length > 1) {
+					return items;
+				}
+			}
+		}*/
+
 		// If no barcode match or no items found, search by item name
 		return this.item_list.filter(item => 
 			item.item_name.toLowerCase().includes(value.toLowerCase())
