@@ -1078,7 +1078,7 @@ def purchase_invoice_permission(doc, ptype, user):
         return True
 
     # Allow access if the document's company is in the user's allowed companies
-    if doc.company in allowed_companies or doc.company in allowed_companies_on_purchase_invoice:
+    if doc.company in allowed_companies :
         return True
 
     # Otherwise, deny access
