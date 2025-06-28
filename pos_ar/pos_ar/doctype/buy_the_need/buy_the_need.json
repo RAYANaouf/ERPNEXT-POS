@@ -18,6 +18,7 @@
   "search_by_time",
   "column_break_l5to",
   "note",
+  "max_of_qty",
   "section_break_gmos",
   "start",
   "column_break_mra3",
@@ -37,7 +38,18 @@
   "column_break_kqgq",
   "generate",
   "column_break_w545",
-  "column_break_s2ve"
+  "column_break_s2ve",
+  "section_break_qums",
+  "alternative_header",
+  "section_break_eqyy",
+  "alter_items",
+  "section_break_ftuq",
+  "column_break_7eiu",
+  "column_break_k8tm",
+  "column_break_2dwa",
+  "generate_alter",
+  "column_break_mqik",
+  "column_break_5pqu"
  ],
  "fields": [
   {
@@ -56,8 +68,7 @@
    "fieldname": "to_warehouse",
    "fieldtype": "Link",
    "label": "to_warehouse",
-   "options": "Warehouse",
-   "reqd": 1
+   "options": "Warehouse"
   },
   {
    "fieldname": "column_break_twus",
@@ -135,7 +146,8 @@
    "fieldname": "company",
    "fieldtype": "Link",
    "label": "to Company",
-   "options": "Company"
+   "options": "Company",
+   "reqd": 1
   },
   {
    "default": "0",
@@ -184,20 +196,25 @@
    "fieldtype": "Section Break"
   },
   {
+   "depends_on": "search_by_time",
    "fieldname": "alter_supplier",
    "fieldtype": "Link",
    "label": "Alter Supplier",
    "options": "Supplier"
   },
   {
+   "depends_on": "search_by_time",
    "fieldname": "alter_from_company",
    "fieldtype": "Link",
+   "hidden": 1,
    "label": "From Company",
    "options": "Company"
   },
   {
+   "depends_on": "search_by_time",
    "fieldname": "alter_warehouse",
    "fieldtype": "Link",
+   "hidden": 1,
    "label": "Warehouse",
    "options": "Warehouse"
   },
@@ -208,12 +225,75 @@
   {
    "fieldname": "column_break_s2ve",
    "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "section_break_qums",
+   "fieldtype": "Section Break"
+  },
+  {
+   "depends_on": "eval:doc.alter_supplier && doc.search_by_time",
+   "fieldname": "alternative_header",
+   "fieldtype": "HTML",
+   "options": "<h1 style=\"width: 100%; text-align: center;\">Alternative</h1>\n"
+  },
+  {
+   "depends_on": "eval:doc.alter_supplier && doc.search_by_time",
+   "fieldname": "alter_items",
+   "fieldtype": "Table",
+   "options": "buy the need item"
+  },
+  {
+   "depends_on": "eval:doc.alter_supplier && doc.search_by_time",
+   "fieldname": "column_break_7eiu",
+   "fieldtype": "Column Break"
+  },
+  {
+   "depends_on": "eval:doc.alter_supplier && doc.search_by_time",
+   "fieldname": "column_break_k8tm",
+   "fieldtype": "Column Break"
+  },
+  {
+   "depends_on": "eval:doc.alter_supplier && doc.search_by_time",
+   "fieldname": "column_break_2dwa",
+   "fieldtype": "Column Break"
+  },
+  {
+   "depends_on": "eval:doc.alter_supplier && doc.search_by_time",
+   "fieldname": "generate_alter",
+   "fieldtype": "Button",
+   "label": "Generate Alternative"
+  },
+  {
+   "depends_on": "eval:doc.alter_supplier && doc.search_by_time",
+   "fieldname": "column_break_mqik",
+   "fieldtype": "Column Break"
+  },
+  {
+   "depends_on": "eval:doc.alter_supplier && doc.search_by_time",
+   "fieldname": "column_break_5pqu",
+   "fieldtype": "Column Break"
+  },
+  {
+   "depends_on": "eval:doc.alter_supplier && doc.search_by_time",
+   "fieldname": "section_break_eqyy",
+   "fieldtype": "Section Break"
+  },
+  {
+   "depends_on": "eval:doc.alter_supplier && doc.search_by_time",
+   "fieldname": "section_break_ftuq",
+   "fieldtype": "Section Break"
+  },
+  {
+   "depends_on": "search_by_time",
+   "fieldname": "max_of_qty",
+   "fieldtype": "Int",
+   "label": "Max Of QTY"
   }
  ],
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2025-06-20 09:47:02.668048",
+ "modified": "2025-06-21 12:54:53.206111",
  "modified_by": "Administrator",
  "module": "POS AR",
  "name": "Buy The Need",

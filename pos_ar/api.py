@@ -279,7 +279,7 @@ def export_items_without_price():
 
 
 @frappe.whitelist()
-def CA_FRD_generator( ref = None, max_count = None , from_warehouse = None , to_warehouse = None):
+def CA_FRD_generator( ref = None, max_count = None , from_warehouse = None  , to_warehouse = None):
 
     useCTN = True
     
@@ -380,6 +380,104 @@ def CA_FRD_generator( ref = None, max_count = None , from_warehouse = None , to_
             "needed_items": needed_items,
             "count": len(needed_items)
         }
+
+
+@frappe.whitelist()
+def  buy_what_you_sell(start, end, company=None , from_warehouse = None , alter_from_warehouse = None , to_warehouse = None , max_qty = None): 
+    if not start or not end:
+        frappe.throw(_("Start and End dates are required"))
+
+    query = """
+        SELECT 
+            sii.item_code,
+            sii.item_name,
+            SUM(sii.qty) AS total_qty,
+            i.stock_uom
+        FROM 
+            `tabSales Invoice Item` sii
+        INNER JOIN 
+            `tabSales Invoice` si ON sii.parent = si.name
+        INNER JOIN 
+            `tabItem` i ON sii.item_code = i.name
+        WHERE 
+            si.posting_date BETWEEN %s AND %s
+            AND si.docstatus = 1
+    """
+    filters = [start, end]
+
+    if company:
+        query += " AND si.company = %s"
+        filters.append(company)
+
+    query += " GROUP BY sii.item_code, sii.item_name, i.stock_uom"
+    query += " HAVING total_qty > 0"
+
+    sold_items = frappe.db.sql(query, filters, as_dict=True)
+    
+    sold_items_set = set(row.item_code for row in sold_items)
+    
+    
+    # Step 1: Get current stock in from warehouse
+    from_warehouse_stock = frappe.get_all(
+        "Bin",
+        filters={"warehouse": from_warehouse},
+        fields=["item_code", "actual_qty"]
+    )  
+    
+    from_warehouse_stock_set = set( row.item_code for row in from_warehouse_stock) 
+    
+    
+    
+    # Step 2: Get current stock in to warehouse
+    to_warehouse_stock = frappe.get_all(
+        "Bin",
+        filters={"warehouse": to_warehouse},
+        fields=["item_code", "actual_qty"]
+    )  
+    
+    
+    if not max_qty:
+        print("Noooooneeeeeeee")
+    else:
+        try:
+            max_qty = float(max_qty)
+        except ValueError:
+            frappe.throw(_("min_qty must be a number"))
+    
+    to_warehouse_set = set( row.item_code for row in to_warehouse_stock if row.actual_qty > max_qty)
+    
+    item_to_buy_map = {
+        row.item_code : row.total_qty for row in sold_items
+        if row.item_code not in to_warehouse_set 
+        }
+    
+    
+    
+    
+    item_to_buy_from_supplier1_map = {
+        row.item_code : row.total_qty for row in item_to_buy_map
+        if row.item_code in from_warehouse_stock_set
+    }
+    
+    item_to_buy_from_supplier2_map = {
+        row.item_code : row.total_qty for row in item_to_buy_map
+        if row.item_code not in item_to_buy_from_supplier1_map and row.item_code in from_warehouse_stock_set
+    }
+    
+    
+    
+    
+    print(f"item_to_buy_map : {item_to_buy_map}")
+    
+    
+    print(f"warehouse  items : {to_warehouse_set}")
+
+
+
+    return {
+            "buy_from_supplier1_map" : item_to_buy_from_supplier1_map,
+            "buy_from_supplier2_map" : item_to_buy_from_supplier2_map
+            }
 
 
 ################################################### user on client script ##############################################
@@ -943,4 +1041,46 @@ def create_customer(name, type , price_list=None, company=None, companies=None, 
     frappe.db.commit()
     return customer.name
     
+
+
+
+
+
+#########################################################  Permission override   ########################################################
+
+def purchase_invoice_permission(doc, ptype, user):
+    
+    # Get all company restrictions for this user
+    allowed_companies = frappe.get_all(
+        "User Permission",
+        filters={
+            "user": user,
+            "allow": "Company",
+            "apply_to_all_doctypes" : True
+        },
+        pluck="for_value"
+    )
+
+    # Get all company restrictions for this user
+    allowed_companies_on_purchase_invoice = frappe.get_all(
+        "User Permission",
+        filters={
+            "user": user,
+            "allow": "Company",
+            "apply_to_all_doctypes" : False,
+            "applicable_for"        : "Purchase Invoice" 
+        },
+        pluck="for_value"
+    )
+
+     # If no restrictions are set, allow access 
+    if not allowed_companies and not allowed_companies_on_purchase_invoice:
+        return True
+
+    # Allow access if the document's company is in the user's allowed companies
+    if doc.company in allowed_companies or doc.company in allowed_companies_on_purchase_invoice:
+        return True
+
+    # Otherwise, deny access
+    return False
 

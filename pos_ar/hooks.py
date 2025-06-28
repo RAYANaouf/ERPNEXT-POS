@@ -107,9 +107,10 @@ app_include_js = ["/assets/pos_ar/js/pos.bundle.js","https://cdnjs.cloudflare.co
 #
 
 
-# has_permission = {
-# 	"Event": "frappe.desk.doctype.event.event.has_permission",
-# }
+has_permission = {
+    #"Event": "frappe.desk.doctype.event.event.has_permission",
+    "Purchase Invoice": "pos_ar.api.purchase_invoice_permission",
+}
 
 
 
