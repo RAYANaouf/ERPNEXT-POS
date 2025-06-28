@@ -1052,6 +1052,8 @@ def purchase_invoice_permission(doc, ptype, user):
     
     
     print(" 0 =====>")
+    frappe.log_error(" 0 ======>")
+
 
     # Get all company restrictions for this user
     allowed_companies = frappe.get_all(
@@ -1065,6 +1067,7 @@ def purchase_invoice_permission(doc, ptype, user):
     )
 
     print(" 1 =====>")
+    frappe.log_error(" 1 ======>")
 
     # Get all company restrictions for this user
     allowed_companies_on_purchase_invoice = frappe.get_all(
@@ -1079,22 +1082,26 @@ def purchase_invoice_permission(doc, ptype, user):
     )
     
     print(" 2 =====>")
+    frappe.log_error(" 2 ======>")
 
 
      # If no restrictions are set, allow access 
     if not allowed_companies and not allowed_companies_on_purchase_invoice:
         
         print(" 3 =====>")
+        frappe.log_error(" 3 ======>")
 
         return True
 
     # Allow access if the document's company is in the user's allowed companies
     if doc.company in allowed_companies :
         print("  4 =========>")
+        frappe.log_error(" 4 ======>")
         return True
 
     # Otherwise, deny access
 
     print("  5 ==========>")
+    frappe.log_error(" 5 ======>")
     return False
 
