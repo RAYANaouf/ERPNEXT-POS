@@ -1050,6 +1050,9 @@ def create_customer(name, type , price_list=None, company=None, companies=None, 
 
 def purchase_invoice_permission(doc, ptype, user):
     
+    
+    print(" 0 =====>")
+
     # Get all company restrictions for this user
     allowed_companies = frappe.get_all(
         "User Permission",
@@ -1060,6 +1063,8 @@ def purchase_invoice_permission(doc, ptype, user):
         },
         pluck="for_value"
     )
+
+    print(" 1 =====>")
 
     # Get all company restrictions for this user
     allowed_companies_on_purchase_invoice = frappe.get_all(
@@ -1072,15 +1077,24 @@ def purchase_invoice_permission(doc, ptype, user):
         },
         pluck="for_value"
     )
+    
+    print(" 2 =====>")
+
 
      # If no restrictions are set, allow access 
     if not allowed_companies and not allowed_companies_on_purchase_invoice:
+        
+        print(" 3 =====>")
+
         return True
 
     # Allow access if the document's company is in the user's allowed companies
     if doc.company in allowed_companies :
+        print("  4 =========>")
         return True
 
     # Otherwise, deny access
+
+    print("  5 ==========>")
     return False
 
