@@ -1108,22 +1108,20 @@ def purchase_invoice_permission(doc, ptype, user):
 
 
 
-
 def purchase_invoice_permission_query_conditions(user):
-
     allowed_companies = frappe.get_all(
         "User Permission",
         filters={
             "user": user,
             "allow": "Company",
-            "apply_to_all_doctypes" : True
+            "apply_to_all_doctypes": True
         },
         pluck="for_value"
     )
 
     if allowed_companies:
-        # Each frappe.db.escape(c) already includes quotes
+        # Proper SQL-safe joining
         allowed_companies_str = ", ".join([frappe.db.escape(c) for c in allowed_companies])
         return f"`tabPurchase Invoice`.`company` IN ({allowed_companies_str})"
     else:
-        return "`tabPurchase Invoice`.`name` IS NULL"
+        return ""  # User has no restrictions, allow all
