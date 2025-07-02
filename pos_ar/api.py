@@ -387,6 +387,7 @@ def  buy_what_you_sell(start, end, company=None , from_warehouse = None , alter_
     if not start or not end:
         frappe.throw(_("Start and End dates are required"))
 
+    print("----1")
     query = """
         SELECT 
             sii.item_code,
@@ -405,6 +406,8 @@ def  buy_what_you_sell(start, end, company=None , from_warehouse = None , alter_
     """
     filters = [start, end]
 
+
+    print("----2")
     if company:
         query += " AND si.company = %s"
         filters.append(company)
@@ -417,6 +420,7 @@ def  buy_what_you_sell(start, end, company=None , from_warehouse = None , alter_
     sold_items_set = set(row.item_code for row in sold_items)
     
     
+    print("----3")
     # Step 1: Get current stock in from warehouse
     from_warehouse_stock = frappe.get_all(
         "Bin",
@@ -424,9 +428,11 @@ def  buy_what_you_sell(start, end, company=None , from_warehouse = None , alter_
         fields=["item_code", "actual_qty"]
     )  
     
+    print("----4")
     from_warehouse_stock_set = set( row.item_code for row in from_warehouse_stock) 
     
     
+    print("----5")
     
     # Step 2: Get current stock in to warehouse
     to_warehouse_stock = frappe.get_all(
@@ -435,6 +441,7 @@ def  buy_what_you_sell(start, end, company=None , from_warehouse = None , alter_
         fields=["item_code", "actual_qty"]
     )  
     
+    print("----6")
     
     if not max_qty:
         print("Noooooneeeeeeee")
@@ -444,8 +451,12 @@ def  buy_what_you_sell(start, end, company=None , from_warehouse = None , alter_
         except ValueError:
             frappe.throw(_("min_qty must be a number"))
     
+    
+    print("----7")
     to_warehouse_set = set( row.item_code for row in to_warehouse_stock if row.actual_qty > max_qty)
     
+    
+    print("----8")
     item_to_buy_map = {
         row.item_code : row.total_qty for row in sold_items
         if row.item_code not in to_warehouse_set 
@@ -453,25 +464,25 @@ def  buy_what_you_sell(start, end, company=None , from_warehouse = None , alter_
     
     
     
+    print("----9")
+    
+    
     
     item_to_buy_from_supplier1_map = {
-        row.item_code : row.total_qty for row in item_to_buy_map
-        if row.item_code in from_warehouse_stock_set
-    }
-    
-    item_to_buy_from_supplier2_map = {
-        row.item_code : row.total_qty for row in item_to_buy_map
-        if row.item_code not in item_to_buy_from_supplier1_map and row.item_code in from_warehouse_stock_set
+        item_code: qty for item_code, qty in item_to_buy_map.items()
+        if item_code in from_warehouse_stock_set
     }
     
     
+    print("----10")
     
-    
-    print(f"item_to_buy_map : {item_to_buy_map}")
-    
-    
-    print(f"warehouse  items : {to_warehouse_set}")
 
+    item_to_buy_from_supplier2_map = {
+        item_code: qty for item_code, qty in item_to_buy_map.items()
+        if item_code not in item_to_buy_from_supplier1_map and item_code in from_warehouse_stock_set
+    }
+
+    print("----11")
 
 
     return {
