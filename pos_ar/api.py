@@ -436,7 +436,9 @@ def  buy_what_you_sell(start, end, company=None , from_warehouse = None , alter_
     print(f"from_warehouse_stock  : ${from_warehouse_stock}")
     
     print("----4")
-    from_warehouse_stock_set = set( row.item_code for row in from_warehouse_stock) 
+    #from_warehouse_stock_set = set( row.item_code for row in from_warehouse_stock) 
+    from_warehouse_stock_set = set( row["item_code"] for row in from_warehouse_stock )
+
     
     print(f"from_warehouse_stock_set  : ${from_warehouse_stock_set}")
     
@@ -457,11 +459,13 @@ def  buy_what_you_sell(start, end, company=None , from_warehouse = None , alter_
         try:
             max_qty = float(max_qty)
         except ValueError:
-            frappe.throw(_("min_qty must be a number"))
+            frappe.throw(_("max_qty must be a number"))
     
     
     print("----7")
-    to_warehouse_set = set( row.item_code for row in to_warehouse_stock if row.actual_qty > max_qty)
+    #to_warehouse_set = set( row.item_code for row in to_warehouse_stock if row.actual_qty > max_qty)
+    to_warehouse_set = set( row["item_code"] for row in to_warehouse_stock if row["actual_qty"] > max_qty )
+
     
     
     print(f"item  : ${to_warehouse_set}")
