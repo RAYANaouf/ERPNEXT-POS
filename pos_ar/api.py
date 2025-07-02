@@ -418,6 +418,8 @@ def  buy_what_you_sell(start, end, company=None , from_warehouse = None , alter_
     sold_items = frappe.db.sql(query, filters, as_dict=True)
     
     sold_items_set = set(row.item_code for row in sold_items)
+
+    print(f"sold items : ${sold_items_set}")
     
     
     print("----3")
@@ -427,10 +429,16 @@ def  buy_what_you_sell(start, end, company=None , from_warehouse = None , alter_
         filters={"warehouse": from_warehouse},
         fields=["item_code", "actual_qty"]
     )  
+
+
+    print(f"from_warehouse  : ${from_warehouse}")
+    
+    print(f"from_warehouse_stock  : ${from_warehouse_stock}")
     
     print("----4")
     from_warehouse_stock_set = set( row.item_code for row in from_warehouse_stock) 
     
+    print(f"from_warehouse_stock_set  : ${from_warehouse_stock_set}")
     
     print("----5")
     
@@ -456,11 +464,18 @@ def  buy_what_you_sell(start, end, company=None , from_warehouse = None , alter_
     to_warehouse_set = set( row.item_code for row in to_warehouse_stock if row.actual_qty > max_qty)
     
     
+    print(f"item  : ${to_warehouse_set}")
+
+
+    
     print("----8")
     item_to_buy_map = {
         row.item_code : row.total_qty for row in sold_items
         if row.item_code not in to_warehouse_set 
         }
+
+        
+    print(f"item_to_buy_map  : ${item_to_buy_map}")
     
     
     
