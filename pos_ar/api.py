@@ -388,6 +388,8 @@ def  buy_what_you_sell(start, end, company=None , from_warehouse = None , alter_
         frappe.throw(_("Start and End dates are required"))
 
     print("----1")
+    frappe.log_error("----1")
+    
     query = """
         SELECT 
             sii.item_code,
@@ -408,6 +410,8 @@ def  buy_what_you_sell(start, end, company=None , from_warehouse = None , alter_
 
 
     print("----2")
+    frappe.log_error("----2")
+
     if company:
         query += " AND si.company = %s"
         filters.append(company)
@@ -423,6 +427,7 @@ def  buy_what_you_sell(start, end, company=None , from_warehouse = None , alter_
     
     
     print("----3")
+    frappe.log_error("----3")
     # Step 1: Get current stock in from warehouse
     from_warehouse_stock = frappe.get_all(
         "Bin",
@@ -436,6 +441,7 @@ def  buy_what_you_sell(start, end, company=None , from_warehouse = None , alter_
     print(f"from_warehouse_stock  : ${from_warehouse_stock}")
     
     print("----4")
+    frappe.log_error("----4")
     #from_warehouse_stock_set = set( row.item_code for row in from_warehouse_stock) 
     from_warehouse_stock_set = set( row["item_code"] for row in from_warehouse_stock )
 
@@ -443,6 +449,7 @@ def  buy_what_you_sell(start, end, company=None , from_warehouse = None , alter_
     print(f"from_warehouse_stock_set  : ${from_warehouse_stock_set}")
     
     print("----5")
+    frappe.log_error("----5")
     
     # Step 2: Get current stock in to warehouse
     to_warehouse_stock = frappe.get_all(
@@ -452,6 +459,7 @@ def  buy_what_you_sell(start, end, company=None , from_warehouse = None , alter_
     )  
     
     print("----6")
+    frappe.log_error("----6")
     
     if not max_qty:
         print("Noooooneeeeeeee")
@@ -463,6 +471,7 @@ def  buy_what_you_sell(start, end, company=None , from_warehouse = None , alter_
     
     
     print("----7")
+    frappe.log_error("----7")
     #to_warehouse_set = set( row.item_code for row in to_warehouse_stock if row.actual_qty > max_qty)
     to_warehouse_set = set( row["item_code"] for row in to_warehouse_stock if row["actual_qty"] > max_qty )
 
@@ -473,6 +482,7 @@ def  buy_what_you_sell(start, end, company=None , from_warehouse = None , alter_
 
     
     print("----8")
+    frappe.log_error("----8")
     item_to_buy_map = {
         row.item_code : row.total_qty for row in sold_items
         if row.item_code not in to_warehouse_set 
@@ -484,6 +494,7 @@ def  buy_what_you_sell(start, end, company=None , from_warehouse = None , alter_
     
     
     print("----9")
+    frappe.log_error("----9")
     
     
     
@@ -494,6 +505,7 @@ def  buy_what_you_sell(start, end, company=None , from_warehouse = None , alter_
     
     
     print("----10")
+    frappe.log_error("----10")
     
 
     item_to_buy_from_supplier2_map = {
@@ -502,6 +514,7 @@ def  buy_what_you_sell(start, end, company=None , from_warehouse = None , alter_
     }
 
     print("----11")
+    frappe.log_error("----11")
 
 
     return {
