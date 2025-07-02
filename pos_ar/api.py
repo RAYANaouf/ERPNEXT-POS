@@ -384,9 +384,145 @@ def CA_FRD_generator( ref = None, max_count = None , from_warehouse = None  , to
 
 @frappe.whitelist()
 def  buy_what_you_sell(start, end, company=None , from_warehouse = None , alter_from_warehouse = None , to_warehouse = None , max_qty = None): 
+    if not start or not end:
+        frappe.throw(_("Start and End dates are required"))
+
+    print("----1")
     frappe.log_error("----1")
     
+    query = """
+        SELECT 
+            sii.item_code,
+            sii.item_name,
+            SUM(sii.qty) AS total_qty,
+            i.stock_uom
+        FROM 
+            `tabSales Invoice Item` sii
+        INNER JOIN 
+            `tabSales Invoice` si ON sii.parent = si.name
+        INNER JOIN 
+            `tabItem` i ON sii.item_code = i.name
+        WHERE 
+            si.posting_date BETWEEN %s AND %s
+            AND si.docstatus = 1
+    """
+    filters = [start, end]
+
+
+    print("----2")
+    frappe.log_error("----2")
+
+    if company:
+        query += " AND si.company = %s"
+        filters.append(company)
+
+    query += " GROUP BY sii.item_code, sii.item_name, i.stock_uom"
+    query += " HAVING total_qty > 0"
+
+    sold_items = frappe.db.sql(query, filters, as_dict=True)
     
+    sold_items_set = set(row.item_code for row in sold_items)
+
+    print(f"sold items : ${sold_items_set}")
+    
+    
+    print("----3")
+    frappe.log_error("----3")
+    # Step 1: Get current stock in from warehouse
+    from_warehouse_stock = frappe.get_all(
+        "Bin",
+        filters={"warehouse": from_warehouse},
+        fields=["item_code", "actual_qty"]
+    )  
+
+
+    print(f"from_warehouse  : ${from_warehouse}")
+    
+    print(f"from_warehouse_stock  : ${from_warehouse_stock}")
+    
+    print("----4")
+    frappe.log_error("----4")
+    #from_warehouse_stock_set = set( row.item_code for row in from_warehouse_stock) 
+    from_warehouse_stock_set = set( row["item_code"] for row in from_warehouse_stock )
+
+    
+    print(f"from_warehouse_stock_set  : ${from_warehouse_stock_set}")
+    
+    print("----5")
+    frappe.log_error("----5")
+    
+    # Step 2: Get current stock in to warehouse
+    to_warehouse_stock = frappe.get_all(
+        "Bin",
+        filters={"warehouse": to_warehouse},
+        fields=["item_code", "actual_qty"]
+    )  
+    
+    print("----6")
+    frappe.log_error("----6")
+    
+    if not max_qty:
+        print("Noooooneeeeeeee")
+    else:
+        try:
+            max_qty = float(max_qty)
+        except ValueError:
+            frappe.throw(_("max_qty must be a number"))
+    
+    
+    print("----7")
+    frappe.log_error("----7")
+    #to_warehouse_set = set( row.item_code for row in to_warehouse_stock if row.actual_qty > max_qty)
+    to_warehouse_set = set( row["item_code"] for row in to_warehouse_stock if row["actual_qty"] > max_qty )
+
+    
+    
+    print(f"item  : ${to_warehouse_set}")
+
+
+    
+    print("----8")
+    frappe.log_error("----8")
+    item_to_buy_map = {
+        row.item_code : row.total_qty for row in sold_items
+        if row.item_code not in to_warehouse_set 
+        }
+
+        
+    print(f"item_to_buy_map  : ${item_to_buy_map}")
+    
+    
+    
+    print("----9")
+    frappe.log_error("----9")
+    
+    
+    
+    item_to_buy_from_supplier1_map = {
+        item_code: qty for item_code, qty in item_to_buy_map.items()
+        if item_code in from_warehouse_stock_set
+    }
+    
+    
+    print("----10")
+    frappe.log_error("----10")
+    
+
+    item_to_buy_from_supplier2_map = {
+        item_code: qty for item_code, qty in item_to_buy_map.items()
+        if item_code not in item_to_buy_from_supplier1_map and item_code in from_warehouse_stock_set
+    }
+
+    print("----11")
+    frappe.log_error("----11")
+
+
+    return {
+            "buy_from_supplier1_map" : item_to_buy_from_supplier1_map,
+            "buy_from_supplier2_map" : item_to_buy_from_supplier2_map
+            }
+
+
 ################################################### user on client script ##############################################
 
 
