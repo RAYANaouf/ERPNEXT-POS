@@ -388,7 +388,7 @@ def  buy_what_you_sell(start, end, company=None , from_warehouse = None , alter_
         frappe.throw(_("Start and End dates are required"))
 
     print("----1")
-    frappe.log_error("*****=>>>>1")
+    frappe.log_error(">>>>------->1")
     
     query = """
         SELECT 
@@ -409,8 +409,6 @@ def  buy_what_you_sell(start, end, company=None , from_warehouse = None , alter_
     filters = [start, end]
 
 
-    print("----2")
-    frappe.log_error("----2")
 
     if to_warehouse:
         query += " AND si.set_warehouse = %s"
@@ -426,8 +424,6 @@ def  buy_what_you_sell(start, end, company=None , from_warehouse = None , alter_
     print(f"sold items : ${sold_items_set}")
     
     
-    print("----3")
-    frappe.log_error("----3")
     # Step 1: Get current stock in from warehouse
     from_warehouse_stock = frappe.get_all(
         "Bin",
@@ -445,15 +441,31 @@ def  buy_what_you_sell(start, end, company=None , from_warehouse = None , alter_
     
     print("----4")
     frappe.log_error("----4")
-    #from_warehouse_stock_set = set( row.item_code for row in from_warehouse_stock) 
     from_warehouse_stock_set = set( row["item_code"] for row in from_warehouse_stock )
 
+
+    #the alternattive 
+    # Step 1: Get current stock in from warehouse
+    alter_from_warehouse_stock = frappe.get_all(
+        "Bin",
+        filters={
+            "warehouse": alter_from_warehouse,
+            "actual_qty": [">", 0]
+            },
+        fields=["item_code", "actual_qty"]
+    )  
+
+
+    print(f"alter_from_warehouse  : ${alter_from_warehouse}")
     
-    print(f"from_warehouse_stock_set  : ${from_warehouse_stock_set}")
+    print(f"alter_from_warehouse_stock  : ${alter_from_warehouse_stock}")
     
-    print("----5")
-    frappe.log_error("----5")
+    alter_from_warehouse_stock_set = set( row["item_code"] for row in alter_from_warehouse_stock )
+
     
+    print(f"alter_from_warehouse_stock_set  : ${alter_from_warehouse_stock_set}")
+    
+
     # Step 2: Get current stock in to warehouse
     to_warehouse_stock = frappe.get_all(
         "Bin",
@@ -513,7 +525,7 @@ def  buy_what_you_sell(start, end, company=None , from_warehouse = None , alter_
 
     item_to_buy_from_supplier2_map = {
         item_code: qty for item_code, qty in item_to_buy_map.items()
-        if item_code not in item_to_buy_from_supplier1_map and item_code in from_warehouse_stock_set
+        if item_code not in item_to_buy_from_supplier1_map and item_code in alter_from_warehouse_stock_set
     }
 
     print("----11")
