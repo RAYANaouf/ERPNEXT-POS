@@ -388,7 +388,7 @@ def  buy_what_you_sell(start, end, company=None , from_warehouse = None , alter_
         frappe.throw(_("Start and End dates are required"))
 
     print("----1")
-    frappe.log_error("----1")
+    frappe.log_error("*****=>>>>1")
     
     query = """
         SELECT 
@@ -412,9 +412,9 @@ def  buy_what_you_sell(start, end, company=None , from_warehouse = None , alter_
     print("----2")
     frappe.log_error("----2")
 
-    if company:
-        query += " AND si.company = %s"
-        filters.append(company)
+    if to_warehouse:
+        query += " AND si.set_warehouse = %s"
+        filters.append(to_warehouse)
 
     query += " GROUP BY sii.item_code, sii.item_name, i.stock_uom"
     query += " HAVING total_qty > 0"
@@ -431,7 +431,10 @@ def  buy_what_you_sell(start, end, company=None , from_warehouse = None , alter_
     # Step 1: Get current stock in from warehouse
     from_warehouse_stock = frappe.get_all(
         "Bin",
-        filters={"warehouse": from_warehouse},
+        filters={
+            "warehouse": from_warehouse,
+            "actual_qty": [">", 0]
+            },
         fields=["item_code", "actual_qty"]
     )  
 
