@@ -2883,6 +2883,7 @@
         if (item.qty > 0)
           is_return = 0;
       });
+      console.log("items ============================> ", items);
       this.selectedItemMaps.get(this.selectedTab.tabName).is_return = is_return;
       this.selectedItemMaps.get(this.selectedTab.tabName).items = items;
       if (items.length == 0)
@@ -8172,4 +8173,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.E6UTR6MG.js.map
+//# sourceMappingURL=pos.bundle.VOFSC6HE.js.map

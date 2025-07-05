@@ -1256,10 +1256,15 @@ pos_ar.PointOfSale.Controller = class {
 				'warehouse': this.appData.appData.pos_profile.warehouse,
 				'income_account': this.appData.appData.pos_profile.income_account,
 			}
+			
 			items.push(newItem)
 			if (item.qty > 0)
 				is_return = 0 
 		})
+
+		console.log("items ============================> " , items)
+
+
 
 		this.selectedItemMaps.get(this.selectedTab.tabName).is_return = is_return
 
