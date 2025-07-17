@@ -505,7 +505,7 @@
     render_pricing_data(data, priceLists, brands) {
       const $pricingScreen = this.wrapper.find(".pricing-screen");
       $pricingScreen.empty();
-      if (!data || data.length === 0) {
+      if (!priceLists || priceLists.length === 0 && !brands || brands.length === 0) {
         $pricingScreen.html(`
                 <div class="no-data-state">
                     <div class="no-data-icon">
@@ -5637,7 +5637,7 @@
 	
 					<div class="receipt-footer">
 						<div>Merci de votre visite!</div>`;
-        if (this.company.name != "OPTILENS TIZIOUZOU") {
+        if (this.company.name != "OPTILENS TIZIOUZOU" || this.company.name != "OPTILENS AZAZGA") {
           receiptHTML += `<div>${this.company.company_name}</div>`;
         }
         receiptHTML += `</div>
@@ -8176,4 +8176,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.ORUDWSH3.js.map
+//# sourceMappingURL=pos.bundle.FXZQKZXR.js.map

@@ -307,7 +307,7 @@ pos_ar.Pricing.PricingController = class {
         const $pricingScreen = this.wrapper.find('.pricing-screen');
         $pricingScreen.empty();
 
-        if (!data || data.length === 0) {
+        if (!priceLists || priceLists.length === 0 &&  !brands || brands.length === 0 ) {
             $pricingScreen.html(`
                 <div class="no-data-state">
                     <div class="no-data-icon">
@@ -320,6 +320,8 @@ pos_ar.Pricing.PricingController = class {
             `);
             return;
         }
+
+
 
         // Load and apply saved column order
         const savedOrder = JSON.parse(localStorage.getItem('priceListOrder') || '[]');

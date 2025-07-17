@@ -394,9 +394,9 @@ def get_item_prices(company=None):
     try:
         
             
-        print("==========>1" )
+        print("==========>>>1" )
 
-        allowed_price_lists = frappe.get_all(
+        user_permissions = frappe.get_all(
             "User Permission",
             filters={
                 "user": frappe.session.user,
@@ -405,25 +405,38 @@ def get_item_prices(company=None):
             fields=["for_value"]
         )
             
-        print("==========>2" + str(allowed_price_lists))
-        
-        allowed_price_lists = [row["for_value"] for row in allowed_price_lists]
+        print("==========>2" + str(user_permissions))
+    
+
+        if user_permissions : 
+            # Restrict to only allowed price lists
+            allowed_price_lists = [ row["for_value"] for row in user_permissions]
+            filters = {
+                "enabled": 1,
+                "custom_company": ["in", [company, "", None]],
+                "name": ["in", allowed_price_lists]
+            }
+        else : 
+            # No restriction → fetch all valid price lists for the company
+            filters = {
+                "enabled": 1,
+                "custom_company": ["in", [company, "", None]]
+            }
+
+
 
 
 
             
-        print("==========>3" + str(allowed_price_lists))
 
         # Filter price lists that are both enabled, belong to the right company, and user is permitted to see
         price_lists = frappe.get_all(
             "Price List",
-            filters={
-                "enabled": 1,
-                "custom_company": ["in", [company, "", None]],
-                "name": ["in", allowed_price_lists]  # ✅ manually restrict using user permissions
-            },
+            filters=filters,
             fields=["name"]
         )
+
+        print("==========>4" + str(price_lists))
 
         # Filter item prices by the price lists fetched
         item_prices = []
