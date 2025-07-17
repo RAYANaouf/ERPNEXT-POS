@@ -661,7 +661,7 @@ pos_ar.PointOfSale.pos_history = class {
 					<div style="font-size:10px;">Date: ${date}</div>
 					<div style="font-size:10px;">Heure: ${time}</div>
 					${this.company.name == "OPTILENS TIZIOUZOU" ? `<div style="font-size:10px;" >Numéro: 026124922</div>` : ''}
-					${this.company.name == "OPTILENS AZAZGA" ?   `<div style="font-size:10px;" >Numéro: 0798 41 48 35</div>` : ''}
+					${this.company.name == "OPTILENS AZAZGA"    ? `<div style="font-size:10px;" >Numéro: 0798 41 48 35</div>` : ''}
 					<div style="${statusStyle}">Statut: ${paymentStatus}</div>
 				</div>
 			</div>
@@ -724,7 +724,7 @@ pos_ar.PointOfSale.pos_history = class {
 					<div class="receipt-footer">
 						<div>Merci de votre visite!</div>`
 
-			if(this.company.name != "OPTILENS TIZIOUZOU"){
+			if(this.company.name != "OPTILENS TIZIOUZOU" || this.company.name != "OPTILENS AZAZGA"  ){
 				receiptHTML += 	`<div>${this.company.company_name}</div>`
 			}
 
