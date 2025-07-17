@@ -5560,7 +5560,7 @@
 				</style>
 			`;
         let logo = "";
-        if (this.company.name == "OPTILENS TIZIOUZOU") {
+        if (this.company.name == "OPTILENS TIZIOUZOU" || this.company.name == "OPTILENS AZAZGA") {
           logo = "/assets/pos_ar/images/nacimolens.jpg";
         } else {
           logo = "/assets/pos_ar/images/logo.jpg";
@@ -5571,7 +5571,9 @@
 					<div class="logo-container">
 						<img src="${logo}" alt="Company Logo" onerror="this.style.display='none';">
 					</div>`;
-        if (this.company.name != "OPTILENS TIZIOUZOU") {
+        if (this.company.name == "OPTILENS AZAZGA") {
+          receiptHTML += `<div class="company-name"> NacimoLens AZAZGA </div>`;
+        } else if (this.company.name != "OPTILENS TIZIOUZOU") {
           receiptHTML += `<div class="company-name">${this.company.company_name}</div>`;
         }
         receiptHTML += `
@@ -5582,6 +5584,7 @@
 					<div style="font-size:10px;">Date: ${date}</div>
 					<div style="font-size:10px;">Heure: ${time}</div>
 					${this.company.name == "OPTILENS TIZIOUZOU" ? `<div style="font-size:10px;" >Num\xE9ro: 026124922</div>` : ""}
+					${this.company.name == "OPTILENS AZAZGA" ? `<div style="font-size:10px;" >Num\xE9ro: 0798 41\xA048\xA035</div>` : ""}
 					<div style="${statusStyle}">Statut: ${paymentStatus}</div>
 				</div>
 			</div>
@@ -8173,4 +8176,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.VOFSC6HE.js.map
+//# sourceMappingURL=pos.bundle.ORUDWSH3.js.map

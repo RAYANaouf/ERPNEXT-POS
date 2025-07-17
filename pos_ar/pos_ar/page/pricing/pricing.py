@@ -72,7 +72,7 @@ def get_all_item_prices(company=None):
 @frappe.whitelist()
 def fix_prices(brand, price_list, new_price):
     try:
-        # Step 1: Update existing item prices using ORM so `modified` is updated
+        # Step 1: Update existing item prices using ORM so `modified` is updated (importing because i notice ERPNext need the date of update to fetch the right price on the right date)
         existing_prices = frappe.get_all("Item Price",
             filters={"brand": brand, "price_list": price_list},
             fields=["name"]

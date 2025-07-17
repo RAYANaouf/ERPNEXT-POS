@@ -630,7 +630,7 @@ pos_ar.PointOfSale.pos_history = class {
 			`;
 	
 			let logo = ''
-			if(this.company.name == "OPTILENS TIZIOUZOU"){
+			if(this.company.name == "OPTILENS TIZIOUZOU" || this.company.name == "OPTILENS AZAZGA" ){
 				logo = '/assets/pos_ar/images/nacimolens.jpg'
 			}else{
 				logo = '/assets/pos_ar/images/logo.jpg'
@@ -644,10 +644,13 @@ pos_ar.PointOfSale.pos_history = class {
 						<img src="${logo}" alt="Company Logo" onerror="this.style.display='none';">
 					</div>`
 
-			if(this.company.name != "OPTILENS TIZIOUZOU"){
-				receiptHTML +=		
-					`<div class="company-name">${this.company.company_name}</div>`
-			}
+				if(this.company.name == "OPTILENS AZAZGA"){
+					receiptHTML +=		
+						`<div class="company-name"> NacimoLens AZAZGA </div>`
+				}else if(this.company.name != "OPTILENS TIZIOUZOU"){
+					receiptHTML +=		
+						`<div class="company-name">${this.company.company_name}</div>`
+				}
 
 			receiptHTML +=	
 			`
@@ -658,6 +661,7 @@ pos_ar.PointOfSale.pos_history = class {
 					<div style="font-size:10px;">Date: ${date}</div>
 					<div style="font-size:10px;">Heure: ${time}</div>
 					${this.company.name == "OPTILENS TIZIOUZOU" ? `<div style="font-size:10px;" >Numéro: 026124922</div>` : ''}
+					${this.company.name == "OPTILENS AZAZGA" ?   `<div style="font-size:10px;" >Numéro: 0798 41 48 35</div>` : ''}
 					<div style="${statusStyle}">Statut: ${paymentStatus}</div>
 				</div>
 			</div>

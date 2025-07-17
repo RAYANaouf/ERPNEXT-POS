@@ -1446,7 +1446,6 @@ pos_ar.PointOfSale.Controller = class {
 				allUnsyncedPos.forEach(pos => {
 					// we still didnt implement the  base_paid_amount and amount_eligible_for_commissionseen
 					// value in deafault pos ==>  ["Administrator"]. i think it is an array.
-					console.log("before sync =============================> " , pos)
 					frappe.db.insert(
 						pos
 					).then(r => {
