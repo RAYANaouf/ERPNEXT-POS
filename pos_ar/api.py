@@ -1106,6 +1106,9 @@ def create_customer(name, type , price_list=None, company=None, companies=None, 
 
 #########################################################  Permission override   ########################################################
 
+
+
+######### purchase invoice
 def purchase_invoice_permission(doc, ptype, user):
     
     
@@ -1183,3 +1186,89 @@ def purchase_invoice_permission_query_conditions(user):
         return f"`tabPurchase Invoice`.`company` IN ({allowed_companies_str})"
     else:
         return ""  # User has no restrictions, allow all
+
+
+
+
+
+
+
+######### customer
+def customer_permission(doc, ptype, user):
+
+
+    
+    print(" 1 =====>")
+    frappe.log_error(" 1 ======>")
+
+    # Get allowed companies for the user
+    allowed_companies = frappe.get_all(
+        "User Permission",
+        filters={
+            "user": user,
+            "allow": "Company",
+            "apply_to_all_doctypes": True
+        },
+        pluck="for_value"
+    )
+
+    
+    print(" 2 =====>")
+    frappe.log_error(" 2 ======>")
+
+
+    # If user has no restriction, allow access
+    if not allowed_companies:
+        return True
+
+
+    print(" 3 =====>")
+    frappe.log_error(" 3 ======>")
+
+    # Fetch list of allowed companies on this customer from the child table
+    customer_companies = [row.company for row in doc.custom_companies]
+
+
+    print(" 4 =====>")
+    frappe.log_error(" 4 ======>")
+
+    # Check for intersection
+    if any(company in allowed_companies for company in customer_companies):
+        return True
+
+
+
+    print(" 5 =====>")
+    frappe.log_error(" 5 ======>")
+
+    # No match, deny access
+    return True
+
+
+def customer_permission_query_conditions(user):
+    from frappe import db, get_all
+
+    # Get companies the current user has access to
+    allowed_companies = get_all(
+        "User Permission",
+        filters={
+            "user": user,
+            "allow": "Company",
+            "apply_to_all_doctypes": True
+        },
+        pluck="for_value"
+    )
+
+    if not allowed_companies:
+        return ""  # User has no restrictions, allow all
+
+    # Escape company names for SQL safety
+    allowed_companies_str = ", ".join([db.escape(c) for c in allowed_companies])
+
+    return f"""
+        EXISTS (
+            SELECT 1 FROM `tabCustomer Company` cc
+            WHERE cc.parent = `tabCustomer`.name
+            AND cc.company IN ({allowed_companies_str})
+        )
+    """
