@@ -632,6 +632,8 @@ pos_ar.PointOfSale.pos_history = class {
 			let logo = ''
 			if(this.company.name == "OPTILENS TIZIOUZOU" || this.company.name == "OPTILENS AZAZGA" ){
 				logo = '/assets/pos_ar/images/nacimolens.jpg'
+			}else if(  this.company.name == "OPTILENS BLIDA DRISS"){
+				logo = '/assets/pos_ar/images/blida-driss.jpg'
 			}else{
 				logo = '/assets/pos_ar/images/logo.jpg'
 			}
