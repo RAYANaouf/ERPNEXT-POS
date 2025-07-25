@@ -989,11 +989,6 @@ def update_customer_user_permissions(doc, method=None):
     customer_name = doc.name
     companies = [row.company for row in doc.custom_companies]
 
-    # Step 1: Delete all user permissions for this customer
-    frappe.db.delete("User Permission", {
-        "allow": "Customer",
-        "for_value": customer_name
-    })
     
     # Step 2: Delete all 'Company' permissions scoped to this customer
     frappe.db.delete("User Permission", {
@@ -1019,9 +1014,6 @@ def update_customer_user_permissions(doc, method=None):
         has_common = any(company in allowed_companies for company in companies)
 
         if has_common:
-            # Add permission to view this customer
-            add_user_permission(user_name, "Customer", customer_name)
-
             for company in companies:
                 # If user doesn’t already have access to this company
                 if company not in allowed_companies:
