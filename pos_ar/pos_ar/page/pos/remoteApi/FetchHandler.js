@@ -96,8 +96,10 @@ pos_ar.PointOfSale.FetchHandler = class FetchHandler{
 	async fetchItems(warehouse) {
 		try {
 
-			const priceLists = await this.fetchPriceList()
 
+			console.log("0000..1111" )
+			const priceLists = await this.fetchPriceList()
+			console.log("2222..3333" )
 			
 			/*if(since){
 				filter.modified = ['>',since]
@@ -166,11 +168,16 @@ pos_ar.PointOfSale.FetchHandler = class FetchHandler{
 
 	async fetchPriceList(since) {
 		try {
+
+			console.log("4444..5555")
 			const filter = {selling : 1 , enabled : 1}
+			console.log("6666..7777")
 			const company = frappe.defaults.get_default("Company");
+			console.log("8888..9999" , company)
 			if(company){
 				filter.custom_company = ['in', [company , ""]];
 			}
+			console.log("1010..1111" , filter)
 			/*if(since){
 				filter.modified = ['>',since]
 			}*/

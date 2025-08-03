@@ -26,8 +26,11 @@ pos_ar.PointOfSale.posAppData = class {
 			await this.getCustomers();			
 			frappe.show_progress('Please Wait', 2, 12, 'loading pos profiles');
 			await this.getPosProfiles();
+			console.log("this.appData.pos_profile" , this.appData.pos_profile)
 			frappe.show_progress('Please Wait', 3, 12, 'loading items...');
+			console.log("this.appData.pos_profile.warehouse" , this.appData.pos_profile.warehouse)
 			await this.getItems(this.appData.pos_profile.warehouse);
+			console.log("this.appData.items" , this.appData.items)
 			frappe.show_progress('Please Wait', 4, 12, 'loading mode of payment');
 			await this.getPosProfileModeOfPayments(this.appData.pos_profile)
 			frappe.show_progress('Please Wait', 5, 12, 'loading warehouses');
@@ -67,6 +70,7 @@ pos_ar.PointOfSale.posAppData = class {
 		const localCustomers = [];
 		//get remote
 		const updatedCustomers = await this.api_handler.fetchCustomers(this.since)
+		console.log("updatedCustomers =**=**=>" , updatedCustomers)
 		//save new customers
 		await this.db.saveCustomerList(updatedCustomers)
 
@@ -83,9 +87,12 @@ pos_ar.PointOfSale.posAppData = class {
 		//get local
 		//const localItems   = await this.db.getAllItems();
 		const localItems   = [];
+
+		console.log("1111" , warehouse)
 		//get remote
 		let updatedItems = await this.api_handler.fetchItems(warehouse)
 
+		console.log("2222" , updatedItems)
 		//save new items
 		//await this.db.saveItemList(updatedItems.message)
 

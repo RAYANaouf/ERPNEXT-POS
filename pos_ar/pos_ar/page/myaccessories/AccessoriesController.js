@@ -262,7 +262,7 @@ pos_ar.myaccessories.AccessoriesController = class {
         let grandTotal = 0;
     
         Object.entries(items).forEach(([itemName, item]) => {
-            grandTotal += item.rate * item.qty;
+            grandTotal += item.rate ;
     
             $('<div class="item-row">')
                 .html(`

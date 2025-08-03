@@ -96,6 +96,44 @@ def get_item_sold(start, end, company=None):
 
 
 
+#get customer with advenced filters
+
+@frappe.whitelist()
+def get_customers_by_company(company=None):
+    """
+    Return customers that are linked to a given company through a child table.
+    """
+    if not company:
+        return {"error": "Missing company"}
+
+    # Step 1: Get customer names linked to the given company in child table
+    customer_names = frappe.get_all(
+        "Customer Company",  
+        filters={"company": company},
+        fields=["parent"],
+        distinct=True
+    )
+
+    # Step 2: Extract customer IDs
+    customer_ids = [row["parent"] for row in customer_names]
+
+    if not customer_ids:
+        return {"customers": []}
+
+    # Step 3: Fetch customers based on those IDs
+    customers = frappe.get_all(
+        "Customer",
+        filters={
+            "name": ["in", customer_ids],
+            "disabled": 0
+        },
+        fields=["name", "customer_name", "custom_debt", "default_price_list"],
+        order_by="customer_name asc",
+        limit_page_length=100000
+    )
+
+    return {"customers": customers}
+
 
 
 

@@ -7540,8 +7540,11 @@
         await this.getCustomers();
         frappe.show_progress("Please Wait", 2, 12, "loading pos profiles");
         await this.getPosProfiles();
+        console.log("this.appData.pos_profile", this.appData.pos_profile);
         frappe.show_progress("Please Wait", 3, 12, "loading items...");
+        console.log("this.appData.pos_profile.warehouse", this.appData.pos_profile.warehouse);
         await this.getItems(this.appData.pos_profile.warehouse);
+        console.log("this.appData.items", this.appData.items);
         frappe.show_progress("Please Wait", 4, 12, "loading mode of payment");
         await this.getPosProfileModeOfPayments(this.appData.pos_profile);
         frappe.show_progress("Please Wait", 5, 12, "loading warehouses");
@@ -7572,6 +7575,7 @@
     async getCustomers() {
       const localCustomers = [];
       const updatedCustomers = await this.api_handler.fetchCustomers(this.since);
+      console.log("updatedCustomers =**=**=>", updatedCustomers);
       await this.db.saveCustomerList(updatedCustomers);
       this.appData.customers = updatedCustomers;
     }
@@ -7580,7 +7584,9 @@
     }
     async getItems(warehouse) {
       const localItems = [];
+      console.log("1111", warehouse);
       let updatedItems = await this.api_handler.fetchItems(warehouse);
+      console.log("2222", updatedItems);
       this.appData.items = updatedItems.message;
     }
     async getPosProfiles() {
@@ -7807,7 +7813,9 @@
     }
     async fetchItems(warehouse) {
       try {
+        console.log("0000..1111");
         const priceLists = await this.fetchPriceList();
+        console.log("2222..3333");
         return await frappe.call({
           method: "pos_ar.pos_ar.doctype.pos_info.pos_info.get_item",
           args: { priceLists, warehouse }
@@ -7855,11 +7863,15 @@
     }
     async fetchPriceList(since) {
       try {
+        console.log("4444..5555");
         const filter = { selling: 1, enabled: 1 };
+        console.log("6666..7777");
         const company = frappe.defaults.get_default("Company");
+        console.log("8888..9999", company);
         if (company) {
           filter.custom_company = ["in", [company, ""]];
         }
+        console.log("1010..1111", filter);
         return await frappe.db.get_list("Price List", {
           fields: ["name", "price_list_name", "currency"],
           filters: filter,
@@ -8178,4 +8190,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.IDBGN2K2.js.map
+//# sourceMappingURL=pos.bundle.A7GUI6SH.js.map
