@@ -201,7 +201,7 @@
       }
       let grandTotal = 0;
       Object.entries(items).forEach(([itemName, item]) => {
-        grandTotal += item.rate * item.qty;
+        grandTotal += item.rate;
         $('<div class="item-row">').html(`
                     <div class="item-col name">${frappe.utils.escape_html(itemName)}</div>
                     <div class="item-col qty">${item.qty}</div>
@@ -8190,4 +8190,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.A7GUI6SH.js.map
+//# sourceMappingURL=pos.bundle.YDFYP7N3.js.map
