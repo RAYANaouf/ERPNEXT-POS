@@ -9,6 +9,7 @@ app_license = "mit"
 # Includes in <head>
 # ------------------
 
+
 # include js, css files in header of desk.html
 app_include_css = "/assets/pos_ar/css/main.css"
 app_include_js  = ["/assets/pos_ar/js/pos.bundle.js","https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js","/assets/pos_ar/js/sw.js"]
