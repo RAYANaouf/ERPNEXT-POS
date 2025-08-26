@@ -16,7 +16,7 @@ def get_transactions(ctn_box_name):
     return frappe.db.get_list(
         "CTN-BOX Transaction",
         filters={"ctn": ctn_box_name, "docstatus": 1},
-        fields=["*"]  # specify what fields you need
+        fields=["*"]  
     )
     
     
