@@ -269,7 +269,7 @@ doc_events = {
 fixtures = [
     {
         'dt': 'DocType',
-        'filters': [['name', 'in', ['check_in_out' , 'money' , 'CTN Item' , 'CTN-BOX' , 'CTN-BOX Transaction' ,  'CTN Transfer' , 'CTN Transfer Item' ,  'Stock Transfer CTN' , "Customer Company" , "Buy The Need" , "Buy The Need Item"]]]
+        'filters': [['name', 'in', ['check_in_out' , 'money' , 'CTN Item' , 'CTN-BOX' , 'CTN-BOX Transaction' ,  'CTN Transfer' , 'CTN Transfer Item' ,  'Stock Transfer CTN' , "Customer Company" , "Buy The Need", "Buy The Sold" , "Buy The Need Item"]]]
     },
     {
         'dt': 'Custom Field',
