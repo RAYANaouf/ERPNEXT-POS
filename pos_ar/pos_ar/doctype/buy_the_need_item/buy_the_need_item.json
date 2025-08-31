@@ -7,20 +7,26 @@
  "engine": "InnoDB",
  "field_order": [
   "item",
-  "column_break_5u0w",
+  "cb_1",
   "sold",
-  "column_break_ekbc",
+  "cb_2",
   "found",
-  "column_break_wxqq",
+  "cb_3",
   "alter",
-  "column_break_sha1",
+  "cb_4",
   "not_found",
-  "section_break_ys0h",
+  "sb_1",
   "on_stock",
-  "column_break_u2ca",
+  "cb_5",
   "best_sell",
-  "column_break_e24n",
-  "best_sell_date"
+  "cb_6",
+  "best_sell_date",
+  "sb_2",
+  "is_overload",
+  "cb_7",
+  "overload_qty",
+  "sb_3",
+  "needed_qty"
  ],
  "fields": [
   {
@@ -31,18 +37,10 @@
    "options": "Item"
   },
   {
-   "fieldname": "column_break_5u0w",
-   "fieldtype": "Column Break"
-  },
-  {
    "fieldname": "sold",
    "fieldtype": "Float",
    "in_list_view": 1,
    "label": "Sold"
-  },
-  {
-   "fieldname": "column_break_ekbc",
-   "fieldtype": "Column Break"
   },
   {
    "fieldname": "found",
@@ -51,18 +49,10 @@
    "label": "Found"
   },
   {
-   "fieldname": "column_break_wxqq",
-   "fieldtype": "Column Break"
-  },
-  {
    "fieldname": "alter",
    "fieldtype": "Float",
    "in_list_view": 1,
    "label": "Alter"
-  },
-  {
-   "fieldname": "column_break_sha1",
-   "fieldtype": "Column Break"
   },
   {
    "fieldname": "not_found",
@@ -71,18 +61,10 @@
    "label": "Not Found"
   },
   {
-   "fieldname": "section_break_ys0h",
-   "fieldtype": "Section Break"
-  },
-  {
    "fieldname": "on_stock",
    "fieldtype": "Float",
    "label": "On Stock",
    "read_only": 1
-  },
-  {
-   "fieldname": "column_break_u2ca",
-   "fieldtype": "Column Break"
   },
   {
    "fieldname": "best_sell",
@@ -91,20 +73,77 @@
    "read_only": 1
   },
   {
-   "fieldname": "column_break_e24n",
-   "fieldtype": "Column Break"
-  },
-  {
    "fieldname": "best_sell_date",
    "fieldtype": "Date",
    "label": "Best Sell Date",
+   "read_only": 1
+  },
+  {
+   "fieldname": "cb_1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "cb_2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "cb_3",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "cb_4",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "sb_1",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "cb_5",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "cb_6",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "sb_2",
+   "fieldtype": "Section Break",
+   "label": "Overload"
+  },
+  {
+   "default": "0",
+   "fieldname": "is_overload",
+   "fieldtype": "Check",
+   "label": "Is Overload",
+   "read_only": 1
+  },
+  {
+   "fieldname": "cb_7",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "sb_3",
+   "fieldtype": "Section Break",
+   "label": "Need"
+  },
+  {
+   "fieldname": "overload_qty",
+   "fieldtype": "Float",
+   "label": "Overload",
+   "read_only": 1
+  },
+  {
+   "fieldname": "needed_qty",
+   "fieldtype": "Float",
+   "label": "Qty Needed",
    "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-08-31 15:27:12.442257",
+ "modified": "2025-08-31 23:30:34.949742",
  "modified_by": "Administrator",
  "module": "POS AR",
  "name": "buy the need item",
