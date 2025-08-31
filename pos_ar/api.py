@@ -8,6 +8,9 @@ import os
 from frappe.utils import get_url
 import json
 
+from frappe.utils import cint
+
+
 
 
 
@@ -575,6 +578,149 @@ def  buy_what_you_sell(start, end, company=None , from_warehouse = None , alter_
             "buy_from_supplier2_map" : item_to_buy_from_supplier2_map
             }
 
+
+@frappe.whitelist()
+def buy_items_you_sell(start, end, company=None , from_warehouse = None , alter_from_warehouse = None , to_warehouse = None , max_qty = None):
+    if not start or not end:
+        frappe.throw(_("Start and End dates are required"))
+    
+    query = """
+        SELECT 
+            sii.item_code,
+            SUM(sii.qty) AS total_qty
+        FROM 
+            `tabSales Invoice Item` sii
+        INNER JOIN 
+            `tabSales Invoice` si ON sii.parent = si.name
+        INNER JOIN 
+            `tabItem` i ON sii.item_code = i.name
+        WHERE 
+            si.posting_date BETWEEN %s AND %s
+            AND si.docstatus = 1
+    """
+    filters = [start, end]
+
+
+
+    if to_warehouse:
+        query += " AND sii.warehouse = %s"
+        filters.append(to_warehouse)
+    if company:
+        query += " AND si.company = %s"
+        filters.append(company)
+
+    query += " GROUP BY sii.item_code"
+    query += " HAVING total_qty > 0"
+
+    sold_items = frappe.db.sql(query, filters, as_dict=True)
+
+    if not sold_items:
+        return sold_items
+
+    # -------- 2) Best month in LAST 5 YEARS for only these items --------
+    # Build list of item codes and placeholders for IN (...)
+    item_codes = [r["item_code"] for r in sold_items if r.get("item_code")]
+    if not item_codes:
+        return sold_items
+
+    placeholders = ", ".join(["%s"] * len(item_codes))
+
+
+        # Last 5 years: [today - 60 months, today]
+    from frappe.utils import getdate, nowdate, add_months
+    to_dt = getdate(nowdate())
+    from_dt = add_months(to_dt, -60)
+
+    best_where = []
+    best_params = []
+
+    # Keep consistent filters
+    best_where.append("si.docstatus = 1")
+    if company:
+        best_where.append("si.company = %s")
+        best_params.append(company)
+
+    best_where.append("si.posting_date BETWEEN %s AND %s")
+    best_params.extend([str(from_dt), str(to_dt)])
+
+    if to_warehouse:
+        best_where.append("sii.warehouse = %s")
+        best_params.append(to_warehouse)
+
+    best_where.append(f"sii.item_code IN ({placeholders})")
+    best_params.extend(item_codes)
+
+    best_sql = f"""
+        WITH monthly AS (
+            SELECT
+                sii.item_code                      AS item_code,
+                YEAR(si.posting_date)              AS y,
+                MONTH(si.posting_date)             AS m,
+                SUM(sii.qty)                       AS qty_month
+            FROM `tabSales Invoice Item` sii
+            JOIN `tabSales Invoice` si ON si.name = sii.parent
+            WHERE {" AND ".join(best_where)}
+            GROUP BY sii.item_code, y, m
+        ),
+        ranked AS (
+            SELECT
+                item_code, y, m, qty_month,
+                ROW_NUMBER() OVER (
+                    PARTITION BY item_code
+                    ORDER BY qty_month DESC, y DESC, m DESC
+                ) AS rn
+            FROM monthly
+        )
+        SELECT item_code, y, m, qty_month
+        FROM ranked
+        WHERE rn = 1
+        ORDER BY item_code
+    """
+
+    best_rows = frappe.db.sql(best_sql, best_params, as_dict=True)
+    best_map = {
+        r["item_code"]: {
+            "best_sell_qty": float(r.get("qty_month") or 0.0),
+            "y": int(r["y"]) if r.get("y") is not None else None,
+            "m": int(r["m"]) if r.get("m") is not None else None,
+        }
+        for r in best_rows
+    }
+
+    
+
+
+    # 3)  # merge back: build "YYYY-MM-01" without using _date
+
+    for r in sold_items:
+        extra = best_map.get(r["item_code"], {})
+        r["best_sell_qty"]  = extra.get("best_sell_qty", 0.0)
+
+        y = cint(extra.get("y"))
+        m = cint(extra.get("m"))
+
+        r["best_sell_date"] = f"{y:04d}-{m:02d}-01" if (y and 1 <= m <= 12) else None
+
+    # 4) on-hand stock in the destination warehouse (actual_qty from Bin)
+    on_stock_map = {}
+    if to_warehouse and item_codes:
+        bins = {}  # ← define the dict
+        bin_sql = f"""
+            SELECT item_code, COALESCE(actual_qty, 0) AS actual_qty
+            FROM `tabBin`
+            WHERE warehouse = %s AND item_code IN ({placeholders})
+        """
+        for b in frappe.db.sql(bin_sql, [to_warehouse, *item_codes], as_dict=True):
+            bins[b["item_code"]] = float(b["actual_qty"] or 0)
+        on_stock_map = bins
+
+    # attach on_stock to each row (0 if not found or no warehouse provided)
+    for r in sold_items:
+        r["on_stock"] = float(on_stock_map.get(r["item_code"], 0.0))
+
+    return sold_items
+    
+    
 
 ################################################### user on client script ##############################################
 

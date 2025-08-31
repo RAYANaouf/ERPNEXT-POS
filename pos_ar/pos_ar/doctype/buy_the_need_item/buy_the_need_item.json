@@ -1,14 +1,26 @@
 {
  "actions": [],
  "allow_rename": 1,
- "creation": "2025-05-28 12:18:08.635142",
+ "creation": "2025-07-22 05:19:02.886175",
  "doctype": "DocType",
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
   "item",
   "column_break_5u0w",
-  "qty"
+  "sold",
+  "column_break_ekbc",
+  "found",
+  "column_break_wxqq",
+  "alter",
+  "column_break_sha1",
+  "not_found",
+  "section_break_ys0h",
+  "on_stock",
+  "column_break_u2ca",
+  "best_sell",
+  "column_break_e24n",
+  "best_sell_date"
  ],
  "fields": [
   {
@@ -23,21 +35,82 @@
    "fieldtype": "Column Break"
   },
   {
-   "fieldname": "qty",
-   "fieldtype": "Int",
+   "fieldname": "sold",
+   "fieldtype": "Float",
    "in_list_view": 1,
-   "label": "Qty"
+   "label": "Sold"
+  },
+  {
+   "fieldname": "column_break_ekbc",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "found",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Found"
+  },
+  {
+   "fieldname": "column_break_wxqq",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "alter",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Alter"
+  },
+  {
+   "fieldname": "column_break_sha1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "not_found",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Not Found"
+  },
+  {
+   "fieldname": "section_break_ys0h",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "on_stock",
+   "fieldtype": "Float",
+   "label": "On Stock",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_u2ca",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "best_sell",
+   "fieldtype": "Float",
+   "label": "Best Sell",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_e24n",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "best_sell_date",
+   "fieldtype": "Date",
+   "label": "Best Sell Date",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-05-28 12:20:06.012729",
+ "modified": "2025-08-31 15:27:12.442257",
  "modified_by": "Administrator",
  "module": "POS AR",
  "name": "buy the need item",
  "owner": "Administrator",
  "permissions": [],
+ "row_format": "Dynamic",
  "sort_field": "modified",
  "sort_order": "DESC",
  "states": []

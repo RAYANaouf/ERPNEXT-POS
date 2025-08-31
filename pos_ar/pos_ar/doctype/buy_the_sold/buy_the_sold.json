@@ -1,0 +1,255 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "format:Order-{company}-{####}",
+ "creation": "2025-08-29 17:43:43.832312",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "supplier",
+  "from_company",
+  "warehouse",
+  "alter_supplier",
+  "alter_from_company",
+  "alter_warehouse",
+  "bc_1",
+  "company",
+  "to_warehouse",
+  "sb_1",
+  "search_by_time",
+  "cb_2",
+  "note",
+  "sb_2",
+  "start",
+  "cb_3",
+  "end",
+  "sb_3",
+  "cb_4",
+  "cb_5",
+  "cb_6",
+  "search",
+  "column_break_8sd2",
+  "column_break_dqav",
+  "sb_4",
+  "items",
+  "sb_5",
+  "column_break_sd6o",
+  "column_break_5dha",
+  "column_break_jhbo",
+  "generate",
+  "column_break_ty7n",
+  "column_break_gxzg",
+  "amended_from"
+ ],
+ "fields": [
+  {
+   "fieldname": "supplier",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Supplier",
+   "options": "Supplier",
+   "reqd": 1
+  },
+  {
+   "fieldname": "from_company",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "From Company",
+   "options": "Company",
+   "read_only": 1,
+   "reqd": 1
+  },
+  {
+   "fieldname": "warehouse",
+   "fieldtype": "Link",
+   "label": "Warehouse",
+   "options": "Warehouse",
+   "read_only": 1
+  },
+  {
+   "fieldname": "alter_supplier",
+   "fieldtype": "Link",
+   "label": "Alter Supplier",
+   "options": "Supplier"
+  },
+  {
+   "fieldname": "alter_from_company",
+   "fieldtype": "Link",
+   "label": "From Company",
+   "options": "Company",
+   "read_only": 1
+  },
+  {
+   "fieldname": "alter_warehouse",
+   "fieldtype": "Link",
+   "label": "Wahouse",
+   "options": "Warehouse",
+   "read_only": 1
+  },
+  {
+   "fieldname": "bc_1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "To Company",
+   "options": "Company",
+   "reqd": 1
+  },
+  {
+   "fieldname": "to_warehouse",
+   "fieldtype": "Link",
+   "label": "to_warehouse",
+   "options": "Warehouse"
+  },
+  {
+   "fieldname": "sb_1",
+   "fieldtype": "Section Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "search_by_time",
+   "fieldtype": "Check",
+   "label": "Search by time"
+  },
+  {
+   "fieldname": "cb_2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "depends_on": "search_by_time",
+   "fieldname": "note",
+   "fieldtype": "Read Only",
+   "label": "Note"
+  },
+  {
+   "depends_on": "search_by_time",
+   "fieldname": "sb_2",
+   "fieldtype": "Section Break",
+   "label": "Set Period"
+  },
+  {
+   "fieldname": "start",
+   "fieldtype": "Date",
+   "label": "start"
+  },
+  {
+   "fieldname": "cb_3",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "end",
+   "fieldtype": "Date",
+   "label": "end"
+  },
+  {
+   "fieldname": "sb_3",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "cb_4",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "cb_5",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "cb_6",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "search",
+   "fieldtype": "Button",
+   "label": "Search"
+  },
+  {
+   "fieldname": "column_break_8sd2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_dqav",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "sb_4",
+   "fieldtype": "Section Break",
+   "label": "Sold Items"
+  },
+  {
+   "fieldname": "items",
+   "fieldtype": "Table",
+   "options": "buy the need item"
+  },
+  {
+   "fieldname": "sb_5",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "column_break_sd6o",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_5dha",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_jhbo",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "generate",
+   "fieldtype": "Button",
+   "label": "Generate"
+  },
+  {
+   "fieldname": "column_break_ty7n",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_gxzg",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Buy The Sold",
+   "print_hide": 1,
+   "read_only": 1,
+   "search_index": 1
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2025-08-29 19:06:01.206654",
+ "modified_by": "Administrator",
+ "module": "POS AR",
+ "name": "Buy The Sold",
+ "naming_rule": "Expression",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
