@@ -277,7 +277,7 @@ fixtures = [
     },
     {
         'dt': 'Client Script',
-        'filters': [['dt', 'in', ['POS Closing Entry','CTN-BOX','Sales Invoice','Purchase Order','CTN Transfer' , 'Stock Entry' , 'Company' , 'Buy The Need']]]
+        'filters': [['dt', 'in', ['POS Closing Entry','CTN-BOX','Sales Invoice','Purchase Order','CTN Transfer' , 'Stock Entry' , 'Company' , 'Buy The Need' , 'Buy The Sold']]]
     },
     {
         'dt': 'Server Script',
