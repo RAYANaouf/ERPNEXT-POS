@@ -281,7 +281,7 @@ fixtures = [
     },
     {
         'dt': 'Server Script',
-        'filters': [['reference_doctype', 'in', ['Purchase Order']]]
+        'filters': [['reference_doctype', 'in', ['Purchase Order' , 'Purchase Invoice' , 'Purchase Order']]]
     }
 ]
 
