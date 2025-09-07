@@ -1483,33 +1483,20 @@ def supplier_permission_query_conditions(user):
     # Escape company names for SQL safety
     allowed_companies_sql = ", ".join([db.escape(c) for c in allowed_companies])
 
-    # Two ways to authorize a Supplier row:
-    # 1) Supplier.represents_company is in the user's companies (internal supplier case)
-    # 2) Supplier has a Party Account for one of the user's companies
-    # Return a WHERE-clause fragment (not a full WHERE)
-    # we just implement the first one for now.
-    #return f"""
-    #(
-    #    `tabSupplier`.represents_company IN ({allowed_companies_sql})
-    #    OR EXISTS (
-    #        SELECT 1
-    #        FROM `tabParty Account` pa
-    #        WHERE pa.parenttype = 'Supplier'
-    #          AND pa.parent = `tabSupplier`.name
-    #          AND pa.company IN ({allowed_companies_sql})
-    #    )
-    #)
-    #"""
+    # Authorize Supplier rows if:
+    # A) Company -> Allowed To Transact With (party_type='Supplier', party=<Supplier.name>)
+    # B) (optional) Supplier.represents_company in allowed companies (internal supplier case)
     return f"""
     (
-        `tabSupplier`.represents_company IN ({allowed_companies_sql})
-        OR EXISTS (
+        EXISTS (
             SELECT 1
-            FROM `tabParty Account` pa
-            WHERE pa.parenttype = 'Supplier'
-              AND pa.parent = `tabSupplier`.name
-              AND pa.company IN ({allowed_companies_sql})
+            FROM `tabAllowed To Transact With` attw
+            WHERE attw.parenttype = 'Company'
+              AND attw.party_type = 'Supplier'
+              AND attw.party = `tabSupplier`.name
+              AND attw.parent IN ({allowed_companies_sql})
         )
+        OR `tabSupplier`.represents_company IN ({allowed_companies_sql})
     )
     """
 
