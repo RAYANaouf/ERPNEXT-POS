@@ -106,6 +106,7 @@ permission_query_conditions = {
 # 	"Event": "frappe.desk.doctype.event.event.get_permission_query_conditions",
     "Purchase Invoice": "pos_ar.api.purchase_invoice_permission_query_conditions",
     "Customer": "pos_ar.api.customer_permission_query_conditions",
+    "Supplier": "pos_ar.api.supplier_permission_query_conditions"
 }
 #
 
@@ -163,7 +164,7 @@ doc_events = {
     },
     "User Permission": {
        "on_update": ["pos_ar.api.sync_customer_permissions_from_user_permission"],
-       "on_trash": ["pos_ar.api.remove_user_company_permission"]
+       "on_trash" : ["pos_ar.api.remove_user_company_permission"]
    }
 }
 

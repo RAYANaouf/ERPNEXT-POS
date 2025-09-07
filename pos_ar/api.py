@@ -1448,3 +1448,68 @@ def customer_permission_query_conditions(user):
             AND cc.company IN ({allowed_companies_str})
         )
     """
+
+
+# Supplier
+def supplier_permission_query_conditions(user):
+    from frappe import db, get_all
+
+
+    # Collect allowed companies from User Permissions:
+    #  - Global: apply_to_all_doctypes = 1
+    #  - Doctype-specific: applicable_for = "Supplier"
+    global_companies  = get_all(
+        "User Permission",
+        filters={
+            "user": user,
+            "allow": "Company",
+            "apply_to_all_doctypes": True
+        },
+        pluck="for_value"
+    )
+
+    supplier_scoped_companies = frappe.get_all(
+        "User Permission",
+        filters={"user": user, "allow": "Company", "applicable_for": "Supplier"},
+        pluck="for_value",
+    )
+
+    allowed_companies = list({*global_companies, *supplier_scoped_companies})
+
+    # No restrictions configured → allow all suppliers
+    if not allowed_companies:
+        return ""
+
+    # Escape company names for SQL safety
+    allowed_companies_str = ", ".join([db.escape(c) for c in allowed_companies])
+
+    # Two ways to authorize a Supplier row:
+    # 1) Supplier.represents_company is in the user's companies (internal supplier case)
+    # 2) Supplier has a Party Account for one of the user's companies
+    # Return a WHERE-clause fragment (not a full WHERE)
+    # we just implement the first one for now.
+    #return f"""
+    #(
+    #    `tabSupplier`.represents_company IN ({allowed_companies_sql})
+    #    OR EXISTS (
+    #        SELECT 1
+    #        FROM `tabParty Account` pa
+    #        WHERE pa.parenttype = 'Supplier'
+    #          AND pa.parent = `tabSupplier`.name
+    #          AND pa.company IN ({allowed_companies_sql})
+    #    )
+    #)
+    #"""
+    return f"""
+    (
+        `tabSupplier`.represents_company IN ({allowed_companies_sql})
+        OR EXISTS (
+            SELECT 1
+            FROM `tabParty Account` pa
+            WHERE pa.parenttype = 'Supplier'
+              AND pa.parent = `tabSupplier`.name
+              AND pa.company IN ({allowed_companies_sql})
+        )
+    )
+    """
+
