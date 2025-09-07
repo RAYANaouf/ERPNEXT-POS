@@ -1481,7 +1481,7 @@ def supplier_permission_query_conditions(user):
         return ""
 
     # Escape company names for SQL safety
-    allowed_companies_str = ", ".join([db.escape(c) for c in allowed_companies])
+    allowed_companies_sql = ", ".join([db.escape(c) for c in allowed_companies])
 
     # Two ways to authorize a Supplier row:
     # 1) Supplier.represents_company is in the user's companies (internal supplier case)
