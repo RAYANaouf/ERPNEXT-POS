@@ -1496,6 +1496,7 @@ def supplier_permission_query_conditions(user):
               AND attw.company IN ({allowed_companies_sql})
         )
         OR `tabSupplier`.represents_company IN ({allowed_companies_sql})
+        OR `tabSupplier`.custom_company IN ({allowed_companies_sql})
     )
     """
 
