@@ -1418,7 +1418,7 @@ def customer_permission(doc, ptype, user):
     frappe.log_error(" 5 ======>")
 
     # No match, deny access
-    return True
+    return False
 
 
 def customer_permission_query_conditions(user):
@@ -1500,3 +1500,68 @@ def supplier_permission_query_conditions(user):
     )
     """
 
+
+######### customer
+def supplier_permission(doc, ptype, user):
+    
+    print(" 1 =====>")
+    frappe.log_error(" 1 ======>")
+
+    # Collect allowed companies from User Permissions:
+    #  - Global: apply_to_all_doctypes = 1
+    #  - Doctype-specific: applicable_for = "Supplier"
+    global_companies  = get_all(
+        "User Permission",
+        filters={
+            "user": user,
+            "allow": "Company",
+            "apply_to_all_doctypes": True
+        },
+        pluck="for_value"
+    )
+
+    supplier_scoped_companies = frappe.get_all(
+        "User Permission",
+        filters={"user": user, "allow": "Company", "applicable_for": "Supplier"},
+        pluck="for_value",
+    )
+
+    allowed_companies = list({*global_companies, *supplier_scoped_companies})
+
+    
+    print(" 2 =====>")
+    frappe.log_error(" 2 ======>")
+
+
+    # If user has no restriction, allow access
+    if not allowed_companies:
+        return True
+
+
+    print(" 3 =====>")
+    frappe.log_error(" 3 ======>")
+
+    # Fetch list of allowed companies on this customer from the child table
+    customer_companies = [row.company for row in doc.companies]
+
+
+    print(" 4 =====>")
+    frappe.log_error(" 4 ======>")
+
+    # Check for intersection
+    if any(company in allowed_companies for company in customer_companies):
+        return True
+
+    if doc.custom_company in allowed_companies:
+        return True
+
+    if doc.represents_company in allowed_companies:
+        return True
+
+
+
+    print(" 5 =====>")
+    frappe.log_error(" 5 ======>")
+
+    # No match, deny access
+    return False
