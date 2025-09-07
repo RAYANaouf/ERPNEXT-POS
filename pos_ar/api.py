@@ -1491,10 +1491,9 @@ def supplier_permission_query_conditions(user):
         EXISTS (
             SELECT 1
             FROM `tabAllowed To Transact With` attw
-            WHERE attw.parenttype = 'Company'
-              AND attw.party_type = 'Supplier'
-              AND attw.party = `tabSupplier`.name
-              AND attw.parent IN ({allowed_companies_sql})
+            WHERE attw.partytype = 'Supplier'
+              AND attw.parent = `tabSupplier`.name
+              AND attw.company IN ({allowed_companies_sql})
         )
         OR `tabSupplier`.represents_company IN ({allowed_companies_sql})
     )
