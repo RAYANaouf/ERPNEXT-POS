@@ -1372,8 +1372,6 @@ def purchase_invoice_permission_query_conditions(user):
 ######### customer
 def customer_permission(doc, ptype, user):
 
-
-    
     print(" 1 =====>")
     frappe.log_error(" 1 ======>")
 
@@ -1503,7 +1501,8 @@ def supplier_permission_query_conditions(user):
 
 ######### customer
 def supplier_permission(doc, ptype, user):
-    
+    from frappe import db, get_all
+
     print(" 1 =====>")
     frappe.log_error(" 1 ======>")
 
