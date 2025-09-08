@@ -104,17 +104,18 @@ app_include_js  = ["/assets/pos_ar/js/pos.bundle.js","https://cdnjs.cloudflare.c
 
 permission_query_conditions = {
 # 	"Event": "frappe.desk.doctype.event.event.get_permission_query_conditions",
-    "Purchase Invoice": "pos_ar.api.purchase_invoice_permission_query_conditions",
-    "Customer": "pos_ar.api.customer_permission_query_conditions",
-    "Supplier": "pos_ar.api.supplier_permission_query_conditions"
+    "Purchase Invoice" : "pos_ar.api.purchase_invoice_permission_query_conditions",
+    "Customer"         : "pos_ar.api.customer_permission_query_conditions",
+    "Supplier"         : "pos_ar.api.supplier_permission_query_conditions"
 }
 #
 
 
 has_permission = {
     #"Event": "frappe.desk.doctype.event.event.has_permission",
-    "Purchase Invoice": "pos_ar.api.purchase_invoice_permission",
-    "Customer": "pos_ar.api.customer_permission",
+    "Purchase Invoice" : "pos_ar.api.purchase_invoice_permission",
+    "Customer"         : "pos_ar.api.customer_permission",
+    "Supplier"         : "pos_ar.api.supplier_permission"
 }
 
 
