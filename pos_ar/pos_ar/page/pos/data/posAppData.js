@@ -64,12 +64,16 @@ pos_ar.PointOfSale.posAppData = class {
 
 
 	async getCustomers(){
+		
+		const company = frappe.defaults.get_default("Company");
 		/*the function should combine the two the logic didnt complite yet we still working on it*/
 		//get local
 		//const localCustomers = await this.db.getAllCustomers();
 		const localCustomers = [];
 		//get remote
-		const updatedCustomers = await this.api_handler.fetchCustomers(this.since)
+		const result = await this.api_handler.fetchCustomers(company , this.since)
+		const updatedCustomers = result.message.customers 
+	
 		console.log("updatedCustomers =**=**=>" , updatedCustomers)
 		//save new customers
 		await this.db.saveCustomerList(updatedCustomers)

@@ -100,7 +100,6 @@ def get_item_sold(start, end, company=None):
 
 
 #get customer with advenced filters
-
 @frappe.whitelist()
 def get_customers_by_company(company=None):
     """

@@ -7573,8 +7573,10 @@
       frappe.hide_progress();
     }
     async getCustomers() {
+      const company = frappe.defaults.get_default("Company");
       const localCustomers = [];
-      const updatedCustomers = await this.api_handler.fetchCustomers(this.since);
+      const result = await this.api_handler.fetchCustomers(company, this.since);
+      const updatedCustomers = result.message.customers;
       console.log("updatedCustomers =**=**=>", updatedCustomers);
       await this.db.saveCustomerList(updatedCustomers);
       this.appData.customers = updatedCustomers;
@@ -7757,16 +7759,13 @@
   // ../pos_ar/pos_ar/pos_ar/page/pos/remoteApi/FetchHandler.js
   pos_ar.PointOfSale.FetchHandler = class FetchHandler {
     constructor() {
-      console.log("testing4");
     }
-    async fetchCustomers(since) {
+    async fetchCustomers(company, since) {
       try {
         const filter = { disabled: 0 };
-        return await frappe.db.get_list("Customer", {
-          fields: ["name", "customer_name", "custom_debt", "default_price_list"],
-          filters: filter,
-          limit: 1e5,
-          order_by: "customer_name ASC"
+        return await frappe.call({
+          method: "pos_ar.api.get_customers_by_company",
+          args: { company }
         });
       } catch (error) {
         console.error("Error fetching customers:", error);
@@ -8190,4 +8189,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.YDFYP7N3.js.map
+//# sourceMappingURL=pos.bundle.HOXMGZQG.js.map

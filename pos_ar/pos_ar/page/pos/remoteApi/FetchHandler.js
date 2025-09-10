@@ -2,11 +2,10 @@ pos_ar.PointOfSale.FetchHandler = class FetchHandler{
 
 	constructor(){
 
-		console.log("testing4")
 	}
 
 
-	async fetchCustomers(since) {
+	async fetchCustomers(company , since) {
 		try {
 
 			const filter = { disabled : 0}
@@ -18,13 +17,12 @@ pos_ar.PointOfSale.FetchHandler = class FetchHandler{
 				filter.modified = ['>',since]
 			}*/
 
+			return await frappe.call({
+				method : "pos_ar.api.get_customers_by_company",
+				args : { company }
 
-			return await frappe.db.get_list('Customer', {
-                fields: ['name' , 'customer_name' , 'custom_debt' , 'default_price_list' ],
-				filters: filter,
-				limit : 100000,
-				order_by : "customer_name ASC"
 			})
+
 		} catch (error) {
 			console.error('Error fetching customers:', error);
 			return []
