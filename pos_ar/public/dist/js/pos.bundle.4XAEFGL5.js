@@ -5458,7 +5458,18 @@
         }
         let previous_balance = customer.custom_debt;
         if (this.app_settings.settings.onlineDebt) {
+          console.log("trying new method  : ", customer);
           previous_balance = await this.app_data.fetchCustomerDebt(customer.name);
+          frappe.call({
+            method: "pos_ar.api.calculate_customer_debt",
+            args: {
+              customer: customer.name,
+              company: this.app_data.appData.pos_profile.company
+            }
+          }).then((result) => {
+            console.log("result : ", result.message);
+            previous_balance = result.message;
+          });
         }
         const creation_time = pos.creation_time || pos.creation;
         if (!creation_time) {
@@ -8189,4 +8200,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.HOXMGZQG.js.map
+//# sourceMappingURL=pos.bundle.4XAEFGL5.js.map

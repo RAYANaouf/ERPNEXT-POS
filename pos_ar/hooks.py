@@ -159,14 +159,7 @@ doc_events = {
     "Stock Entry": {
         "on_submit": ["pos_ar.api.update_ctn_box_warehouse"  , "pos_ar.api.manage_related_ctn_transactions"],
         "on_cancel": ["pos_ar.api.update_ctn_box_warehouse"  , "pos_ar.api.manage_related_ctn_transactions"]
-    },
-    "Customer" : {
-        "on_update" : ["pos_ar.api.update_customer_user_permissions"]
-    },
-    "User Permission": {
-       "on_update": ["pos_ar.api.sync_customer_permissions_from_user_permission"],
-       "on_trash" : ["pos_ar.api.remove_user_company_permission"]
-   }
+    }
 }
 
 

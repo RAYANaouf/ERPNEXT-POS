@@ -58,8 +58,35 @@ def update_all_customers_debt(doc, method):
         frappe.logger().error(f"Error updating debts for all customers: {str(e)}")
 
 
+@frappe.whitelist()
+def calculate_customer_debt(customer , company=None):
+    
+    pos_invoices =frappe.get_all(
+        "POS Invoice" , 
+        filters={
+            "customer": customer , 
+            "company": company , 
+            "docstatus": 1 , 
+            "consolidated_invoice": None , 
+            "outstanding_amount": [">" , 0]
+        },
+        fields=["outstanding_amount"]
+    )
 
+    sales_invoices =frappe.get_all(
+        "Sales Invoice" , 
+        filters={
+            "customer": customer , 
+            "company": company , 
+            "docstatus": 1 , 
+            "outstanding_amount": [">" , 0]
+        },
+        fields=["outstanding_amount"]
+    )
 
+    total_outstanding = sum([invoice["outstanding_amount"] for invoice in pos_invoices]) + sum([invoice["outstanding_amount"] for invoice in sales_invoices])
+
+    return total_outstanding
 
 
 
@@ -1104,179 +1131,7 @@ def remove_ctn(doc, method):
                     frappe.msgprint(f"CTN-BOX {row.ctn} not found, skipping.")
                 except Exception as e:
                     frappe.log_error(frappe.get_traceback(), f"Error deleting CTN-BOX {row.ctn}")
-                
-
-
-
-
-#Customer filtring.
-
-def sync_customer_permissions_from_user_permission(doc, method=None):
-    if doc.allow != "Company" or doc.applicable_for  :
-        return
-    company = doc.for_value
-    user = doc.user
-    
-    # Step 1: Get all Customers linked to the granted Company
-    customers = frappe.db.sql("""
-        SELECT DISTINCT parent
-        FROM `tabCustomer Company` 
-        WHERE company = %s
-    """, (company,), as_list=True)
-    
-    # Flatten the result into a simple list of names
-    customer_names = [row[0] for row in customers]
-    
-    for customer_name in customer_names:
-        # Step 2: Add Customer permission (if not already there biensur)
-        # check if permission already exists
-        exist = frappe.db.exists("User Permission",{
-            "user":user,
-            "allow":"Customer",
-            "for_value":customer_name,
-            "applicable_for": None
-        })
-        if not exist:
-            add_user_permission(user,"Customer",customer_name)
-            
-         # Step 3: Use get_doc to fetch companies from custom_companies child table
-        customer_doc = frappe.get_doc("Customer", customer_name)
-        
-        for row in customer_doc.custom_companies:
-            print("row.company : ", row.company)
-            print("customer_name : ", customer_name)
-            linked_company = row.company
-
-            scoped_perm_exists = frappe.db.exists("User Permission", {
-                "user": user,
-                "allow": "Company",
-                "for_value": linked_company,
-                "applicable_for": "Customer"
-            })
-
-            if not scoped_perm_exists:
-                add_company_permission_for_customer(user, linked_company)
-                
-            print("--------scoped_perm_exists : ", scoped_perm_exists)
-
-        
-            
-    
-    
-
-    
-
-
-@frappe.whitelist()
-def update_customer_user_permissions(doc, method=None):
-    customer_name = doc.name
-    companies = [row.company for row in doc.custom_companies]
-
-    
-    # Step 2: Delete all 'Company' permissions scoped to this customer
-    frappe.db.delete("User Permission", {
-        "allow": "Company",
-        "applicable_for": "Customer",
-        "for_value": customer_name
-    })
-
-
-    users = frappe.get_all("User", filters={"enabled": 1}, pluck="name")
-
-    for user_name in users:
-        # Get all allowed companies for user
-        allowed_companies = frappe.get_all(
-            "User Permission",
-            filters={"user": user_name, "allow": "Company"},
-            pluck="for_value"
-        )
-
-        if not allowed_companies:
-            continue
-
-        has_common = any(company in allowed_companies for company in companies)
-
-        if has_common:
-            for company in companies:
-                # If user doesn’t already have access to this company
-                if company not in allowed_companies:
-                    add_company_permission_for_customer(user_name, company)
-
-
-def add_user_permission(user, doctype, for_value):
-    frappe.get_doc({
-        "doctype": "User Permission",
-        "user": user,
-        "allow": doctype,
-        "for_value": for_value,
-    }).insert(ignore_permissions=True)
-
-
-
-
-def add_company_permission_for_customer(user_name, company):
-    frappe.get_doc({
-        "doctype": "User Permission",
-        "user": user_name,
-        "allow": "Company",
-        "for_value": company,
-        "apply_to_all_doctypes": 0,
-        "applicable_for": "Customer"
-    }).insert(ignore_permissions=True)
-    
-    
-    
-def remove_user_company_permission(doc , method=None):
-    print("doc.allow : ", doc.allow)
-    print("doc.user : ", doc.user)
-    print("doc.for_value : ", doc.for_value)
-    print("doc.applicable_for : ", doc.applicable_for)
-    if doc.allow != "Company" or doc.applicable_for  :
-        return
-    
-        
-    #Fetch all Customer linked to this Company
-    customers = frappe.db.sql("""
-        SELECT DISTINCT parent
-        FROM `tabCustomer Company` 
-        WHERE company = %s
-    """, (doc.for_value,), as_list=True)
-    
-    # Flatten the result into a simple list of names
-    customer_names = [row[0] for row in customers]
-    
-    #delete all customer access to this company
-    for customer_name in customer_names:
-        # Delete all user permissions for this customer
-        frappe.db.delete("User Permission", {
-            "user": doc.user,
-            "allow": "Customer",
-            "for_value": customer_name
-        })
-        print(f"deleted customer access to this company {customer_name}")
-        
-    
-    
-@frappe.whitelist()
-def create_customer(name, type , price_list=None, company=None, companies=None, is_internal=False, represent_company=None, allowed_companies=None):
-    # Bypass permission checks
-    frappe.flags.ignore_permissions = True
-
-    # Create the Customer
-    customer = frappe.get_doc({
-        "doctype": "Customer",
-        "customer_name": name,
-        "customer_type": type,
-        "custom_company": company,
-    })
-
-    customer.insert()
-    frappe.db.commit()
-    return customer.name
-    
-
-
-
+                    
 
 
 #########################################################  Permission override   ########################################################
