@@ -6821,6 +6821,14 @@
 				<div id="total_client_debt">Total: 0 DA</div>
 				<div id="partially_client_debt">Selected: 0 DA</div>
 				<button id="pay_selected_invoices_btn">Pay</button>
+				<button id="print_client_debt_btn" class="print-btn" style="display:flex;align-items:center;gap:8px;background:#2e7d32;color:#fff;border:none;border-radius:10px;padding:8px 14px;cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,0.15);">
+    				<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        				<path d="M6 9V2h12v7"/>
+        				<path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
+        				<path d="M6 14h12v8H6z"/>
+				    </svg>
+			    	<span>Print</span>
+				</button>
 			</div>
 			<div id="debt_debtsList"></div>
 		`);
@@ -6841,6 +6849,7 @@
       this.total_client_debt = this.leftContainer.find("#total_client_debt");
       this.partially_client_debt = this.leftContainer.find("#partially_client_debt");
       this.pay_selected_invoices_btn = this.leftContainer.find("#pay_selected_invoices_btn");
+      this.print_btn = this.leftContainer.find("#print_client_debt_btn");
       this.debtList = this.leftContainer.find("#debt_debtsList");
     }
     add_customer_to_list(customer) {
@@ -6890,6 +6899,15 @@
         console.log("check the list ==> ", this._selected_invoice);
         this.paySelectedInvoice();
       });
+      this.print_btn.on("click", () => {
+        if (!this.selected_client || !this.selected_client.customer_name) {
+          frappe.msgprint(__("Please select a customer first."));
+          return;
+        }
+        this.printClientDebt();
+      });
+      this.print_btn.on("mouseenter", () => this.print_btn.css("background", "#1b5e20"));
+      this.print_btn.on("mouseleave", () => this.print_btn.css("background", "#2e7d32"));
       this.debtList.on("click", '.invoiceBox input[type="checkbox"]', (event2) => {
         const checkbox = $(event2.target);
         const invoiceName = checkbox.data("invoice-name");
@@ -6917,6 +6935,7 @@
     }
     refreshTotal(total_debt) {
       this.total_client_debt.text(`Total Debt : ${total_debt} DA`);
+      this.total_debt = total_debt;
     }
     refresh_partially_paid() {
       let partially_paid = 0;
@@ -6937,6 +6956,10 @@
       console.log("the profile : ", this.app_data.appData.pos_profile);
       const result = await this.app_data.fetchDebts(customer.name, this.app_data.appData.pos_profile.company);
       const result2 = await this.app_data.fetchDebtsSalesInvoices(customer.name, this.app_data.appData.pos_profile.company);
+      this._pos_invoice = result;
+      this._sales_invoice = result2;
+      console.log(" =======> the result : ", result);
+      console.log(" =======> the result2 : ", result2);
       result.forEach((invoice) => {
         total_debt += invoice.outstanding_amount;
         const customerBox = $(
@@ -7141,6 +7164,59 @@
       });
       console.log("Fetched POS invoices:", response);
       return response || [];
+    }
+    printClientDebt() {
+      try {
+        const clientName = this.selected_client.customer_name || this.selected_client.name || "";
+        const now = new Date();
+        const dateStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")} ${String(now.getHours()).toString().padStart(2, "0")}:${String(now.getMinutes()).toString().padStart(2, "0")}`;
+        const totalDebt = this.total_debt || 0;
+        const selectedTotal = (this._selected_invoice || []).reduce((s, inv) => s + (inv.outstanding_amount || 0), 0);
+        const w = window.open("", "_blank");
+        if (!w) {
+          frappe.msgprint(__("Please allow pop-ups to print."));
+          return;
+        }
+        const styles = `
+				<style>
+					body { font-family: Arial, sans-serif; padding: 24px; }
+					h2 { margin: 0 0 12px 0; font-size: 18px; }
+					.meta { margin: 6px 0; font-size: 13px; }
+					.summary { margin-top: 14px; padding: 12px; border: 1px dashed #999; border-radius: 8px; background:#fafafa; }
+					.summary .line { display:flex; justify-content:space-between; margin: 6px 0; font-size: 14px; }
+					@media print { .no-print { display: none; } }
+				</style>
+			`;
+        const html = `
+				<html>
+				<head>
+					<title>Client Debt</title>
+					${styles}
+				</head>
+				<body>
+					<h2>Client Debt Summary</h2>
+					<div class="meta">Client: <strong>${clientName}</strong></div>
+					<div class="meta">Date: ${dateStr}</div>
+					<div class="summary">
+						<div class="line"><span>Total Debt</span><strong>${totalDebt} DA</strong></div>
+						${selectedTotal > 0 ? `<div class="line"><span>Selected Debt</span><strong>${selectedTotal} DA</strong></div>` : ""}
+					</div>
+					<script>
+						window.onload = function(){
+							window.print();
+							setTimeout(()=> window.close(), 200);
+						};
+					<\/script>
+				</body>
+				</html>
+			`;
+        w.document.open();
+        w.document.write(html);
+        w.document.close();
+      } catch (e) {
+        console.error("Print error", e);
+        frappe.msgprint(__("Could not open print preview."));
+      }
     }
   };
 
@@ -8200,4 +8276,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.4XAEFGL5.js.map
+//# sourceMappingURL=pos.bundle.5QL2VZIY.js.map
