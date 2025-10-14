@@ -14,6 +14,31 @@ from frappe.utils import cint
 
 
 
+
+
+#########################################################################################################################################
+############################################################ helper functions ###########################################################
+#########################################################################################################################################
+
+
+
+def _get_target_company_from_customer(customer: str) -> str | None:
+    """If the SI customer represents another internal company, use that as target company."""
+    return frappe.db.get_value("Customer", customer, "represents_company")
+
+def _find_internal_supplier_for(company_to_represent: str) -> str | None:
+    """Find Supplier record that represents a given internal company (e.g., CA)."""
+    return frappe.db.get_value("Supplier", {"represents_company": company_to_represent, "is_internal_supplier": 1}, "name")
+
+
+
+
+#########################################################################################################################################
+############################################################ ---------------- ###########################################################
+#########################################################################################################################################
+
+
+
 def update_all_customers_debt(doc, method):
     """
     Updates the custom_debt field for all customers in the Customer Doctype,
@@ -906,12 +931,9 @@ def get_company_default_warehouse(company=None, ignorePermission=False):
 
 
 
-#################################################### event functions ####################################################
-
-
-
-
-
+#########################################################################################################################################
+############################################################ event functions ###########################################################
+#########################################################################################################################################
 
 
 
@@ -1131,11 +1153,76 @@ def remove_ctn(doc, method):
                     frappe.msgprint(f"CTN-BOX {row.ctn} not found, skipping.")
                 except Exception as e:
                     frappe.log_error(frappe.get_traceback(), f"Error deleting CTN-BOX {row.ctn}")
-                    
+
+def auto_inter_company_purchase_invoice_creation(doc , method):
+    """
+    Triggered on Sales Invoice submit/cancel to mirror an inter-company Purchase Invoice.
+    - On submit: create & submit PI in the target company and link back.
+    - On cancel: cancel the linked PI (if found).
+    """
+    
+    # Quick sanity: only act on Sales Invoice from OPTILENS CA (adjust as you need)
+    if doc.doctype != "Sales Invoice" or doc.company != "OPTILENS CA":
+        return
+    
+    print("doc.doctype ==============> : ", doc.doctype)
+    print("doc.company ==============> : ", doc.company)
+    
+    # Determine the target company from the SI customer (internal customer must have represents_company)
+    target_company = _get_target_company_from_customer(doc.customer)
+    if not target_company:
+        frappe.msgprint("ℹ️ Skipping: Customer is not internal (no 'represents_company').")
+        return
+    
+    target_company_obj = frappe.get_doc("Company", target_company)
+    
+    print("target_company ==============> : ", target_company)
+    print("target_company_obj ==============> : ", target_company_obj)
+
+    # Supplier in the target company that represents the source company (CA)
+    internal_supplier = _find_internal_supplier_for(doc.company)
+    if not internal_supplier:
+        frappe.msgprint(f"⚠️ No Supplier found with represents_company = {doc.company}. Create it first.")
+        return
+        
+    print("supplier ==============> : ", internal_supplier)
+        
+    if method == "on_submit" : 
+        # Build PI (minimal viable fields; extend as needed)
+        pi = frappe.new_doc("Purchase Invoice")
+        pi.company       = target_company
+        pi.supplier      = internal_supplier
+        pi.is_internal_supplier = 1
+        pi.posting_date  = doc.posting_date
+        pi.due_date      = doc.due_date or doc.posting_date
+        pi.bill_no       = doc.name  # reference back
+        pi.update_stock  = doc.update_stock
+        pi.set_warehouse = target_company_obj.custom_default_warehouse
+
+        # Copy items 1:1 (you may need item master parity across companies)
+        for it in doc.items:
+            pi.append("items", {
+                "item_code": it.item_code,
+                "item_name": it.item_name,
+                "uom": it.uom,
+                "qty": it.qty,
+                "rate": it.rate,
+            })
+  
+        # Insert & submit (ignore_permissions in case user lacks perms in target company)
+        pi.flags.ignore_permissions = True
+        pi.insert()
+        pi.submit()
+            
+        print("CA on_submit")
+    if method == "on_cancel" : 
+        print("CA on_cancel")
+            
 
 
-#########################################################  Permission override   ########################################################
-
+#########################################################################################################################################
+#########################################################  Permission override ##########################################################
+#########################################################################################################################################
 
 
 ######### purchase invoice

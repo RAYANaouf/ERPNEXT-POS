@@ -145,8 +145,8 @@ has_permission = {
 
 doc_events = {
     "Sales Invoice": {
-        "on_submit": ["pos_ar.api.update_customer_debt_on_invoice" , "pos_ar.api.manage_related_ctn_transactions"],
-        "on_cancel": ["pos_ar.api.update_customer_debt_on_invoice" , "pos_ar.api.manage_related_ctn_transactions"],
+        "on_submit": ["pos_ar.api.update_customer_debt_on_invoice" , "pos_ar.api.manage_related_ctn_transactions" , "pos_ar.api.auto_inter_company_purchase_invoice_creation"],
+        "on_cancel": ["pos_ar.api.update_customer_debt_on_invoice" , "pos_ar.api.manage_related_ctn_transactions" , "pos_ar.api.auto_inter_company_purchase_invoice_creation"],
     },
     "POS Invoice": {
         "on_submit": "pos_ar.api.update_customer_debt_on_invoice",
@@ -159,7 +159,7 @@ doc_events = {
     "Stock Entry": {
         "on_submit": ["pos_ar.api.update_ctn_box_warehouse"  , "pos_ar.api.manage_related_ctn_transactions"],
         "on_cancel": ["pos_ar.api.update_ctn_box_warehouse"  , "pos_ar.api.manage_related_ctn_transactions"]
-    }
+    },
 }
 
 
