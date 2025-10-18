@@ -1154,7 +1154,12 @@ def remove_ctn(doc, method):
                 except Exception as e:
                     frappe.log_error(frappe.get_traceback(), f"Error deleting CTN-BOX {row.ctn}")
 
+
+
 def auto_inter_company_purchase_invoice_creation(doc , method):
+    
+    print("method ==============> : ", method)
+
     """
     Triggered on Sales Invoice submit/cancel to mirror an inter-company Purchase Invoice.
     - On submit: create & submit PI in the target company and link back.
@@ -1216,6 +1221,16 @@ def auto_inter_company_purchase_invoice_creation(doc , method):
             
         print("CA on_submit")
     if method == "on_cancel" : 
+        
+        print("we are on method ==============> : ", method)
+        
+        #we need to cancel the purchase invoice in the target company
+        purchase_invoice = frappe.db.get_value("Purchase Invoice", {"bill_no": doc.name})
+        print("purchase_invoice ==============> : ", purchase_invoice)
+        if purchase_invoice:
+            frappe.get_doc("Purchase Invoice", purchase_invoice).cancel()
+        
+        
         print("CA on_cancel")
             
 

@@ -1549,6 +1549,8 @@ pos_ar.PointOfSale.Controller = class {
 		voucher.company = this.POSOpeningEntry.company;
 		voucher.user = frappe.session.user;
 
+
+		
 		//to test
 		//voucher.save();
 

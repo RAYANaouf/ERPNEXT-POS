@@ -7899,9 +7899,7 @@
     }
     async fetchItems(warehouse) {
       try {
-        console.log("0000..1111");
         const priceLists = await this.fetchPriceList();
-        console.log("2222..3333");
         return await frappe.call({
           method: "pos_ar.pos_ar.doctype.pos_info.pos_info.get_item",
           args: { priceLists, warehouse }
@@ -7949,15 +7947,11 @@
     }
     async fetchPriceList(since) {
       try {
-        console.log("4444..5555");
         const filter = { selling: 1, enabled: 1 };
-        console.log("6666..7777");
         const company = frappe.defaults.get_default("Company");
-        console.log("8888..9999", company);
         if (company) {
           filter.custom_company = ["in", [company, ""]];
         }
-        console.log("1010..1111", filter);
         return await frappe.db.get_list("Price List", {
           fields: ["name", "price_list_name", "currency"],
           filters: filter,
@@ -8276,4 +8270,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.5QL2VZIY.js.map
+//# sourceMappingURL=pos.bundle.DDETDEBY.js.map
