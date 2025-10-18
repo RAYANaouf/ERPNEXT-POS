@@ -1222,13 +1222,13 @@ def auto_inter_company_purchase_invoice_creation(doc , method):
         print("CA on_submit")
     if method == "on_cancel" : 
         
-        print("we are on method ==============> : ", method)
-        
         #we need to cancel the purchase invoice in the target company
         purchase_invoice = frappe.db.get_value("Purchase Invoice", {"bill_no": doc.name})
         print("purchase_invoice ==============> : ", purchase_invoice)
         if purchase_invoice:
-            frappe.get_doc("Purchase Invoice", purchase_invoice).cancel()
+            pi = frappe.get_doc("Purchase Invoice", purchase_invoice)
+            if pi.docstatus == 1:
+                pi.cancel()
         
         
         print("CA on_cancel")
