@@ -1155,84 +1155,99 @@ def remove_ctn(doc, method):
                     frappe.log_error(frappe.get_traceback(), f"Error deleting CTN-BOX {row.ctn}")
 
 
-
-def auto_inter_company_purchase_invoice_creation(doc , method):
-    
-    print("method ==============> : ", method)
-
-    """
-    Triggered on Sales Invoice submit/cancel to mirror an inter-company Purchase Invoice.
-    - On submit: create & submit PI in the target company and link back.
-    - On cancel: cancel the linked PI (if found).
-    """
-    
-    # Quick sanity: only act on Sales Invoice from OPTILENS CA (adjust as you need)
+def auto_inter_company_purchase_invoice_creation(doc, method):
+    # Only Sales Invoice from OPTILENS CA
     if doc.doctype != "Sales Invoice" or doc.company != "OPTILENS CA":
         return
-    
-    print("doc.doctype ==============> : ", doc.doctype)
-    print("doc.company ==============> : ", doc.company)
-    
-    # Determine the target company from the SI customer (internal customer must have represents_company)
+
+    # Target company from internal customer
     target_company = _get_target_company_from_customer(doc.customer)
     if not target_company:
         frappe.msgprint("ℹ️ Skipping: Customer is not internal (no 'represents_company').")
         return
-    
-    target_company_obj = frappe.get_doc("Company", target_company)
-    
-    print("target_company ==============> : ", target_company)
-    print("target_company_obj ==============> : ", target_company_obj)
 
-    # Supplier in the target company that represents the source company (CA)
+    # Internal supplier in target company that represents source company
     internal_supplier = _find_internal_supplier_for(doc.company)
     if not internal_supplier:
         frappe.msgprint(f"⚠️ No Supplier found with represents_company = {doc.company}. Create it first.")
         return
-        
-    print("supplier ==============> : ", internal_supplier)
-        
-    if method == "on_submit" : 
-        # Build PI (minimal viable fields; extend as needed)
-        pi = frappe.new_doc("Purchase Invoice")
-        pi.company       = target_company
-        pi.supplier      = internal_supplier
-        pi.is_internal_supplier = 1
-        pi.posting_date  = doc.posting_date
-        pi.due_date      = doc.due_date or doc.posting_date
-        pi.bill_no       = doc.name  # reference back
-        pi.update_stock  = doc.update_stock
-        pi.set_warehouse = target_company_obj.custom_default_warehouse
 
-        # Copy items 1:1 (you may need item master parity across companies)
+    if method == "on_submit":
+        # Get the (single) Sales Order from SI items
+        sales_order = next((it.sales_order for it in doc.items if getattr(it, "sales_order", None)), None)
+        if not sales_order:
+            frappe.msgprint("ℹ️ Skipping: No Sales Order found in SI.")
+            return
+
+        po_no = frappe.db.get_value("Sales Order", sales_order, "po_no")
+
+        # Find the existing PO in target company for that po_no
+        po = None
+        if po_no:
+            po  = frappe.get_doc(
+                "Purchase Order",
+                po_no
+            )
+            
+            
+        
+        print("po ==============> : ", po.name)
+        print("po item size ==============> : ", len(po.items))
+        
+        
+        
+
+       
+
+        # Create mirrored PI
+        target_company_wh = frappe.db.get_value("Company", target_company, "custom_default_warehouse")
+        pi = frappe.new_doc("Purchase Invoice")
+        pi.buying_price_list = doc.selling_price_list
+        pi.company = target_company
+        pi.supplier = internal_supplier
+        pi.is_internal_supplier = 1
+        pi.posting_date = doc.posting_date
+        pi.due_date = doc.due_date or doc.posting_date
+        pi.bill_no = doc.name
+        pi.update_stock = doc.update_stock
+        pi.set_warehouse = target_company_wh
+
+        print("heeere pi ==============> : ", pi.name)
+        print("heeere pi item size ==============> : ", len(pi.items))
+        
         for it in doc.items:
+            po_detail = None
+            for item in po.items:
+                if item.item_code == it.item_code:
+                    po_detail = item
+                    break
+                
+            print("heeree po_detail ==============> : ", po_detail.name)
+
             pi.append("items", {
                 "item_code": it.item_code,
                 "item_name": it.item_name,
                 "uom": it.uom,
                 "qty": it.qty,
                 "rate": it.rate,
+                "warehouse": target_company_wh,
+                "purchase_order": po.name,  # may be None if not found; OK
+                "po_detail": po_detail.name,     # row link for PO achievement
             })
-  
-        # Insert & submit (ignore_permissions in case user lacks perms in target company)
+
         pi.flags.ignore_permissions = True
         pi.insert()
         pi.submit()
-            
-        print("CA on_submit")
-    if method == "on_cancel" : 
-        
-        #we need to cancel the purchase invoice in the target company
-        purchase_invoice = frappe.db.get_value("Purchase Invoice", {"bill_no": doc.name})
-        print("purchase_invoice ==============> : ", purchase_invoice)
-        if purchase_invoice:
-            pi = frappe.get_doc("Purchase Invoice", purchase_invoice)
+        return
+
+    if method == "on_cancel":
+        # Cancel the mirrored PI (if exists)
+        pi_name = frappe.db.get_value("Purchase Invoice", {"bill_no": doc.name})
+        if pi_name:
+            pi = frappe.get_doc("Purchase Invoice", pi_name)
             if pi.docstatus == 1:
                 pi.cancel()
-        
-        
-        print("CA on_cancel")
-            
+        return
 
 
 #########################################################################################################################################
