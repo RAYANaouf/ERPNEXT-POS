@@ -20,6 +20,7 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 		onCheckoutClick    ,
 		savePosInvoice     ,
 		db                 ,
+		getPrice           ,
 	){
 
 
@@ -41,6 +42,8 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 		this.create_new_tab          = createNewTab    ;
 		this.save_pos_invoice        = savePosInvoice  ;
 		this.db                      = db              ;
+		this.getPrice                = getPrice        ;
+
 		//local
 		this.taxes_map   = new Map();
 		this.total_tax_amout = 0 ;
@@ -621,7 +624,7 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 
 		})
 
-
+		//debug here 1
 		this.priceListInput.on('input' , (event) =>{
 			this.selected_item_maps.get(this.selected_tab.tabName).priceList = event.target.value;
 			//reset items rate:
@@ -723,14 +726,20 @@ pos_ar.PointOfSale.pos_selected_item_cart = class{
 	}
 
 
+	//debug here 2
 	resetItemRateBaseOnPriceList(){
+		let me = this;
 		this.selected_item_maps.get(this.selected_tab.tabName).items.forEach( item  => {
 			console.log("item " , item)
 			if(item.manually_edited == true){
 				return
 			}
 			//item.rate                = this.get_item_price(item , this.selected_item_maps.get(this.selected_tab.tabName).priceList)
-			item.rate = item.prices.find(price => price.price_list == this.selected_item_maps.get(this.selected_tab.tabName).priceList)?.price_list_rate || 0;
+			console.log("item.prices " , item.prices)
+			console.log("selected_price_list " , me.selected_item_maps.get(me.selected_tab.tabName).priceList)
+			let rate = me.getPrice(item , me.selected_item_maps.get(me.selected_tab.tabName).priceList)
+			console.log("item.rate " , rate)
+			item.rate = rate;
 			item.discount_percentage = 0.00
 			item.discount_amount     = 0.00
 		})

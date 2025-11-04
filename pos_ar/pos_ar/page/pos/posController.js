@@ -486,7 +486,6 @@ pos_ar.PointOfSale.Controller = class {
 				this.history_cart.print_receipt(pos)
 			}
 		)
-
 		this.screenManager.registerScreen("customer_box", this.customer_box);
 		this.screenManager.customer_box = this.customer_box;
 	}
@@ -542,7 +541,8 @@ pos_ar.PointOfSale.Controller = class {
 				this.screenManager.navigate("payment_cart");
 			},
 			this.savePosInvoice.bind(this),
-			this.db
+			this.db,
+			this.searchForItemPriceByItemNameAndPriceList.bind(this)
 		)
 		this.screenManager.registerScreen("selected_item_cart", this.selected_item_cart);
 		this.screenManager.selected_item_cart = this.selected_item_cart;
@@ -895,6 +895,7 @@ pos_ar.PointOfSale.Controller = class {
 			const tab = this.selected_item_cart.createNewTab()
 
 			this.selectedItemMaps.get(this.selectedTab.tabName).items = message.items;
+			this.selectedItemMaps.get(this.selectedTab.tabName).duplicated = true;
 			this.screenManager.navigate('home')
 
 
@@ -1814,6 +1815,7 @@ pos_ar.PointOfSale.Controller = class {
 		)
 	}
 
+	
 	addItemToPosInvoice(clickedItem) {
 		let clonedItem = structuredClone(clickedItem);
 
@@ -1845,6 +1847,30 @@ pos_ar.PointOfSale.Controller = class {
 
 		}
 
+	}
+
+	searchForItemPriceByItemNameAndPriceList(item_obj, priceList){
+		console.log("item " , item_obj.item_code)
+		console.log("priceList " , priceList)
+
+		console.log("==> " , item_obj.item_code)
+		console.log("==> " , priceList)
+
+
+		let r1 = this.appData.appData.items.find(item => item.name == item_obj.item_code)
+
+		this.appData.appData.items.forEach(item => {
+			if(item.name == "1.56 HC -0.00 -0.00"){
+				console.log("item ======>" , item)
+			}
+		})
+		
+
+		console.log("this.appData.appData.items.find(item => item.item_code == itemName) " , r1 )
+		console.log("this.appData.appData.items.find(item => item.item_code == itemName)?.prices " , r1)
+		console.log("this.appData.appData.items.find(item => item.item_code == itemName)?.prices.find(price => price.price_list == priceList) " , r1?.prices.find(price => price.price_list == priceList))
+		console.log("this.appData.appData.items.find(item => item.item_code == itemName)?.prices.find(price => price.price_list == priceList)?.price_list_rate " , r1?.prices.find(price => price.price_list == priceList)?.price_list_rate)
+		return r1?.prices.find(price => price.price_list == priceList)?.price_list_rate || 0;
 	}
 
 	deleteItemFromPOsInvoice(itemId) {

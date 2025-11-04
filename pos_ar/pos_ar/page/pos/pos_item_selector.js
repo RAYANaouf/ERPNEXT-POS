@@ -103,6 +103,8 @@ pos_ar.PointOfSale.pos_item_selector = class {
 		const groupItemListInput = document.getElementById("ItemGroupInput");
 		this.setItemInFlow(this.getItemByItemGroup(groupItemListInput.value));
 	}
+
+
 	setItemInFlow(filtered_item_list){
         const itemsContainer_html = document.getElementById("itemsContainer");
         itemsContainer_html.innerHTML = "";
@@ -122,6 +124,10 @@ pos_ar.PointOfSale.pos_item_selector = class {
 		}
 
 		for(let i=0 ; i<filtered_item_list.length && i<50 ; i++){
+
+			if(i == 15){
+				console.log("item in flow ======>" , filtered_item_list[i])
+			}
 
 			let item = filtered_item_list[i];
                 	const itemBox = document.createElement("div");

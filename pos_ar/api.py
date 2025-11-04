@@ -1188,15 +1188,6 @@ def auto_inter_company_purchase_invoice_creation(doc, method):
                 "Purchase Order",
                 po_no
             )
-            
-            
-        
-        print("po ==============> : ", po.name)
-        print("po item size ==============> : ", len(po.items))
-        
-        
-        
-
        
 
         # Create mirrored PI
@@ -1207,13 +1198,11 @@ def auto_inter_company_purchase_invoice_creation(doc, method):
         pi.supplier = internal_supplier
         pi.is_internal_supplier = 1
         pi.posting_date = doc.posting_date
-        pi.due_date = doc.due_date or doc.posting_date
+        pi.due_date = doc.posting_date
         pi.bill_no = doc.name
         pi.update_stock = doc.update_stock
         pi.set_warehouse = target_company_wh
 
-        print("heeere pi ==============> : ", pi.name)
-        print("heeere pi item size ==============> : ", len(pi.items))
         
         for it in doc.items:
             po_detail = None
@@ -1248,6 +1237,99 @@ def auto_inter_company_purchase_invoice_creation(doc, method):
             if pi.docstatus == 1:
                 pi.cancel()
         return
+
+
+
+
+
+
+
+import frappe
+
+def auto_inter_company_purchase_invoice_creation_from_alger(doc, method):
+    print("heeree doc alger  ==============> : ", doc)
+
+    """
+    Mirrors a Sales Invoice from OPTILENS Alger into a Purchase Invoice
+    in the target (internal) company that represents the customer.
+
+    Trigger: hook on Sales Invoice (on_submit / on_cancel)
+    """
+    # Only Sales Invoice from OPTILENS Alger
+    if doc.doctype != "Sales Invoice" or doc.company != "OPTILENS ALGER":
+        return
+
+    # Target company from internal customer (must have represents_company)
+    target_company = _get_target_company_from_customer(doc.customer)
+    print("heeree target_company ==============> : ", target_company)
+    if not target_company:
+        frappe.msgprint("ℹ️ Skipping: Customer is not internal (no 'represents_company').")
+        return
+
+    # Internal supplier in target company that represents OPTILENS Alger
+    internal_supplier = _find_internal_supplier_for(doc.company)
+    print("heeree internal_supplier ==============> : ", internal_supplier)
+    if not internal_supplier:
+        frappe.msgprint(f"⚠️ No Supplier found with represents_company = {doc.company}. Create it first.")
+        return
+
+    if method == "on_submit":
+        
+        # Create mirrored Purchase Invoice
+        target_company_wh = frappe.db.get_value("Company", target_company, "custom_default_warehouse")
+        pi = frappe.new_doc("Purchase Invoice")
+        pi.company = target_company
+        pi.supplier = internal_supplier
+        pi.is_internal_supplier = 1
+        pi.buying_price_list = doc.selling_price_list
+        pi.posting_date = doc.posting_date
+        pi.due_date = doc.posting_date
+        pi.bill_no = doc.name  # link back to SI number
+        pi.update_stock = doc.update_stock
+        if target_company_wh:
+            pi.set_warehouse = target_company_wh
+
+        # Mirror items (+ optional PO row linkage for achievement)
+        for it in doc.items:
+            
+            row = {
+                "item_code": it.item_code,
+                "item_name": it.item_name,
+                "uom": it.uom,
+                "qty": it.qty,
+                "rate": it.rate,
+            }
+            if target_company_wh:
+                row["warehouse"] = target_company_wh
+            
+
+            pi.append("items", row)
+
+        pi.flags.ignore_permissions = True
+        pi.insert()
+        pi.submit()
+        return
+
+    if method == "on_cancel":
+        # Cancel the mirrored PI created for this SI (we used bill_no = SI.name)
+        # Narrow the search to target company & supplier to avoid side effects
+        pi_name = frappe.db.get_value(
+            "Purchase Invoice",
+            {
+                "bill_no": doc.name,
+                "company": _get_target_company_from_customer(doc.customer) or ["!=", ""],
+                "supplier": _find_internal_supplier_for(doc.company) or ["!=", ""],
+            },
+            "name"
+        )
+        if pi_name:
+            pi = frappe.get_doc("Purchase Invoice", pi_name)
+            if pi.docstatus == 1:
+                pi.cancel()
+        return
+
+
+
 
 
 #########################################################################################################################################

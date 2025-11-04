@@ -2387,7 +2387,8 @@
           this.screenManager.navigate("payment_cart");
         },
         this.savePosInvoice.bind(this),
-        this.db
+        this.db,
+        this.searchForItemPriceByItemNameAndPriceList.bind(this)
       );
       this.screenManager.registerScreen("selected_item_cart", this.selected_item_cart);
       this.screenManager.selected_item_cart = this.selected_item_cart;
@@ -2659,6 +2660,7 @@
         this.item_selector.clearSearchField();
         const tab = this.selected_item_cart.createNewTab();
         this.selectedItemMaps.get(this.selectedTab.tabName).items = message.items;
+        this.selectedItemMaps.get(this.selectedTab.tabName).duplicated = true;
         this.screenManager.navigate("home");
       } else if (event2 == "return") {
         const tab = this.selected_item_cart.createTabForEditPOS();
@@ -3262,6 +3264,24 @@
         Object.assign(this.selectedItem, clone);
       }
     }
+    searchForItemPriceByItemNameAndPriceList(item_obj, priceList) {
+      var _a, _b;
+      console.log("item ", item_obj.item_code);
+      console.log("priceList ", priceList);
+      console.log("==> ", item_obj.item_code);
+      console.log("==> ", priceList);
+      let r1 = this.appData.appData.items.find((item) => item.name == item_obj.item_code);
+      this.appData.appData.items.forEach((item) => {
+        if (item.name == "1.56 HC -0.00 -0.00") {
+          console.log("item ======>", item);
+        }
+      });
+      console.log("this.appData.appData.items.find(item => item.item_code == itemName) ", r1);
+      console.log("this.appData.appData.items.find(item => item.item_code == itemName)?.prices ", r1);
+      console.log("this.appData.appData.items.find(item => item.item_code == itemName)?.prices.find(price => price.price_list == priceList) ", r1 == null ? void 0 : r1.prices.find((price) => price.price_list == priceList));
+      console.log("this.appData.appData.items.find(item => item.item_code == itemName)?.prices.find(price => price.price_list == priceList)?.price_list_rate ", (_a = r1 == null ? void 0 : r1.prices.find((price) => price.price_list == priceList)) == null ? void 0 : _a.price_list_rate);
+      return ((_b = r1 == null ? void 0 : r1.prices.find((price) => price.price_list == priceList)) == null ? void 0 : _b.price_list_rate) || 0;
+    }
     deleteItemFromPOsInvoice(itemId) {
       const posInvoice = this.selectedItemMaps.get(this.selectedTab.tabName);
       const posItems = posInvoice.items;
@@ -3399,6 +3419,9 @@
         return;
       }
       for (let i = 0; i < filtered_item_list.length && i < 50; i++) {
+        if (i == 15) {
+          console.log("item in flow ======>", filtered_item_list[i]);
+        }
         let item = filtered_item_list[i];
         const itemBox = document.createElement("div");
         itemBox.classList.add("itemBox");
@@ -3937,7 +3960,7 @@
 
   // ../pos_ar/pos_ar/pos_ar/page/pos/pos_selected_item_cart.js
   pos_ar.PointOfSale.pos_selected_item_cart = class {
-    constructor(wrapper, settingsData, selectedItemMaps, priceLists, customerList, brandList, salesTaxes, invoiceData, selectedTab, selectedItem, selectedField, onSelectedItemClick, onTabClick, onKeyPressed, createNewTab, onCheckoutClick, savePosInvoice, db) {
+    constructor(wrapper, settingsData, selectedItemMaps, priceLists, customerList, brandList, salesTaxes, invoiceData, selectedTab, selectedItem, selectedField, onSelectedItemClick, onTabClick, onKeyPressed, createNewTab, onCheckoutClick, savePosInvoice, db, getPrice) {
       this.wrapper = wrapper;
       this.settings_data = settingsData;
       this.selected_item_maps = selectedItemMaps;
@@ -3956,6 +3979,7 @@
       this.create_new_tab = createNewTab;
       this.save_pos_invoice = savePosInvoice;
       this.db = db;
+      this.getPrice = getPrice;
       this.taxes_map = /* @__PURE__ */ new Map();
       this.total_tax_amout = 0;
       this.counter = 1;
@@ -4430,13 +4454,17 @@
       this.invoice_data.grandTotal = grandTotal;
     }
     resetItemRateBaseOnPriceList() {
+      let me = this;
       this.selected_item_maps.get(this.selected_tab.tabName).items.forEach((item) => {
-        var _a;
         console.log("item ", item);
         if (item.manually_edited == true) {
           return;
         }
-        item.rate = ((_a = item.prices.find((price) => price.price_list == this.selected_item_maps.get(this.selected_tab.tabName).priceList)) == null ? void 0 : _a.price_list_rate) || 0;
+        console.log("item.prices ", item.prices);
+        console.log("selected_price_list ", me.selected_item_maps.get(me.selected_tab.tabName).priceList);
+        let rate = me.getPrice(item, me.selected_item_maps.get(me.selected_tab.tabName).priceList);
+        console.log("item.rate ", rate);
+        item.rate = rate;
         item.discount_percentage = 0;
         item.discount_amount = 0;
       });
@@ -8270,4 +8298,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.DDETDEBY.js.map
+//# sourceMappingURL=pos.bundle.CPEY7SKK.js.map
