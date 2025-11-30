@@ -1284,6 +1284,7 @@ def auto_inter_company_purchase_invoice_creation_from_alger(doc, method):
         pi.buying_price_list = doc.selling_price_list
         pi.posting_date = doc.posting_date
         pi.due_date = doc.posting_date
+        pi.bill_date = doc.posting_date
         pi.bill_no = doc.name  # link back to SI number
         pi.update_stock = doc.update_stock
         if target_company_wh:
