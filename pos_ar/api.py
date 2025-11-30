@@ -1199,6 +1199,7 @@ def auto_inter_company_purchase_invoice_creation(doc, method):
         pi.is_internal_supplier = 1
         pi.posting_date = doc.posting_date
         pi.due_date = doc.posting_date
+        pi.bill_date = doc.posting_date
         pi.bill_no = doc.name
         pi.update_stock = doc.update_stock
         pi.set_warehouse = target_company_wh
