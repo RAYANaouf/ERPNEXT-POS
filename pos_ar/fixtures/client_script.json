@@ -3,6 +3,17 @@
   "docstatus": 0,
   "doctype": "Client Script",
   "dt": "POS Closing Entry",
+  "enabled": 0,
+  "modified": "2025-10-18 17:51:21.241901",
+  "module": "POS AR",
+  "name": "include_all_pos_invoice",
+  "script": "frappe.ui.form.on('POS Closing Entry', {\n\trefresh(frm) {\n\t\t// your code here\n\t\tif (frm.is_new()) {\n            addTenMinutes(frm);\n        }\n\t\t\n\t}\n})\n\n\nfunction addTenMinutes(frm) {\n  const now = new Date();\n  now.setMinutes(now.getMinutes() + 10);\n\n  const pad = n => String(n).padStart(2, '0');\n  const yyyy = now.getFullYear();\n  const mm = pad(now.getMonth() + 1);\n  const dd = pad(now.getDate());\n  const HH = pad(now.getHours());\n  const MM = pad(now.getMinutes());\n  const SS = pad(now.getSeconds());\n\n  frm.set_value('period_end_date', `${yyyy}-${mm}-${dd} ${HH}:${MM}:${SS}`); // Datetime\n  frm.set_value('posting_date', `${yyyy}-${mm}-${dd}`);                      // Date\n  frm.set_value('posting_time', `${HH}:${MM}:${SS}`);                        // Time\n}",
+  "view": "Form"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Client Script",
+  "dt": "POS Closing Entry",
   "enabled": 1,
   "modified": "2025-06-03 19:47:04.214019",
   "module": "POS AR",
