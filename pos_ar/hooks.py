@@ -155,11 +155,7 @@ doc_events = {
     "Payment Entry": {
         "on_submit": "pos_ar.api.update_customer_debt_on_invoice",
         "on_cancel": "pos_ar.api.update_customer_debt_on_invoice",
-    },
-    "Stock Entry": {
-        "on_submit": ["pos_ar.api.update_ctn_box_warehouse"  , "pos_ar.api.manage_related_ctn_transactions"],
-        "on_cancel": ["pos_ar.api.update_ctn_box_warehouse"  , "pos_ar.api.manage_related_ctn_transactions"]
-    },
+    }
 }
 
 
