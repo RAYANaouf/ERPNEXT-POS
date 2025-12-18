@@ -157,7 +157,7 @@ doc_events = {
         "on_cancel": "pos_ar.api.update_customer_debt_on_invoice",
     },
     "Stock Entry": {
-        "on_submit": ["pos_ar.api.update_ctn_box_warehouse"  , "pos_ar.api.manage_related_ctn_transactions"],
+        "on_submit": ["pos_ar.api.update_ctn_box_warehouse"  , "pos_ar.api.manage_related_ctn_transactions","pos_ar.api.create_purchase_order_for_shortage"],
         "on_cancel": ["pos_ar.api.update_ctn_box_warehouse"  , "pos_ar.api.manage_related_ctn_transactions"]
     },
 }
