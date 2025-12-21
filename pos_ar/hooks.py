@@ -155,17 +155,13 @@ doc_events = {
     "Payment Entry": {
         "on_submit": "pos_ar.api.update_customer_debt_on_invoice",
         "on_cancel": "pos_ar.api.update_customer_debt_on_invoice",
-<<<<<<< HEAD
+
     },
     "Stock Entry": {
         "on_submit": ["pos_ar.api.update_ctn_box_warehouse"  , "pos_ar.api.manage_related_ctn_transactions","pos_ar.api.create_purchase_order_for_shortage"],
         "on_cancel": ["pos_ar.api.update_ctn_box_warehouse"  , "pos_ar.api.manage_related_ctn_transactions"]
     },
-=======
-    }
->>>>>>> edad1254af0ac67e864a9b538c673e032011ac35
 }
-
 
 # Scheduled Tasks
 # ---------------
