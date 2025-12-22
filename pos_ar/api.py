@@ -1262,6 +1262,7 @@ def purchase_invoice_permission_query_conditions(user):
             "apply_to_all_doctypes": True
         },
         pluck="for_value"
+        
     )
 
     if allowed_companies:

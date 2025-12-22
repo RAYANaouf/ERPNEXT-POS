@@ -87,6 +87,8 @@ app_include_js  = ["/assets/pos_ar/js/pos.bundle.js","https://cdnjs.cloudflare.c
 # Integration Cleanup
 # -------------------
 # To clean up dependencies/integrations with other apps
+
+
 # Name of the app being uninstalled is passed as an argument
 
 # before_app_uninstall = "pos_ar.utils.before_app_uninstall"
