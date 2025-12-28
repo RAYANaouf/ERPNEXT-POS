@@ -1599,7 +1599,7 @@ def create_inter_company_purchase_order(material_request, shortage_items, compan
             "qty": item["qty"],
             "uom": item["uom"],
             "warehouse": company_default_warehouse,  
-            "schedule_date": item["schedule_date"]
+            "schedule_date":  nowdate()
         })
 
         print("po.items ======> " + str( po.items ) )
