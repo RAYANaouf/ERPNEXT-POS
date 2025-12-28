@@ -87,6 +87,7 @@ app_include_js  = ["/assets/pos_ar/js/pos.bundle.js","https://cdnjs.cloudflare.c
 # Integration Cleanup
 # -------------------
 # To clean up dependencies/integrations with other apps
+
 # Name of the app being uninstalled is passed as an argument
 
 # before_app_uninstall = "pos_ar.utils.before_app_uninstall"
@@ -155,9 +156,11 @@ doc_events = {
     "Payment Entry": {
         "on_submit": "pos_ar.api.update_customer_debt_on_invoice",
         "on_cancel": "pos_ar.api.update_customer_debt_on_invoice",
-    }
+    },
+    "Stock Entry": {
+        "on_submit": ["pos_ar.api.create_purchase_order_for_shortage"],
+    },
 }
-
 
 # Scheduled Tasks
 # ---------------
@@ -255,7 +258,6 @@ doc_events = {
 # default_log_clearing_doctypes = {
 # 	"Logging DocType Name": 30  # days to retain logs
 # }
-
 
 
 

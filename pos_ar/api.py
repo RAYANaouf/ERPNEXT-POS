@@ -1472,3 +1472,170 @@ def supplier_permission(doc, ptype, user):
 
     # No match, deny access
     return False
+
+
+
+
+
+
+
+
+from frappe.utils import flt, nowdate
+
+def create_purchase_order_for_shortage(stock_entry_doc, method=None):
+    """
+    Appelé après la création du Stock Entry depuis Material Request
+    Crée automatiquement une Purchase Order inter-sociétés pour les articles manquants
+    """
+    
+    # Vérifier si c'est un transfert matériel
+    if stock_entry_doc.purpose != "Material Transfer":
+        return
+    
+    # Vérifier s'il y a une Material Request liée
+    if not stock_entry_doc.items or not stock_entry_doc.items[0].material_request:
+        return
+    
+    company = stock_entry_doc.company
+    company_default_warehouse = frappe.db.get_value("Company", company, "custom_default_warehouse")
+    frappe.log_error(" company  ======> " + str( company ) )
+    frappe.log_error(" company_default_warehouse ======> " + str( company_default_warehouse ) )
+    print(" company_default_warehouse ======> " + str( company_default_warehouse ) )
+    print("company ======> " + str( company ) )
+
+    
+    material_request = stock_entry_doc.items[0].material_request
+    mr_doc = frappe.get_doc("Material Request", material_request)
+    
+    # Récupérer les quantités demandées vs transférées
+    shortage_items = []
+    
+    for mr_item in mr_doc.items:
+        # Trouver la quantité transférée pour cet article
+        transferred_qty = 0
+        for se_item in stock_entry_doc.items:
+            if se_item.item_code == mr_item.item_code:
+                transferred_qty += flt(se_item.qty)
+        
+        # Calculer le manque
+        shortage = flt(mr_item.qty) - transferred_qty
+        
+        if shortage > 0:
+            frappe.log_error(" mr_item.warehouse ======> " + str( mr_item.warehouse ) )
+            shortage_items.append({
+                "item_code": mr_item.item_code,
+                "item_name": mr_item.item_name,
+                "qty": shortage,
+                "uom": mr_item.uom,
+                "warehouse": mr_item.warehouse,  # MagasinOA - OA (destination finale)
+                "schedule_date": mr_item.schedule_date or nowdate()
+            })
+    
+    # Si des articles manquent, créer une Purchase Order
+    print("shortage_items ======> " + str( shortage_items ) )
+    if shortage_items:
+        create_inter_company_purchase_order(mr_doc, shortage_items,  company , company_default_warehouse)
+
+
+def create_inter_company_purchase_order(material_request, shortage_items, company , company_default_warehouse):
+    """
+    Crée une Purchase Order inter-sociétés pour les articles en shortage
+    Optilens Alger commande chez le fournisseur "ca" (Optilens ca)
+    """
+
+
+    # Configuration inter-sociétés
+    supplier = "ca"  # Fournisseur qui représente Optilens ca
+
+    
+    # Vérifier que le fournisseur existe
+    if not frappe.db.exists("Supplier", supplier):
+        frappe.log_error(message=frappe.get_traceback(), title="Le fournisseur n'existe pas. La commande d'achat n'a pas été créée.")
+        return
+    
+    # Récupérer la société du fournisseur
+    supplier_company = frappe.db.get_value("Supplier", supplier, "represents_company")
+    
+    if not supplier_company:
+        frappe.log_error(message=frappe.get_traceback(), title="there is no represented company on ca supplier")
+        return
+    
+    # Récupérer l'entrepôt du fournisseur (Boulieu - OC)
+    supplier_warehouse = frappe.db.get_value("Company", supplier_company, "custom_default_warehouse")
+    
+
+    print("supplier_warehouse ======> " + str( supplier_warehouse ) )
+    print("supplier_company ======> " + str( supplier_company ) )
+    print("supplier ======> " + str( supplier ) )
+    print("company ======> " + str( company ) )
+    print("company_default_warehouse ======> " + str( company_default_warehouse ) )
+
+    # Créer le document Purchase Order pour Optilens ca
+    po = frappe.get_doc({
+        "doctype"               : "Purchase Order",
+        "supplier"              : supplier,
+        "company"               : company,  
+        "buying_price_list"     : "TP - Alger",
+        "custom_generate_order" : 1,
+        "set_warehouse"         : company_default_warehouse,  
+        "items"                 : []
+    })
+
+
+
+    
+    # Ajouter les articles en shortage
+    for item in shortage_items:
+        
+        po.append("items", {
+            "item_code": item["item_code"],
+            "item_name": item["item_name"],
+            "qty": item["qty"],
+            "uom": item["uom"],
+            "warehouse": company_default_warehouse,  
+            "schedule_date": item["schedule_date"]
+        })
+
+        print("po.items ======> " + str( po.items ) )
+    
+    
+    print("po ======> " + str( po ) )
+    
+    try:
+        
+        print("we are here 1" )
+        # Sauvegarder la Purchase Order
+        po.insert(ignore_permissions=True)
+
+        print("we are here 2" )
+        po.submit()
+
+        
+        print("we are here 3" )
+
+        
+        # Créer automatiquement la Material Request pour le transfert inter-sociétés
+        # (optionnel - à activer si tu veux automatiser aussi le transfert final)
+        # create_inter_company_material_request(po, material_request, shortage_items)
+        
+    except Exception as e:
+        frappe.log_error(message=frappe.get_traceback(), title="Erreur Création PO Inter-Sociétés")
+        frappe.msgprint(
+            _("Erreur lors de la création de la Purchase Order: {0}").format(str(e)),
+            alert=True,
+            indicator="red"
+        )
+
+
+
+
+
+def get_mr_item_name(material_request, item_code):
+    """
+    Récupère le nom de la ligne d'article dans la Material Request
+    """
+    return frappe.db.get_value(
+        "Material Request Item",
+        {"parent": material_request, "item_code": item_code},
+        "name"
+    )
