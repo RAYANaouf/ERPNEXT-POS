@@ -1497,7 +1497,13 @@ def create_purchase_order_for_shortage(stock_entry_doc, method=None):
         return
     
     company = stock_entry_doc.company
+    # check if it is for Optilens Alger company
+    if company != "OPTILENS ALGER":
+        return
+    
     company_default_warehouse = frappe.db.get_value("Company", company, "custom_default_warehouse")
+
+    
     frappe.log_error(" company  ======> " + str( company ) )
     frappe.log_error(" company_default_warehouse ======> " + str( company_default_warehouse ) )
     print(" company_default_warehouse ======> " + str( company_default_warehouse ) )
