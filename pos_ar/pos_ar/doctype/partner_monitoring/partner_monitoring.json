@@ -1,0 +1,180 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "format:{company}-{date}",
+ "creation": "2025-12-31 08:45:05.443020",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "company",
+  "column_break_rgan",
+  "date",
+  "commands_section",
+  "commands",
+  "column_break_fxu2",
+  "sales",
+  "section_break_ulkl",
+  "note",
+  "section_break_utpm",
+  "make_a_call",
+  "call_content",
+  "column_break_tqq6",
+  "make_a_command",
+  "des",
+  "section_break_90em",
+  "my_opinion",
+  "column_break_3u6t",
+  "reserve",
+  "column_break_fnoh",
+  "dg_instruction",
+  "amended_from"
+ ],
+ "fields": [
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Company",
+   "options": "Company",
+   "reqd": 1
+  },
+  {
+   "fieldname": "date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "date",
+   "reqd": 1
+  },
+  {
+   "fieldname": "commands_section",
+   "fieldtype": "Section Break",
+   "label": "Commands"
+  },
+  {
+   "fieldname": "commands",
+   "fieldtype": "Table",
+   "label": "Commands",
+   "options": "Partner Monitoring Item",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_fxu2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "note",
+   "fieldtype": "Long Text",
+   "label": "Note"
+  },
+  {
+   "fieldname": "section_break_utpm",
+   "fieldtype": "Section Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "make_a_call",
+   "fieldtype": "Check",
+   "label": "Make A Call"
+  },
+  {
+   "depends_on": "make_a_call",
+   "fieldname": "call_content",
+   "fieldtype": "Long Text"
+  },
+  {
+   "fieldname": "column_break_tqq6",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "make_a_command",
+   "fieldtype": "Check",
+   "label": "Make A Command"
+  },
+  {
+   "depends_on": "make_a_command",
+   "fieldname": "des",
+   "fieldtype": "Long Text"
+  },
+  {
+   "fieldname": "section_break_90em",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "my_opinion",
+   "fieldtype": "Long Text",
+   "label": "My Opinion"
+  },
+  {
+   "fieldname": "column_break_3u6t",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "reserve",
+   "fieldtype": "Long Text",
+   "label": "Reserve"
+  },
+  {
+   "fieldname": "column_break_fnoh",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "dg_instruction",
+   "fieldtype": "Long Text",
+   "label": "DG Instruction"
+  },
+  {
+   "fieldname": "column_break_rgan",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Partner Monitoring",
+   "print_hide": 1,
+   "read_only": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "sales",
+   "fieldtype": "Table",
+   "label": "sales",
+   "options": "Partner Monitoring Invoice",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_ulkl",
+   "fieldtype": "Section Break"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2025-12-31 22:36:03.044134",
+ "modified_by": "Administrator",
+ "module": "POS AR",
+ "name": "Partner Monitoring",
+ "naming_rule": "Expression",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
