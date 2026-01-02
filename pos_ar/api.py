@@ -1645,3 +1645,75 @@ def get_mr_item_name(material_request, item_code):
         {"parent": material_request, "item_code": item_code},
         "name"
     )
+
+
+
+
+
+import frappe
+from frappe.utils import getdate, nowdate, add_days
+from typing import Optional
+
+def _unauthorized(msg="Unauthorized"):
+    frappe.throw(msg, frappe.PermissionError)
+
+@frappe.whitelist(allow_guest=True)
+def get_partner_monitoring(token: str,  only_unsent: int = 1):
+    """
+    Returns Partner Monitoring docs for the last N days (default 7),
+    including child tables (commands + sales) and captions text.
+
+    n8n calls this endpoint once per week.
+    """
+
+    # --- Simple token protection ---
+    # this should be on site_config.json:
+    # "n8n_partner_monitoring_token": "YOUR_LONG_SECRET"
+    expected = frappe.conf.get("n8n_partner_monitoring_token")
+    if not expected or token != expected:
+        _unauthorized("Invalid token")
+
+    
+    only_unsent = int(only_unsent or 0)
+
+
+    filters = [
+        ["docstatus", "=", 1],
+    ]
+
+
+    if only_unsent:
+        filters.append(["workflow_state", "=", "Archived"])
+
+    names = frappe.get_all(
+        "Partner Monitoring",
+        filters=filters,
+        fields=["name"],
+        order_by="creation asc",
+        limit_page_length=500
+    )
+
+    docs = []
+    for d in names:
+        doc = frappe.get_doc("Partner Monitoring", d.name)
+
+        docs.append({
+            "name": doc.name,
+            "company": doc.company,
+            "date": getattr(doc, "date", None),
+            "creation": str(doc.creation),
+            "owner": doc.owner,
+            "workflow_state": getattr(doc, "workflow_state", None),
+
+            # captions field: adjust if your fieldname is different
+            "note": getattr(doc, "note", None),
+
+            # child tables (use your real fieldnames)
+            "commands": doc.get("commands") or [],
+            "sales": doc.get("sales") or [],
+        })
+
+    return {
+        "count": len(docs),
+        "records": docs
+    }
