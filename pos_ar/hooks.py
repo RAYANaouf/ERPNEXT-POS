@@ -273,15 +273,21 @@ fixtures = [
     },
     {
         'dt': 'Custom Field',
-        'filters': [['dt', 'in', ['POS Invoice', 'Customer' , 'POS Closing Entry' ,'Sales Invoice','Purchase Order','Item' , 'Stock Entry' , 'Company' , 'Supplier' , 'Brand']]]
+        'filters': [
+            ["module" , "in" , ["POS AR"]],
+        ]
     },
     {
         'dt': 'Client Script',
-        'filters': [['dt', 'in', ['POS Closing Entry','CTN-BOX','Sales Invoice','Purchase Order','CTN Transfer' , 'Stock Entry' , 'Company' , 'Buy The Need' , 'Buy The Sold']]]
+        'filters': [
+            ["module" , "in" , ["POS AR"]],
+        ]
     },
     {
         'dt': 'Server Script',
-        'filters': [['reference_doctype', 'in', ['Purchase Order' , 'Purchase Invoice' , 'Purchase Order']]]
+        'filters': [
+            ["module" , "in" , ["POS AR"]],
+        ]
     }
 ]
 

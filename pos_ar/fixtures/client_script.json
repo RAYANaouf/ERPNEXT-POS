@@ -2,6 +2,39 @@
  {
   "docstatus": 0,
   "doctype": "Client Script",
+  "dt": "CreateMyCustomer",
+  "enabled": 1,
+  "modified": "2025-06-10 15:10:17.965090",
+  "module": "POS AR",
+  "name": "btn_create",
+  "script": "frappe.ui.form.on('CreateMyCustomer', {\n\trefresh(frm) {\n\t\t// your code here\n\t},\n\tbtn_create(frm){\n\t    frappe.call({\n\t        method : \"pos_ar.api.create_customer\",\n\t        args   : {\n\t            \"name\"        : frm.doc.customer_name,\n\t            \"type\"        : frm.doc.type,\n\t            \"price_list\"  : frm.doc.price_list,\n\t            \"company\"     : frm.doc.customer_company,\n\t            \"is_internal\" : frm.doc.is_internal,\n\t            \"represent\"   : frm.doc.represent,\n\t            \n\t        },\n\t        callback : function(r){\n\t            frappe.msgprint(`customer ${r.message} created successfully.` )\n\t        }\n\t    })\n\t}\n})",
+  "view": "Form"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Client Script",
+  "dt": "CTN-BOX Transaction",
+  "enabled": 1,
+  "modified": "2025-06-16 08:55:13.800104",
+  "module": "POS AR",
+  "name": "Controller CTN Transaction",
+  "script": "frappe.ui.form.on('CTN-BOX Transaction', {\n\trefresh(frm) {\n\t\t// your code here\n\t},\n\tref_type(frm){\n\t  if( frm.doc.ref_type == \"Other\" ){\n\t      frm.set_df_property(\"ref\" , \"hidden\" , true)\n\t  }else{\n\t      frm.set_df_property(\"ref\" , \"hidden\" , false)\n\t  }\n\t}\n})",
+  "view": "Form"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Client Script",
+  "dt": "Brand",
+  "enabled": 1,
+  "modified": "2025-09-11 01:20:38.926973",
+  "module": "POS AR",
+  "name": "Brand - client script",
+  "script": "frappe.ui.form.on('Brand', {\n\trefresh(frm) {\n        frm.set_query(\"custom_father\", function() {\n            return { filters: { custom_root: 1 } };\n        });\n\t}\n})",
+  "view": "Form"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Client Script",
   "dt": "POS Closing Entry",
   "enabled": 0,
   "modified": "2025-10-18 17:51:21.241901",
@@ -112,12 +145,23 @@
  {
   "docstatus": 0,
   "doctype": "Client Script",
-  "dt": "Stock Entry",
+  "dt": "Partner Monitoring",
+  "enabled": 0,
+  "modified": "2025-12-31 22:33:09.753849",
+  "module": "POS AR",
+  "name": "Partener Monitoring Client Script",
+  "script": "frappe.ui.form.on(\"Partner Monitoring\", {\r\n  async company(frm) {\r\n\r\n    if (!frm.doc.company) return;\r\n\r\n    // 0) Get Customer representing this Company\r\n    const custRes = await frappe.call({\r\n      method: \"frappe.client.get_list\",\r\n      args: {\r\n        doctype: \"Customer\",\r\n        fields: [\"name\"],\r\n        filters: {\r\n          represents_company: frm.doc.company   // change if your fieldname differs\r\n        },\r\n        limit_page_length: 1\r\n      }\r\n    });\r\n    \r\n    \r\n\r\n    const customer = (custRes.message || [])[0]?.name;\r\n\r\n    \r\n\r\n    if (!customer) {\r\n      // stop here to avoid crash and wrong results\r\n      frm.clear_table(\"commands\");\r\n      frm.clear_table(\"sales\");\r\n      frm.refresh_field(\"commands\");\r\n      frm.refresh_field(\"sales\");\r\n      return;\r\n    }\r\n\r\n    // -----------------------------\r\n    // A) Sales Orders (not closed)\r\n    // -----------------------------\r\n    frm.clear_table(\"commands\");\r\n    frm.refresh_field(\"commands\");\r\n    \r\n\r\n    const soRes = await frappe.call({\r\n      method: \"frappe.client.get_list\",\r\n      args: {\r\n        doctype: \"Sales Order\",\r\n        fields: [\"name\" , \"grand_total\" , \"transaction_date\"],\r\n        filters:{\r\n            company   : \"Optilens CA\",\r\n            customer  : customer,\r\n            status: [\"!=\", \"Closed\"],\r\n            docstatus :1\r\n        }\r\n      }\r\n    });\r\n    \r\n\r\n    const sales_orders = soRes.message || [];\r\n\r\n\r\n    sales_orders.forEach(so => {\r\n      let row = frm.add_child(\"commands\");\r\n      row.order_name = so.name;\r\n      row.date = so.transaction_date;           // ✅ correct field\r\n      row.grand_total = so.grand_total;\r\n    });\r\n\r\n    frm.refresh_field(\"commands\");\r\n    frappe.show_alert({ message: __(\"Loaded {0} Sales Orders\", [sales_orders.length]), indicator: \"green\" });\r\n\r\n    // -----------------------------\r\n    // B) Outstanding Sales Invoices\r\n    // -----------------------------\r\n    frm.clear_table(\"sales\");\r\n    frm.refresh_field(\"sales\");\r\n\r\n    const invRes = await frappe.call({\r\n      method: \"frappe.client.get_list\",\r\n      args: {\r\n        doctype: \"Sales Invoice\",\r\n        fields: [\"name\", \"posting_date\", \"grand_total\", \"outstanding_amount\"],\r\n        filters: {\r\n          company: \"Optilens CA\",              \r\n          customer: customer,                    \r\n          outstanding_amount: [\">\", 0],          \r\n          docstatus: 1\r\n        },\r\n        order_by: \"posting_date desc\",\r\n        limit_page_length: 500\r\n      }\r\n    });\r\n\r\n    const invoices = invRes.message || [];\r\n    \r\n\r\n    invoices.forEach(inv => {\r\n      let row = frm.add_child(\"sales\");\r\n      row.sales_invoice = inv.name;\r\n      row.outstanding = inv.outstanding_amount;\r\n      row.date = inv.posting_date;\r\n      row.total = inv.grand_total;\r\n    });\r\n\r\n    frm.refresh_field(\"sales\");\r\n    frappe.show_alert({ message: __(\"Loaded {0} Outstanding Sales Invoices\", [invoices.length]), indicator: \"green\" });\r\n  }\r\n});\r\n",
+  "view": "Form"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Client Script",
+  "dt": "Partner Monitoring",
   "enabled": 1,
-  "modified": "2025-12-13 03:08:42.491023",
-  "module": "CTN Tracking App",
-  "name": "Auto Fulfilling",
-  "script": "frappe.ui.form.on('Stock Entry', {\r\n\r\n\tcustom_transfer_by_ctns(frm) {\r\n\t\tupdate_items_from_ctns(frm);\r\n\t}\r\n});\r\n\r\n\r\nfrappe.ui.form.on('Stock Entry Carton', {\r\n\tcustom_carton_table_remove(frm) {\r\n\t\tupdate_items_from_ctns(frm);\r\n\t},\r\n\r\n\tcarton(frm) {\r\n\t\tupdate_items_from_ctns(frm);\r\n\t}\r\n});\r\n\r\nfunction update_items_from_ctns(frm) {\r\n    \r\n    const is_receipt = frm.doc.stock_entry_type === \"Material Receipt\";\r\n    \r\n\tif (!frm.doc.custom_transfer_by_carton || !frm.doc.custom_carton_table.length) return;\r\n\r\n\tfrm.clear_table(\"items\");\r\n\tfrm.refresh_field(\"items\");\r\n\r\n    const ctn_names = frm.doc.custom_carton_table.map(row => row.carton)\r\n\r\n\r\n    console.log(\"the =>>>> \" , ctn_names)\r\n    \r\n    frappe.call({\r\n        method : \"ctn_tracking_app.api.get_items_from_ctns\",\r\n        args : { ctn_list : ctn_names},\r\n        freeze : true,\r\n        freeze_message : \"Fetching items from CTNs ...\",\r\n        callback : function(r){\r\n            if(!r.message) return;\r\n            frm.clear_table(\"items\");\r\n            r.message.forEach(item => {\r\n                frm.add_child(\"items\" , {\r\n                    item_code         : item.item_code,\r\n                    qty               : item.qty ,\r\n                    uom               : item.uom || \"\",\r\n                    stock_uom         : item.uom || \"\",\r\n                    transfer_qty      : item.qty * item.conversion_factor,\r\n                    conversion_factor : item.conversion_factor || 1 ,\r\n                    s_warehouse       : is_receipt ? \"\" :item.s_warehouse,\r\n                    t_warehouse       : frm.doc.to_warehouse //default to warhouse on issue just dont set it.\r\n                })\r\n            })\r\n            \r\n            frm.refresh_field(\"items\");\r\n            frappe.show_alert(\"Items updated from CTNs\")\r\n        }\r\n    })\r\n\r\n}\r\n",
+  "modified": "2025-12-31 22:33:01.168617",
+  "module": "POS AR",
+  "name": "Partner Monitoring Client Script",
+  "script": "frappe.ui.form.on(\"Partner Monitoring\", {\r\n  async company(frm) {\r\n\r\n    if (!frm.doc.company) return;\r\n\r\n    // 0) Get Customer representing this Company\r\n    const custRes = await frappe.call({\r\n      method: \"frappe.client.get_list\",\r\n      args: {\r\n        doctype: \"Customer\",\r\n        fields: [\"name\"],\r\n        filters: {\r\n          represents_company: frm.doc.company   // change if your fieldname differs\r\n        },\r\n        limit_page_length: 1\r\n      }\r\n    });\r\n    \r\n    \r\n\r\n    const customer = (custRes.message || [])[0]?.name;\r\n\r\n    \r\n\r\n    if (!customer) {\r\n      // stop here to avoid crash and wrong results\r\n      frm.clear_table(\"commands\");\r\n      frm.clear_table(\"sales\");\r\n      frm.refresh_field(\"commands\");\r\n      frm.refresh_field(\"sales\");\r\n      return;\r\n    }\r\n\r\n    // -----------------------------\r\n    // A) Sales Orders (not closed)\r\n    // -----------------------------\r\n    frm.clear_table(\"commands\");\r\n    frm.refresh_field(\"commands\");\r\n    \r\n\r\n    const soRes = await frappe.call({\r\n      method: \"frappe.client.get_list\",\r\n      args: {\r\n        doctype: \"Sales Order\",\r\n        fields: [\"name\" , \"grand_total\" , \"transaction_date\"],\r\n        filters:{\r\n            company   : \"Optilens CA\",\r\n            customer  : customer,\r\n            status: [\"!=\", \"Closed\"],\r\n            docstatus :1\r\n        }\r\n      }\r\n    });\r\n    \r\n\r\n    const sales_orders = soRes.message || [];\r\n\r\n\r\n    sales_orders.forEach(so => {\r\n      let row = frm.add_child(\"commands\");\r\n      row.order_name = so.name;\r\n      row.date = so.transaction_date;           // ✅ correct field\r\n      row.grand_total = so.grand_total;\r\n    });\r\n\r\n    frm.refresh_field(\"commands\");\r\n    frappe.show_alert({ message: __(\"Loaded {0} Sales Orders\", [sales_orders.length]), indicator: \"green\" });\r\n\r\n    // -----------------------------\r\n    // B) Outstanding Sales Invoices\r\n    // -----------------------------\r\n    frm.clear_table(\"sales\");\r\n    frm.refresh_field(\"sales\");\r\n\r\n    const invRes = await frappe.call({\r\n      method: \"frappe.client.get_list\",\r\n      args: {\r\n        doctype: \"Sales Invoice\",\r\n        fields: [\"name\", \"posting_date\", \"grand_total\", \"outstanding_amount\"],\r\n        filters: {\r\n          company: \"Optilens CA\",              \r\n          customer: customer,                    \r\n          outstanding_amount: [\">\", 0],          \r\n          docstatus: 1\r\n        },\r\n        order_by: \"posting_date desc\",\r\n        limit_page_length: 500\r\n      }\r\n    });\r\n\r\n    const invoices = invRes.message || [];\r\n    \r\n\r\n    invoices.forEach(inv => {\r\n      let row = frm.add_child(\"sales\");\r\n      row.sales_invoice = inv.name;\r\n      row.outstanding = inv.outstanding_amount;\r\n      row.date = inv.posting_date;\r\n      row.total = inv.grand_total;\r\n    });\r\n\r\n    frm.refresh_field(\"sales\");\r\n    frappe.show_alert({ message: __(\"Loaded {0} Outstanding Sales Invoices\", [invoices.length]), indicator: \"green\" });\r\n  }\r\n});\r\n",
   "view": "Form"
  }
 ]
