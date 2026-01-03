@@ -1,8 +1,10 @@
 {
  "actions": [],
+ "allow_events_in_timeline": 1,
+ "allow_import": 1,
  "allow_rename": 1,
  "autoname": "format:Order-{company}-{####}",
- "creation": "2025-08-29 17:43:43.832312",
+ "creation": "2025-12-21 18:29:59.315115",
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
@@ -17,6 +19,8 @@
   "to_warehouse",
   "sb_1",
   "search_by_time",
+  "column_break_lipg",
+  "command_qty_needed",
   "cb_2",
   "note",
   "sb_2",
@@ -28,18 +32,22 @@
   "cb_5",
   "cb_6",
   "search",
-  "column_break_8sd2",
-  "column_break_dqav",
+  "cb_7",
+  "cb_8",
   "sb_4",
   "items",
   "sb_5",
-  "column_break_sd6o",
-  "column_break_5dha",
-  "column_break_jhbo",
+  "export_btn",
+  "cb_9",
+  "cb_10",
+  "sb_6",
   "generate",
-  "column_break_ty7n",
-  "column_break_gxzg",
-  "amended_from"
+  "command_achat",
+  "facture_achat",
+  "cb_13",
+  "generate_alter",
+  "alter_command_achat",
+  "alter_facture_achat"
  ],
  "fields": [
   {
@@ -109,7 +117,7 @@
    "fieldtype": "Section Break"
   },
   {
-   "default": "0",
+   "default": "1",
    "fieldname": "search_by_time",
    "fieldtype": "Check",
    "label": "Search by time"
@@ -166,14 +174,6 @@
    "label": "Search"
   },
   {
-   "fieldname": "column_break_8sd2",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "column_break_dqav",
-   "fieldtype": "Column Break"
-  },
-  {
    "fieldname": "sb_4",
    "fieldtype": "Section Break",
    "label": "Sold Items"
@@ -188,46 +188,94 @@
    "fieldtype": "Section Break"
   },
   {
-   "fieldname": "column_break_sd6o",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "column_break_5dha",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "column_break_jhbo",
-   "fieldtype": "Column Break"
-  },
-  {
    "fieldname": "generate",
    "fieldtype": "Button",
-   "label": "Generate"
+   "label": "Generate Command"
   },
   {
-   "fieldname": "column_break_ty7n",
+   "fieldname": "column_break_lipg",
    "fieldtype": "Column Break"
   },
   {
-   "fieldname": "column_break_gxzg",
+   "default": "0",
+   "fieldname": "command_qty_needed",
+   "fieldtype": "Check",
+   "label": "Command Qty Needed"
+  },
+  {
+   "fieldname": "cb_7",
    "fieldtype": "Column Break"
   },
   {
-   "fieldname": "amended_from",
-   "fieldtype": "Link",
-   "label": "Amended From",
+   "fieldname": "cb_8",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "export_btn",
+   "fieldtype": "Button",
+   "label": "Export All"
+  },
+  {
+   "fieldname": "cb_9",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "cb_10",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "sb_6",
+   "fieldtype": "Section Break",
+   "label": "Linked Doc",
    "no_copy": 1,
-   "options": "Buy The Sold",
    "print_hide": 1,
    "read_only": 1,
    "search_index": 1
+  },
+  {
+   "allow_on_submit": 1,
+   "default": "---",
+   "fieldname": "command_achat",
+   "fieldtype": "Data",
+   "label": "Command d'achat",
+   "read_only": 1
+  },
+  {
+   "default": "---",
+   "fieldname": "facture_achat",
+   "fieldtype": "Data",
+   "label": "Facture d'achat",
+   "read_only": 1
+  },
+  {
+   "fieldname": "cb_13",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "generate_alter",
+   "fieldtype": "Button",
+   "label": "Generate Alternative Command"
+  },
+  {
+   "default": "---",
+   "fieldname": "alter_command_achat",
+   "fieldtype": "Data",
+   "label": "Alter Command d'achat",
+   "read_only": 1
+  },
+  {
+   "default": "---",
+   "fieldname": "alter_facture_achat",
+   "fieldtype": "Data",
+   "label": "Alter Factur d'achat",
+   "read_only": 1
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-08-29 19:06:01.206654",
+ "modified": "2026-01-03 08:44:15.210355",
  "modified_by": "Administrator",
  "module": "POS AR",
  "name": "Buy The Sold",
@@ -251,5 +299,8 @@
  "row_format": "Dynamic",
  "sort_field": "modified",
  "sort_order": "DESC",
- "states": []
+ "states": [],
+ "track_changes": 1,
+ "track_seen": 1,
+ "track_views": 1
 }
