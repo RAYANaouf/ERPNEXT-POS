@@ -265,26 +265,28 @@ doc_events = {
 
 fixtures = [
     {
-        'dt': 'DocType',
-        'filters': [['name', 'in', ['check_in_out' , 'money' , 'CTN Item' , 'CTN-BOX' , 'CTN-BOX Transaction' ,  'CTN Transfer' , 'CTN Transfer Item' ,  'Stock Transfer CTN' , "Customer Company" , "Buy The Need", "Buy The Sold" , "Buy The Need Item" , "CTN Transfer Piece"]]]
+        "dt": "Client Script",
+        "filters": [
+            ["module", "in", ["POS AR"]]
+        ]
     },
     {
-        'dt': 'Custom Field',
-        'filters': [['dt', 'in', ['POS Invoice', 'Customer' , 'POS Closing Entry' ,'Sales Invoice','Purchase Order','Item' , 'Stock Entry' , 'Company' , 'Supplier' , 'Brand']]]
+        "dt": "Server Script",
+        "filters": [
+            ["module", "in", ["POS AR"]]
+        ]
     },
     {
-        'dt': 'Client Script',
-        'filters': [['dt', 'in', ['POS Closing Entry','CTN-BOX','Sales Invoice','Purchase Order','CTN Transfer' , 'Stock Entry' , 'Company' , 'Buy The Need' , 'Buy The Sold']]]
+        "dt": "Custom Field",
+        "filters": [
+            ["module", "in", ["POS AR"]]
+        ]
     },
     {
-        'dt': 'Server Script',
-        'filters': [['reference_doctype', 'in', ['Purchase Order' , 'Purchase Invoice' , 'Purchase Order']]]
+        "dt": "DocType",
+        "filters": [
+            ["module", "in", ["POS AR"]],
+            ["istable", "=", 1]
+        ]
     }
 ]
-
-
-
-
-
-
-

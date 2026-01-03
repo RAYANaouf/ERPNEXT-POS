@@ -1,0 +1,85 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2026-01-01 13:55:52.309128",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "article",
+  "qte_facturee",
+  "qte_1",
+  "qte_2",
+  "qte_3",
+  "qte_4",
+  "total",
+  "ecart"
+ ],
+ "fields": [
+  {
+   "fieldname": "ecart",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "\u00c9cart"
+  },
+  {
+   "fieldname": "qte_facturee",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Qt\u00e9 Factur\u00e9e",
+   "read_only": 1
+  },
+  {
+   "fieldname": "article",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Article",
+   "options": "Item"
+  },
+  {
+   "fieldname": "qte_1",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Qt\u00e9 1"
+  },
+  {
+   "fieldname": "qte_2",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Qt\u00e9 2"
+  },
+  {
+   "fieldname": "qte_3",
+   "fieldtype": "Float",
+   "label": "Qt\u00e9 3"
+  },
+  {
+   "fieldname": "qte_4",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Qt\u00e9 4"
+  },
+  {
+   "fieldname": "total",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Total",
+   "read_only": 1
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2026-01-02 23:54:44.709370",
+ "modified_by": "Administrator",
+ "module": "POS AR",
+ "name": "Ajustement Item",
+ "owner": "Administrator",
+ "permissions": [],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

@@ -1,0 +1,114 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2026-01-01 13:02:58.493801",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "ajustement_quantit\u00e9_section",
+  "facture_de_vente",
+  "date",
+  "section_break_alrk",
+  "articles",
+  "section_break_mwwi",
+  "note_de_credit_creee",
+  "facture_supplementaire_creee",
+  "client",
+  "amended_from"
+ ],
+ "fields": [
+  {
+   "fieldname": "ajustement_quantit\u00e9_section",
+   "fieldtype": "Section Break",
+   "label": "Ajustement Quantit\u00e9"
+  },
+  {
+   "default": "Today",
+   "fieldname": "date",
+   "fieldtype": "Date",
+   "label": "Date",
+   "reqd": 1
+  },
+  {
+   "fieldname": "articles",
+   "fieldtype": "Table",
+   "label": "Articles",
+   "options": "Ajustement Item",
+   "reqd": 1
+  },
+  {
+   "fieldname": "facture_de_vente",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Facture de Vente",
+   "options": "Sales Invoice",
+   "reqd": 1
+  },
+  {
+   "fieldname": "client",
+   "fieldtype": "Link",
+   "label": "Client",
+   "options": "Customer"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Ajustement Quantite",
+   "print_hide": 1,
+   "read_only": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "note_de_credit_creee",
+   "fieldtype": "Link",
+   "label": "Note de Cr\u00e9dit Cr\u00e9\u00e9e",
+   "options": "Sales Invoice",
+   "read_only": 1
+  },
+  {
+   "fieldname": "facture_supplementaire_creee",
+   "fieldtype": "Link",
+   "label": "Facture Suppl\u00e9mentaire Cr\u00e9\u00e9e",
+   "options": "Sales Invoice",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_alrk",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "section_break_mwwi",
+   "fieldtype": "Section Break"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2026-01-03 08:55:16.423846",
+ "modified_by": "Administrator",
+ "module": "POS AR",
+ "name": "Ajustement Quantite",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
