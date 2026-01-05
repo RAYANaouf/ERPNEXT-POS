@@ -1678,7 +1678,6 @@ def get_partner_monitoring(token: str,  only_unsent: int = 1):
 
 
     filters = [
-        ["docstatus", "=", 1],
     ]
 
 
