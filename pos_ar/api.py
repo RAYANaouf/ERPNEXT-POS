@@ -1041,7 +1041,7 @@ def auto_inter_company_purchase_invoice_creation(doc, method):
                 "Purchase Order",
                 po_no
             )
-       
+          
 
         # Create mirrored PI
         target_company_wh = frappe.db.get_value("Company", target_company, "custom_default_warehouse")
@@ -1081,6 +1081,7 @@ def auto_inter_company_purchase_invoice_creation(doc, method):
         pi.flags.ignore_permissions = True
         pi.insert()
         pi.submit()
+        doc.db_set("linked_purchase_invoice", pi.name)
         return
 
     if method == "on_cancel":
@@ -1160,9 +1161,16 @@ def auto_inter_company_purchase_invoice_creation_from_alger(doc, method):
 
             pi.append("items", row)
 
+
+
+
+            doc.purchase_order_inter_company = None
+        doc.save(ignore_permissions=True)
+
         pi.flags.ignore_permissions = True
         pi.insert()
         pi.submit()
+        doc.db_set("linked_purchase_invoice", pi.name)
         return
 
     if method == "on_cancel":
