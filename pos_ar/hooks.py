@@ -288,6 +288,9 @@ fixtures = [
         'filters': [
             ["module" , "in" , ["POS AR"]],
         ]
+    },
+    {
+        'dt': 'Workflow',
     }
 ]
 
