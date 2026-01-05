@@ -1703,7 +1703,8 @@ def get_partner_monitoring(token: str,  only_unsent: int = 1):
             "creation": str(doc.creation),
             "owner": doc.owner,
             "workflow_state": getattr(doc, "workflow_state", None),
-
+            "make_a_call": getattr(doc, "make_a_call", None),
+            "make_a_command": getattr(doc, "make_a_command", None),
             # captions field: adjust if your fieldname is different
             "note": getattr(doc, "note", None),
 
