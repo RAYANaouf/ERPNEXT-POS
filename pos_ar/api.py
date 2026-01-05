@@ -1081,6 +1081,8 @@ def auto_inter_company_purchase_invoice_creation(doc, method):
         pi.flags.ignore_permissions = True
         pi.insert()
         pi.submit()
+        # Update the Sales Invoice with the Purchase Invoice ID
+        doc.db_set("custom_purchase_invoice_id", pi.name)
         return
 
     if method == "on_cancel":
@@ -1090,6 +1092,8 @@ def auto_inter_company_purchase_invoice_creation(doc, method):
             pi = frappe.get_doc("Purchase Invoice", pi_name)
             if pi.docstatus == 1:
                 pi.cancel()
+                # Update the Sales Invoice with the Purchase Invoice ID
+                doc.db_set("custom_purchase_invoice_id", "")
         return
 
 
