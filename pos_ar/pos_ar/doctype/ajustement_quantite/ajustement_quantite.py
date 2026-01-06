@@ -65,7 +65,6 @@ class AjustementQuantite(Document):
         credit.posting_date = self.date
         credit.is_return = 1
         credit.return_against = original_invoice.name
-        credit.update_stock = 1
         credit.set_posting_time = 1
 
         for item in items:
@@ -95,7 +94,7 @@ class AjustementQuantite(Document):
         new_inv.company = original_invoice.company
         new_inv.posting_date = self.date
         new_inv.set_posting_time = 1
-        new_inv.update_stock = 1
+    
 
         for item in items:
             orig = self.get_original_item(original_invoice, item.article)
