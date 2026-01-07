@@ -1029,21 +1029,23 @@ def auto_inter_company_purchase_invoice_creation(doc, method):
         # Handle Sales Return vs Regular Invoice
         is_return = doc.get("is_return")
 
+
+        # Find the existing PO in target company for that po_no
+        po = None
+        
         # Get the (single) Sales Order from SI items
         sales_order = next((it.sales_order for it in doc.items if getattr(it, "sales_order", None)), None)
         if not sales_order:
             frappe.msgprint("ℹ️ Skipping: No Sales Order found in SI.")
-            return
+            po_no = frappe.db.get_value("Sales Order", sales_order, "po_no")
+            if po_no:
+                po  = frappe.get_doc(
+                    "Purchase Order",
+                    po_no
+                )
 
-        po_no = frappe.db.get_value("Sales Order", sales_order, "po_no")
-
-        # Find the existing PO in target company for that po_no
-        po = None
-        if po_no:
-            po  = frappe.get_doc(
-                "Purchase Order",
-                po_no
-            )
+        
+        
 
         sales_invoice_return_against = doc.return_against 
         purchase_invoice_return_against_doc = None
@@ -1081,23 +1083,35 @@ def auto_inter_company_purchase_invoice_creation(doc, method):
         
         for it in doc.items:
             po_detail = None
-            for item in po.items:
-                if item.item_code == it.item_code:
-                    po_detail = item
-                    break
-                
-            print("heeree po_detail ==============> : ", po_detail.name)
+            if po:
+                for item in po.items:
+                    if item.item_code == it.item_code:
+                        po_detail = item
+                        break
+                print("heeree po_detail ==============> : ", po_detail.name)    
+            
 
-            pi.append("items", {
-                "item_code": it.item_code,
-                "item_name": it.item_name,
-                "uom": it.uom,
-                "qty": it.qty,
-                "rate": it.rate,
-                "warehouse": target_company_wh,
-                "purchase_order": po.name,  # may be None if not found; OK
-                "po_detail": po_detail.name,     # row link for PO achievement
-            })
+            if po_detail and po : 
+                pi.append("items", {
+                    "item_code": it.item_code,
+                    "item_name": it.item_name,
+                    "uom": it.uom,
+                    "qty": it.qty,
+                    "rate": it.rate,
+                    "warehouse": target_company_wh,
+                    "purchase_order": po.name,  # may be None if not found; OK
+                    "po_detail": po_detail.name,     # row link for PO achievement
+                })
+            else:
+                pi.append("items", {
+                    "item_code": it.item_code,
+                    "item_name": it.item_name,
+                    "uom": it.uom,
+                    "qty": it.qty,
+                    "rate": it.rate,
+                    "warehouse": target_company_wh,
+                })
+             
 
         pi.flags.ignore_permissions = True
         pi.insert()
