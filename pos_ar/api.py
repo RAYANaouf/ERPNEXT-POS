@@ -1653,3 +1653,127 @@ def get_mr_item_name(material_request, item_code):
         {"parent": material_request, "item_code": item_code},
         "name"
     )
+
+
+
+import frappe
+from frappe import _
+from frappe.utils import flt, getdate
+
+
+@frappe.whitelist()
+def alert_sales_order(doc, method):
+    """
+    Event trigger : on_submit sur Sales Order
+    Objectif :
+    Détecter une surconsommation si le client commande une quantité
+    supérieure à la consommation réelle entre ses deux dernières commandes.
+    """
+
+    print("========== DÉBUT ALERT SALES ORDER ==========")
+    frappe.log_error(">>>> START alert_sales_order")
+
+    # Vérifier que la société = OPTILENS CA
+    if doc.company != "OPTILENS CA":
+        frappe.log_error(f"Commande ignorée — Société = {doc.company}")
+        return
+
+    frappe.log_error(f"Analyse commande client = {doc.customer}, Date = {doc.transaction_date}")
+
+    alerts = []
+
+    for item in doc.items:
+        alert_msg = check_item_overconsumption(
+            customer=doc.customer,
+            item_code=item.item_code,
+            item_name=item.item_name,
+            ordered_qty=item.qty,
+            current_order_date=doc.transaction_date,
+        )
+
+        if alert_msg:
+            alerts.append(alert_msg)
+
+    # Si des alertes existent → créer un commentaire dans le Sales Order
+    if alerts:
+        comment = "⚠️ ALERTE SURCONSOMMATION DÉTECTÉE\n\n" + "\n".join(alerts)
+        doc.add_comment("Comment", text=comment)
+        frappe.log_error("Alerte enregistrée dans le document")
+    else:
+        frappe.log_error("Aucune surconsommation détectée")
+
+    print("========== FIN ALERT SALES ORDER ==========")
+    frappe.log_error(">>>> END alert_sales_order")
+
+
+def check_item_overconsumption(customer, item_code, item_name, ordered_qty, current_order_date):
+    """
+    Règle métier :
+    Comparer la nouvelle commande avec la consommation réelle
+    entre la DERNIÈRE COMMANDE et la nouvelle commande.
+    """
+
+    # 1️⃣ Récupérer la dernière commande précédente
+    last_so_query = """
+        SELECT so.name, so.transaction_date, soi.qty
+        FROM `tabSales Order` so
+        INNER JOIN `tabSales Order Item` soi ON soi.parent = so.name
+        WHERE so.docstatus = 1
+          AND so.customer = %s
+          AND soi.item_code = %s
+          AND so.transaction_date < %s
+        ORDER BY so.transaction_date DESC
+        LIMIT 1
+    """
+
+    last_so = frappe.db.sql(
+        last_so_query,
+        (customer, item_code, current_order_date),
+        as_dict=True
+    )
+
+    # 👉 S’il n’y a pas d’ancienne commande → pas de comparaison
+    if not last_so:
+        return None
+
+    last_order_date = last_so[0].transaction_date
+    last_order_name = last_so[0].name
+
+    # 2️⃣ Calculer la consommation réelle entre les deux dates
+    consumption_query = """
+        SELECT COALESCE(SUM(dni.qty), 0) AS total_consumed
+        FROM `tabDelivery Note` dn
+        INNER JOIN `tabDelivery Note Item` dni ON dni.parent = dn.name
+        WHERE dn.docstatus = 1
+          AND dn.customer = %s
+          AND dni.item_code = %s
+          AND dn.posting_date >= %s
+          AND dn.posting_date < %s
+    """
+
+    consumption = frappe.db.sql(
+        consumption_query,
+        (customer, item_code, last_order_date, current_order_date),
+        as_dict=True
+    )
+
+    total_consumed = flt(consumption[0].total_consumed)
+
+    # 3️⃣ Comparaison nouvelle commande vs consommation réelle
+    if ordered_qty > total_consumed:
+        surplus = ordered_qty - total_consumed
+        display_name = item_name or item_code
+
+        alert_msg = (
+            f"- **{display_name}** ({item_code}) : "
+            f"Commande actuelle **{int(ordered_qty)}** > "
+            f"Consommation réelle **{int(total_consumed)}** "
+            f"depuis la dernière commande du {last_order_date} "
+            f"(Doc: {last_order_name}) "
+            f"(Surplus **+{int(surplus)}**)"
+        )
+
+        frappe.log_error(f"ALERTE CONSOMMATION ENTRE LES DEUX COMMANDES — {alert_msg}")
+        return alert_msg
+
+    return None

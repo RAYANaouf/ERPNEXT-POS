@@ -160,6 +160,7 @@ doc_events = {
     "Stock Entry": {
         "on_submit": ["pos_ar.api.create_purchase_order_for_shortage"],
     },
+   
 }
 
 # Scheduled Tasks
