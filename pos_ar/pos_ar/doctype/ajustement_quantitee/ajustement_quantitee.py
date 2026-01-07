@@ -219,6 +219,7 @@ class AjustementQuantitee(Document):
         credit.is_return = 1
         credit.return_against = original_si.name
         credit.update_stock = 1
+        credit.update_outstanding_for_self = 0
         
         # Entrepôt par défaut du vendeur
         vendor_warehouse = frappe.db.get_value(
