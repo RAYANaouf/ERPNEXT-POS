@@ -1026,6 +1026,9 @@ def auto_inter_company_purchase_invoice_creation(doc, method):
         return
 
     if method == "on_submit":
+        # Handle Sales Return vs Regular Invoice
+        is_return = doc.get("is_return")
+
         # Get the (single) Sales Order from SI items
         sales_order = next((it.sales_order for it in doc.items if getattr(it, "sales_order", None)), None)
         if not sales_order:
@@ -1041,12 +1044,27 @@ def auto_inter_company_purchase_invoice_creation(doc, method):
                 "Purchase Order",
                 po_no
             )
-       
+
+        sales_invoice_return_against = doc.return_against 
+        purchase_invoice_return_against_doc = None
+        if sales_invoice_return_against:
+            sales_invoice_return_against_doc    = frappe.get_doc("Sales Invoice", sales_invoice_return_against)
+            print("sales_invoice_return_against ==============> : ", sales_invoice_return_against)
+            print("sales_invoice_return_against_doc ==============> : ", sales_invoice_return_against_doc)
+            print("purchase_invoice_return_against_doc ==============> : ", sales_invoice_return_against_doc.custom_purchase_invoice_id)
+          
+
+  
 
         # Create mirrored PI
         target_company_wh = frappe.db.get_value("Company", target_company, "custom_default_warehouse")
         pi = frappe.new_doc("Purchase Invoice")
         pi.buying_price_list = doc.selling_price_list
+        if is_return:
+            pi.is_return = is_return
+            pi.return_against = sales_invoice_return_against_doc.custom_purchase_invoice_id
+            # FORCE the flag here
+            pi.update_outstanding_for_self = 0
         pi.company = target_company
         pi.supplier = internal_supplier
         pi.is_internal_supplier = 1
@@ -1057,6 +1075,9 @@ def auto_inter_company_purchase_invoice_creation(doc, method):
         pi.update_stock = doc.update_stock
         pi.set_warehouse = target_company_wh
 
+        print("heeree the posting date ==============> : ", pi.posting_date)
+        print("heeree the due date ==============> : ", pi.due_date)
+        print("heeree the update_outstanding_for_self ==============> : ", pi.update_outstanding_for_self)
         
         for it in doc.items:
             po_detail = None
@@ -1080,6 +1101,11 @@ def auto_inter_company_purchase_invoice_creation(doc, method):
 
         pi.flags.ignore_permissions = True
         pi.insert()
+
+        # If the system forced 'update_outstanding_for_self' to 1 on insert, fix it here:
+        if is_return:
+            pi.db_set("update_outstanding_for_self", 0)
+            
         pi.submit()
         # Update the Sales Invoice with the Purchase Invoice ID
         doc.db_set("custom_purchase_invoice_id", pi.name)
