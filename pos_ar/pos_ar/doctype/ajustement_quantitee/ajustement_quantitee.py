@@ -46,6 +46,44 @@ class AjustementQuantitee(Document):
         self.create_vendor_side_documents(invoice, retours, supplements)
         
         self.db_update()
+        
+
+
+    def on_cancel(self):
+     """
+     Annule tous les documents créés automatiquement
+     lors du on_submit de l'Ajustement Quantitee
+      """
+
+     frappe.msgprint("🔄 Annulation des documents liés à l'ajustement...")
+
+     documents = [
+        ("Purchase Invoice", self.avoir_cree),
+        ("Purchase Invoice", self.facture_supplementaire_creee),
+        ("Sales Invoice", self.avoir_vendeur_cree),
+        ("Sales Invoice", self.facture_vendeur_creee),
+     ]
+
+     for doctype, name in documents:
+        if not name:
+            continue
+
+        if not frappe.db.exists(doctype, name):
+            continue
+
+        doc = frappe.get_doc(doctype, name)
+
+        if doc.docstatus == 1:
+            doc.flags.ignore_permissions = True
+            doc.cancel()
+            frappe.msgprint(f"❌ {doctype} annulée : {name}")
+
+     # Nettoyer les champs après annulation
+     self.db_set("avoir_cree", None)
+     self.db_set("facture_supplementaire_creee", None)
+     self.db_set("avoir_vendeur_cree", None)
+     self.db_set("facture_vendeur_creee", None)
+		
 
     # =========================================
     # FONCTIONS CÔTÉ ACHETEUR
