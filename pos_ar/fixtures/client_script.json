@@ -130,5 +130,16 @@
   "name": "Ajustement Quantitee",
   "script": "// ======================================\r\n//  DOCTYPE : Ajustement Quantitee\r\n// ======================================\r\nfrappe.ui.form.on(\"Ajustement Quantitee\", {\r\n    facture_achat(frm) {\r\n        if (!frm.doc.facture_achat) return;\r\n\r\n        // Charger la Purchase Invoice avec ses items\r\n        frappe.db.get_doc(\"Purchase Invoice\", frm.doc.facture_achat).then(inv => {\r\n\r\n            // Récupérer fournisseur\r\n            frm.set_value(\"fournisseur\", inv.supplier);\r\n                                \r\n            // Vider la table articles\r\n            frm.clear_table(\"articles\");\r\n\r\n            // Remplir les lignes\r\n            (inv.items || []).forEach(i => {\r\n                let row = frm.add_child(\"articles\");\r\n\r\n                row.article = i.item_code;\r\n                row.qte_facturee = i.qty;\r\n\r\n                row.qte_1 = 0;\r\n                row.qte_2 = 0;\r\n                row.qte_3 = 0;\r\n                row.qte_4 = 0;\r\n\r\n                row.total = 0;\r\n                row.ecart = 0;\r\n            });\r\n\r\n            frm.refresh_field(\"articles\");\r\n        });\r\n    }\r\n});\r\n\r\n\r\n// ======================================\r\n//  TABLE ENFANT : Ajustement Achat Item\r\n// ======================================\r\nfrappe.ui.form.on(\"Ajustement Item\", {\r\n    qte_1: calculer_ecart,\r\n    qte_2: calculer_ecart,\r\n    qte_3: calculer_ecart,\r\n    qte_4: calculer_ecart\r\n});\r\n\r\n\r\n// ======================================\r\n//  FONCTION DE CALCUL — OK\r\n// ======================================\r\nfunction calculer_ecart(frm, cdt, cdn) {\r\n    let row = locals[cdt][cdn];\r\n\r\n    let total =\r\n        flt(row.qte_1) +\r\n        flt(row.qte_2) +\r\n        flt(row.qte_3) +\r\n        flt(row.qte_4);\r\n\r\n    row.total = total;\r\n    row.ecart = total - flt(row.qte_facturee);\r\n\r\n    frm.refresh_field(\"articles\");\r\n\r\n    // Mise en couleur si écart\r\n    setTimeout(() => {\r\n        let grid_row = frm.fields_dict[\"articles\"]\r\n            .grid.grid_rows_by_docname[cdn];\r\n\r\n        if (!grid_row) return;\r\n\r\n        grid_row.row.style.backgroundColor =\r\n            (row.ecart !== 0) ? \"#ffe6e6\" : \"\";\r\n    }, 50);\r\n}\r\n",
   "view": "Form"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Client Script",
+  "dt": "Purchase Invoice",
+  "enabled": 1,
+  "modified": "2026-01-10 12:10:10.022418",
+  "module": "POS AR",
+  "name": "purchase invoice",
+  "script": "frappe.ui.form.on('Purchase Invoice', {\r\n    refresh(frm) {\r\n\r\n        // bouton seulement si la facture est validée\r\n        if (frm.doc.docstatus === 1) {\r\n\r\n            frm.add_custom_button(__('Créer Ajustement Quantité'), function () {\r\n\r\n                frappe.model.with_doctype('Ajustement Quantitee', function () {\r\n\r\n                    let doc = frappe.model.get_new_doc('Ajustement Quantitee');\r\n\r\n                    // lier la Purchase Invoice\r\n                    doc.facture_achat = frm.doc.name;\r\n\r\n                    // ouvrir le document\r\n                    frappe.set_route('Form', 'Ajustement Quantitee', doc.name);\r\n                });\r\n\r\n            }, __('Actions'));\r\n        }\r\n    }\r\n});\r\n",
+  "view": "Form"
  }
 ]
