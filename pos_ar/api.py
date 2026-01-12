@@ -1206,11 +1206,6 @@ def auto_inter_company_purchase_invoice_creation_from_alger(doc, method):
             pi.append("items", row)
 
 
-
-
-            doc.purchase_order_inter_company = None
-        doc.save(ignore_permissions=True)
-
         pi.flags.ignore_permissions = True
         pi.insert()
         pi.submit()
