@@ -1,0 +1,111 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2026-01-14 15:20:08.231273",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "item",
+  "column_break_xfjf",
+  "actual_qty",
+  "column_break_accs",
+  "q1",
+  "column_break_wxer",
+  "q2",
+  "column_break_ofue",
+  "q3",
+  "column_break_mmg8",
+  "q4",
+  "column_break_7mjg",
+  "total"
+ ],
+ "fields": [
+  {
+   "fieldname": "item",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Item",
+   "options": "Item",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_xfjf",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "actual_qty",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Actual Qty",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_accs",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "q1",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Q1",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_wxer",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "q2",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Q2",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_ofue",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "q3",
+   "fieldtype": "Float",
+   "label": "Q3",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_mmg8",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "q4",
+   "fieldtype": "Float",
+   "label": "Q4",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_7mjg",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "total",
+   "fieldtype": "Float",
+   "label": "Total",
+   "reqd": 1
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2026-01-14 15:22:05.078938",
+ "modified_by": "Administrator",
+ "module": "POS AR",
+ "name": "Brand-Based Inventory Item",
+ "owner": "Administrator",
+ "permissions": [],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

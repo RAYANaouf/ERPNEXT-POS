@@ -1,0 +1,139 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2026-01-14 15:06:57.998219",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "company",
+  "column_break_xxor",
+  "warehouse",
+  "column_break_gr2l",
+  "date_time",
+  "ctn_section_section",
+  "carton",
+  "column_break_ijv4",
+  "carton_items",
+  "brand_section_section",
+  "brand",
+  "item_section_section",
+  "items",
+  "amended_from"
+ ],
+ "fields": [
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Company",
+   "options": "Company",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_xxor",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "warehouse",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Warehouse",
+   "options": "Warehouse",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_gr2l",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "date_time",
+   "fieldtype": "Datetime",
+   "in_list_view": 1,
+   "label": "date & time",
+   "reqd": 1
+  },
+  {
+   "fieldname": "ctn_section_section",
+   "fieldtype": "Section Break",
+   "label": "CTN Section"
+  },
+  {
+   "fieldname": "carton",
+   "fieldtype": "Table",
+   "label": "Carton",
+   "options": "Brand-Based Inventory Carton"
+  },
+  {
+   "fieldname": "column_break_ijv4",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "carton_items",
+   "fieldtype": "Table",
+   "label": "Carton Items",
+   "options": "Brand-Based Inventory Carton Item",
+   "read_only": 1
+  },
+  {
+   "fieldname": "brand_section_section",
+   "fieldtype": "Section Break",
+   "label": "Brand Section"
+  },
+  {
+   "fieldname": "brand",
+   "fieldtype": "Table",
+   "label": "Brand",
+   "options": "Brand-Based Inventory Brand"
+  },
+  {
+   "fieldname": "item_section_section",
+   "fieldtype": "Section Break",
+   "label": "Item Section"
+  },
+  {
+   "fieldname": "items",
+   "fieldtype": "Table",
+   "label": "Items",
+   "options": "Brand-Based Inventory Item"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Brand-Based Inventory",
+   "print_hide": 1,
+   "read_only": 1,
+   "search_index": 1
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2026-01-14 15:23:55.009357",
+ "modified_by": "Administrator",
+ "module": "POS AR",
+ "name": "Brand-Based Inventory",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
