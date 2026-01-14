@@ -1,6 +1,7 @@
 {
  "actions": [],
  "allow_rename": 1,
+ "autoname": "format:Inventory-{company}-{warehouse}-{date_time}",
  "creation": "2026-01-14 15:06:57.998219",
  "doctype": "DocType",
  "engine": "InnoDB",
@@ -111,10 +112,11 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-01-14 15:23:55.009357",
+ "modified": "2026-01-14 19:28:49.490717",
  "modified_by": "Administrator",
  "module": "POS AR",
  "name": "Brand-Based Inventory",
+ "naming_rule": "Expression",
  "owner": "Administrator",
  "permissions": [
   {

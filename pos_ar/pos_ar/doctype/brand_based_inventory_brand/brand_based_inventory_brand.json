@@ -8,7 +8,11 @@
  "field_order": [
   "brand",
   "column_break_c4bu",
-  "items"
+  "items",
+  "section_break_mhve",
+  "gap",
+  "column_break_gctj",
+  "gap_percentage"
  ],
  "fields": [
   {
@@ -32,13 +36,33 @@
    "label": "Items",
    "read_only": 1,
    "reqd": 1
+  },
+  {
+   "fieldname": "section_break_mhve",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "gap",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Gap"
+  },
+  {
+   "fieldname": "column_break_gctj",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "gap_percentage",
+   "fieldtype": "Percent",
+   "in_list_view": 1,
+   "label": "Gap %"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2026-01-14 16:45:54.462158",
+ "modified": "2026-01-14 19:09:19.150538",
  "modified_by": "Administrator",
  "module": "POS AR",
  "name": "Brand-Based Inventory Brand",

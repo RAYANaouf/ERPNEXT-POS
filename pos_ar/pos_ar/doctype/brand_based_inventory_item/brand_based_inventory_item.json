@@ -22,7 +22,9 @@
   "difference_section",
   "dif",
   "column_break_gm4k",
-  "gap"
+  "gap",
+  "brand_section",
+  "brand"
  ],
  "fields": [
   {
@@ -129,13 +131,25 @@
    "fieldname": "gap",
    "fieldtype": "Float",
    "label": "Gap"
+  },
+  {
+   "fieldname": "brand_section",
+   "fieldtype": "Section Break",
+   "label": "Brand"
+  },
+  {
+   "fieldname": "brand",
+   "fieldtype": "Link",
+   "label": "Brand",
+   "options": "Brand",
+   "read_only": 1
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2026-01-14 18:58:09.027218",
+ "modified": "2026-01-14 19:14:42.138774",
  "modified_by": "Administrator",
  "module": "POS AR",
  "name": "Brand-Based Inventory Item",
