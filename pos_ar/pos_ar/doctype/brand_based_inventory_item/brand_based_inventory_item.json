@@ -18,7 +18,11 @@
   "column_break_mmg8",
   "q4",
   "column_break_7mjg",
-  "total"
+  "total",
+  "difference_section",
+  "dif",
+  "column_break_gm4k",
+  "gap"
  ],
  "fields": [
   {
@@ -27,8 +31,8 @@
    "fieldtype": "Link",
    "in_list_view": 1,
    "label": "Item",
-   "length": 3,
    "options": "Item",
+   "read_only": 1,
    "reqd": 1
   },
   {
@@ -41,7 +45,6 @@
    "fieldtype": "Float",
    "in_list_view": 1,
    "label": "Actual Qty",
-   "length": 1,
    "read_only": 1,
    "reqd": 1
   },
@@ -51,12 +54,11 @@
   },
   {
    "columns": 1,
+   "default": "0",
    "fieldname": "q1",
    "fieldtype": "Float",
    "in_list_view": 1,
-   "label": "Q1",
-   "length": 1,
-   "reqd": 1
+   "label": "Q1"
   },
   {
    "fieldname": "column_break_wxer",
@@ -64,12 +66,11 @@
   },
   {
    "columns": 1,
+   "default": "0",
    "fieldname": "q2",
    "fieldtype": "Float",
    "in_list_view": 1,
-   "label": "Q2",
-   "length": 1,
-   "reqd": 1
+   "label": "Q2"
   },
   {
    "fieldname": "column_break_ofue",
@@ -77,12 +78,11 @@
   },
   {
    "columns": 1,
+   "default": "0",
    "fieldname": "q3",
    "fieldtype": "Float",
    "in_list_view": 1,
-   "label": "Q3",
-   "length": 1,
-   "reqd": 1
+   "label": "Q3"
   },
   {
    "fieldname": "column_break_mmg8",
@@ -90,12 +90,11 @@
   },
   {
    "columns": 1,
+   "default": "0",
    "fieldname": "q4",
    "fieldtype": "Float",
    "in_list_view": 1,
-   "label": "Q4",
-   "length": 1,
-   "reqd": 1
+   "label": "Q4"
   },
   {
    "fieldname": "column_break_7mjg",
@@ -103,21 +102,40 @@
   },
   {
    "columns": 1,
+   "default": "0",
    "fieldname": "total",
    "fieldtype": "Float",
    "in_list_view": 1,
    "label": "Total",
-   "length": 1,
    "non_negative": 1,
-   "read_only": 1,
-   "reqd": 1
+   "read_only": 1
+  },
+  {
+   "fieldname": "difference_section",
+   "fieldtype": "Section Break",
+   "label": "Difference "
+  },
+  {
+   "default": "0",
+   "fieldname": "dif",
+   "fieldtype": "Float",
+   "label": "Dif"
+  },
+  {
+   "fieldname": "column_break_gm4k",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "gap",
+   "fieldtype": "Float",
+   "label": "Gap"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2026-01-14 16:50:06.498606",
+ "modified": "2026-01-14 18:58:09.027218",
  "modified_by": "Administrator",
  "module": "POS AR",
  "name": "Brand-Based Inventory Item",
