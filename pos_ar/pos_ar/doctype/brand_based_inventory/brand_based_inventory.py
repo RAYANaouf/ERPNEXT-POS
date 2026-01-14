@@ -5,7 +5,8 @@
 
 import frappe
 from frappe.model.document import Document
-
+import json
+from frappe.utils import flt
 
 class BrandBasedInventory(Document):
 	pass
@@ -16,7 +17,6 @@ class BrandBasedInventory(Document):
 def get_items_from_cartons(cartons):
     # Parse the JSON list of cartons sent from the client
     if isinstance(cartons, str):
-        import json
         cartons = json.loads(cartons)
     
     if not cartons:
@@ -36,27 +36,10 @@ def get_items_from_cartons(cartons):
 
 
 
-To achieve a structured response grouped by brand, we need to modify the Python function to accept a list of brands and then iterate through the items to build a nested dictionary.
-
-Since the "hmc -0.00 -0.00" format in your example looks like a combination of a prefix and some values (likely price or stock), I have included placeholders for those fields.
-
-1. Updated Python Function (brand_based_inventory.py)
-This function accepts a list of brands, fetches the related items, and organizes them into the specific JSON structure you requested.
-
-Python
-
-import frappe
-import json
-from frappe.model.document import Document
-
-class BrandBasedInventory(Document):
-    pass
-
 @frappe.whitelist()
-def get_items_by_brand(brands):
+def get_items_by_brand(brands, warehouse=None):
     """
-    Accepts a list of brands and returns a grouped dictionary.
-    Example input: ["Brand A", "Brand B"] or json string '["Brand A"]'
+    Returns items grouped by brand with their actual quantity in a specific warehouse.
     """
     if isinstance(brands, str):
         brands = json.loads(brands)
@@ -64,20 +47,77 @@ def get_items_by_brand(brands):
     if not brands:
         return {}
 
-    # Initialize the result dictionary
     result = {}
 
     for brand in brands:
         # Fetch items linked to this brand
-        # Replace 'custom_field_1' etc., with actual fields like 'standard_rate' if needed
         items = frappe.get_all("Item",
             filters={"brand": brand, "disabled": 0},
-            fields=["name"]
+            fields=["name"],
+            order_by="name asc"
         )
+
+        item_list = []
+        for itm in items:
+            # Fetch actual quantity from the Bin table for this item and warehouse
+            actual_qty = 0
+            if warehouse:
+                actual_qty = frappe.db.get_value("Bin", 
+                    {"item_code": itm.name, "warehouse": warehouse}, 
+                    "actual_qty"
+                ) or 0
+
+            # 2. Find the timestamp of the LAST Stock Reconciliation for THIS ITEM in THIS WAREHOUSE
+            # We check the Stock Ledger Entry directly.
+            print("actual_qty ::: ", actual_qty)
+            print("warehouse ::: ", warehouse)
+            last_sle_reco = frappe.db.get_all("Stock Ledger Entry",
+                    filters={
+                        "item_code": itm.name,
+                        "warehouse": warehouse,
+                        "voucher_type": "Stock Reconciliation",
+                        "docstatus": 1
+                    },
+                    fields=["posting_date", "posting_time"],
+                    order_by="posting_date desc, posting_time desc",
+                    limit=1
+                )
+
+			# 3. Sum POS Invoices newer than that specific SLE
+            query = """
+                SELECT SUM(item.qty) 
+                FROM `tabPOS Invoice Item` item
+                JOIN `tabPOS Invoice` parent ON item.parent = parent.name
+                WHERE item.item_code = %s 
+                AND item.warehouse = %s 
+                AND (parent.consolidated_invoice IS NULL OR parent.consolidated_invoice = '')
+                AND parent.docstatus = 1
+                """
+            params = [itm.name, warehouse]
+            print("last_sle_reco ::: ", last_sle_reco)
+            if last_sle_reco:
+                # Combine posting_date and posting_time for the comparison
+                last_timestamp = f"{last_sle_reco[0].posting_date} {last_sle_reco[0].posting_time}"
+                query += " AND TIMESTAMP(parent.posting_date, parent.posting_time) > %s"
+                params.append(last_timestamp)
+
+            pos_qty = frappe.db.sql(query, tuple(params))[0][0] or 0
+
+
+            # Adjusted quantity
+            print("the item", itm.name)
+            print("pos_qty", pos_qty)
+            print("actual_qty", actual_qty)
+            actual_qty = flt(actual_qty) - flt(pos_qty)
+            
+            item_list.append({
+                "name": itm.name,
+                "actual_qty": actual_qty
+            })
 
         result[brand] = {
             "total": len(items),
-            "items": item_details
+            "items": item_list
         }
     
     return result
