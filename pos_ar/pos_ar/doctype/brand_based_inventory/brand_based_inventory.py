@@ -120,4 +120,5 @@ def get_items_by_brand(brands, warehouse=None):
             "items": item_list
         }
     
+    
     return result
