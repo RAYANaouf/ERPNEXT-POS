@@ -34,91 +34,64 @@ def get_items_from_cartons(cartons):
     return items
 
 
-
+import json
+import frappe
+from frappe.utils import flt
 
 @frappe.whitelist()
 def get_items_by_brand(brands, warehouse=None):
-    """
-    Returns items grouped by brand with their actual quantity in a specific warehouse.
-    """
     if isinstance(brands, str):
         brands = json.loads(brands)
     
-    if not brands:
-        return {}
+    if not warehouse or not brands:
+        return {"brands": {}, "items": {}}
 
-    result = {}
+    result = {
+        "brands": {}, 
+        "items": {}   
+    }
 
-    for brand in brands:
-        # Fetch items linked to this brand
-        items = frappe.get_all("Item",
-            filters={"brand": brand, "disabled": 0},
-            fields=["name"],
-            order_by="name asc"
-        )
+    # Fetch items matching the brands
+    items = frappe.get_all("Item",
+        filters={"brand": ["in", brands], "disabled": 0},
+        fields=["name", "brand"],
+        order_by="name asc"
+    )
 
-        item_list = []
-        for itm in items:
-            # Fetch actual quantity from the Bin table for this item and warehouse
-            actual_qty = 0
-            if warehouse:
-                actual_qty = frappe.db.get_value("Bin", 
-                    {"item_code": itm.name, "warehouse": warehouse}, 
-                    "actual_qty"
-                ) or 0
+    for item in items:
+        # 1. Fetch Bin Qty
+        bin_qty = frappe.db.get_value("Bin", 
+            {"item_code": item.name, "warehouse": warehouse}, 
+            "actual_qty") or 0
 
-            # 2. Find the timestamp of the LAST Stock Reconciliation for THIS ITEM in THIS WAREHOUSE
-            # We check the Stock Ledger Entry directly.
-            print("actual_qty ::: ", actual_qty)
-            print("warehouse ::: ", warehouse)
-            last_sle_reco = frappe.db.get_all("Stock Ledger Entry",
-                    filters={
-                        "item_code": itm.name,
-                        "warehouse": warehouse,
-                        "voucher_type": "Stock Reconciliation",
-                        "docstatus": 1
-                    },
-                    fields=["posting_date", "posting_time"],
-                    order_by="posting_date desc, posting_time desc",
-                    limit=1
-                )
+        # 2. Get Last Reconciliation for POS adjustment
+        last_sle = frappe.get_all("Stock Ledger Entry",
+            filters={"item_code": item.name, "warehouse": warehouse, "voucher_type": "Stock Reconciliation", "docstatus": 1},
+            fields=["posting_date", "posting_time"],
+            order_by="posting_date desc, posting_time desc", limit=1)
 
-			# 3. Sum POS Invoices newer than that specific SLE
-            query = """
-                SELECT SUM(item.qty) 
-                FROM `tabPOS Invoice Item` item
-                JOIN `tabPOS Invoice` parent ON item.parent = parent.name
-                WHERE item.item_code = %s 
-                AND item.warehouse = %s 
-                AND (parent.consolidated_invoice IS NULL OR parent.consolidated_invoice = '')
-                AND parent.docstatus = 1
-                """
-            params = [itm.name, warehouse]
-            print("last_sle_reco ::: ", last_sle_reco)
-            if last_sle_reco:
-                # Combine posting_date and posting_time for the comparison
-                last_timestamp = f"{last_sle_reco[0].posting_date} {last_sle_reco[0].posting_time}"
-                query += " AND TIMESTAMP(parent.posting_date, parent.posting_time) > %s"
-                params.append(last_timestamp)
+        # 3. Calculate Pending POS Qty
+        query = """
+            SELECT SUM(item.qty) FROM `tabPOS Invoice Item` item
+            JOIN `tabPOS Invoice` parent ON item.parent = parent.name
+            WHERE item.item_code = %s AND item.warehouse = %s 
+            AND (parent.consolidated_invoice IS NULL OR parent.consolidated_invoice = '')
+            AND parent.docstatus = 1
+        """
+        params = [item.name, warehouse]
+        if last_sle:
+            query += " AND TIMESTAMP(parent.posting_date, parent.posting_time) > %s"
+            params.append(f"{last_sle[0].posting_date} {last_sle[0].posting_time}")
 
-            pos_qty = frappe.db.sql(query, tuple(params))[0][0] or 0
-
-
-            # Adjusted quantity
-            print("the item", itm.name)
-            print("pos_qty", pos_qty)
-            print("actual_qty", actual_qty)
-            actual_qty = flt(actual_qty) - flt(pos_qty)
-            
-            item_list.append({
-                "name": itm.name,
-                "actual_qty": actual_qty
-            })
-
-        result[brand] = {
-            "total": len(items),
-            "items": item_list
+        pos_qty = frappe.db.sql(query, tuple(params))[0][0] or 0
+        
+        # Final Calculation
+        result["items"][item.name] = {
+            "brand": item.brand,
+            "actual_qty": flt(bin_qty) - flt(pos_qty)
         }
-    
-    
+
+        # Count brand items
+        result["brands"][item.brand] = result["brands"].get(item.brand, 0) + 1
+
     return result
