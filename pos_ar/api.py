@@ -923,7 +923,7 @@ def update_customer_debt_on_invoice(doc, method):
                 FROM (
                     SELECT outstanding_amount
                     FROM `tabSales Invoice`
-                    WHERE customer = %s AND docstatus = 1
+                    WHERE customer = %s AND docstatus = 1 AND outstanding_amount > 0
 
                     UNION ALL
 
