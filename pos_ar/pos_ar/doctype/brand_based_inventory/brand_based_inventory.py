@@ -6,11 +6,55 @@
 import frappe
 from frappe.model.document import Document
 import json
-from frappe.utils import flt
+from frappe.utils import flt, getdate, get_time
 
 class BrandBasedInventory(Document):
-	pass
 
+    def on_submit(self):
+        print("============> on_submit")
+        self.create_stock_reconciliation()
+
+    def create_stock_reconciliation(self):
+        # 1. Prepare the items list for Stock Reconciliation
+        reco_items = []
+        
+        
+        for d in self.items:
+            reco_items.append({
+                "item_code": d.item,
+                "warehouse": self.warehouse,
+                "qty": d.total,
+                # Optional: specify valuation rate if needed, 
+                # otherwise it uses system valuation
+            })
+
+        if not reco_items:
+            frappe.throw("No items found to reconcile.")
+
+        # 2. Extract Date and Time from DateTime field
+        # If date_time is empty, fallback to current system time
+        posting_date = getdate(self.date_time) if self.date_time else frappe.utils.nowdate()
+        posting_time = get_time(self.date_time) if self.date_time else frappe.utils.nowtime()
+
+        # 2. Create the Stock Reconciliation Document
+        sr = frappe.get_doc({
+            "doctype": "Stock Reconciliation",
+            "purpose": "Stock Reconciliation",
+            "company": self.company,
+            "posting_date": posting_date,
+            "posting_time": posting_time,
+            "items": reco_items,
+            "remarks": f"Automatically created from Brand Based Inventory: {self.name}"
+        })
+
+        sr.insert()
+        sr.submit()
+        
+        # 3. Link the created SR back to this document for reference
+        # Make sure you have a field 'stock_reconciliation' in your DocType
+        #self.db_set("stock_reconciliation", sr.name)
+        
+        frappe.msgprint(f"Stock Reconciliation {sr.name} created and submitted.")
 
 
 @frappe.whitelist()
@@ -95,3 +139,14 @@ def get_items_by_brand(brands, warehouse=None):
         result["brands"][item.brand] = result["brands"].get(item.brand, 0) + 1
 
     return result
+
+
+
+
+
+
+
+
+
+
+

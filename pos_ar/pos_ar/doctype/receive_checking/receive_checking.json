@@ -95,7 +95,7 @@
  "modified": "2026-01-10 12:37:25.615860",
  "modified_by": "Administrator",
  "module": "POS AR",
- "name": "Ajustement Quantitee",
+ "name": "Receive Checking",
  "owner": "Administrator",
  "permissions": [
   {

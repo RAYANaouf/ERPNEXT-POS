@@ -1,7 +1,7 @@
 import frappe
 from frappe.model.document import Document
 
-class AjustementQuantitee(Document):
+class ReceiveChecking(Document):
 
     def before_save(self):
         """Calcul automatique des totaux et écarts"""

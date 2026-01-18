@@ -5,5 +5,5 @@
 from frappe.tests.utils import FrappeTestCase
 
 
-class TestAjustementQuantitee(FrappeTestCase):
+class TestReceiveChecking(FrappeTestCase):
 	pass
