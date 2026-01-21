@@ -1008,6 +1008,8 @@ def remove_ctn(doc, method):
                     frappe.log_error(frappe.get_traceback(), f"Error deleting CTN-BOX {row.ctn}")
 
 
+
+
 def auto_inter_company_purchase_invoice_creation(doc, method):
     # Only Sales Invoice from OPTILENS CA
     if doc.doctype != "Sales Invoice" or doc.company != "OPTILENS CA":
@@ -1037,12 +1039,13 @@ def auto_inter_company_purchase_invoice_creation(doc, method):
         sales_order = next((it.sales_order for it in doc.items if getattr(it, "sales_order", None)), None)
         if not sales_order:
             frappe.msgprint("ℹ️ Skipping: No Sales Order found in SI.")
-            po_no = frappe.db.get_value("Sales Order", sales_order, "po_no")
-            if po_no:
-                po  = frappe.get_doc(
-                    "Purchase Order",
-                    po_no
-                )
+            
+        po_no = frappe.db.get_value("Sales Order", sales_order, "po_no")
+        if po_no:
+            po  = frappe.get_doc(
+                "Purchase Order",
+                po_no
+            )
 
         
         
