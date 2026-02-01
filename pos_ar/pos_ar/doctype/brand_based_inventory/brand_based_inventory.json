@@ -11,6 +11,8 @@
   "warehouse",
   "column_break_gr2l",
   "date_time",
+  "column_break_qiol",
+  "price_list",
   "ctn_section_section",
   "carton",
   "column_break_ijv4",
@@ -106,13 +108,24 @@
    "print_hide": 1,
    "read_only": 1,
    "search_index": 1
+  },
+  {
+   "fieldname": "column_break_qiol",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "price_list",
+   "fieldtype": "Link",
+   "label": "Price List",
+   "options": "Price List",
+   "reqd": 1
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-01-14 19:28:49.490717",
+ "modified": "2026-01-27 22:48:27.224681",
  "modified_by": "Administrator",
  "module": "POS AR",
  "name": "Brand-Based Inventory",

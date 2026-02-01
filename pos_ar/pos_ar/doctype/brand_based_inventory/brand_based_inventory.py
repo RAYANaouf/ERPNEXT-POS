@@ -17,13 +17,23 @@ class BrandBasedInventory(Document):
     def create_stock_reconciliation(self):
         # 1. Prepare the items list for Stock Reconciliation
         reco_items = []
-        
+
+        price_list = self.price_list
         
         for d in self.items:
+            price = frappe.db.get_value("Item Price", 
+                {"item_code": d.item, "price_list": price_list}, 
+                "price_list_rate")
+            
+            # If no price is found in the Price List, fallback to 0 or Item Master valuation
+            if not price:
+                price = frappe.db.get_value("Item", d.item, "valuation_rate") or 0
+
             reco_items.append({
                 "item_code": d.item,
                 "warehouse": self.warehouse,
                 "qty": d.total,
+                "valuation_rate": price,
                 # Optional: specify valuation rate if needed, 
                 # otherwise it uses system valuation
             })
