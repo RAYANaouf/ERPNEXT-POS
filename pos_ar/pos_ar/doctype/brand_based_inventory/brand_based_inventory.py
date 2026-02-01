@@ -34,8 +34,6 @@ class BrandBasedInventory(Document):
                 "warehouse": self.warehouse,
                 "qty": d.total,
                 "valuation_rate": price,
-                # Optional: specify valuation rate if needed, 
-                # otherwise it uses system valuation
             })
 
         if not reco_items:

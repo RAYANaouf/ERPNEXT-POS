@@ -1,7 +1,16 @@
+# Copyright (c) 2026, rayan aouf and contributors
+# For license information, please see license.txt
+
 import frappe
 from frappe.model.document import Document
 
+<<<<<<<< HEAD:pos_ar/pos_ar/doctype/receive_checking/receive_checking.py
 class ReceiveChecking(Document):
+========
+
+class cheakingtheinvoice(Document):
+
+>>>>>>>> origin/dev:pos_ar/pos_ar/doctype/cheaking_the_invoice/cheaking_the_invoice.py
 
     def before_save(self):
         """Calcul automatique des totaux et écarts"""
@@ -15,7 +24,7 @@ class ReceiveChecking(Document):
             item.ecart = item.total - (item.qte_facturee or 0)
 
     def on_submit(self):
-        """Création des documents d'ajustement côté acheteur ET vendeur"""
+        """Création des documents d'ajustement côté vendeur uniquement"""
         
         invoice = frappe.get_doc("Purchase Invoice", self.facture_achat)
         
@@ -30,18 +39,9 @@ class ReceiveChecking(Document):
                 supplements.append(item)
 
         # ============================================
-        # CÔTÉ ACHETEUR (logique existante)
-        # ============================================
-        if retours:
-            credit = self.create_credit_note(invoice, retours)
-            self.avoir_cree = credit.name
-
-        if supplements:
-            new_inv = self.create_supplier_invoice(invoice, supplements)
-            self.facture_supplementaire_creee = new_inv.name
-
-        # ============================================
-        # CÔTÉ VENDEUR (miroir inter-compagnie)
+        # CÔTÉ VENDEUR (création Sales Invoices en draft)
+        # Les Purchase Invoices seront créées automatiquement par ERPNext
+        # lors de la validation des Sales Invoices
         # ============================================
         self.create_vendor_side_documents(invoice, retours, supplements)
         
@@ -50,117 +50,56 @@ class ReceiveChecking(Document):
 
 
     def on_cancel(self):
-     """
-     Annule tous les documents créés automatiquement
-     lors du on_submit de l'Ajustement Quantitee
-      """
+        """
+        Annule/supprime les documents créés automatiquement
+        """
 
-     frappe.msgprint("🔄 Annulation des documents liés à l'ajustement...")
+        frappe.msgprint("🔄 Annulation des documents liés à l'ajustement...")
 
-     documents = [
-        ("Purchase Invoice", self.avoir_cree),
-        ("Purchase Invoice", self.facture_supplementaire_creee),
-        ("Sales Invoice", self.avoir_vendeur_cree),
-        ("Sales Invoice", self.facture_vendeur_creee),
-     ]
+        documents = [
+            ("Sales Invoice", self.avoir_vendeur_cree),
+            ("Sales Invoice", self.facture_vendeur_creee),
+        ]
 
-     for doctype, name in documents:
-        if not name:
-            continue
+        for doctype, name in documents:
+            if not name:
+                continue
 
-        if not frappe.db.exists(doctype, name):
-            continue
+            if not frappe.db.exists(doctype, name):
+                continue
 
-        doc = frappe.get_doc(doctype, name)
+            doc = frappe.get_doc(doctype, name)
 
-        if doc.docstatus == 1:
-            doc.flags.ignore_permissions = True
-            doc.cancel()
-            frappe.msgprint(f"❌ {doctype} annulée : {name}")
+            # Annuler si soumis, sinon supprimer
+            if doc.docstatus == 1:
+                doc.flags.ignore_permissions = True
+                doc.cancel()
+                frappe.msgprint(f"❌ {doctype} annulée : {name}")
+            elif doc.docstatus == 0:  # Draft
+                doc.flags.ignore_permissions = True
+                doc.delete()
+                frappe.msgprint(f"🗑️ {doctype} supprimée (brouillon) : {name}")
 
-     # Nettoyer les champs après annulation
-     self.db_set("avoir_cree", None)
-     self.db_set("facture_supplementaire_creee", None)
-     self.db_set("avoir_vendeur_cree", None)
-     self.db_set("facture_vendeur_creee", None)
+        # Nettoyer les champs après annulation
+        self.db_set("avoir_vendeur_cree", None)
+        self.db_set("facture_vendeur_creee", None)
 		
 
     # =========================================
-    # FONCTIONS CÔTÉ ACHETEUR
-    # =========================================
-    
-    def create_credit_note(self, original_invoice, items):
-        """Crée un avoir d'achat (Purchase Invoice Return)"""
-        
-        credit = frappe.new_doc("Purchase Invoice")
-        credit.supplier = original_invoice.supplier
-        credit.company = original_invoice.company
-        credit.posting_date = self.date
-        credit.is_return = 1
-        credit.return_against = original_invoice.name
-        credit.update_stock = 1
-
-        for item in items:
-            orig = self.get_original_item(original_invoice, item.article)
-            if not orig:
-                continue
-
-            credit.append("items", {
-                "item_code": item.article,
-                "qty": item.ecart,
-                "rate": orig.rate,
-                "warehouse": orig.warehouse
-            })
-
-        credit.flags.ignore_permissions = True
-        credit.insert()
-        credit.submit()
-        
-        frappe.msgprint(f"✅ Avoir d'achat créé : {credit.name}")
-        return credit
-
-    def create_supplier_invoice(self, original_invoice, items):
-        """Crée une facture d'achat supplémentaire"""
-        
-        inv = frappe.new_doc("Purchase Invoice")
-        inv.supplier = original_invoice.supplier
-        inv.company = original_invoice.company
-        inv.posting_date = self.date
-        inv.update_stock = 1
-
-        for item in items:
-            orig = self.get_original_item(original_invoice, item.article)
-            if not orig:
-                continue
-
-            inv.append("items", {
-                "item_code": item.article,
-                "qty": item.ecart,
-                "rate": orig.rate,
-                "warehouse": orig.warehouse
-            })
-
-        inv.flags.ignore_permissions = True
-        inv.insert()
-        inv.submit()
-        
-        frappe.msgprint(f"✅ Facture d'achat supplémentaire créée : {inv.name}")
-        return inv
-
-    # =========================================
-    # FONCTIONS CÔTÉ VENDEUR (CORRIGÉ)
+    # FONCTIONS CÔTÉ VENDEUR
     # =========================================
     
     def create_vendor_side_documents(self, purchase_invoice, retours, supplements):
         """
         Crée les documents miroir côté vendeur si transaction inter-compagnie
+        Les Purchase Invoices correspondantes seront créées automatiquement
+        par ERPNext lors de la validation de ces Sales Invoices
         """
         
         # 1. Vérifier si le fournisseur est interne
-        # CORRECTION : Utiliser filters au lieu de passer directement le nom
         supplier_data = frappe.db.get_value(
             "Supplier",
-            {"name": purchase_invoice.supplier},  # ← CORRECTION ICI
+            {"name": purchase_invoice.supplier},
             ["represents_company", "is_internal_supplier"],
             as_dict=True
         )
@@ -199,7 +138,7 @@ class ReceiveChecking(Document):
             )
             return
         
-        # 4. Créer les documents côté vendeur
+        # 4. Créer les documents côté vendeur (en draft)
         if retours:
             vendor_credit = self.create_vendor_credit_note(
                 sales_inv, 
@@ -247,7 +186,8 @@ class ReceiveChecking(Document):
 
     def create_vendor_credit_note(self, original_si, items, customer, company):
         """
-        Crée un avoir de vente (Sales Invoice Return) côté vendeur
+        Crée un avoir de vente (Sales Invoice Return) côté vendeur EN BROUILLON
+    
         """
         
         credit = frappe.new_doc("Sales Invoice")
@@ -280,14 +220,18 @@ class ReceiveChecking(Document):
 
         credit.flags.ignore_permissions = True
         credit.insert()
-        credit.submit()
         
-        frappe.msgprint(f"✅ Avoir de vente créé côté vendeur : {credit.name}", indicator="green")
+        frappe.msgprint(
+            f"✅ Avoir de vente créé en brouillon : {credit.name}<br>"
+            f"💡 La Purchase Invoice Return sera créée automatiquement lors de la validation",
+            indicator="blue"
+        )
         return credit
 
     def create_vendor_sales_invoice(self, original_si, items, customer, company):
         """
-        Crée une facture de vente supplémentaire côté vendeur
+        Crée une facture de vente supplémentaire côté vendeur EN BROUILLON
+        
         """
         
         inv = frappe.new_doc("Sales Invoice")
@@ -316,9 +260,12 @@ class ReceiveChecking(Document):
 
         inv.flags.ignore_permissions = True
         inv.insert()
-        inv.submit()
         
-        frappe.msgprint(f"✅ Facture de vente créée côté vendeur : {inv.name}", indicator="green")
+        frappe.msgprint(
+            f"✅ Facture de vente créée en brouillon : {inv.name}<br>"
+            f"💡 La Purchase Invoice sera créée automatiquement lors de la validation",
+            indicator="blue"
+        )
         return inv
 
     # =========================================
@@ -340,13 +287,6 @@ class ReceiveChecking(Document):
         )
         
         return customer
-
-    def get_original_item(self, invoice, item_code):
-        """Trouve l'article dans la Purchase Invoice"""
-        for item in invoice.items:
-            if item.item_code == item_code:
-                return item
-        return None
     
     def get_original_si_item(self, sales_invoice, item_code):
         """Trouve l'article dans la Sales Invoice"""
