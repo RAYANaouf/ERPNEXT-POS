@@ -4,13 +4,10 @@
 import frappe
 from frappe.model.document import Document
 
-<<<<<<<< HEAD:pos_ar/pos_ar/doctype/receive_checking/receive_checking.py
-class ReceiveChecking(Document):
-========
+
 
 class cheakingtheinvoice(Document):
 
->>>>>>>> origin/dev:pos_ar/pos_ar/doctype/cheaking_the_invoice/cheaking_the_invoice.py
 
     def before_save(self):
         """Calcul automatique des totaux et écarts"""
