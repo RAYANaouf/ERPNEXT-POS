@@ -2,6 +2,17 @@
  {
   "docstatus": 0,
   "doctype": "Client Script",
+  "dt": "cheaking the invoice",
+  "enabled": 1,
+  "modified": "2026-01-31 12:51:30.997092",
+  "module": "POS AR",
+  "name": "cheaking the invoice",
+  "script": "// ======================================\n//  DOCTYPE : cheaking the invoice\n// ======================================\nfrappe.ui.form.on(\"cheaking the invoice\", {\n    facture_achat(frm) {\n        if (!frm.doc.facture_achat) return;\n\n        // Charger la Purchase Invoice avec ses items\n        frappe.db.get_doc(\"Purchase Invoice\", frm.doc.facture_achat).then(inv => {\n\n            // Récupérer fournisseur\n            frm.set_value(\"fournisseur\", inv.supplier);\n                                \n            // Vider la table articles\n            frm.clear_table(\"articles\");\n\n            // Remplir les lignes\n            (inv.items || []).forEach(i => {\n                let row = frm.add_child(\"articles\");\n\n                row.article = i.item_code;\n                row.qte_facturee = i.qty;\n\n                row.qte_1 = 0;\n                row.qte_2 = 0;\n                row.qte_3 = 0;\n                row.qte_4 = 0;\n\n                row.total = 0;\n                row.ecart = 0;\n            });\n\n            frm.refresh_field(\"articles\");\n        });\n    }\n});\n\n\n// ======================================\n//  TABLE ENFANT : Ajustement Achat Item\n// ======================================\nfrappe.ui.form.on(\"Ajustement Item\", {\n    qte_1: calculer_ecart,\n    qte_2: calculer_ecart,\n    qte_3: calculer_ecart,\n    qte_4: calculer_ecart\n});\n\n\n// ======================================\n//  FONCTION DE CALCUL — OK\n// ======================================\nfunction calculer_ecart(frm, cdt, cdn) {\n    let row = locals[cdt][cdn];\n\n    let total =\n        flt(row.qte_1) +\n        flt(row.qte_2) +\n        flt(row.qte_3) +\n        flt(row.qte_4);\n\n    row.total = total;\n    row.ecart = total - flt(row.qte_facturee);\n\n    frm.refresh_field(\"articles\");\n\n    // Mise en couleur si écart\n    setTimeout(() => {\n        let grid_row = frm.fields_dict[\"articles\"]\n            .grid.grid_rows_by_docname[cdn];\n\n        if (!grid_row) return;\n\n        grid_row.row.style.backgroundColor =\n            (row.ecart !== 0) ? \"#ffe6e6\" : \"\";\n    }, 50);\n}\n",
+  "view": "Form"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Client Script",
   "dt": "CreateMyCustomer",
   "enabled": 1,
   "modified": "2025-06-10 15:10:17.965090",
@@ -180,10 +191,10 @@
   "doctype": "Client Script",
   "dt": "Purchase Invoice",
   "enabled": 1,
-  "modified": "2026-01-11 20:07:21.346079",
+  "modified": "2026-01-31 17:00:52.944136",
   "module": "POS AR",
   "name": "purchase invoice",
-  "script": "frappe.ui.form.on('Purchase Invoice', {\r\n    refresh(frm) {\r\n\r\n        // bouton seulement si la facture est validée\r\n        if (frm.doc.docstatus === 1) {\r\n\r\n            frm.add_custom_button(__('Checking the invoice'), function () {\r\n\r\n                frappe.model.with_doctype('Receive Checking', function () {\r\n\r\n                    let doc = frappe.model.get_new_doc('Receive Checking');\r\n\r\n                    // lier la Purchase Invoice\r\n                    doc.facture_achat = frm.doc.name;\r\n\r\n                    // ouvrir le document\r\n                    frappe.set_route('Form', 'Receive Checking', doc.name);\r\n                });\r\n\r\n            }, __('Actions'));\r\n        }\r\n    }\r\n});\r\n",
+  "script": "frappe.ui.form.on('Purchase Invoice', {\r\n    refresh(frm) {\r\n\r\n        // bouton seulement si la facture est validée\r\n        if (frm.doc.docstatus === 1) {\r\n\r\n            frm.add_custom_button(__('cheaking the invoice'), function () {\r\n\r\n                frappe.model.with_doctype('cheaking the invoice', function () {\r\n\r\n                    let doc = frappe.model.get_new_doc('cheaking the invoice');\r\n\r\n                    // lier la Purchase Invoice\r\n                    doc.facture_achat = frm.doc.name;\r\n\r\n                    // ouvrir le document\r\n                    frappe.set_route('Form', 'cheaking the invoice', doc.name);\r\n                });\r\n\r\n            }, __('Actions'));\r\n        }\r\n    }\r\n});\r\n",
   "view": "Form"
  },
  {
