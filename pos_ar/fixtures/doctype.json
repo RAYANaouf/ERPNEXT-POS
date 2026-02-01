@@ -2447,7 +2447,7 @@
   "allow_import": 0,
   "allow_rename": 1,
   "app": null,
-  "autoname": "CTN-Transaction.{name}.#### ",
+  "autoname": null,
   "beta": 0,
   "color": null,
   "colour": null,
