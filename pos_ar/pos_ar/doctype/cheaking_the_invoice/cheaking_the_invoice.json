@@ -97,12 +97,8 @@
  "modified": "2026-01-31 19:00:33.845118",
  "modified_by": "Administrator",
  "module": "POS AR",
-<<<<<<<< HEAD:pos_ar/pos_ar/doctype/receive_checking/receive_checking.json
- "name": "Receive Checking",
-========
  "name": "cheaking the invoice",
  "naming_rule": "Expression",
->>>>>>>> origin/dev:pos_ar/pos_ar/doctype/cheaking_the_invoice/cheaking_the_invoice.json
  "owner": "Administrator",
  "permissions": [
   {
