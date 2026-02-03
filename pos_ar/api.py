@@ -1149,8 +1149,6 @@ def auto_inter_company_purchase_invoice_creation(doc, method):
 import frappe
 
 def auto_inter_company_purchase_invoice_creation_from_alger(doc, method):
-    print("heeree doc alger  ==============> : ", doc)
-
     """
     Mirrors a Sales Invoice from OPTILENS Alger into a Purchase Invoice
     in the target (internal) company that represents the customer.
@@ -1238,6 +1236,49 @@ def auto_inter_company_purchase_invoice_creation_from_alger(doc, method):
 
 
 
+
+def update_checking_invoice_peices(doc, method):
+
+    if doc.doctype != "Purchase Invoice":
+        return
+
+    si_name = (doc.bill_no or "").strip()
+
+    if not si_name:
+        return
+
+    checking_invoice_peice = frappe.db.get_value(
+        "Sales Invoice",
+        si_name,
+        "custom_checking_invoice_peice"
+    )
+
+    frappe.log_error(f"SI={si_name} => Checking={checking_invoice_peice}")
+
+    if not checking_invoice_peice:
+        return
+
+    def do_update():
+
+        if doc.is_return == 1:
+
+            frappe.db.sql("""
+                UPDATE `tabChecking The Invoice`
+                SET client_return = %s
+                WHERE name = %s
+            """, (doc.name, checking_invoice_peice))
+
+        else:
+
+            frappe.db.sql("""
+                UPDATE `tabChecking The Invoice`
+                SET client_invoice = %s
+                WHERE name = %s
+            """, (doc.name, checking_invoice_peice))
+
+        frappe.db.commit()
+
+    frappe.db.after_commit(do_update)
 
 
 #########################################################################################################################################

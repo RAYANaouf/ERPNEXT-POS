@@ -1,0 +1,156 @@
+{
+    "actions": [],
+    "allow_rename": 1,
+    "autoname": "format:FS-VEN-{YYYY}-{#####}",
+    "creation": "2026-01-31 12:42:55.863086",
+    "default_view": "List",
+    "doctype": "DocType",
+    "engine": "InnoDB",
+    "field_order": [
+        "date",
+        "purchase_invoice",
+        "supplier",
+        "items",
+        "section_break_c5pf",
+        "column_break_dk7x",
+        "client_return",
+        "client_invoice",
+        "column_break_pt6f",
+        "supplier_return",
+        "supplier_invoice",
+        "section_break_vnq5",
+        "workflow_state",
+        "amended_from"
+    ],
+    "fields": [
+        {
+            "default": "Today",
+            "fieldname": "date",
+            "fieldtype": "Date",
+            "in_list_view": 1,
+            "label": "Date",
+            "read_only": 1,
+            "reqd": 1
+        },
+        {
+            "allow_on_submit": 1,
+            "fieldname": "workflow_state",
+            "fieldtype": "Link",
+            "hidden": 1,
+            "label": "Workflow State",
+            "options": "Workflow State"
+        },
+        {
+            "fieldname": "purchase_invoice",
+            "fieldtype": "Link",
+            "in_list_view": 1,
+            "label": "Purchase Invoice",
+            "options": "Purchase Invoice",
+            "read_only": 1,
+            "reqd": 1,
+            "unique": 1
+        },
+        {
+            "fieldname": "supplier",
+            "fieldtype": "Link",
+            "in_list_view": 1,
+            "label": "Supplier",
+            "options": "Supplier",
+            "read_only": 1
+        },
+        {
+            "fieldname": "items",
+            "fieldtype": "Table",
+            "label": "Items",
+            "options": "Ajustement Item",
+            "reqd": 1
+        },
+        {
+            "fieldname": "section_break_c5pf",
+            "fieldtype": "Section Break"
+        },
+        {
+            "fieldname": "column_break_dk7x",
+            "fieldtype": "Column Break",
+            "label": "Client"
+        },
+        {
+            "fieldname": "column_break_pt6f",
+            "fieldtype": "Column Break",
+            "label": "Supplier"
+        },
+        {
+            "fieldname": "section_break_vnq5",
+            "fieldtype": "Section Break"
+        },
+        {
+            "fieldname": "supplier_return",
+            "fieldtype": "Link",
+            "label": "Supplier Return",
+            "options": "Sales Invoice",
+            "read_only": 1
+        },
+        {
+            "fieldname": "supplier_invoice",
+            "fieldtype": "Link",
+            "label": "Supplier Invoice",
+            "options": "Sales Invoice",
+            "read_only": 1
+        },
+        {
+            "fieldname": "amended_from",
+            "fieldtype": "Link",
+            "label": "Amended From",
+            "no_copy": 1,
+            "options": "Checking The Invoice",
+            "print_hide": 1,
+            "read_only": 1,
+            "search_index": 1
+        },
+        {
+            "allow_on_submit": 1,
+            "fieldname": "client_return",
+            "fieldtype": "Link",
+            "label": "Client Return",
+            "options": "Purchase Invoice",
+            "read_only": 1
+        },
+        {
+            "allow_on_submit": 1,
+            "fieldname": "client_invoice",
+            "fieldtype": "Link",
+            "label": "Client Invoice",
+            "options": "Purchase Invoice",
+            "read_only": 1
+        }
+    ],
+    "grid_page_length": 50,
+    "index_web_pages_for_search": 1,
+    "is_submittable": 1,
+    "links": [],
+    "modified": "2026-02-03 19:36:14.552066",
+    "modified_by": "Administrator",
+    "module": "POS AR",
+    "name": "Checking The Invoice",
+    "naming_rule": "Expression",
+    "owner": "Administrator",
+    "permissions": [
+        {
+            "create": 1,
+            "delete": 1,
+            "email": 1,
+            "export": 1,
+            "print": 1,
+            "read": 1,
+            "report": 1,
+            "role": "System Manager",
+            "share": 1,
+            "write": 1
+        }
+    ],
+    "row_format": "Dynamic",
+    "rows_threshold_for_grid_search": 20,
+    "sort_field": "modified",
+    "sort_order": "DESC",
+    "states": []
+}

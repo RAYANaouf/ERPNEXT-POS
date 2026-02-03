@@ -2,7 +2,7 @@
 // For license information, please see license.txt
 
 
-// frappe.ui.form.on("cheaking the invoice", {
+// frappe.ui.form.on("Checking The Invoice", {
 // 	refresh(frm) {
 
 // 	},

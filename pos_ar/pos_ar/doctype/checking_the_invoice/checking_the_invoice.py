@@ -6,12 +6,12 @@ from frappe.model.document import Document
 
 
 
-class cheakingtheinvoice(Document):
+class CheckingTheInvoice(Document):
 
 
     def before_save(self):
         """Calcul automatique des totaux et écarts"""
-        for item in self.articles:
+        for item in self.items:
             item.total = (
                 (item.qte_1 or 0) +
                 (item.qte_2 or 0) +
@@ -20,16 +20,17 @@ class cheakingtheinvoice(Document):
             )
             item.ecart = item.total - (item.qte_facturee or 0)
 
+
     def on_submit(self):
         """Création des documents d'ajustement côté vendeur uniquement"""
         
-        invoice = frappe.get_doc("Purchase Invoice", self.facture_achat)
+        invoice = frappe.get_doc("Purchase Invoice", self.purchase_invoice)
         
         # Séparer les retours et suppléments
-        retours = []
-        supplements = []
+        retours     = []
+        supplements = [] 
 
-        for item in self.articles:
+        for item in self.items:
             if item.ecart < 0:
                 retours.append(item)
             elif item.ecart > 0:
@@ -54,8 +55,8 @@ class cheakingtheinvoice(Document):
         frappe.msgprint("🔄 Annulation des documents liés à l'ajustement...")
 
         documents = [
-            ("Sales Invoice", self.avoir_vendeur_cree),
-            ("Sales Invoice", self.facture_vendeur_creee),
+            ("Sales Invoice", self.supplier_return),
+            ("Sales Invoice", self.supplier_invoice),
         ]
 
         for doctype, name in documents:
@@ -78,8 +79,8 @@ class cheakingtheinvoice(Document):
                 frappe.msgprint(f"🗑️ {doctype} supprimée (brouillon) : {name}")
 
         # Nettoyer les champs après annulation
-        self.db_set("avoir_vendeur_cree", None)
-        self.db_set("facture_vendeur_creee", None)
+        self.db_set("client_return", None)
+        self.db_set("client_invoice", None)
 		
 
     # =========================================
@@ -111,8 +112,7 @@ class cheakingtheinvoice(Document):
             frappe.msgprint("ℹ️ Le fournisseur n'a pas de 'represents_company' défini.")
             return
         
-        frappe.msgprint(f"🔄 Transaction inter-compagnie détectée avec {supplier_company}")
-        
+      
         # 2. Trouver la Sales Invoice d'origine
         original_sales_invoice = self.find_original_sales_invoice(purchase_invoice)
         
@@ -143,7 +143,7 @@ class cheakingtheinvoice(Document):
                 internal_customer,
                 supplier_company
             )
-            self.db_set("avoir_vendeur_cree", vendor_credit.name)
+            self.db_set("supplier_return", vendor_credit.name)
         
         if supplements:
             vendor_invoice = self.create_vendor_sales_invoice(
@@ -152,41 +152,30 @@ class cheakingtheinvoice(Document):
                 internal_customer,
                 supplier_company
             )
-            self.db_set("facture_vendeur_creee", vendor_invoice.name)
+            self.db_set("supplier_invoice", vendor_invoice.name)
+
+
+
+
 
     def find_original_sales_invoice(self, purchase_invoice):
         """
         Trouve la Sales Invoice d'origine liée à cette Purchase Invoice
         """
-        
         # Méthode 1 : Via le champ bill_no
         si_name = purchase_invoice.bill_no
-        
         if si_name and frappe.db.exists("Sales Invoice", si_name):
             return si_name
-        
-        # Méthode 2 : Via champ custom linked_sales_invoice
-        if hasattr(purchase_invoice, 'linked_sales_invoice') and purchase_invoice.linked_sales_invoice:
-            return purchase_invoice.linked_sales_invoice
-        
-        # Méthode 3 : Recherche dans Purchase Invoice avec filtre
-        linked_si = frappe.db.get_value(
-            "Purchase Invoice",
-            {"name": purchase_invoice.name},
-            "bill_no"
-        )
-        
-        if linked_si and frappe.db.exists("Sales Invoice", linked_si):
-            return linked_si
-        
+
         return None
+
+
 
     def create_vendor_credit_note(self, original_si, items, customer, company):
         """
         Crée un avoir de vente (Sales Invoice Return) côté vendeur EN BROUILLON
-    
         """
-        
+        print("================> we are hereeeeeeeeeeeeeeeee!!!!")
         credit = frappe.new_doc("Sales Invoice")
         credit.customer = customer
         credit.company = company
@@ -195,6 +184,7 @@ class cheakingtheinvoice(Document):
         credit.return_against = original_si.name
         credit.update_stock = 1
         credit.update_outstanding_for_self = 0
+        credit.custom_checking_invoice_peice = self.name
         
         # Entrepôt par défaut du vendeur
         vendor_warehouse = frappe.db.get_value(
@@ -217,6 +207,7 @@ class cheakingtheinvoice(Document):
 
         credit.flags.ignore_permissions = True
         credit.insert()
+        credit.submit()
         
         frappe.msgprint(
             f"✅ Avoir de vente créé en brouillon : {credit.name}<br>"
@@ -224,6 +215,7 @@ class cheakingtheinvoice(Document):
             indicator="blue"
         )
         return credit
+
 
     def create_vendor_sales_invoice(self, original_si, items, customer, company):
         """
@@ -236,6 +228,7 @@ class cheakingtheinvoice(Document):
         inv.company = company
         inv.posting_date = self.date
         inv.update_stock = 1
+        inv.custom_checking_invoice_peice = self.name
         
         vendor_warehouse = frappe.db.get_value(
             "Company", 
@@ -257,6 +250,7 @@ class cheakingtheinvoice(Document):
 
         inv.flags.ignore_permissions = True
         inv.insert()
+        inv.submit()
         
         frappe.msgprint(
             f"✅ Facture de vente créée en brouillon : {inv.name}<br>"
@@ -264,11 +258,11 @@ class cheakingtheinvoice(Document):
             indicator="blue"
         )
         return inv
-
+   
     # =========================================
     # FONCTIONS UTILITAIRES
     # =========================================
-    
+     
     def find_internal_customer(self, vendor_company, buyer_company):
         """
         Trouve le client interne dans vendor_company qui représente buyer_company

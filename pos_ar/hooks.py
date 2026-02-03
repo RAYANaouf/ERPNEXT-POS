@@ -146,8 +146,12 @@ has_permission = {
 
 doc_events = {
     "Sales Invoice": {
-        "on_submit": ["pos_ar.api.update_customer_debt_on_invoice" ,  "pos_ar.api.auto_inter_company_purchase_invoice_creation" , "pos_ar.api.auto_inter_company_purchase_invoice_creation_from_alger"],
+        "on_submit": ["pos_ar.api.update_customer_debt_on_invoice" ,  "pos_ar.api.auto_inter_company_purchase_invoice_creation" , "pos_ar.api.auto_inter_company_purchase_invoice_creation_from_alger" ],
         "on_cancel": ["pos_ar.api.update_customer_debt_on_invoice" ,  "pos_ar.api.auto_inter_company_purchase_invoice_creation" , "pos_ar.api.auto_inter_company_purchase_invoice_creation_from_alger"],
+    },
+    "Purchase Invoice": {
+        "on_submit": "pos_ar.api.update_checking_invoice_peices",
+        "on_cancel": "pos_ar.api.update_checking_invoice_peices",
     },
     "POS Invoice": {
         "on_submit": "pos_ar.api.update_customer_debt_on_invoice",
