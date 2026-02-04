@@ -1571,6 +1571,69 @@ def supplier_permission(doc, ptype, user):
 
 
 
+# Checking The Invoice
+def checking_the_invoice_permission_query_conditions(user):
+    if user == "Administrator":
+        return ""
+
+    from frappe import db, get_all
+
+    # Allowed companies
+    global_companies = get_all(
+        "User Permission",
+        filters={
+            "user": user,
+            "allow": "Company",
+            "apply_to_all_doctypes": True
+        },
+        pluck="for_value"
+    )
+
+    scoped_companies = get_all(
+        "User Permission",
+        filters={
+            "user": user,
+            "allow": "Company",
+            "applicable_for": "Checking The Invoice"
+        },
+        pluck="for_value"
+    )
+
+    allowed_companies = list(set(global_companies + scoped_companies))
+
+    if not allowed_companies:
+        return "1=0"  # Nothing allowed
+
+    # Escape company names for SQL
+    allowed_companies_sql = ", ".join([db.escape(c) for c in allowed_companies])
+
+    # Full OR condition with parentheses
+    return f"""(
+        `tabChecking The Invoice`.`purchase_invoice_company` IN ({allowed_companies_sql})
+        OR
+        (
+            `tabChecking The Invoice`.`supplier_company` IN ({allowed_companies_sql})
+            AND `tabChecking The Invoice`.`workflow_state` != 'Draft'
+        )
+    )"""
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

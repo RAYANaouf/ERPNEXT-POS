@@ -25,6 +25,12 @@ class CheckingTheInvoice(Document):
         """Création des documents d'ajustement côté vendeur uniquement"""
         
         invoice = frappe.get_doc("Purchase Invoice", self.purchase_invoice)
+
+        print(" the status ====> " , self.workflow_state)
+
+        if self.workflow_state == "Rejected":
+            frappe.msgprint("❌ Cet ajustement a été rejeté.")
+            return
         
         # Séparer les retours et suppléments
         retours     = []
@@ -46,7 +52,6 @@ class CheckingTheInvoice(Document):
         self.db_update()
         
 
-
     def on_cancel(self):
         """
         Annule/supprime les documents créés automatiquement
@@ -66,22 +71,34 @@ class CheckingTheInvoice(Document):
             if not frappe.db.exists(doctype, name):
                 continue
 
-            doc = frappe.get_doc(doctype, name)
+            try:
+                # Cancel submitted documents
+                if frappe.get_value(doctype, name, "docstatus") == 1:
+                    frappe.get_doc(doctype, name).cancel(flags={"ignore_permissions": True})
+                    frappe.msgprint(f"❌ {doctype} annulée : {name}")
 
-            # Annuler si soumis, sinon supprimer
-            if doc.docstatus == 1:
-                doc.flags.ignore_permissions = True
-                doc.cancel()
-                frappe.msgprint(f"❌ {doctype} annulée : {name}")
-            elif doc.docstatus == 0:  # Draft
-                doc.flags.ignore_permissions = True
-                doc.delete()
-                frappe.msgprint(f"🗑️ {doctype} supprimée (brouillon) : {name}")
+                # Delete drafts
+                elif frappe.get_value(doctype, name, "docstatus") == 0:
+                    frappe.delete_doc(doctype, name, force=1, ignore_permissions=True)
+                    frappe.msgprint(f"🗑️ {doctype} supprimée (brouillon) : {name}")
 
-        # Nettoyer les champs après annulation
-        self.db_set("client_return", None)
-        self.db_set("client_invoice", None)
-		
+            except Exception as e:
+                frappe.log_error(f"Erreur lors de l'annulation de {doctype} {name}: {e}")
+                
+        # Clean fields on this Checking The Invoice doc
+        try:
+            fields_to_clear = [
+                "supplier_invoice",
+                "supplier_return",
+                "client_invoice",
+                "client_return"
+            ]
+
+            for field in fields_to_clear:
+                self.db_set(field, None)
+
+        except Exception as e:
+            frappe.log_error(f"Erreur lors du nettoyage des champs: {e}")
 
     # =========================================
     # FONCTIONS CÔTÉ VENDEUR
@@ -285,3 +302,52 @@ class CheckingTheInvoice(Document):
             if item.item_code == item_code:
                 return item
         return None
+
+
+
+@frappe.whitelist()
+def show_action_btn(purchase_invoice_name , status):
+    user = frappe.session.user
+
+    # Admin always allowed
+    if user == "Administrator":
+        return True
+
+    if status == "Draft":
+        return True
+
+    companies = frappe.get_all(
+        "User Permission",
+        filters={
+            "user": user,
+            "allow": "Company",
+            "apply_to_all_doctypes" : 1
+        },
+        pluck="for_value"
+    )
+
+    companies_specific = frappe.get_all(
+        "User Permission",
+        filters={
+            "user": user,
+            "allow": "Company",
+            "apply_to_all_doctypes" : 0,
+            "applicable_for" : "Checking The Invoice"
+        },
+        pluck="for_value"
+    )
+
+    purchase_invoice = frappe.get_doc("Purchase Invoice", purchase_invoice_name)
+
+    supplier = purchase_invoice.supplier
+    supplier_company = frappe.db.get_value("Supplier", supplier, "represents_company")
+
+    if supplier_company in companies or supplier_company in companies_specific:
+        return True
+    else:
+        return False
+    
+
+
+    
+
