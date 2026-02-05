@@ -1262,23 +1262,35 @@ def update_checking_invoice_peices(doc, method):
     if not checking_invoice_peice:
         return
 
-    def do_update():
+    def do_update( method = method):
 
         if doc.is_return == 1:
-
-            frappe.db.sql("""
-                UPDATE `tabChecking The Invoice`
-                SET client_return = %s
-                WHERE name = %s
-            """, (doc.name, checking_invoice_peice))
+            if method == "on_submit":
+                frappe.db.sql("""
+                    UPDATE `tabChecking The Invoice`
+                    SET client_return = %s
+                    WHERE name = %s
+                """, (doc.name, checking_invoice_peice))
+            elif method == "on_cancel":
+                frappe.db.sql("""
+                    UPDATE `tabChecking The Invoice`
+                    SET client_return = %s
+                    WHERE name = %s
+                """, ("", checking_invoice_peice))
 
         else:
-
-            frappe.db.sql("""
-                UPDATE `tabChecking The Invoice`
-                SET client_invoice = %s
-                WHERE name = %s
-            """, (doc.name, checking_invoice_peice))
+            if method == "on_submit" :  
+                frappe.db.sql("""
+                    UPDATE `tabChecking The Invoice`
+                    SET client_invoice = %s
+                    WHERE name = %s
+                """, (doc.name, checking_invoice_peice))
+            elif method == "on_cancel" :
+                frappe.db.sql("""
+                    UPDATE `tabChecking The Invoice`
+                    SET client_invoice = %s
+                    WHERE name = %s
+                """, ("", checking_invoice_peice))
 
         frappe.db.commit()
 
@@ -1307,6 +1319,10 @@ def on_checking_the_invoice_cancel(doc, method):
     Annule/supprime les documents créés automatiquement
     """
 
+    print("doctype :::::::: " , doc.doctype)
+    print("name :::::::: " , doc.name)
+
+
     frappe.msgprint("🔄 Annulation des documents liés à l'ajustement...")
 
     documents = [
@@ -1329,14 +1345,14 @@ def on_checking_the_invoice_cancel(doc, method):
             docstatus = frappe.get_value("Sales Invoice", name, "docstatus")
 
             # Get document
-            doc = frappe.get_doc("Sales Invoice", name)
+            s_invoice = frappe.get_doc("Sales Invoice", name)
 
             # 🔑 IMPORTANT: ignore permissions BEFORE action
-            doc.flags.ignore_permissions = True
+            s_invoice.flags.ignore_permissions = True
 
             # Cancel submitted docs
             if docstatus == 1:
-                doc.cancel()
+                s_invoice.cancel()
                 frappe.msgprint(f"❌ Sales Invoice annulée : {name}")
 
             # Delete draft docs
@@ -1354,6 +1370,30 @@ def on_checking_the_invoice_cancel(doc, method):
                 title="Erreur annulation document lié",
                 message=f"Sales Invoice {name}\n{frappe.get_traceback()}"
             )
+
+    # Clean fields on this Checking The Invoice doc
+    try:
+        fields_to_clear = [
+            "supplier_invoice",
+            "supplier_return",
+        ]
+        print("doctype : " , doc.doctype)
+        print("name : " , doc.name)
+        print("fields_to_clear : " , fields_to_clear)
+        for field in fields_to_clear:
+            print("field : " , field)
+            frappe.db.set_value(
+                doc.doctype,
+                doc.name,
+                field,
+                "",
+                update_modified=False
+            )
+    except Exception as e:
+        frappe.log_error(
+            title="Erreur nettoyage champs",
+            message=f"Checking The Invoice {doc.name}\n{frappe.get_traceback()}"
+        )
 
 
 
@@ -1466,9 +1506,6 @@ def purchase_invoice_permission_query_conditions(user):
 ######### customer
 def customer_permission(doc, ptype, user):
 
-    print(" 1 =====>")
-    frappe.log_error(" 1 ======>")
-
     # Get allowed companies for the user
     allowed_companies = frappe.get_all(
         "User Permission",
@@ -1480,34 +1517,18 @@ def customer_permission(doc, ptype, user):
         pluck="for_value"
     )
 
-    
-    print(" 2 =====>")
-    frappe.log_error(" 2 ======>")
 
 
     # If user has no restriction, allow access
     if not allowed_companies:
         return True
 
-
-    print(" 3 =====>")
-    frappe.log_error(" 3 ======>")
-
     # Fetch list of allowed companies on this customer from the child table
     customer_companies = [row.company for row in doc.custom_companies]
-
-
-    print(" 4 =====>")
-    frappe.log_error(" 4 ======>")
 
     # Check for intersection
     if any(company in allowed_companies for company in customer_companies):
         return True
-
-
-
-    print(" 5 =====>")
-    frappe.log_error(" 5 ======>")
 
     # No match, deny access
     return False
