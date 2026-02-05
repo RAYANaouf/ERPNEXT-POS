@@ -154,6 +154,7 @@ class CheckingTheInvoice(Document):
         credit.price_list = original_si.selling_price_list
         credit.return_against = original_si.name
         credit.update_stock = 1
+        credit.custom_checking_status = "Checked"
         credit.update_outstanding_for_self = 0
         credit.custom_checking_invoice_peice = self.name
         
@@ -201,6 +202,7 @@ class CheckingTheInvoice(Document):
         inv.price_list = original_si.selling_price_list
         inv.update_stock = 1
         inv.custom_checking_invoice_peice = self.name
+        inv.custom_checking_status = "Checked"
         
         vendor_warehouse = frappe.db.get_value(
             "Company", 
