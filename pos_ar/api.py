@@ -1130,10 +1130,13 @@ def auto_inter_company_purchase_invoice_creation(doc, method):
         return
 
     if method == "on_cancel":
+
         # Cancel the mirrored PI (if exists)
         pi_name = frappe.db.get_value("Purchase Invoice", {"bill_no": doc.name})
         if pi_name:
+            # IMPORTANT: ignore permissions BEFORE action
             pi = frappe.get_doc("Purchase Invoice", pi_name)
+            pi.flags.ignore_permissions = True
             if pi.docstatus == 1:
                 pi.cancel()
                 # Update the Sales Invoice with the Purchase Invoice ID
@@ -1229,6 +1232,7 @@ def auto_inter_company_purchase_invoice_creation_from_alger(doc, method):
         if pi_name:
             pi = frappe.get_doc("Purchase Invoice", pi_name)
             if pi.docstatus == 1:
+                pi.flags.ignore_permissions = True
                 pi.cancel()
                 # Update the Sales Invoice with the Purchase Invoice ID
                 doc.db_set("custom_purchase_invoice_id", "")
@@ -1279,6 +1283,94 @@ def update_checking_invoice_peices(doc, method):
         frappe.db.commit()
 
     frappe.db.after_commit(do_update)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+def on_checking_the_invoice_cancel(doc, method):
+    """
+    Annule/supprime les documents créés automatiquement
+    """
+
+    frappe.msgprint("🔄 Annulation des documents liés à l'ajustement...")
+
+    documents = [
+        ("Sales Invoice", doc.supplier_return),
+        ("Sales Invoice", doc.supplier_invoice),
+    ]
+
+    for  name in documents:
+
+        print(" Document , name  =====>", name)
+        frappe.log_error(" Document , name  =====>", name)
+
+        if not name:
+            continue
+
+        if not frappe.db.exists("Sales Invoice", name):
+            continue
+
+        try:
+            docstatus = frappe.get_value("Sales Invoice", name, "docstatus")
+
+            # Get document
+            doc = frappe.get_doc("Sales Invoice", name)
+
+            # 🔑 IMPORTANT: ignore permissions BEFORE action
+            doc.flags.ignore_permissions = True
+
+            # Cancel submitted docs
+            if docstatus == 1:
+                doc.cancel()
+                frappe.msgprint(f"❌ Sales Invoice annulée : {name}")
+
+            # Delete draft docs
+            elif docstatus == 0:
+                frappe.delete_doc(
+                    "Sales Invoice",
+                    name,
+                    force=1,
+                    ignore_permissions=True
+                )
+                frappe.msgprint(f"🗑️ Sales Invoice supprimée (brouillon) : {name}")
+
+        except Exception as e:
+            frappe.log_error(
+                title="Erreur annulation document lié",
+                message=f"Sales Invoice {name}\n{frappe.get_traceback()}"
+            )
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 #########################################################################################################################################
@@ -1602,7 +1694,7 @@ def checking_the_invoice_permission_query_conditions(user):
     allowed_companies = list(set(global_companies + scoped_companies))
 
     if not allowed_companies:
-        return "1=0"  # Nothing allowed
+        return "1=1"  # allthings is allowed
 
     # Escape company names for SQL
     allowed_companies_sql = ", ".join([db.escape(c) for c in allowed_companies])

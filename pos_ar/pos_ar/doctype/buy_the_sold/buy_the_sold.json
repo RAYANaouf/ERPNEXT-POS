@@ -47,7 +47,8 @@
   "cb_13",
   "generate_alter",
   "alter_command_achat",
-  "alter_facture_achat"
+  "alter_facture_achat",
+  "amended_from"
  ],
  "fields": [
   {
@@ -200,6 +201,7 @@
    "default": "0",
    "fieldname": "command_qty_needed",
    "fieldtype": "Check",
+   "hidden": 1,
    "label": "Command Qty Needed"
   },
   {
@@ -269,13 +271,23 @@
    "fieldtype": "Data",
    "label": "Alter Factur d'achat",
    "read_only": 1
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Buy The Sold",
+   "print_hide": 1,
+   "read_only": 1,
+   "search_index": 1
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-01-03 08:44:15.210355",
+ "modified": "2026-02-04 22:37:10.754267",
  "modified_by": "Administrator",
  "module": "POS AR",
  "name": "Buy The Sold",
@@ -291,6 +303,32 @@
    "read": 1,
    "report": 1,
    "role": "System Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Purchase Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Purchase User",
    "share": 1,
    "submit": 1,
    "write": 1

@@ -52,53 +52,6 @@ class CheckingTheInvoice(Document):
         self.db_update()
         
 
-    def on_cancel(self):
-        """
-        Annule/supprime les documents créés automatiquement
-        """
-
-        frappe.msgprint("🔄 Annulation des documents liés à l'ajustement...")
-
-        documents = [
-            ("Sales Invoice", self.supplier_return),
-            ("Sales Invoice", self.supplier_invoice),
-        ]
-
-        for doctype, name in documents:
-            if not name:
-                continue
-
-            if not frappe.db.exists(doctype, name):
-                continue
-
-            try:
-                # Cancel submitted documents
-                if frappe.get_value(doctype, name, "docstatus") == 1:
-                    frappe.get_doc(doctype, name).cancel(flags={"ignore_permissions": True})
-                    frappe.msgprint(f"❌ {doctype} annulée : {name}")
-
-                # Delete drafts
-                elif frappe.get_value(doctype, name, "docstatus") == 0:
-                    frappe.delete_doc(doctype, name, force=1, ignore_permissions=True)
-                    frappe.msgprint(f"🗑️ {doctype} supprimée (brouillon) : {name}")
-
-            except Exception as e:
-                frappe.log_error(f"Erreur lors de l'annulation de {doctype} {name}: {e}")
-                
-        # Clean fields on this Checking The Invoice doc
-        try:
-            fields_to_clear = [
-                "supplier_invoice",
-                "supplier_return",
-                "client_invoice",
-                "client_return"
-            ]
-
-            for field in fields_to_clear:
-                self.db_set(field, None)
-
-        except Exception as e:
-            frappe.log_error(f"Erreur lors du nettoyage des champs: {e}")
 
     # =========================================
     # FONCTIONS CÔTÉ VENDEUR
@@ -198,6 +151,7 @@ class CheckingTheInvoice(Document):
         credit.company = company
         credit.posting_date = self.date
         credit.is_return = 1
+        credit.price_list = original_si.selling_price_list
         credit.return_against = original_si.name
         credit.update_stock = 1
         credit.update_outstanding_for_self = 0
@@ -244,6 +198,7 @@ class CheckingTheInvoice(Document):
         inv.customer = customer
         inv.company = company
         inv.posting_date = self.date
+        inv.price_list = original_si.selling_price_list
         inv.update_stock = 1
         inv.custom_checking_invoice_peice = self.name
         
