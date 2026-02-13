@@ -1,0 +1,53 @@
+[
+ {
+  "add_total_row": 0,
+  "add_translate_data": 0,
+  "columns": [],
+  "disabled": 0,
+  "docstatus": 0,
+  "doctype": "Report",
+  "filters": [
+   {
+    "default": null,
+    "fieldname": "warehouse",
+    "fieldtype": "Link",
+    "label": "Warehouse",
+    "mandatory": 1,
+    "options": "Warehouse",
+    "parent": "Stock State",
+    "parentfield": "filters",
+    "parenttype": "Report",
+    "wildcard_filter": 0
+   }
+  ],
+  "is_standard": "No",
+  "javascript": null,
+  "json": null,
+  "letter_head": null,
+  "modified": "2026-02-13 05:38:42.324670",
+  "module": "POS AR",
+  "name": "Stock State",
+  "prepared_report": 0,
+  "query": "SELECT \r\n    sle.item_code,\r\n    sle.warehouse,\r\n\r\n    -- Sum of movements AFTER last zero\r\n    SUM(\r\n        CASE \r\n            WHEN sle.posting_datetime > (\r\n                SELECT z.posting_datetime\r\n                FROM `tabStock Ledger Entry` z\r\n                WHERE z.actual_qty = 0\r\n                AND z.item_code = sle.item_code\r\n                AND z.warehouse = sle.warehouse\r\n                ORDER BY z.posting_datetime DESC\r\n                LIMIT 1\r\n            )\r\n            THEN sle.actual_qty\r\n            ELSE 0\r\n        END\r\n    )\r\n    +\r\n    IFNULL((\r\n        SELECT z.qty_after_transaction\r\n        FROM `tabStock Ledger Entry` z\r\n        WHERE z.actual_qty = 0\r\n        AND z.item_code = sle.item_code\r\n        AND z.warehouse = sle.warehouse\r\n        ORDER BY z.posting_datetime DESC\r\n        LIMIT 1\r\n    ), 0) AS final_qty\r\n    \r\nFROM `tabStock Ledger Entry` sle\r\nWHERE sle.warehouse = %(warehouse)s\r\nGROUP BY sle.item_code, sle.warehouse\r\n",
+  "ref_doctype": "Stock Ledger Entry",
+  "reference_report": null,
+  "report_name": "Stock State",
+  "report_script": null,
+  "report_type": "Query Report",
+  "roles": [
+   {
+    "parent": "Stock State",
+    "parentfield": "roles",
+    "parenttype": "Report",
+    "role": "Stock User"
+   },
+   {
+    "parent": "Stock State",
+    "parentfield": "roles",
+    "parenttype": "Report",
+    "role": "Accounts Manager"
+   }
+  ],
+  "timeout": 0
+ }
+]

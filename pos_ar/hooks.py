@@ -299,6 +299,12 @@ fixtures = [
         ]
     },
     {
+        'dt': 'Report',
+        'filters': [
+            ["module" , "in" , ["POS AR"]],
+        ]
+    },
+    {
         'dt': 'Workflow',
     }
 ]
