@@ -24,11 +24,11 @@
   "javascript": null,
   "json": null,
   "letter_head": null,
-  "modified": "2026-02-13 05:38:42.324670",
+  "modified": "2026-02-13 07:20:55.296300",
   "module": "POS AR",
   "name": "Stock State",
   "prepared_report": 0,
-  "query": "SELECT \r\n    sle.item_code,\r\n    sle.warehouse,\r\n\r\n    -- Sum of movements AFTER last zero\r\n    SUM(\r\n        CASE \r\n            WHEN sle.posting_datetime > (\r\n                SELECT z.posting_datetime\r\n                FROM `tabStock Ledger Entry` z\r\n                WHERE z.actual_qty = 0\r\n                AND z.item_code = sle.item_code\r\n                AND z.warehouse = sle.warehouse\r\n                ORDER BY z.posting_datetime DESC\r\n                LIMIT 1\r\n            )\r\n            THEN sle.actual_qty\r\n            ELSE 0\r\n        END\r\n    )\r\n    +\r\n    IFNULL((\r\n        SELECT z.qty_after_transaction\r\n        FROM `tabStock Ledger Entry` z\r\n        WHERE z.actual_qty = 0\r\n        AND z.item_code = sle.item_code\r\n        AND z.warehouse = sle.warehouse\r\n        ORDER BY z.posting_datetime DESC\r\n        LIMIT 1\r\n    ), 0) AS final_qty\r\n    \r\nFROM `tabStock Ledger Entry` sle\r\nWHERE sle.warehouse = %(warehouse)s\r\nGROUP BY sle.item_code, sle.warehouse\r\n",
+  "query": "SELECT \r\n    sle.item_code,\r\n    sle.warehouse,\r\n\r\n    -- Sum of movements AFTER last zero\r\n    SUM(\r\n        CASE \r\n            WHEN sle.posting_datetime > (\r\n                SELECT z.posting_datetime\r\n                FROM `tabStock Ledger Entry` z\r\n                WHERE z.actual_qty = 0\r\n                AND z.item_code = sle.item_code\r\n                AND z.warehouse = sle.warehouse\r\n                ORDER BY z.posting_datetime DESC\r\n                LIMIT 1\r\n            )\r\n            THEN sle.actual_qty\r\n            ELSE 0\r\n        END\r\n    )\r\n    +\r\n    IFNULL((\r\n        SELECT z.qty_after_transaction\r\n        FROM `tabStock Ledger Entry` z\r\n        WHERE z.actual_qty = 0\r\n        AND z.item_code = sle.item_code\r\n        AND z.warehouse = sle.warehouse\r\n        ORDER BY z.posting_datetime DESC\r\n        LIMIT 1\r\n    ), 0) AS final_qty,\r\n\r\n    (\r\n        SELECT z.posting_datetime\r\n        FROM `tabStock Ledger Entry` z\r\n        WHERE z.actual_qty = 0\r\n        AND z.item_code = sle.item_code\r\n        AND z.warehouse = sle.warehouse\r\n        ORDER BY z.posting_datetime DESC\r\n        LIMIT 1\r\n    ) AS last_zero_datetime\r\n\r\nFROM `tabStock Ledger Entry` sle\r\nWHERE sle.warehouse = %(warehouse)s\r\nGROUP BY sle.item_code, sle.warehouse\r\n",
   "ref_doctype": "Stock Ledger Entry",
   "reference_report": null,
   "report_name": "Stock State",
@@ -49,5 +49,56 @@
    }
   ],
   "timeout": 0
+ },
+ {
+  "add_total_row": 1,
+  "add_translate_data": 0,
+  "columns": [],
+  "disabled": 0,
+  "docstatus": 0,
+  "doctype": "Report",
+  "filters": [
+   {
+    "default": null,
+    "fieldname": "warehouse",
+    "fieldtype": "Link",
+    "label": "Warehouse",
+    "mandatory": 1,
+    "options": "Warehouse",
+    "parent": "Stock State Lightweight",
+    "parentfield": "filters",
+    "parenttype": "Report",
+    "wildcard_filter": 0
+   }
+  ],
+  "is_standard": "No",
+  "javascript": null,
+  "json": null,
+  "letter_head": null,
+  "modified": "2026-02-13 20:17:16.068749",
+  "module": "POS AR",
+  "name": "Stock State Lightweight",
+  "prepared_report": 1,
+  "query": "SELECT \r\n    sle.item_code,\r\n    sle.warehouse,\r\n    sle.qty_after_transaction AS final_qty\r\nFROM `tabStock Ledger Entry` sle\r\nINNER JOIN (\r\n    SELECT \r\n        item_code,\r\n        warehouse,\r\n        MAX(posting_datetime) AS last_dt\r\n    FROM `tabStock Ledger Entry`\r\n    WHERE warehouse = %(warehouse)s\r\n      AND is_cancelled = 0\r\n    GROUP BY item_code, warehouse\r\n) latest\r\nON sle.item_code = latest.item_code\r\nAND sle.warehouse = latest.warehouse\r\nAND sle.posting_datetime = latest.last_dt\r\nWHERE sle.warehouse = %(warehouse)s\r\n  AND sle.is_cancelled = 0;\r\n",
+  "ref_doctype": "Stock Ledger Entry",
+  "reference_report": null,
+  "report_name": "Stock State Lightweight",
+  "report_script": null,
+  "report_type": "Query Report",
+  "roles": [
+   {
+    "parent": "Stock State Lightweight",
+    "parentfield": "roles",
+    "parenttype": "Report",
+    "role": "Stock User"
+   },
+   {
+    "parent": "Stock State Lightweight",
+    "parentfield": "roles",
+    "parenttype": "Report",
+    "role": "Accounts Manager"
+   }
+  ],
+  "timeout": 3000
  }
 ]
