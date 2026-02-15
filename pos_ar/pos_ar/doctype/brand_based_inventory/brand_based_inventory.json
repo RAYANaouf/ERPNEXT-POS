@@ -21,6 +21,8 @@
   "brand",
   "item_section_section",
   "items",
+  "linked_document_section",
+  "stock_reconciliation",
   "amended_from"
  ],
  "fields": [
@@ -100,16 +102,6 @@
    "options": "Brand-Based Inventory Item"
   },
   {
-   "fieldname": "amended_from",
-   "fieldtype": "Link",
-   "label": "Amended From",
-   "no_copy": 1,
-   "options": "Brand-Based Inventory",
-   "print_hide": 1,
-   "read_only": 1,
-   "search_index": 1
-  },
-  {
    "fieldname": "column_break_qiol",
    "fieldtype": "Column Break"
   },
@@ -119,13 +111,36 @@
    "label": "Price List",
    "options": "Price List",
    "reqd": 1
+  },
+  {
+   "fieldname": "linked_document_section",
+   "fieldtype": "Section Break",
+   "label": "Linked Document"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "stock_reconciliation",
+   "fieldtype": "Link",
+   "label": "Stock Reconciliation",
+   "options": "Stock Reconciliation",
+   "read_only": 1
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Brand-Based Inventory",
+   "print_hide": 1,
+   "read_only": 1,
+   "search_index": 1
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-02-04 22:35:56.937102",
+ "modified": "2026-02-15 02:18:01.095914",
  "modified_by": "Administrator",
  "module": "POS AR",
  "name": "Brand-Based Inventory",

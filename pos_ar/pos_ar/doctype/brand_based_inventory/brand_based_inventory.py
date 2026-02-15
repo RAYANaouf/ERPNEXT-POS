@@ -11,7 +11,6 @@ from frappe.utils import flt, getdate, get_time
 class BrandBasedInventory(Document):
 
     def on_submit(self):
-        print("============> on_submit")
         self.create_stock_reconciliation()
 
     def create_stock_reconciliation(self):
@@ -27,7 +26,7 @@ class BrandBasedInventory(Document):
             
             # If no price is found in the Price List, fallback to 0 or Item Master valuation
             if not price:
-                price = frappe.db.get_value("Item", d.item, "valuation_rate") or 0
+                price = frappe.db.get_value("Item", d.item, "valuation_rate") or 0.1
 
             reco_items.append({
                 "item_code": d.item,
@@ -51,19 +50,34 @@ class BrandBasedInventory(Document):
             "company": self.company,
             "posting_date": posting_date,
             "posting_time": posting_time,
+            "custom_brand_based_inventory_peice" : self.name,
             "items": reco_items,
             "remarks": f"Automatically created from Brand Based Inventory: {self.name}"
         })
 
         sr.insert()
-        sr.submit()
-        
-        # 3. Link the created SR back to this document for reference
-        # Make sure you have a field 'stock_reconciliation' in your DocType
-        #self.db_set("stock_reconciliation", sr.name)
+        self.db_set("stock_reconciliation", sr.name)
         
         frappe.msgprint(f"Stock Reconciliation {sr.name} created and submitted.")
 
+    def on_cancel(self):
+        self.cancel_stock_reconciliation()
+
+    def cancel_stock_reconciliation(self):
+        sr_name = frappe.db.get_value(
+            "Stock Reconciliation",
+            {"custom_brand_based_inventory_peice": self.name}
+        )
+
+        if not sr_name:
+            return
+
+        sr = frappe.get_doc("Stock Reconciliation", sr_name)
+
+        if sr.docstatus == 1:
+            sr.cancel()
+
+        frappe.msgprint(f"Stock Reconciliation {sr.name} cancelled.")
 
 @frappe.whitelist()
 def get_items_from_cartons(cartons):
