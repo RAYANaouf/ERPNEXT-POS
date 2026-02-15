@@ -100,5 +100,92 @@
    }
   ],
   "timeout": 3000
+ },
+ {
+  "add_total_row": 0,
+  "add_translate_data": 0,
+  "columns": [],
+  "disabled": 0,
+  "docstatus": 0,
+  "doctype": "Report",
+  "filters": [
+   {
+    "default": null,
+    "fieldname": "start_date",
+    "fieldtype": "Date",
+    "label": "Start Date",
+    "mandatory": 1,
+    "options": null,
+    "parent": "Best Sell Report",
+    "parentfield": "filters",
+    "parenttype": "Report",
+    "wildcard_filter": 0
+   },
+   {
+    "default": null,
+    "fieldname": "end_date",
+    "fieldtype": "Date",
+    "label": "End Date",
+    "mandatory": 1,
+    "options": null,
+    "parent": "Best Sell Report",
+    "parentfield": "filters",
+    "parenttype": "Report",
+    "wildcard_filter": 0
+   },
+   {
+    "default": null,
+    "fieldname": "company",
+    "fieldtype": "Link",
+    "label": "Company",
+    "mandatory": 1,
+    "options": "Company",
+    "parent": "Best Sell Report",
+    "parentfield": "filters",
+    "parenttype": "Report",
+    "wildcard_filter": 0
+   },
+   {
+    "default": null,
+    "fieldname": "warehouse",
+    "fieldtype": "Link",
+    "label": "Warehouse",
+    "mandatory": 1,
+    "options": "Warehouse",
+    "parent": "Best Sell Report",
+    "parentfield": "filters",
+    "parenttype": "Report",
+    "wildcard_filter": 0
+   }
+  ],
+  "is_standard": "No",
+  "javascript": null,
+  "json": null,
+  "letter_head": null,
+  "modified": "2026-02-15 06:46:59.621638",
+  "module": "POS AR",
+  "name": "Best Sell Report",
+  "prepared_report": 0,
+  "query": "WITH sold_items AS (\r\n    SELECT \r\n        sii.item_code,\r\n        SUM(sii.qty) AS total_qty\r\n    FROM `tabSales Invoice Item` sii\r\n    INNER JOIN `tabSales Invoice` si \r\n        ON sii.parent = si.name\r\n    WHERE \r\n        si.docstatus = 1\r\n        AND si.posting_date BETWEEN %(start_date)s AND %(end_date)s\r\n        AND (%(company)s IS NULL OR si.company = %(company)s)\r\n        AND (%(warehouse)s IS NULL OR sii.warehouse = %(warehouse)s)\r\n    GROUP BY sii.item_code\r\n    HAVING SUM(sii.qty) > 0\r\n),\r\n\r\nmonthly_sales AS (\r\n    SELECT\r\n        sii.item_code,\r\n        YEAR(si.posting_date) AS y,\r\n        MONTH(si.posting_date) AS m,\r\n        SUM(sii.qty) AS qty_month\r\n    FROM `tabSales Invoice Item` sii\r\n    INNER JOIN `tabSales Invoice` si \r\n        ON sii.parent = si.name\r\n    WHERE\r\n        si.docstatus = 1\r\n        AND si.posting_date BETWEEN DATE_SUB(CURDATE(), INTERVAL 60 MONTH) AND CURDATE()\r\n        AND (%(company)s IS NULL OR si.company = %(company)s)\r\n        AND (%(warehouse)s IS NULL OR sii.warehouse = %(warehouse)s)\r\n    GROUP BY sii.item_code, y, m\r\n),\r\n\r\nranked AS (\r\n    SELECT\r\n        item_code,\r\n        y,\r\n        m,\r\n        qty_month,\r\n        ROW_NUMBER() OVER (\r\n            PARTITION BY item_code\r\n            ORDER BY qty_month DESC, y DESC, m DESC\r\n        ) AS rn\r\n    FROM monthly_sales\r\n)\r\n\r\nSELECT \r\n    s.item_code,\r\n    s.total_qty,\r\n    COALESCE(r.qty_month, 0) AS best_sell_qty,\r\n    CASE \r\n        WHEN r.y IS NOT NULL AND r.m IS NOT NULL\r\n        THEN CONCAT(r.y, '-', LPAD(r.m, 2, '0'), '-01')\r\n        ELSE NULL\r\n    END AS best_sell_month,\r\n    COALESCE(b.actual_qty, 0) AS on_stock\r\n\r\nFROM sold_items s\r\nLEFT JOIN ranked r \r\n    ON r.item_code = s.item_code AND r.rn = 1\r\nLEFT JOIN `tabBin` b \r\n    ON b.item_code = s.item_code\r\n    AND (%(warehouse)s IS NULL OR b.warehouse = %(warehouse)s)\r\n\r\nORDER BY s.item_code\r\n",
+  "ref_doctype": "Sales Invoice",
+  "reference_report": null,
+  "report_name": "Best Sell Report",
+  "report_script": null,
+  "report_type": "Query Report",
+  "roles": [
+   {
+    "parent": "Best Sell Report",
+    "parentfield": "roles",
+    "parenttype": "Report",
+    "role": "Accounts Manager"
+   },
+   {
+    "parent": "Best Sell Report",
+    "parentfield": "roles",
+    "parenttype": "Report",
+    "role": "Accounts User"
+   }
+  ],
+  "timeout": 0
  }
 ]
