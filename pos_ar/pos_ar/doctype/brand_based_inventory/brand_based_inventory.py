@@ -39,17 +39,22 @@ class BrandBasedInventory(Document):
             frappe.throw("No items found to reconcile.")
 
         # 2. Extract Date and Time from DateTime field
-        # If date_time is empty, fallback to current system time
-        posting_date = getdate(self.date_time) if self.date_time else frappe.utils.nowdate()
-        posting_time = get_time(self.date_time) if self.date_time else frappe.utils.nowtime()
+        # 2.1. Ensure date_time exists
+        if not self.date_time:
+            frappe.throw("Date and Time is required to create Stock Reconciliation.")
 
-        # 2. Create the Stock Reconciliation Document
+        # 2.2 Extract Date and Time safely
+        posting_date = getdate(self.date_time)
+        posting_time = get_time(self.date_time)
+
+        # 3. Create the Stock Reconciliation Document
         sr = frappe.get_doc({
-            "doctype": "Stock Reconciliation",
-            "purpose": "Stock Reconciliation",
-            "company": self.company,
-            "posting_date": posting_date,
-            "posting_time": posting_time,
+            "doctype"      : "Stock Reconciliation",
+            "purpose"      : "Stock Reconciliation",
+            "company"      : self.company,
+            "posting_date" : posting_date,
+            "posting_time" : posting_time,
+            "set_posting_time" : 1,
             "custom_brand_based_inventory_peice" : self.name,
             "items": reco_items,
             "remarks": f"Automatically created from Brand Based Inventory: {self.name}"
