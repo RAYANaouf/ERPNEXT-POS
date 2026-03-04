@@ -220,7 +220,7 @@
       const dataArray = Object.entries(this.data || {}).map(([key, value]) => ({
         name: key,
         qty: value.qty,
-        total: value.rate * value.qty
+        total: value.rate
       }));
       if (dataArray.length === 0) {
         frappe.msgprint("No data to export.");
@@ -8298,4 +8298,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.CPEY7SKK.js.map
+//# sourceMappingURL=pos.bundle.ZOHTZ6DN.js.map

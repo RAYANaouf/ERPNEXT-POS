@@ -289,7 +289,7 @@ pos_ar.myaccessories.AccessoriesController = class {
         const dataArray = Object.entries(this.data || {}).map(([key, value]) => ({
             name: key,
             qty: value.qty,
-            total: value.rate * value.qty
+            total: value.rate 
         }));
     
         // Check if dataArray is not empty
