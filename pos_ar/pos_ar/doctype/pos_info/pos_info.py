@@ -503,15 +503,21 @@ def get_saled_item(company=None, pos_opening_entry=None, brand=None):
 
 
             # If status is Open - Get all after start time
+            # For Open status - filter by posting_date >= start_date and posting_time >= start_time
             if opening_entry.status == "Open":
-                filters_invoice["posting_date"] = [">=", start_time]
-            
-            # If status is Closed - Get all between start and end time
+                filters_invoice["posting_date"] = [">=", start_time.date()]
+                # Also need to filter by time for the same date
+                filters_invoice["posting_time"] = [">=", start_time.time()]
+
+            # For Closed status - filter by date range and time range  
             elif opening_entry.status == "Closed":
                 closing_entry = frappe.get_doc("POS Closing Entry", opening_entry.pos_closing_entry)
                 end_time = closing_entry.period_end_date
-                filters_invoice["posting_date"] = ["between", (start_time, end_time)]
-
+                filters_invoice["posting_date"] = [">=", start_time.date()]
+                filters_invoice["posting_time"] = [">=", start_time.time()]
+                filters_invoice["posting_date"] = ["<=", end_time.date()]
+                filters_invoice["posting_time"] = ["<=", end_time.time()]
+            
         # Get POS Invoices with the applied filters
         posInvoices = frappe.get_all(
             "POS Invoice",
