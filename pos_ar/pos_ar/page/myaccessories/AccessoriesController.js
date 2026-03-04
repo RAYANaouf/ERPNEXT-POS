@@ -175,7 +175,7 @@ pos_ar.myaccessories.AccessoriesController = class {
                     company   : this.selectedCompany,
                     docstatus : 1
                 },
-                fields: ['name', 'pos_profile'],
+                fields: ['name', 'pos_profile' , 'period_start_date'],
                 limit: 0,
                 order_by: 'creation desc'
             },
@@ -188,10 +188,12 @@ pos_ar.myaccessories.AccessoriesController = class {
                             .text('All POS Sessions')
                     );
                     response.message.forEach(entry => {
+                        // Format the date if it exists, otherwise just show name and profile
+                        const dateStr = entry.period_start_date ? ` - ${entry.period_start_date}` : '';
                         this.posOpeningSelect.append(
                             $('<option></option>')
                                 .val(entry.name)
-                                .text(`${entry.name} (${entry.pos_profile})`)
+                                .text(`${entry.name} (${entry.pos_profile})${dateStr}`)
                         );
                     });
                     this.posOpeningSelect.val(this.selectedPOSOpening);

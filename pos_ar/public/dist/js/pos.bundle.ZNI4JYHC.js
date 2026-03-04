@@ -135,7 +135,7 @@
             company: this.selectedCompany,
             docstatus: 1
           },
-          fields: ["name", "pos_profile"],
+          fields: ["name", "pos_profile", "period_start_date"],
           limit: 0,
           order_by: "creation desc"
         },
@@ -146,8 +146,9 @@
               $("<option></option>").val("").text("All POS Sessions")
             );
             response.message.forEach((entry) => {
+              const dateStr = entry.period_start_date ? ` - ${entry.period_start_date}` : "";
               this.posOpeningSelect.append(
-                $("<option></option>").val(entry.name).text(`${entry.name} (${entry.pos_profile})`)
+                $("<option></option>").val(entry.name).text(`${entry.name} (${entry.pos_profile})${dateStr}`)
               );
             });
             this.posOpeningSelect.val(this.selectedPOSOpening);
@@ -8298,4 +8299,4 @@
     }
   };
 })();
-//# sourceMappingURL=pos.bundle.ZOHTZ6DN.js.map
+//# sourceMappingURL=pos.bundle.ZNI4JYHC.js.map
