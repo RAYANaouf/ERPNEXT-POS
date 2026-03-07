@@ -1147,10 +1147,6 @@ def auto_inter_company_purchase_invoice_creation(doc, method):
 
 
 
-
-
-import frappe
-
 def auto_inter_company_purchase_invoice_creation_from_alger(doc, method):
     """
     Mirrors a Sales Invoice from OPTILENS Alger into a Purchase Invoice
@@ -1177,6 +1173,8 @@ def auto_inter_company_purchase_invoice_creation_from_alger(doc, method):
         return
 
     if method == "on_submit":
+        # Handle Sales Return vs Regular Invoice
+        is_return = doc.get("is_return")
         
         # Create mirrored Purchase Invoice
         target_company_wh = frappe.db.get_value("Company", target_company, "custom_default_warehouse")
@@ -1184,6 +1182,8 @@ def auto_inter_company_purchase_invoice_creation_from_alger(doc, method):
         pi.company = target_company
         pi.supplier = internal_supplier
         pi.is_internal_supplier = 1
+        if is_return:
+            pi.is_return = is_return
         pi.buying_price_list = doc.selling_price_list
         pi.posting_date = doc.posting_date
         pi.due_date = doc.posting_date
