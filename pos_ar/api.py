@@ -1163,7 +1163,6 @@ def auto_inter_company_purchase_invoice_creation_from_alger(doc, method):
     frappe.log_error("debuging 1")
     # Target company from internal customer (must have represents_company)
     target_company = _get_target_company_from_customer(doc.customer)
-    print("heeree target_company ==============> : ", target_company)
     frappe.log_error(f"heeree target_company =========> : {target_company}")
     if not target_company:
         frappe.msgprint("ℹ️ Skipping: Customer is not internal (no 'represents_company').")
@@ -1171,7 +1170,6 @@ def auto_inter_company_purchase_invoice_creation_from_alger(doc, method):
 
     # Internal supplier in target company that represents OPTILENS Alger
     internal_supplier = _find_internal_supplier_for(doc.company)
-    print("heeree internal_supplier ==============> : ", internal_supplier)
     if not internal_supplier:
         frappe.msgprint(f"⚠️ No Supplier found with represents_company = {doc.company}. Create it first.")
         return
@@ -1183,17 +1181,9 @@ def auto_inter_company_purchase_invoice_creation_from_alger(doc, method):
 
         for it in doc.items:
             if it.qty > 0:
-                print(f"positive -- item : {it.item_code} , qty : {it.qty}")
                 positive_items.append(it)
             elif it.qty < 0:
-                print(f"negative -- item : {it.item_code} , qty : {it.qty}")
                 negative_items.append(it)
-
-        print(f"positive item count: {len(positive_items)}")
-        print(f"negative item count: {len(negative_items)}")
-
-        frappe.log_error(f"positive_items: {positive_items}", "Debug")
-        frappe.log_error(f"negative_items: {negative_items}", "Debug")
 
 
           
