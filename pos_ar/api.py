@@ -1148,6 +1148,8 @@ def auto_inter_company_purchase_invoice_creation(doc, method):
 
 
 def auto_inter_company_purchase_invoice_creation_from_alger(doc, method):
+
+    frappe.log_error("auto_inter_company_purchase_invoice_creation_from_alger called", "Debug")
     """
     Mirrors a Sales Invoice from OPTILENS Alger into a Purchase Invoice
     in the target (internal) company that represents the customer.
@@ -1158,9 +1160,11 @@ def auto_inter_company_purchase_invoice_creation_from_alger(doc, method):
     if doc.doctype != "Sales Invoice" or doc.company != "OPTILENS ALGER":
         return
 
+    frappe.log_error("debuging 1")
     # Target company from internal customer (must have represents_company)
     target_company = _get_target_company_from_customer(doc.customer)
     print("heeree target_company ==============> : ", target_company)
+    frappe.log_error(f"heeree target_company =========> : {target_company}")
     if not target_company:
         frappe.msgprint("ℹ️ Skipping: Customer is not internal (no 'represents_company').")
         return
@@ -1173,49 +1177,96 @@ def auto_inter_company_purchase_invoice_creation_from_alger(doc, method):
         return
 
     if method == "on_submit":
-        # Handle Sales Return vs Regular Invoice
-        is_return = doc.get("is_return")
-        
+
+        positive_items = []
+        negative_items = []
+
+        for it in doc.items:
+            if it.qty > 0:
+                print(f"positive -- item : {it.item_code} , qty : {it.qty}")
+                positive_items.append(it)
+            elif it.qty < 0:
+                print(f"negative -- item : {it.item_code} , qty : {it.qty}")
+                negative_items.append(it)
+
+        print(f"positive item count: {len(positive_items)}")
+        print(f"negative item count: {len(negative_items)}")
+
+        frappe.log_error(f"positive_items: {positive_items}", "Debug")
+        frappe.log_error(f"negative_items: {negative_items}", "Debug")
+
+
+          
         # Create mirrored Purchase Invoice
         target_company_wh = frappe.db.get_value("Company", target_company, "custom_default_warehouse")
-        pi = frappe.new_doc("Purchase Invoice")
-        pi.company = target_company
-        pi.supplier = internal_supplier
-        pi.is_internal_supplier = 1
-        if is_return:
-            pi.is_return = is_return
-        pi.buying_price_list = doc.selling_price_list
-        pi.posting_date = doc.posting_date
-        pi.due_date = doc.posting_date
-        pi.bill_date = doc.posting_date
-        pi.bill_no = doc.name  # link back to SI number
-        pi.update_stock = doc.update_stock
-        if target_company_wh:
-            pi.set_warehouse = target_company_wh
+     
 
-        # Mirror items (+ optional PO row linkage for achievement)
-        for it in doc.items:
-            
-            row = {
-                "item_code": it.item_code,
-                "item_name": it.item_name,
-                "uom": it.uom,
-                "qty": it.qty,
-                "rate": it.rate,
-            }
+        if positive_items:
+            pi = frappe.new_doc("Purchase Invoice")
+            pi.company = target_company
+            pi.supplier = internal_supplier
+            pi.is_internal_supplier = 1
+            pi.buying_price_list = doc.selling_price_list
+            pi.posting_date = doc.posting_date
+            pi.due_date = doc.posting_date
+            pi.bill_date = doc.posting_date
+            pi.bill_no = doc.name  # link back to SI number
+            pi.update_stock = doc.update_stock
             if target_company_wh:
-                row["warehouse"] = target_company_wh
-            
+                pi.set_warehouse = target_company_wh
+        
+            for it in positive_items:
+                row = {
+                    "item_code": it.item_code,
+                    "item_name": it.item_name,
+                    "uom": it.uom,
+                    "qty": it.qty,
+                    "rate": it.rate,
+                }
+                if target_company_wh:
+                    row["warehouse"] = target_company_wh
+                pi.append("items", row)
 
-            pi.append("items", row)
+            pi.flags.ignore_permissions = True
+            pi.insert()
+            pi.submit()
+            # Update the Sales Invoice with the Purchase Invoice ID
+            doc.db_set("custom_purchase_invoice_id", pi.name)
 
+        if negative_items:
+            pr = frappe.new_doc("Purchase Invoice")
+            pr.company              = target_company
+            pr.supplier             = internal_supplier
+            pr.is_internal_supplier = 1
+            pr.buying_price_list    = doc.selling_price_list
+            pr.posting_date         = doc.posting_date
+            pr.due_date             = doc.posting_date
+            pr.bill_date            = doc.posting_date
+            pr.is_return            = 1
+            pr.bill_no              = doc.name  # link back to SI number
+            pr.update_stock         = doc.update_stock
+            if target_company_wh:
+                pr.set_warehouse = target_company_wh
+        
+            for it in negative_items:
+                row = {
+                    "item_code": it.item_code,
+                    "item_name": it.item_name,
+                    "uom": it.uom,
+                    "qty": it.qty,
+                    "rate": it.rate,
+                }
+                if target_company_wh:
+                    row["warehouse"] = target_company_wh
+                pr.append("items", row)
 
-        pi.flags.ignore_permissions = True
-        pi.insert()
-        pi.submit()
-        # Update the Sales Invoice with the Purchase Invoice ID
-        doc.db_set("custom_purchase_invoice_id", pi.name)
-        return
+            pr.flags.ignore_permissions = True
+            pr.insert()
+            pr.submit()
+            # Update the Sales Invoice with the Purchase Invoice ID
+            doc.db_set("custom_purchase_invoice_id", pr.name)
+
+    
 
     if method == "on_cancel":
         # Cancel the mirrored PI created for this SI (we used bill_no = SI.name)
