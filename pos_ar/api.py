@@ -1802,6 +1802,9 @@ def create_purchase_order_for_shortage(stock_entry_doc, method=None):
     # Vérifier si c'est un transfert matériel
     if stock_entry_doc.purpose != "Material Transfer":
         return
+
+    if stock_entry_doc.from_warehouse != "Bordj el kiffen - OA":
+        return
     
     # Vérifier s'il y a une Material Request liée
     if not stock_entry_doc.items or not stock_entry_doc.items[0].material_request:
