@@ -177,6 +177,12 @@ class CheckingTheInvoice(Document):
                 "warehouse": vendor_warehouse or orig.warehouse
             })
 
+        
+        # Set missing values (like currency, income accounts, etc.)
+        credit.set_missing_values()
+        # Calculate taxes and totals so grand_total is not None
+        credit.calculate_taxes_and_totals()
+
         credit.flags.ignore_permissions = True
         credit.insert()
         credit.submit()
@@ -221,6 +227,11 @@ class CheckingTheInvoice(Document):
                 "rate": orig.rate,
                 "warehouse": vendor_warehouse or orig.warehouse
             })
+        
+        # Set missing values (like currency, income accounts, etc.)
+        inv.set_missing_values()
+        # Calculate taxes and totals so grand_total is not None
+        inv.calculate_taxes_and_totals()
 
         inv.flags.ignore_permissions = True
         inv.insert()
