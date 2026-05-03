@@ -19,7 +19,20 @@ class CheckingTheInvoice(Document):
                 (item.qte_4 or 0)
             )
             item.ecart = item.total - (item.qte_facturee or 0)
-
+    def onload(self):
+     if self.workflow_state == "Pending":
+        has_ecart = any((item.ecart or 0) != 0 for item in self.items)
+        
+        if not has_ecart:
+            try:
+                doc = frappe.get_doc("Checking The Invoice", self.name)
+                frappe.model.workflow.apply_workflow(doc, "Approve")
+                frappe.db.commit()
+                frappe.msgprint("✅ Aucun écart détecté. Approbation automatique.", indicator="green", alert=True)
+                self.workflow_state = "Approved"
+            except Exception as e:
+                frappe.log_error(str(e), "Auto Approve Failed - onload")
+            
 
     def on_submit(self):
         """Création des documents d'ajustement côté vendeur uniquement"""

@@ -138,11 +138,11 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-02-04 21:47:48.928859",
+ "modified": "2026-04-30 13:30:12.466921",
  "modified_by": "Administrator",
  "module": "POS AR",
  "name": "Checking The Invoice",
- "naming_rule": "Expression",
+ "naming_rule": "Expression (old style)",
  "owner": "Administrator",
  "permissions": [
   {
