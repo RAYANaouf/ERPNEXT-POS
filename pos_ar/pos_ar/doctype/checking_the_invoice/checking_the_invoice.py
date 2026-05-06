@@ -28,7 +28,7 @@ class CheckingTheInvoice(Document):
                 doc = frappe.get_doc("Checking The Invoice", self.name)
                 frappe.model.workflow.apply_workflow(doc, "Approve")
                 frappe.db.commit()
-                frappe.msgprint("✅ Aucun écart détecté. Approbation automatique.", indicator="green", alert=True)
+                frappe.msgprint(" Aucun écart détecté. Approbation automatique.", indicator="green", alert=True)
                 self.workflow_state = "Approved"
             except Exception as e:
                 frappe.log_error(str(e), "Auto Approve Failed - onload")

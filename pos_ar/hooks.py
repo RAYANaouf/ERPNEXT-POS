@@ -168,8 +168,10 @@ doc_events = {
     "Checking The Invoice": {
         "on_cancel": "pos_ar.api.on_checking_the_invoice_cancel",
     },
-   
+
 }
+   
+
 
 # Scheduled Tasks
 # ---------------
