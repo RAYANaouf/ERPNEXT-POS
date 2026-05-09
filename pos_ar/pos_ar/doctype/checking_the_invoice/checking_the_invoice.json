@@ -13,6 +13,8 @@
   "supplier",
   "supplier_company",
   "items",
+  "client_note",
+  "supplier_note",
   "section_break_c5pf",
   "column_break_dk7x",
   "client_return",
@@ -132,13 +134,23 @@
    "hidden": 1,
    "label": "Supplier Company",
    "read_only": 1
+  },
+  {
+   "fieldname": "client_note",
+   "fieldtype": "Small Text",
+   "label": "Client Note"
+  },
+  {
+   "fieldname": "supplier_note",
+   "fieldtype": "Small Text",
+   "label": "Supplier Note"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-04-30 13:30:12.466921",
+ "modified": "2026-05-09 15:35:22.695470",
  "modified_by": "Administrator",
  "module": "POS AR",
  "name": "Checking The Invoice",

@@ -14,8 +14,9 @@
   "company",
   "section_wrong",
   "wrong_items",
-  "section_true",
+  "column_break_vukj",
   "true_items",
+  "section_true",
   "amended_from",
   "material_issue_ref",
   "material_receipt_ref"
@@ -54,7 +55,7 @@
   {
    "fieldname": "section_wrong",
    "fieldtype": "Section Break",
-   "label": "Wrong Items"
+   "label": "Items"
   },
   {
    "fieldname": "wrong_items",
@@ -64,8 +65,7 @@
   },
   {
    "fieldname": "section_true",
-   "fieldtype": "Section Break",
-   "label": "True Items"
+   "fieldtype": "Section Break"
   },
   {
    "fieldname": "true_items",
@@ -102,13 +102,17 @@
    "fieldtype": "Link",
    "label": "Company",
    "options": "Company"
+  },
+  {
+   "fieldname": "column_break_vukj",
+   "fieldtype": "Column Break"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-05-06 20:07:01.633032",
+ "modified": "2026-05-06 20:38:07.181390",
  "modified_by": "Administrator",
  "module": "POS AR",
  "name": "Stock Correction Report",
