@@ -416,9 +416,16 @@ frappe.pages['testt'].on_page_load = function(wrapper) {
 
         $results.empty();
         if (filtered.length > 0) {
-            filtered.forEach(item => {
-                $results.append(`<div class="dropdown-item" data-val="${item.name}">${item.name} ${item.item_name ? '- ' + item.item_name : ''}</div>`);
+            // Only render first 10 to keep the page smooth
+            filtered.slice(0, 10).forEach(item => {
+                const label = (item.item_name && item.item_name !== item.name) 
+                    ? `${item.name} - ${item.item_name}` 
+                    : item.name;
+                $results.append(`<div class="dropdown-item" data-val="${item.name}">${label}</div>`);
             });
+            if (filtered.length > 10) {
+                $results.append(`<div class="dropdown-item disabled text-muted" style="font-style: italic; pointer-events: none; background: #f8fafc;">Type more to refine ${filtered.length - 10} more results...</div>`);
+            }
             $results.show();
         } else {
             $results.hide();
