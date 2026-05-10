@@ -9,10 +9,11 @@ frappe.pages['testt'].on_page_load = function(wrapper) {
 	$container.empty();
 
 	const table_html = `
-		<div class="testt-wrapper" style="padding: 30px; max-width: 1000px; margin: 0 auto;">
+		<div class="testt-wrapper" style="padding: 20px; width: 100%;">
             <style>
                 .testt-wrapper {
                     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+                    width: 100% !important;
                 }
                 .testt-card {
                     background: #fff;
@@ -283,9 +284,12 @@ frappe.pages['testt'].on_page_load = function(wrapper) {
 	$container.append(table_html);
 
     // --- Multi-Select Logic ---
+    let company_selection = new Set();
+    let warehouse_selection = new Set();
+
     const setupMultiSelect = (type, doctype, defaultVal = null, onChange = null) => {
         let all_data = [];
-        let selected = new Set();
+        let selected = (type === 'company') ? company_selection : warehouse_selection;
         const $wrapper = $(`#${type}-tags-wrapper`);
         const $search = $(`#${type}-search`);
         const $results = $(`#${type}-results`);
@@ -434,9 +438,54 @@ frappe.pages['testt'].on_page_load = function(wrapper) {
 
     $container.on('click', '.item-results .dropdown-item', function() {
         const $item = $(this);
-        const $container = $item.closest('.item-select-container');
-        $container.find('.item-input').val($item.data('val'));
+        const item_code = $item.data('val');
+        const $row = $item.closest('tr');
+        const $input_container = $item.closest('.item-select-container');
+        
+        $input_container.find('.item-input').val(item_code);
         $item.closest('.item-results').hide();
+
+        // Fetch quantities for this item across all selected companies and warehouses
+        const companies = Array.from(company_selection);
+        const warehouses = current_warehouses;
+
+        if (warehouses.length > 0) {
+            // Set loading state
+            $row.find('.qty-input').val('...').css('opacity', '0.5');
+
+            frappe.call({
+                method: "frappe.client.get_list",
+                args: {
+                    doctype: "Bin",
+                    filters: {
+                        item_code: item_code,
+                        warehouse: ["in", warehouses]
+                    },
+                    fields: ["warehouse", "actual_qty"]
+                },
+                callback: (r) => {
+                    $row.find('.qty-input').css('opacity', '1');
+                    const stock_map = {};
+                    if (r.message) {
+                        r.message.forEach(bin => {
+                            stock_map[bin.warehouse] = bin.actual_qty;
+                        });
+                    }
+
+                    // Fulfill the table columns
+                    $row.find('.qty-input').each(function(index) {
+                        const warehouse = warehouses[index];
+                        const qty = stock_map[warehouse] || 0;
+                        $(this).val(qty);
+                        
+                        // Optional: Highlight positive/negative stock
+                        if (qty > 0) $(this).css('color', '#2f855a');
+                        else if (qty < 0) $(this).css('color', '#c53030');
+                        else $(this).css('color', '#718096');
+                    });
+                }
+            });
+        }
     });
 
 	const add_row = () => {
