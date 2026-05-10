@@ -1517,10 +1517,11 @@ def purchase_invoice_permission(doc, ptype, user):
     frappe.log_error(" 5 ======>")
     return False
 
-
-
-
 def purchase_invoice_permission_query_conditions(user):
+
+    # ------------------------
+    # COMPANY RULE
+    # ------------------------
     allowed_companies = frappe.get_all(
         "User Permission",
         filters={
@@ -1531,17 +1532,48 @@ def purchase_invoice_permission_query_conditions(user):
         pluck="for_value"
     )
 
+    company_condition = ""
     if allowed_companies:
-        # Proper SQL-safe joining
-        allowed_companies_str = ", ".join([frappe.db.escape(c) for c in allowed_companies])
-        return f"`tabPurchase Invoice`.`company` IN ({allowed_companies_str})"
-    else:
-        return ""  # User has no restrictions, allow all
+        allowed_companies_str = ", ".join(
+            [frappe.db.escape(c) for c in allowed_companies]
+        )
+        company_condition = f"`tabPurchase Invoice`.company IN ({allowed_companies_str})"
 
+    # ------------------------
+    # EMPLOYEE WAREHOUSE RULE
+    # ------------------------
+    employee = frappe.db.get_value("Employee", {"user_id": user}, "name")
 
+    warehouse_condition = ""
 
+    if employee:
+        warehouses = frappe.get_all(
+            "Employee Warehouse",
+            filters={"parent": employee},
+            pluck="warehouse"
+        )
 
+        if warehouses:
+            wh_list = "', '".join(warehouses)
 
+            warehouse_condition = f"""
+                EXISTS (
+                    SELECT 1
+                    FROM `tabPurchase Invoice Item`
+                    WHERE `tabPurchase Invoice Item`.parent = `tabPurchase Invoice`.name
+                    AND `tabPurchase Invoice Item`.warehouse IN ('{wh_list}')
+                )
+            """
+
+    # ------------------------
+    # COMBINE CONDITIONS
+    # ------------------------
+    conditions = [c for c in [company_condition, warehouse_condition] if c]
+
+    if not conditions:
+        return ""
+
+    return " AND ".join(conditions)
 
 
 ######### stock entry
