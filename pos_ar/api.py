@@ -1581,6 +1581,71 @@ def stock_entry_query(user):
 
 
 
+
+######## Sales Order
+
+
+
+def sales_order_query(user):
+
+    employee = frappe.db.get_value("Employee", {"user_id": user}, "name")
+    if not employee:
+        return "1=1"
+
+    warehouses = frappe.get_all(
+        "Employee Warehouse",
+        filters={"parent": employee},
+        pluck="warehouse"
+    )
+
+    if not warehouses:
+        return "1=1"
+
+    wh_list = "', '".join(warehouses)
+
+    return f"""
+        EXISTS (
+            SELECT 1
+            FROM `tabSales Order Item`
+            WHERE `tabSales Order Item`.parent = `tabSales Order`.name
+            AND `tabSales Order Item`.warehouse IN ('{wh_list}')
+        )
+    """
+
+
+
+
+
+######### Material Request 
+
+
+def material_request_query(user):
+
+    employee = frappe.db.get_value("Employee", {"user_id": user}, "name")
+    if not employee:
+        return "1=1"
+
+    warehouses = frappe.get_all(
+        "Employee Warehouse",
+        filters={"parent": employee},
+        pluck="warehouse"
+    )
+
+    if not warehouses:
+        return "1=1"
+
+    wh_list = "', '".join(warehouses)
+
+    return f"""
+        EXISTS (
+            SELECT 1
+            FROM `tabMaterial Request Item`
+            WHERE `tabMaterial Request Item`.parent = `tabMaterial Request`.name
+            AND `tabMaterial Request Item`.warehouse IN ('{wh_list}')
+        )
+    """
+
+
 ######### customer
 def customer_permission(doc, ptype, user):
 
