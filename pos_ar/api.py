@@ -1642,6 +1642,7 @@ def material_request_query(user):
             FROM `tabMaterial Request Item`
             WHERE `tabMaterial Request Item`.parent = `tabMaterial Request`.name
             AND `tabMaterial Request Item`.warehouse IN ('{wh_list}')
+            AND `tabMaterial Request Item`.from_warehouse IN('{wh_list}')
         )
     """
 
