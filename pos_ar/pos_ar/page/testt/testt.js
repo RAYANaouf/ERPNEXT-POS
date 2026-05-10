@@ -157,6 +157,24 @@ frappe.pages['testt'].on_page_load = function(wrapper) {
                 .stock-table tr:last-child td {
                     border-bottom: none;
                 }
+                .item-select-container {
+                    position: relative;
+                }
+                .item-results {
+                    position: absolute;
+                    top: 100%;
+                    left: 0;
+                    right: 0;
+                    background: white;
+                    border: 1px solid #e2e8f0;
+                    border-radius: 6px;
+                    margin-top: 2px;
+                    max-height: 200px;
+                    overflow-y: auto;
+                    z-index: 1001;
+                    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+                    display: none;
+                }
                 .form-control-custom {
                     width: 100%;
                     padding: 8px 12px;
@@ -369,10 +387,49 @@ frappe.pages['testt'].on_page_load = function(wrapper) {
         updateTableHeaders(warehouses);
     });
 
+    let all_items = [];
+    frappe.call({
+        method: "frappe.client.get_list",
+        args: { doctype: "Item", fields: ["name", "item_name"], limit_page_length: 2000 },
+        callback: (r) => { if (r.message) all_items = r.message; }
+    });
+
     $(document).on('click', (e) => {
         if (!$(e.target).closest('.multi-select-container').length) {
             $('.custom-dropdown').hide();
         }
+        if (!$(e.target).closest('.item-select-container').length) {
+            $('.item-results').hide();
+        }
+    });
+
+    // Item search logic
+    $container.on('focus input', '.item-input', function() {
+        const $input = $(this);
+        const $results = $input.siblings('.item-results');
+        const query = $input.val().toLowerCase();
+        
+        const filtered = all_items.filter(i => 
+            i.name.toLowerCase().includes(query) || 
+            (i.item_name && i.item_name.toLowerCase().includes(query))
+        ).slice(0, 50);
+
+        $results.empty();
+        if (filtered.length > 0) {
+            filtered.forEach(item => {
+                $results.append(`<div class="dropdown-item" data-val="${item.name}">${item.name} ${item.item_name ? '- ' + item.item_name : ''}</div>`);
+            });
+            $results.show();
+        } else {
+            $results.hide();
+        }
+    });
+
+    $container.on('click', '.item-results .dropdown-item', function() {
+        const $item = $(this);
+        const $container = $item.closest('.item-select-container');
+        $container.find('.item-input').val($item.data('val'));
+        $item.closest('.item-results').hide();
     });
 
 	const add_row = () => {
@@ -383,7 +440,12 @@ frappe.pages['testt'].on_page_load = function(wrapper) {
 
 		const row_html = `
 			<tr>
-				<td><input type="text" class="form-control-custom item-input" placeholder="e.g. Spare Parts"></td>
+				<td>
+                    <div class="item-select-container">
+                        <input type="text" class="form-control-custom item-input" placeholder="Search item...">
+                        <div class="item-results"></div>
+                    </div>
+                </td>
 				${warehouse_cols}
 				<td><button class="btn-remove remove-row"><i class="fa fa-trash"></i></button></td>
 			</tr>
