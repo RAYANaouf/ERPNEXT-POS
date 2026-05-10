@@ -1615,6 +1615,102 @@ def sales_order_query(user):
 
 
 
+######### Sales Invoice
+
+
+def sales_invoice_query(user):
+
+    employee = frappe.db.get_value("Employee", {"user_id": user}, "name")
+    if not employee:
+        return "1=1"
+
+    warehouses = frappe.get_all(
+        "Employee Warehouse",
+        filters={"parent": employee},
+        pluck="warehouse"
+    )
+
+    if not warehouses:
+        return "1=1"
+
+    wh_list = "', '".join(warehouses)
+
+    return f"""
+        EXISTS (
+            SELECT 1
+            FROM `tabSales Invoice Item`
+            WHERE `tabSales Invoice Item`.parent = `tabSales Invoice`.name
+            AND `tabSales Invoice Item`.warehouse IN ('{wh_list}')
+        )
+    """
+
+
+######### Purchase Order
+
+def purchase_order_query(user):
+
+    employee = frappe.db.get_value("Employee", {"user_id": user}, "name")
+    if not employee:
+        return "1=1"
+
+    warehouses = frappe.get_all(
+        "Employee Warehouse",
+        filters={"parent": employee},
+        pluck="warehouse"
+    )
+
+    if not warehouses:
+        return "1=1"
+
+    wh_list = "', '".join(warehouses)
+
+    return f"""
+        EXISTS (
+            SELECT 1
+            FROM `tabPurchase Order Item`
+            WHERE `tabPurchase Order Item`.parent = `tabPurchase Order`.name
+            AND `tabPurchase Order Item`.warehouse IN ('{wh_list}')
+        )
+    """
+
+
+
+
+######### Purchase Invoice
+
+def purchase_invoice_query(user):
+
+    employee = frappe.db.get_value("Employee", {"user_id": user}, "name")
+    if not employee:
+        return "1=1"
+
+    warehouses = frappe.get_all(
+        "Employee Warehouse",
+        filters={"parent": employee},
+        pluck="warehouse"
+    )
+
+    if not warehouses:
+        return "1=1"
+
+    wh_list = "', '".join(warehouses)
+
+    return f"""
+        EXISTS (
+            SELECT 1
+            FROM `tabPurchase Invoice Item`
+            WHERE `tabPurchase Invoice Item`.parent = `tabPurchase Invoice`.name
+            AND `tabPurchase Invoice Item`.warehouse IN ('{wh_list}')
+        )
+    """
+
+
+
+
+
+
+
+
 
 ######### Material Request 
 
@@ -1645,6 +1741,10 @@ def material_request_query(user):
             AND `tabMaterial Request Item`.from_warehouse IN('{wh_list}')
         )
     """
+
+
+
+
 
 
 ######### customer
