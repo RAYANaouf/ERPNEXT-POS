@@ -1714,7 +1714,6 @@ def purchase_invoice_query(user):
 
 ######### Material Request 
 
-
 def material_request_query(user):
 
     employee = frappe.db.get_value("Employee", {"user_id": user}, "name")
@@ -1730,20 +1729,28 @@ def material_request_query(user):
     if not warehouses:
         return "1=1"
 
-    wh_list = "', '".join(warehouses)
+    # SAFE SQL formatting
+    wh_tuple = tuple(warehouses)
+
+    # handle single value edge case
+    if len(wh_tuple) == 1:
+        wh_tuple = f"('{wh_tuple[0]}')"
+    else:
+        wh_tuple = str(wh_tuple)
 
     return f"""
         EXISTS (
             SELECT 1
-            FROM `tabMaterial Request Item`
-            WHERE `tabMaterial Request Item`.parent = `tabMaterial Request`.name
-            AND `tabMaterial Request Item`.warehouse IN ('{wh_list}')
-            AND `tabMaterial Request Item`.from_warehouse IN('{wh_list}')
+            FROM `tabMaterial Request Item` child
+            WHERE child.parent = `tabMaterial Request`.name
+            AND (
+                COALESCE(child.warehouse, '') IN {wh_tuple}
+                OR COALESCE(child.from_warehouse, '') IN {wh_tuple}
+                OR COALESCE(`tabMaterial Request`.set_warehouse, '') IN {wh_tuple}
+                OR COALESCE(`tabMaterial Request`.set_from_warehouse, '') IN {wh_tuple}
+            )
         )
     """
-
-
-
 
 
 
