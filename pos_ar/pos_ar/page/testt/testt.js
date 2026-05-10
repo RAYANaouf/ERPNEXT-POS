@@ -390,7 +390,7 @@ frappe.pages['testt'].on_page_load = function(wrapper) {
     let all_items = [];
     frappe.call({
         method: "frappe.client.get_list",
-        args: { doctype: "Item", fields: ["name", "item_name"], limit_page_length: 2000 },
+        args: { doctype: "Item", fields: ["name", "item_name"], limit_page_length: 5000 },
         callback: (r) => { if (r.message) all_items = r.message; }
     });
 
@@ -412,7 +412,7 @@ frappe.pages['testt'].on_page_load = function(wrapper) {
         const filtered = all_items.filter(i => 
             i.name.toLowerCase().includes(query) || 
             (i.item_name && i.item_name.toLowerCase().includes(query))
-        ).slice(0, 50);
+        );
 
         $results.empty();
         if (filtered.length > 0) {
