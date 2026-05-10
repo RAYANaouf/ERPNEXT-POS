@@ -171,6 +171,12 @@ frappe.pages['testt'].on_page_load = function(wrapper) {
                     border-color: #4299e1;
                     box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.1);
                 }
+                .form-control-custom[readonly] {
+                    background-color: #f8fafc;
+                    color: #718096;
+                    cursor: not-allowed;
+                    border-color: #edf2f7;
+                }
                 .btn-add-row {
                     display: inline-flex;
                     align-items: center;
@@ -372,7 +378,7 @@ frappe.pages['testt'].on_page_load = function(wrapper) {
 	const add_row = () => {
 		let warehouse_cols = '';
         current_warehouses.forEach(w => {
-            warehouse_cols += `<td><input type="number" class="form-control-custom qty-input" value="0"></td>`;
+            warehouse_cols += `<td><input type="number" class="form-control-custom qty-input" value="0" readonly></td>`;
         });
 
 		const row_html = `
