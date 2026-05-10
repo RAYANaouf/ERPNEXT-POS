@@ -8298,5 +8298,40 @@
       }
     }
   };
+
+  // ../pos_ar/pos_ar/pos_ar/page/testt/TestController.js
+  frappe.provide("pos_ar.testt");
+  pos_ar.testt.TestController = class {
+    constructor(wrapper) {
+      this.wrapper = $(wrapper).find(".layout-main-section");
+      this.make();
+    }
+    make() {
+      this.createLayout();
+    }
+    createLayout() {
+      const container = $(`<div class="testt-container" style="padding: 20px;">
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover">
+                    <thead class="thead-light">
+                        <tr>
+                            <th>Item</th>
+                            <th>Qty Alger</th>
+                            <th>Qty level -1</th>
+                            <th>Qty BEK</th>
+                            <th>Qty CA</th>
+                        </tr>
+                    </thead>
+                    <tbody id="testt-table-body">
+                        <!-- Data will be loaded here -->
+                        <tr>
+                            <td colspan="5" class="text-center text-muted">No data loaded yet...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>`).appendTo(this.wrapper);
+    }
+  };
 })();
-//# sourceMappingURL=pos.bundle.ZNI4JYHC.js.map
+//# sourceMappingURL=pos.bundle.UOLT6Y6T.js.map
