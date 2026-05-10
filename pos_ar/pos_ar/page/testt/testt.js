@@ -9,18 +9,28 @@ frappe.pages['testt'].on_page_load = function(wrapper) {
 	$container.empty();
 
 	const table_html = `
-		<div class="testt-wrapper" style="padding: 20px; width: 100%;">
+		<div class="testt-wrapper">
             <style>
+                body[data-route="testt"] .main-section .sticky-top,
+                body[data-route="testt"] .page-head-flex .container {
+                    display: none !important;
+                }
                 .testt-wrapper {
                     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-                    width: 100% !important;
                 }
                 .testt-card {
                     background: #fff;
-                    border: 1px solid #ebeff2;
-                    border-radius: 8px;
-                    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
-                    padding: 24px;
+                    position: absolute !important;
+                    top: 0 !important;
+                    left: 0 !important;
+                    width: 100vw !important;
+                    min-height: 100vh !important;
+                    z-index: 1000 !important;
+                    padding: 40px !important;
+                    overflow-y: auto !important;
+                    border: none !important;
+                    border-radius: 0 !important;
+                    box-shadow: none !important;
                 }
                 .testt-header {
                     display: flex;
@@ -286,6 +296,7 @@ frappe.pages['testt'].on_page_load = function(wrapper) {
     // --- Multi-Select Logic ---
     let company_selection = new Set();
     let warehouse_selection = new Set();
+    let warehouse_cache = []; // Store all warehouses to filter locally
 
     const setupMultiSelect = (type, doctype, defaultVal = null, onChange = null) => {
         let all_data = [];
@@ -313,7 +324,17 @@ frappe.pages['testt'].on_page_load = function(wrapper) {
 
         const filter_results = (query) => {
             $results.empty();
-            const filtered = all_data.filter(v => v.toLowerCase().includes(query.toLowerCase()));
+            let data_to_filter = all_data;
+
+            // SPECIAL LOGIC: Filter warehouses based on selected companies
+            if (type === 'warehouse' && company_selection.size > 0) {
+                const companies = Array.from(company_selection);
+                data_to_filter = warehouse_cache
+                    .filter(w => companies.includes(w.company))
+                    .map(w => w.name);
+            }
+
+            const filtered = data_to_filter.filter(v => v.toLowerCase().includes(query.toLowerCase()));
             if (filtered.length > 0) {
                 filtered.forEach(val => {
                     const is_selected = selected.has(val);
@@ -329,19 +350,32 @@ frappe.pages['testt'].on_page_load = function(wrapper) {
             }
         };
 
-        frappe.call({
-            method: "frappe.client.get_list",
-            args: { doctype, fields: ["name"], limit_page_length: 500 },
-            callback: (r) => {
-                if (r.message) {
-                    all_data = r.message.map(d => d.name);
-                    if (defaultVal) {
-                        selected.add(defaultVal);
-                        render_tags();
+        const load_data = () => {
+            let call_args = { doctype, fields: ["name"], limit_page_length: 500 };
+            if (type === 'warehouse') call_args.fields.push("company");
+
+            frappe.call({
+                method: "frappe.client.get_list",
+                args: call_args,
+                callback: (r) => {
+                    if (r.message) {
+                        if (type === 'warehouse') {
+                            warehouse_cache = r.message;
+                            all_data = r.message.map(d => d.name);
+                        } else {
+                            all_data = r.message.map(d => d.name);
+                        }
+
+                        if (defaultVal) {
+                            selected.add(defaultVal);
+                            render_tags();
+                        }
                     }
                 }
-            }
-        });
+            });
+        };
+
+        load_data();
 
         $search.on('focus input', function() { filter_results($(this).val()); });
         $results.on('click', '.dropdown-item', function() {
@@ -355,10 +389,14 @@ frappe.pages['testt'].on_page_load = function(wrapper) {
         });
         $wrapper.on('click', '.tag-remove', function(e) {
             e.stopPropagation();
-            selected.delete($(this).parent().data('val'));
+            const val = $(this).parent().data('val');
+            selected.delete(val);
             render_tags();
         });
         $wrapper.on('click', () => $search.focus());
+
+        // Return a way to trigger filtering from outside
+        return { filter_results, render_tags, selected };
     };
 
     let current_warehouses = [];
@@ -374,21 +412,28 @@ frappe.pages['testt'].on_page_load = function(wrapper) {
         $head.append('<th style="width: 48px;"></th>');
         
         // Refresh rows to match new columns
-        const $rows = $('#stock-table-body tr');
-        if ($rows.length === 0) {
-            add_row();
-        } else {
-            // This is a simple implementation that clears rows on column change
-            // to avoid data misalignment. 
-            $('#stock-table-body').empty();
-            add_row();
-        }
+        $('#stock-table-body').empty();
+        add_row();
     };
 
     // Initialize Multi-selects
-    setupMultiSelect('company', 'Company', frappe.defaults.get_user_default('company'));
-    setupMultiSelect('warehouse', 'Warehouse', null, (warehouses) => {
+    const warehouse_control = setupMultiSelect('warehouse', 'Warehouse', null, (warehouses) => {
         updateTableHeaders(warehouses);
+    });
+
+    setupMultiSelect('company', 'Company', frappe.defaults.get_user_default('company'), (companies) => {
+        // When companies change, we need to:
+        // 1. Remove selected warehouses that don't belong to these companies
+        if (companies.length > 0) {
+            warehouse_selection.forEach(w_name => {
+                const w_data = warehouse_cache.find(w => w.name === w_name);
+                if (w_data && !companies.includes(w_data.company)) {
+                    warehouse_selection.delete(w_name);
+                }
+            });
+        }
+        // 2. Refresh warehouse tags and table
+        warehouse_control.render_tags();
     });
 
     let all_items = [];
