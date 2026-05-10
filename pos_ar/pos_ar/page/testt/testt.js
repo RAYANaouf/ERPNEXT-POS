@@ -61,6 +61,7 @@ frappe.pages['testt'].on_page_load = function(wrapper) {
                     min-height: 42px;
                     cursor: text;
                     transition: all 0.2s;
+                    margin-bottom: 4px;
                 }
                 .tags-input-wrapper:focus-within {
                     border-color: #4299e1;
@@ -100,7 +101,7 @@ frappe.pages['testt'].on_page_load = function(wrapper) {
                     min-width: 150px;
                     font-size: 0.875rem;
                 }
-                .company-dropdown {
+                .custom-dropdown {
                     position: absolute;
                     top: 100%;
                     left: 0;
@@ -212,34 +213,37 @@ frappe.pages['testt'].on_page_load = function(wrapper) {
                     <h2 class="testt-title">Inventory Quantities</h2>
                 </div>
 
-                <div class="filter-section">
-                    <div style="display: flex; flex-direction: column; gap: 4px; width: 100%;">
+                <div class="filter-section" style="flex-wrap: wrap;">
+                    <div style="flex: 1; min-width: 300px;">
                         <span class="filter-label">Companies</span>
                         <div class="multi-select-container">
-                            <div class="tags-input-wrapper" id="tags-wrapper">
-                                <input type="text" class="search-input" id="company-search" placeholder="Type to search companies...">
+                            <div class="tags-input-wrapper" id="company-tags-wrapper">
+                                <input type="text" class="search-input" id="company-search" placeholder="Search companies...">
                             </div>
-                            <div class="company-dropdown" id="company-results">
-                                <!-- Search results will appear here -->
+                            <div class="custom-dropdown" id="company-results"></div>
+                        </div>
+                    </div>
+                    <div style="flex: 1; min-width: 300px;">
+                        <span class="filter-label">Warehouses</span>
+                        <div class="multi-select-container">
+                            <div class="tags-input-wrapper" id="warehouse-tags-wrapper">
+                                <input type="text" class="search-input" id="warehouse-search" placeholder="Search warehouses...">
                             </div>
+                            <div class="custom-dropdown" id="warehouse-results"></div>
                         </div>
                     </div>
                 </div>
 
                 <table class="stock-table" id="stock-table">
-                    <thead>
+                    <thead id="stock-table-head">
                         <tr>
                             <th>Item Name</th>
-                            <th style="width: 200px;">Quantity</th>
+                            <!-- Warehouse columns will appear here -->
                             <th style="width: 48px;"></th>
                         </tr>
                     </thead>
                     <tbody id="stock-table-body">
-                        <tr>
-                            <td><input type="text" class="form-control-custom item-input" placeholder="e.g. Spare Parts"></td>
-                            <td><input type="number" class="form-control-custom qty-input" value="0"></td>
-                            <td><button class="btn-remove remove-row"><i class="fa fa-trash"></i></button></td>
-                        </tr>
+                        <!-- Rows will be rendered here -->
                     </tbody>
                 </table>
 
@@ -254,135 +258,127 @@ frappe.pages['testt'].on_page_load = function(wrapper) {
 
 	$container.append(table_html);
 
-    let all_companies = [];
-    let selected_companies = new Set();
+    // --- Multi-Select Logic ---
+    const setupMultiSelect = (type, doctype, defaultVal = null, onChange = null) => {
+        let all_data = [];
+        let selected = new Set();
+        const $wrapper = $(`#${type}-tags-wrapper`);
+        const $search = $(`#${type}-search`);
+        const $results = $(`#${type}-results`);
 
-    const render_tags = () => {
-        const $wrapper = $('#tags-wrapper');
-        $wrapper.find('.tag').remove();
-        
-        selected_companies.forEach(company => {
-            const tag = $(`
-                <div class="tag" data-company="${company}">
-                    ${company}
-                    <span class="tag-remove"><i class="fa fa-times"></i></span>
-                </div>
-            `);
-            tag.insertBefore('#company-search');
-        });
-
-        // Update selected state in dropdown
-        $('#company-results .dropdown-item').each(function() {
-            const company = $(this).data('company');
-            $(this).toggleClass('selected', selected_companies.has(company));
-        });
-    };
-
-    const filter_results = (query) => {
-        const $results = $('#company-results');
-        $results.empty();
-        
-        const filtered = all_companies.filter(c => 
-            c.toLowerCase().includes(query.toLowerCase())
-        );
-
-        if (filtered.length > 0) {
-            filtered.forEach(company => {
-                const is_selected = selected_companies.has(company);
-                $results.append(`
-                    <div class="dropdown-item ${is_selected ? 'selected' : ''}" data-company="${company}">
-                        ${company} ${is_selected ? '<i class="fa fa-check pull-right" style="margin-top: 3px;"></i>' : ''}
+        const render_tags = () => {
+            $wrapper.find('.tag').remove();
+            selected.forEach(val => {
+                const tag = $(`
+                    <div class="tag" data-val="${val}">
+                        ${val}
+                        <span class="tag-remove"><i class="fa fa-times"></i></span>
                     </div>
                 `);
+                tag.insertBefore($search);
             });
-            $results.show();
+            $results.find('.dropdown-item').each(function() {
+                $(this).toggleClass('selected', selected.has($(this).data('val')));
+            });
+            if (onChange) onChange(Array.from(selected));
+        };
+
+        const filter_results = (query) => {
+            $results.empty();
+            const filtered = all_data.filter(v => v.toLowerCase().includes(query.toLowerCase()));
+            if (filtered.length > 0) {
+                filtered.forEach(val => {
+                    const is_selected = selected.has(val);
+                    $results.append(`
+                        <div class="dropdown-item ${is_selected ? 'selected' : ''}" data-val="${val}">
+                            ${val} ${is_selected ? '<i class="fa fa-check pull-right" style="margin-top: 3px;"></i>' : ''}
+                        </div>
+                    `);
+                });
+                $results.show();
+            } else {
+                $results.hide();
+            }
+        };
+
+        frappe.call({
+            method: "frappe.client.get_list",
+            args: { doctype, fields: ["name"], limit_page_length: 500 },
+            callback: (r) => {
+                if (r.message) {
+                    all_data = r.message.map(d => d.name);
+                    if (defaultVal) {
+                        selected.add(defaultVal);
+                        render_tags();
+                    }
+                }
+            }
+        });
+
+        $search.on('focus input', function() { filter_results($(this).val()); });
+        $results.on('click', '.dropdown-item', function() {
+            const val = $(this).data('val');
+            if (!selected.has(val)) {
+                selected.add(val);
+                $search.val('').focus();
+                filter_results('');
+                render_tags();
+            }
+        });
+        $wrapper.on('click', '.tag-remove', function(e) {
+            e.stopPropagation();
+            selected.delete($(this).parent().data('val'));
+            render_tags();
+        });
+        $wrapper.on('click', () => $search.focus());
+    };
+
+    let current_warehouses = [];
+
+    const updateTableHeaders = (warehouses) => {
+        current_warehouses = warehouses;
+        const $head = $('#stock-table-head tr');
+        $head.empty();
+        $head.append('<th>Item Name</th>');
+        warehouses.forEach(w => {
+            $head.append(`<th style="min-width: 120px;">${w}</th>`);
+        });
+        $head.append('<th style="width: 48px;"></th>');
+        
+        // Refresh rows to match new columns
+        const $rows = $('#stock-table-body tr');
+        if ($rows.length === 0) {
+            add_row();
         } else {
-            $results.hide();
+            // This is a simple implementation that clears rows on column change
+            // to avoid data misalignment. 
+            $('#stock-table-body').empty();
+            add_row();
         }
     };
 
-    // Fetch companies for validation
-    frappe.call({
-        method: "frappe.client.get_list",
-        args: {
-            doctype: "Company",
-            fields: ["name"],
-            limit_page_length: 500
-        },
-        callback: (r) => {
-            if (r.message) {
-                all_companies = r.message.map(c => c.name);
-                // Set default
-                const default_company = frappe.defaults.get_user_default('company');
-                if (default_company) {
-                    selected_companies.add(default_company);
-                    render_tags();
-                }
-            }
-        }
-    });
-
-    // Search behavior
-    $('#company-search').on('focus input', function() {
-        filter_results($(this).val());
+    // Initialize Multi-selects
+    setupMultiSelect('company', 'Company', frappe.defaults.get_user_default('company'));
+    setupMultiSelect('warehouse', 'Warehouse', null, (warehouses) => {
+        updateTableHeaders(warehouses);
     });
 
     $(document).on('click', (e) => {
         if (!$(e.target).closest('.multi-select-container').length) {
-            $('#company-results').hide();
+            $('.custom-dropdown').hide();
         }
-    });
-
-    $('#company-results').on('click', '.dropdown-item', function() {
-        const company = $(this).data('company');
-        if (!selected_companies.has(company)) {
-            selected_companies.add(company);
-            $('#company-search').val('').focus();
-            filter_results('');
-            render_tags();
-        }
-    });
-
-    // Handle adding company via Enter key
-    $('#company-search').on('keydown', function(e) {
-        if (e.key === 'Enter') {
-            const value = $(this).val().trim();
-            if (!value) return;
-
-            // Find exact match (case-insensitive)
-            const matched_company = all_companies.find(c => c.toLowerCase() === value.toLowerCase());
-
-            if (matched_company) {
-                if (!selected_companies.has(matched_company)) {
-                    selected_companies.add(matched_company);
-                    $(this).val('');
-                    render_tags();
-                } else {
-                    frappe.show_alert({message: __('Company already added'), indicator: 'orange'});
-                    $(this).val('');
-                }
-            } else {
-                frappe.show_alert({message: __('Invalid Company Name'), indicator: 'red'});
-            }
-        }
-    });
-
-    $('#tags-wrapper').on('click', '.tag-remove', function(e) {
-        e.stopPropagation();
-        const company = $(this).parent().data('company');
-        selected_companies.delete(company);
-        render_tags();
-    });
-
-    $('#tags-wrapper').on('click', () => {
-        $('#company-search').focus();
     });
 
 	const add_row = () => {
+		let warehouse_cols = '';
+        current_warehouses.forEach(w => {
+            warehouse_cols += `<td><input type="number" class="form-control-custom qty-input" value="0"></td>`;
+        });
+
 		const row_html = `
 			<tr>
 				<td><input type="text" class="form-control-custom item-input" placeholder="e.g. Spare Parts"></td>
-				<td><input type="number" class="form-control-custom qty-input" value="0"></td>
+				${warehouse_cols}
 				<td><button class="btn-remove remove-row"><i class="fa fa-trash"></i></button></td>
 			</tr>
 		`;
