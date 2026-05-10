@@ -108,7 +108,8 @@ permission_query_conditions = {
     "Purchase Invoice"     : "pos_ar.api.purchase_invoice_permission_query_conditions",
     "Customer"             : "pos_ar.api.customer_permission_query_conditions",
     "Supplier"             : "pos_ar.api.supplier_permission_query_conditions",
-    "Checking The Invoice" : "pos_ar.api.checking_the_invoice_permission_query_conditions"
+    "Checking The Invoice" : "pos_ar.api.checking_the_invoice_permission_query_conditions",
+    "Stock Entry"          : "pos_ar.api.stock_entry_query"
 }
 #
 

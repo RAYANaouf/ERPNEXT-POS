@@ -1544,6 +1544,43 @@ def purchase_invoice_permission_query_conditions(user):
 
 
 
+######### stock entry
+
+
+def stock_entry_query(user):
+    if "System Manager" in frappe.get_roles(user):
+        return ""
+
+    employee = frappe.db.get_value("Employee", {"user_id": user}, "name")
+    if not employee:
+        return "1=1"
+
+    warehouses = frappe.get_all(
+        "Employee Warehouse",
+        filters={"parent": employee},
+        pluck="warehouse"
+    )
+
+    if not warehouses:
+        return "1=1"
+
+    wh_list = "', '".join(warehouses)
+
+    return f"""
+        EXISTS (
+            SELECT 1
+            FROM `tabStock Entry Detail`
+            WHERE `tabStock Entry Detail`.parent = `tabStock Entry`.name
+            AND (
+                `tabStock Entry Detail`.s_warehouse IN ('{wh_list}')
+                OR `tabStock Entry Detail`.t_warehouse IN ('{wh_list}')
+            )
+        )
+    """
+
+
+
+
 ######### customer
 def customer_permission(doc, ptype, user):
 
