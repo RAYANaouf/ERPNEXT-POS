@@ -224,6 +224,23 @@ frappe.pages['testt'].on_page_load = function(wrapper) {
                     background: #e2e8f0;
                     color: #1e293b;
                 }
+                .btn-export {
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 8px;
+                    padding: 8px 16px;
+                    background: #2f855a;
+                    color: #ffffff;
+                    border: none;
+                    border-radius: 6px;
+                    font-weight: 500;
+                    font-size: 0.875rem;
+                    cursor: pointer;
+                    transition: all 0.2s;
+                }
+                .btn-export:hover {
+                    background: #276749;
+                }
                 .btn-remove {
                     display: flex;
                     align-items: center;
@@ -246,6 +263,9 @@ frappe.pages['testt'].on_page_load = function(wrapper) {
             <div class="testt-card">
                 <div class="testt-header">
                     <h2 class="testt-title">Inventory Quantities</h2>
+                    <button class="btn-export" id="export-btn">
+                        <i class="fa fa-file-excel-o"></i> Export to Excel
+                    </button>
                 </div>
 
                 <div class="filter-section" style="flex-wrap: wrap;">
@@ -558,6 +578,45 @@ frappe.pages['testt'].on_page_load = function(wrapper) {
 	$container.find('#add-row-btn').on('click', () => {
 		add_row();
 	});
+
+    // --- Export Logic ---
+    const exportToExcel = () => {
+        const headers = [];
+        $('#stock-table-head th').each(function(i, th) {
+            const text = $(th).text().trim();
+            if (text) headers.push(text); // Skip the empty/remove column
+        });
+
+        const rows = [headers];
+        $('#stock-table-body tr').each(function() {
+            const rowData = [];
+            $(this).find('td').each(function(i, td) {
+                const $input = $(td).find('input');
+                if ($input.length) {
+                    rowData.push($input.val());
+                }
+            });
+            if (rowData.length > 0) rows.push(rowData);
+        });
+
+        let csvContent = "data:text/csv;charset=utf-8,\uFEFF"; // BOM for Excel
+        rows.forEach(function(rowArray) {
+            let row = rowArray.join(",");
+            csvContent += row + "\r\n";
+        });
+
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", `inventory_quantities_${frappe.datetime.now_datetime()}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    };
+
+    $container.find('#export-btn').on('click', () => {
+        exportToExcel();
+    });
 
 	// Event listener for Remove Row button (using delegation)
 	$container.on('click', '.remove-row', function() {
