@@ -132,9 +132,9 @@ has_permission = {
 # ---------------
 # Override standard doctype classes
 
-# override_doctype_class = {
-# 	"ToDo": "custom_app.overrides.CustomToDo"
-# }
+override_doctype_class = {
+    "Stock Reconciliation": "pos_ar.overrides.custom_stock_reconciliation.CustomStockReconciliation"
+}
 
 # Document Events
 # ---------------
