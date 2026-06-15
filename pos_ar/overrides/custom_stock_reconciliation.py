@@ -1,123 +1,76 @@
 import frappe
-from frappe.utils import cint, flt, rounded
+from frappe.utils import cint, flt
 from erpnext.stock.doctype.stock_reconciliation.stock_reconciliation import StockReconciliation
-
-try:
-    from erpnext.stock.doctype.stock_reconciliation.stock_reconciliation import (
-        EmptyStockReconciliationItemsError,
-    )
-except ImportError:
-    EmptyStockReconciliationItemsError = None
-
-FLOAT_PRECISION = 9
 
 
 class CustomStockReconciliation(StockReconciliation):
-    def validate(self):
-        original_items = [d.as_dict() for d in self.items]
-        exceptions = [frappe.exceptions.ValidationError]
-        
-        if EmptyStockReconciliationItemsError:
-            exceptions.append(EmptyStockReconciliationItemsError)
-
-        try:
-            super().validate()
-        except tuple(exceptions) as e:
-            error_msg = str(e)
-            is_no_change_error = (
-                "None of the items have any change" in error_msg
-                or "EmptyStockReconciliationItemsError" in error_msg
-                or (EmptyStockReconciliationItemsError and isinstance(e, EmptyStockReconciliationItemsError))
-            )
-            
-            if is_no_change_error:
-                self.items = []
-                for item_dict in original_items:
-                    self.append("items", item_dict)
-            else:
-                raise
-
-        if not self.items and original_items:
-            self.items = []
-            for item_dict in original_items:
-                self.append("items", item_dict)
 
     def remove_items_with_no_change(self):
-        pass
+        from erpnext.stock.stock_ledger import get_stock_value_difference
+        from erpnext.stock.utils import get_stock_balance
 
-    def update_stock_ledger(self):
-        if not self.items:
-            return
-            
-        sle_map = self._fetch_sle_map()
-        has_change = any(not self._item_has_no_change(row, sle_map) for row in self.items)
-        
-        if has_change:
-            super().update_stock_ledger()
+        self.difference_amount = 0.0
 
-    def _fetch_sle_map(self):
-        if not self.items:
-            return {}
+        def _process(item):
+            if item.current_serial_and_batch_bundle:
+                bundle_data = frappe.get_all(
+                    "Serial and Batch Bundle",
+                    filters={"name": item.current_serial_and_batch_bundle},
+                    fields=["total_qty as qty", "avg_rate as rate"],
+                )[0]
+                bundle_data.qty = abs(bundle_data.qty)
+                self.calculate_difference_amount(item, bundle_data)
+                return
 
-        values = {
-            "posting_date": self.posting_date,
-            "posting_time": self.posting_time,
-        }
+            result = get_stock_balance(
+                item.item_code,
+                item.warehouse,
+                self.posting_date,
+                self.posting_time,
+                with_valuation_rate=True,
+            )
 
-        pair_conditions = []
-        for i, row in enumerate(self.items):
-            pair_conditions.append(f"(item_code = %(item_{i})s AND warehouse = %(wh_{i})s)")
-            values[f"item_{i}"] = row.item_code
-            values[f"wh_{i}"] = row.warehouse
+            current_qty = flt(result[0]) if isinstance(result, tuple) else flt(result)
+            current_rate = flt(result[1]) if isinstance(result, tuple) and len(result) > 1 else 0.0
 
-        where_clause = " OR ".join(pair_conditions)
+            item_dict = {"qty": current_qty, "rate": current_rate}
 
-        query = f"""
-            SELECT item_code, warehouse, qty_after_transaction, valuation_rate
-            FROM (
-                SELECT 
-                    item_code, 
-                    warehouse, 
-                    qty_after_transaction, 
-                    valuation_rate,
-                    ROW_NUMBER() OVER(
-                        PARTITION BY item_code, warehouse 
-                        ORDER BY posting_date DESC, posting_time DESC, creation DESC
-                    ) as rn
-                FROM `tabStock Ledger Entry`
-                WHERE is_cancelled = 0
-                  AND (
-                      posting_date < %(posting_date)s 
-                      OR (posting_date = %(posting_date)s AND posting_time <= %(posting_time)s)
-                  )
-                  AND ({where_clause})
-            ) AS latest_sle
-            WHERE rn = 1
-        """
+            if (
+                not item_dict.get("qty")
+                and not item.qty
+                and not item.valuation_rate
+                and not item.current_qty
+            ):
+                difference_amount = get_stock_value_difference(
+                    item.item_code, item.warehouse, self.posting_date, self.posting_time, self.name
+                )
+                if abs(difference_amount) > 0:
+                    self.difference_amount += difference_amount
+                return
 
-        rows = frappe.db.sql(query, values, as_dict=True)
+            if item.qty is None:
+                item.qty = item_dict.get("qty")
 
-        return {
-            (r.item_code, r.warehouse): {
-                "qty": flt(r.qty_after_transaction),
-                "rate": flt(r.valuation_rate),
-            }
-            for r in rows
-        }
+            if item.valuation_rate is None:
+                item.valuation_rate = item_dict.get("rate")
 
-    def _item_has_no_change(self, row, sle_map):
-        entry = sle_map.get((row.item_code, row.warehouse))
-        
-        if not entry:
-            return flt(row.qty) == 0.0 and (flt(row.valuation_rate) == 0.0 or not row.valuation_rate)
+            item.current_qty = item_dict.get("qty")
+            item.current_valuation_rate = item_dict.get("rate")
 
-        qty_unchanged = rounded(flt(row.qty), FLOAT_PRECISION) == rounded(entry["qty"], FLOAT_PRECISION)
-        rate_unchanged = (
-            rounded(flt(row.valuation_rate), FLOAT_PRECISION) == rounded(entry["rate"], FLOAT_PRECISION)
-            or not row.valuation_rate
-        )
-        
-        return qty_unchanged and rate_unchanged
+            self.calculate_difference_amount(item, item_dict)
+
+        for item in self.items:
+            _process(item)
+
+    def validate(self):
+        try:
+            super().validate()
+        except frappe.ValidationError as e:
+            if "None of the items have any change" in str(e):
+                if frappe.message_log:
+                    frappe.message_log.pop()
+            else:
+                raise
 
     def get_parent_document_name(self):
         return frappe.db.get_value(
@@ -126,10 +79,16 @@ class CustomStockReconciliation(StockReconciliation):
             "name",
         )
 
-    def before_submit(self):
-        pass
-
     def on_submit(self):
+        try:
+            super().on_submit()
+        except frappe.ValidationError as e:
+            if "No stock ledger entries were created" in str(e):
+                if frappe.message_log:
+                    frappe.message_log.pop()
+            else:
+                raise
+
         if self.flags.get("is_zero_out_child_process") or self.get_parent_document_name():
             return
 
@@ -153,7 +112,7 @@ class CustomStockReconciliation(StockReconciliation):
 
         frappe.throw(
             f"<b>Action Blocked</b><br><br>"
-            f"This zero-out document is managed automatically. You cannot cancel it directly.<br>"
+            f"This zero-out document is managed automatically and cannot be cancelled directly.<br>"
             f"Please navigate to the parent document "
             f"<a href='/app/stock-reconciliation/{parent_name}'><b>{parent_name}</b></a> "
             f"and cancel it there to trigger the cascade cancellation.",
@@ -162,7 +121,7 @@ class CustomStockReconciliation(StockReconciliation):
 
     def on_cancel(self):
         linked_doc_name = self.get("custom_zero_out_document")
-        
+
         if linked_doc_name:
             if cint(frappe.db.get_value("Stock Reconciliation", linked_doc_name, "docstatus")) == 1:
                 linked_doc = frappe.get_doc("Stock Reconciliation", linked_doc_name)
@@ -177,18 +136,17 @@ class CustomStockReconciliation(StockReconciliation):
                 except Exception as e:
                     frappe.throw(f"Failed to cancel linked document <b>{linked_doc_name}</b>: {e}")
                 finally:
-                    if hasattr(frappe.flags, "allow_child_reconciliation_cancel"):
-                        del frappe.flags.allow_child_reconciliation_cancel
+                    frappe.flags.pop("allow_child_reconciliation_cancel", None)
 
         super().on_cancel()
 
     def _zero_out_unlisted_items(self):
         default_warehouse = self.get("set_warehouse")
-        
+
         if not default_warehouse:
             frappe.throw(
-                "Please select a Default Warehouse before submitting.", 
-                title="Missing Warehouse"
+                "Please select a Default Warehouse before submitting.",
+                title="Missing Warehouse",
             )
 
         existing_doc = frappe.db.get_value("Stock Reconciliation", self.name, "custom_zero_out_document")
@@ -204,20 +162,20 @@ class CustomStockReconciliation(StockReconciliation):
         query = """
             SELECT item_code, warehouse, valuation_rate
             FROM (
-                SELECT 
-                    item_code, 
-                    warehouse, 
-                    qty_after_transaction, 
+                SELECT
+                    item_code,
+                    warehouse,
+                    qty_after_transaction,
                     valuation_rate,
                     ROW_NUMBER() OVER(
-                        PARTITION BY item_code 
+                        PARTITION BY item_code, warehouse
                         ORDER BY posting_date DESC, posting_time DESC, creation DESC
                     ) as rn
                 FROM `tabStock Ledger Entry`
                 WHERE warehouse = %(warehouse)s
                   AND is_cancelled = 0
                   AND (
-                      posting_date < %(posting_date)s 
+                      posting_date < %(posting_date)s
                       OR (posting_date = %(posting_date)s AND posting_time <= %(posting_time)s)
                   )
             ) AS latest_sle
@@ -232,7 +190,7 @@ class CustomStockReconciliation(StockReconciliation):
 
         sle_data = frappe.db.sql(query, values, as_dict=True)
         items_to_zero = [row for row in sle_data if row.item_code not in reconciled_items]
-        
+
         if not items_to_zero:
             return
 
