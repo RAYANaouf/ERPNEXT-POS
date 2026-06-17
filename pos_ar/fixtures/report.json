@@ -3,6 +3,492 @@
   "add_total_row": 0,
   "add_translate_data": 0,
   "columns": [],
+  "disabled": 1,
+  "docstatus": 0,
+  "doctype": "Report",
+  "filters": [
+   {
+    "default": "Optilens Alger",
+    "fieldname": "company",
+    "fieldtype": "Link",
+    "label": "Company",
+    "mandatory": 1,
+    "options": "Company",
+    "parent": "Tarif Articles",
+    "parentfield": "filters",
+    "parenttype": "Report",
+    "wildcard_filter": 0
+   },
+   {
+    "default": "Public - Alger",
+    "fieldname": "price_list",
+    "fieldtype": "Link",
+    "label": "Price List",
+    "mandatory": 1,
+    "options": "Price List",
+    "parent": "Tarif Articles",
+    "parentfield": "filters",
+    "parenttype": "Report",
+    "wildcard_filter": 1
+   },
+   {
+    "default": "Tous",
+    "fieldname": "is_empty",
+    "fieldtype": "Select",
+    "label": "Prix null",
+    "mandatory": 1,
+    "options": "Tous\nSans tarif",
+    "parent": "Tarif Articles",
+    "parentfield": "filters",
+    "parenttype": "Report",
+    "wildcard_filter": 0
+   }
+  ],
+  "is_standard": "No",
+  "javascript": null,
+  "json": null,
+  "letter_head": null,
+  "modified": "2025-04-26 15:44:39.922613",
+  "module": "POS AR",
+  "name": "Tarif Articles",
+  "prepared_report": 0,
+  "query": "Select i.item_name, i.brand, ip.price_list_rate, pl.price_list_name, pl.custom_company from tabItem as i\nleft join `tabItem Price` as ip on ip.item_code=i.name\nleft join `tabPrice List` as pl on pl.name=ip.price_list\nwhere \n(pl.custom_company=%(company)s and pl.price_list_name like %(price_list)s and %(is_empty)s=\"Tous\" )\nor pl.custom_company IS NULL",
+  "ref_doctype": "Item",
+  "reference_report": null,
+  "report_name": "Tarif Articles",
+  "report_script": null,
+  "report_type": "Query Report",
+  "roles": [
+   {
+    "parent": "Tarif Articles",
+    "parentfield": "roles",
+    "parenttype": "Report",
+    "role": "Item Manager"
+   },
+   {
+    "parent": "Tarif Articles",
+    "parentfield": "roles",
+    "parenttype": "Report",
+    "role": "Stock Manager"
+   },
+   {
+    "parent": "Tarif Articles",
+    "parentfield": "roles",
+    "parenttype": "Report",
+    "role": "Stock User"
+   },
+   {
+    "parent": "Tarif Articles",
+    "parentfield": "roles",
+    "parenttype": "Report",
+    "role": "Sales User"
+   },
+   {
+    "parent": "Tarif Articles",
+    "parentfield": "roles",
+    "parenttype": "Report",
+    "role": "Purchase User"
+   },
+   {
+    "parent": "Tarif Articles",
+    "parentfield": "roles",
+    "parenttype": "Report",
+    "role": "Maintenance User"
+   },
+   {
+    "parent": "Tarif Articles",
+    "parentfield": "roles",
+    "parenttype": "Report",
+    "role": "Accounts User"
+   },
+   {
+    "parent": "Tarif Articles",
+    "parentfield": "roles",
+    "parenttype": "Report",
+    "role": "Manufacturing User"
+   },
+   {
+    "parent": "Tarif Articles",
+    "parentfield": "roles",
+    "parenttype": "Report",
+    "role": "Desk User"
+   }
+  ],
+  "timeout": 0
+ },
+ {
+  "add_total_row": 1,
+  "add_translate_data": 0,
+  "columns": [],
+  "disabled": 0,
+  "docstatus": 0,
+  "doctype": "Report",
+  "filters": [
+   {
+    "default": null,
+    "fieldname": "start",
+    "fieldtype": "Datetime",
+    "label": "start date/time",
+    "mandatory": 1,
+    "options": null,
+    "parent": "commission Rapport",
+    "parentfield": "filters",
+    "parenttype": "Report",
+    "wildcard_filter": 0
+   },
+   {
+    "default": null,
+    "fieldname": "end",
+    "fieldtype": "Datetime",
+    "label": "end date/time",
+    "mandatory": 1,
+    "options": null,
+    "parent": "commission Rapport",
+    "parentfield": "filters",
+    "parenttype": "Report",
+    "wildcard_filter": 0
+   },
+   {
+    "default": null,
+    "fieldname": "customer",
+    "fieldtype": "Link",
+    "label": "Customer",
+    "mandatory": 1,
+    "options": "Customer",
+    "parent": "commission Rapport",
+    "parentfield": "filters",
+    "parenttype": "Report",
+    "wildcard_filter": 0
+   }
+  ],
+  "is_standard": "No",
+  "javascript": null,
+  "json": null,
+  "letter_head": null,
+  "modified": "2025-12-28 17:50:27.857900",
+  "module": "POS AR",
+  "name": "commission Rapport",
+  "prepared_report": 0,
+  "query": "SELECT\r\n    pos_i.name AS \"Invoice ID:Link/POS Invoice:160\",\r\n    pos_i.posting_date AS \"Date:Date:100\",\r\n    DATE_FORMAT(pos_i.posting_time, '%%H:%%i') AS \"Time:Data:70\",\r\n    pos_i.customer AS \"Customer:Link/Customer:160\",\r\n    pos_i.selling_price_list AS \"Price List:Link/Price List:160\",\r\n    poi.item_code AS \"Item:Link/Item:150\",\r\n    poi.qty AS \"Qty:Float:80\",\r\n    poi.price_list_rate AS \"Price (normal):Currency:120\",\r\n    \r\n    /* Unit commission price from T1 price list (effective on posting_date) */\r\n    (\r\n        SELECT ip.price_list_rate\r\n        FROM `tabItem Price` ip\r\n        WHERE ip.item_code = poi.item_code\r\n          AND ip.price_list = 'T1'\r\n          AND (ip.valid_from IS NULL OR ip.valid_from <= pos_i.posting_date)\r\n        ORDER BY ip.valid_from DESC, ip.modified DESC\r\n        LIMIT 1\r\n    ) AS \"Commission Price (T1):Currency:120\",\r\n\r\n    poi.amount AS \"Amount:Currency:120\",\r\n    /* Total commission amount = unit commission × quantity */\r\n    (\r\n        poi.qty *\r\n        (\r\n            SELECT ip.price_list_rate\r\n            FROM `tabItem Price` ip\r\n            WHERE ip.item_code = poi.item_code\r\n              AND ip.price_list = 'T1'\r\n              AND (ip.valid_from IS NULL OR ip.valid_from <= pos_i.posting_date)\r\n            ORDER BY ip.valid_from DESC, ip.modified DESC\r\n            LIMIT 1\r\n        )\r\n    ) AS \"Commission Amount (T1):Currency:130\"\r\n\r\nFROM `tabPOS Invoice` AS pos_i\r\nJOIN `tabPOS Invoice Item` AS poi\r\n  ON poi.parent = pos_i.name\r\nWHERE pos_i.customer = %(customer)s\r\n  AND pos_i.docstatus = 1   -- only valid (submitted) POS Invoices\r\n  AND pos_i.posting_date >= DATE(%(start)s)\r\n  AND pos_i.posting_date <= DATE(%(end)s)\r\n  AND poi.item_name NOT LIKE '%%DIVER%%' and poi.item_name not like '%%SERVICE%%' and poi.item_name not like '%%achat%%' and poi.item_name not like '%%TRANSPORT%%'\r\nORDER BY pos_i.posting_date DESC, pos_i.posting_time DESC, poi.idx ASC;\r\n",
+  "ref_doctype": "POS Invoice",
+  "reference_report": null,
+  "report_name": "commission Rapport",
+  "report_script": null,
+  "report_type": "Query Report",
+  "roles": [
+   {
+    "parent": "commission Rapport",
+    "parentfield": "roles",
+    "parenttype": "Report",
+    "role": "Accounts Manager"
+   },
+   {
+    "parent": "commission Rapport",
+    "parentfield": "roles",
+    "parenttype": "Report",
+    "role": "Accounts User"
+   },
+   {
+    "parent": "commission Rapport",
+    "parentfield": "roles",
+    "parenttype": "Report",
+    "role": "Sales Manager"
+   }
+  ],
+  "timeout": 0
+ },
+ {
+  "add_total_row": 1,
+  "add_translate_data": 0,
+  "columns": [],
+  "disabled": 0,
+  "docstatus": 0,
+  "doctype": "Report",
+  "filters": [
+   {
+    "default": null,
+    "fieldname": "sales_invoice",
+    "fieldtype": "Link",
+    "label": "Sales Invoice",
+    "mandatory": 1,
+    "options": "Sales Invoice",
+    "parent": "commission Rapport (By Sales Invoice)",
+    "parentfield": "filters",
+    "parenttype": "Report",
+    "wildcard_filter": 0
+   }
+  ],
+  "is_standard": "No",
+  "javascript": null,
+  "json": null,
+  "letter_head": null,
+  "modified": "2026-03-03 14:40:20.175523",
+  "module": "POS AR",
+  "name": "commission Rapport (By Sales Invoice)",
+  "prepared_report": 0,
+  "query": "SELECT\r\n    si.posting_date AS \"Date:Date:100\",\r\n\r\n\r\n    -- option B: price from the invoice selling price list\r\n    ipn.price_list_rate AS \"Price List Rate (Normal):Currency:140\",\r\n\r\n\r\n    -- 10 discount on Amount\r\n    (sii.amount * 0.9) AS \"Amount -10:Currency:130\",\r\n    \r\n    sii.amount AS \"Amount:Currency:120\",\r\n\r\n    si.grand_total AS \"sales invoice:Currency:130\"\r\n    \r\n    \r\nFROM `tabSales Invoice` si\r\nJOIN `tabSales Invoice Item` sii ON sii.parent = si.name\r\n\r\nLEFT JOIN `tabItem Price` ip\r\n    ON ip.item_code = sii.item_code\r\n   AND ip.price_list = 'T1'\r\n   AND (ip.valid_from IS NULL OR ip.valid_from <= si.posting_date)\r\n\r\nLEFT JOIN `tabItem Price` ipn\r\n    ON ipn.item_code = sii.item_code\r\n   AND ipn.price_list = si.selling_price_list\r\n   AND (ipn.valid_from IS NULL OR ipn.valid_from <= si.posting_date)\r\n\r\nWHERE\r\n    si.docstatus = 1\r\n    AND LOWER(sii.item_code) NOT LIKE '%%diver%%'\r\n    AND LOWER(sii.item_code) NOT LIKE '%%achat%%'\r\n    AND LOWER(sii.item_code) NOT LIKE '%%transport%%'\r\n    AND (%(sales_invoice)s IS NULL OR %(sales_invoice)s = '' OR si.name = %(sales_invoice)s)\r\n\r\nORDER BY\r\n    si.posting_date DESC,\r\n    si.posting_time DESC,\r\n    sii.idx ASC;",
+  "ref_doctype": "Sales Invoice",
+  "reference_report": null,
+  "report_name": "commission Rapport (By Sales Invoice)",
+  "report_script": null,
+  "report_type": "Query Report",
+  "roles": [
+   {
+    "parent": "commission Rapport (By Sales Invoice)",
+    "parentfield": "roles",
+    "parenttype": "Report",
+    "role": "Accounts Manager"
+   },
+   {
+    "parent": "commission Rapport (By Sales Invoice)",
+    "parentfield": "roles",
+    "parenttype": "Report",
+    "role": "Sales Manager"
+   },
+   {
+    "parent": "commission Rapport (By Sales Invoice)",
+    "parentfield": "roles",
+    "parenttype": "Report",
+    "role": "Sales Master Manager"
+   }
+  ],
+  "timeout": 0
+ },
+ {
+  "add_total_row": 0,
+  "add_translate_data": 0,
+  "columns": [],
+  "disabled": 0,
+  "docstatus": 0,
+  "doctype": "Report",
+  "filters": [
+   {
+    "default": null,
+    "fieldname": "from_date",
+    "fieldtype": "Date",
+    "label": "Date From",
+    "mandatory": 0,
+    "options": null,
+    "parent": "Customer Payement Tracking",
+    "parentfield": "filters",
+    "parenttype": "Report",
+    "wildcard_filter": 0
+   },
+   {
+    "default": null,
+    "fieldname": "to_date",
+    "fieldtype": "Date",
+    "label": "Date To",
+    "mandatory": 0,
+    "options": null,
+    "parent": "Customer Payement Tracking",
+    "parentfield": "filters",
+    "parenttype": "Report",
+    "wildcard_filter": 0
+   },
+   {
+    "default": "Monthly",
+    "fieldname": "period",
+    "fieldtype": "Select",
+    "label": "Period",
+    "mandatory": 0,
+    "options": "Daily\nWeekly\nMonthly",
+    "parent": "Customer Payement Tracking",
+    "parentfield": "filters",
+    "parenttype": "Report",
+    "wildcard_filter": 0
+   },
+   {
+    "default": null,
+    "fieldname": "customer",
+    "fieldtype": "Link",
+    "label": "Customer",
+    "mandatory": 0,
+    "options": "Customer",
+    "parent": "Customer Payement Tracking",
+    "parentfield": "filters",
+    "parenttype": "Report",
+    "wildcard_filter": 0
+   },
+   {
+    "default": null,
+    "fieldname": "company",
+    "fieldtype": "Link",
+    "label": "company",
+    "mandatory": 1,
+    "options": "Company",
+    "parent": "Customer Payement Tracking",
+    "parentfield": "filters",
+    "parenttype": "Report",
+    "wildcard_filter": 0
+   }
+  ],
+  "is_standard": "No",
+  "javascript": null,
+  "json": null,
+  "letter_head": null,
+  "modified": "2026-04-28 12:57:43.704343",
+  "module": "POS AR",
+  "name": "Customer Payement Tracking",
+  "prepared_report": 0,
+  "query": "SELECT\r\n    CASE\r\n        WHEN %(period)s = 'Daily' THEN DATE(posting_date)\r\n        WHEN %(period)s = 'Weekly' THEN DATE_FORMAT(posting_date, '%%x-W%%v')\r\n        WHEN %(period)s = 'Monthly' THEN DATE_FORMAT(posting_date, '%%Y-%%m')\r\n    END AS \"Period\",\r\n\r\n    company AS \"Company\",\r\n\r\n    party AS \"Customer\",\r\n\r\n    SUM(paid_amount) AS \"Total Paid\"\r\n\r\nFROM\r\n    `tabPayment Entry`\r\n\r\nWHERE\r\n    party_type = 'Customer'\r\n    AND docstatus = 1\r\n\r\n    AND posting_date >= COALESCE(%(from_date)s, '1900-01-01')\r\n    AND posting_date <= COALESCE(%(to_date)s, '2100-12-31')\r\n\r\n    AND company = %(company)s\r\n\r\n    AND (\r\n        %(customer)s IS NULL\r\n        OR %(customer)s = ''\r\n        OR party = %(customer)s\r\n    )\r\n\r\nGROUP BY\r\n    Period, company, party\r\n\r\nORDER BY\r\n    Period DESC",
+  "ref_doctype": "Payment Entry",
+  "reference_report": null,
+  "report_name": "Customer Payement Tracking",
+  "report_script": null,
+  "report_type": "Query Report",
+  "roles": [
+   {
+    "parent": "Customer Payement Tracking",
+    "parentfield": "roles",
+    "parenttype": "Report",
+    "role": "Accounts User"
+   },
+   {
+    "parent": "Customer Payement Tracking",
+    "parentfield": "roles",
+    "parenttype": "Report",
+    "role": "Accounts Manager"
+   }
+  ],
+  "timeout": 0
+ },
+ {
+  "add_total_row": 1,
+  "add_translate_data": 0,
+  "columns": [],
+  "disabled": 0,
+  "docstatus": 0,
+  "doctype": "Report",
+  "filters": [
+   {
+    "default": null,
+    "fieldname": "r_client",
+    "fieldtype": "Link",
+    "label": "Client",
+    "mandatory": 1,
+    "options": "Customer",
+    "parent": "Encaissement par Client",
+    "parentfield": "filters",
+    "parenttype": "Report",
+    "wildcard_filter": 0
+   },
+   {
+    "default": "Today",
+    "fieldname": "r_date",
+    "fieldtype": "Date",
+    "label": "Date",
+    "mandatory": 0,
+    "options": null,
+    "parent": "Encaissement par Client",
+    "parentfield": "filters",
+    "parenttype": "Report",
+    "wildcard_filter": 0
+   }
+  ],
+  "is_standard": "No",
+  "javascript": null,
+  "json": null,
+  "letter_head": null,
+  "modified": "2026-03-19 13:00:59.872300",
+  "module": "POS AR",
+  "name": "Encaissement par Client",
+  "prepared_report": 0,
+  "query": "Select pdv.customer_name as `Nom du client`, sum(pdv.paid_amount) as Montant\nfrom `tabPOS Invoice` as pdv\nwhere pdv.customer_name=%(r_client)s and pdv.posting_date=%(r_date)s and pdv.docstatus=1\nunion\nSelect si.party_name, sum(si.received_amount) as Montant\nfrom `tabPayment Entry` as si \nwhere si.party_name=%(r_client)s and si.posting_date=%(r_date)s and si.docstatus=1",
+  "ref_doctype": "Customer",
+  "reference_report": null,
+  "report_name": "Encaissement par Client",
+  "report_script": null,
+  "report_type": "Query Report",
+  "roles": [
+   {
+    "parent": "Encaissement par Client",
+    "parentfield": "roles",
+    "parenttype": "Report",
+    "role": "Analytics"
+   },
+   {
+    "parent": "Encaissement par Client",
+    "parentfield": "roles",
+    "parenttype": "Report",
+    "role": "Sales User POS"
+   }
+  ],
+  "timeout": 0
+ },
+ {
+  "add_total_row": 0,
+  "add_translate_data": 0,
+  "columns": [],
+  "disabled": 0,
+  "docstatus": 0,
+  "doctype": "Report",
+  "filters": [
+   {
+    "default": null,
+    "fieldname": "company",
+    "fieldtype": "Link",
+    "label": "Company",
+    "mandatory": 0,
+    "options": "Company",
+    "parent": "Negatif Stock",
+    "parentfield": "filters",
+    "parenttype": "Report",
+    "wildcard_filter": 0
+   }
+  ],
+  "is_standard": "Yes",
+  "javascript": null,
+  "json": "{}",
+  "letter_head": null,
+  "modified": "2025-06-11 13:12:02.034448",
+  "module": "POS AR",
+  "name": "Negatif Stock",
+  "prepared_report": 0,
+  "query": null,
+  "ref_doctype": "Item",
+  "reference_report": null,
+  "report_name": "Negatif Stock",
+  "report_script": null,
+  "report_type": "Script Report",
+  "roles": [
+   {
+    "parent": "Negatif Stock",
+    "parentfield": "roles",
+    "parenttype": "Report",
+    "role": "Item Manager"
+   },
+   {
+    "parent": "Negatif Stock",
+    "parentfield": "roles",
+    "parenttype": "Report",
+    "role": "Stock Manager"
+   },
+   {
+    "parent": "Negatif Stock",
+    "parentfield": "roles",
+    "parenttype": "Report",
+    "role": "Stock User"
+   },
+   {
+    "parent": "Negatif Stock",
+    "parentfield": "roles",
+    "parenttype": "Report",
+    "role": "Accounts User"
+   },
+   {
+    "parent": "Negatif Stock",
+    "parentfield": "roles",
+    "parenttype": "Report",
+    "role": "System Manager"
+   }
+  ],
+  "timeout": 0
+ },
+ {
+  "add_total_row": 1,
+  "add_translate_data": 0,
+  "columns": [],
   "disabled": 0,
   "docstatus": 0,
   "doctype": "Report",
@@ -27,7 +513,7 @@
   "modified": "2026-02-18 21:21:34.065247",
   "module": "POS AR",
   "name": "Stock State",
-  "prepared_report": 0,
+  "prepared_report": 1,
   "query": "SELECT \r\n    sle.item_code,\r\n    sle.warehouse,\r\n\r\n    SUM(\r\n        CASE \r\n            WHEN TIMESTAMP(sle.posting_date, sle.posting_time) >\r\n                IFNULL((\r\n                    SELECT TIMESTAMP(z.posting_date, z.posting_time)\r\n                    FROM `tabStock Ledger Entry` z\r\n                    WHERE z.actual_qty = 0\r\n                      AND z.item_code = sle.item_code\r\n                      AND z.warehouse = sle.warehouse\r\n                      AND z.is_cancelled = 0\r\n                    ORDER BY \r\n                        z.posting_date DESC,\r\n                        z.posting_time DESC,\r\n                        z.creation DESC,\r\n                        z.name DESC\r\n                    LIMIT 1\r\n                ), '0000-00-00 00:00:00')\r\n            THEN sle.actual_qty\r\n            ELSE 0\r\n        END\r\n    )\r\n    +\r\n    IFNULL((\r\n        SELECT z.qty_after_transaction\r\n        FROM `tabStock Ledger Entry` z\r\n        WHERE z.actual_qty = 0\r\n          AND z.item_code = sle.item_code\r\n          AND z.warehouse = sle.warehouse\r\n          AND z.is_cancelled = 0\r\n        ORDER BY \r\n            z.posting_date DESC,\r\n            z.posting_time DESC,\r\n            z.creation DESC,\r\n            z.name DESC\r\n        LIMIT 1\r\n    ), 0) AS final_qty\r\n\r\nFROM `tabStock Ledger Entry` sle\r\nWHERE sle.warehouse = %(warehouse)s\r\n  AND sle.is_cancelled = 0\r\nGROUP BY sle.item_code, sle.warehouse;\r\n",
   "ref_doctype": "Stock Ledger Entry",
   "reference_report": null,
@@ -78,7 +564,7 @@
   "modified": "2026-02-18 21:18:18.443314",
   "module": "POS AR",
   "name": "Stock State Lightweight",
-  "prepared_report": 1,
+  "prepared_report": 0,
   "query": "SELECT item_code, warehouse, final_qty\r\nFROM (\r\n    SELECT \r\n        item_code, \r\n        warehouse, \r\n        qty_after_transaction AS final_qty,\r\n        ROW_NUMBER() OVER (\r\n            PARTITION BY item_code, warehouse \r\n            ORDER BY posting_date DESC, posting_time DESC, creation DESC , name DESC\r\n        ) as row_num\r\n    FROM `tabStock Ledger Entry`\r\n    WHERE warehouse = %(warehouse)s \r\n      AND is_cancelled = 0\r\n) t\r\nWHERE row_num = 1;\r\n",
   "ref_doctype": "Stock Ledger Entry",
   "reference_report": null,
@@ -102,7 +588,7 @@
   "timeout": 3000
  },
  {
-  "add_total_row": 0,
+  "add_total_row": 1,
   "add_translate_data": 0,
   "columns": [],
   "disabled": 0,
