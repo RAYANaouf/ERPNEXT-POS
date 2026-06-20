@@ -328,7 +328,63 @@ def show_action_btn(purchase_invoice_name , status):
     else:
         return False
     
+def get_purchase_invoice_items(purchase_invoice_name):
+    items = frappe.db.get_all(
+        "Purchase Invoice Item",
+        filters={"parent": purchase_invoice_name},
+        fields=["item_code", "qty"],
+        order_by="idx asc"
+    )
+    return items
+def create_checking_invoice(purchase_invoice_name):
+    existing = frappe.db.get_value(
+        "Checking The Invoice",
+        {"purchase_invoice": purchase_invoice_name},
+        "name"
+    )
+    if existing:
+        return {"existing": True, "name": existing}
 
+    pi = frappe.get_doc("Purchase Invoice", purchase_invoice_name)
+
+    supplier_company = None
+    if pi.supplier:
+        supplier_company = frappe.db.get_value(
+            "Supplier", pi.supplier, "represents_company"
+        )
+
+    pi_items = frappe.db.get_all(
+        "Purchase Invoice Item",
+        filters={"parent": purchase_invoice_name},
+        fields=["item_code", "qty"],
+        order_by="idx asc"
+    )
+
+    doc = frappe.new_doc("Checking The Invoice")
+    doc.purchase_invoice = pi.name
+    doc.purchase_invoice_company = pi.company
+    doc.supplier = pi.supplier
+    if supplier_company:
+        doc.supplier_company = supplier_company
+    doc.date = frappe.utils.nowdate()
+
+    for i in pi_items:
+        doc.append("items", {
+            "article": i.item_code,
+            "qte_facturee": i.qty,
+            "qte_1": 0,
+            "qte_2": 0,
+            "qte_3": 0,
+            "qte_4": 0,
+            "total": 0,
+            "ecart": 0
+        })
+
+    doc.flags.ignore_permissions = True
+    doc.insert()
+    frappe.db.commit()
+
+    return {"existing": False, "name": doc.name}
 
     
 
