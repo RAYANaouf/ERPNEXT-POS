@@ -336,6 +336,7 @@ def get_purchase_invoice_items(purchase_invoice_name):
         order_by="idx asc"
     )
     return items
+@frappe.whitelist()
 def create_checking_invoice(purchase_invoice_name):
     existing = frappe.db.get_value(
         "Checking The Invoice",
@@ -360,6 +361,7 @@ def create_checking_invoice(purchase_invoice_name):
         order_by="idx asc"
     )
 
+    # 1. Créer le parent SANS items (bypass validation "Items requis")
     doc = frappe.new_doc("Checking The Invoice")
     doc.purchase_invoice = pi.name
     doc.purchase_invoice_company = pi.company
@@ -367,24 +369,40 @@ def create_checking_invoice(purchase_invoice_name):
     if supplier_company:
         doc.supplier_company = supplier_company
     doc.date = frappe.utils.nowdate()
-
-    for i in pi_items:
-        doc.append("items", {
-            "article": i.item_code,
-            "qte_facturee": i.qty,
-            "qte_1": 0,
-            "qte_2": 0,
-            "qte_3": 0,
-            "qte_4": 0,
-            "total": 0,
-            "ecart": 0
-        })
-
     doc.flags.ignore_permissions = True
+    doc.flags.ignore_mandatory = True
     doc.insert()
+
+    # 2. Insérer les child rows en masse
+    values = []
+    for idx, i in enumerate(pi_items, start=1):
+        qty = i.qty or 0
+        values.append((
+            frappe.generate_hash(length=10),
+            doc.name,
+            "Checking The Invoice",
+            "items",
+            idx,
+            i.item_code,
+            qty,
+            qty,
+            0,
+            0,
+            0,
+            qty,
+            0
+        ))
+
+    frappe.db.bulk_insert(
+        "Ajustement Item",
+        fields=[
+            "name", "parent", "parenttype", "parentfield", "idx",
+            "article", "qte_facturee", "qte_1", "qte_2", "qte_3", "qte_4",
+            "total", "ecart"
+        ],
+        values=values
+    )
+
     frappe.db.commit()
 
     return {"existing": False, "name": doc.name}
-
-    
-

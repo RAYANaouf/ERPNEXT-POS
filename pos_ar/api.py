@@ -2346,12 +2346,6 @@ from frappe.utils import flt, getdate
 
 @frappe.whitelist()
 def alert_sales_order(doc, method):
-    """
-    Event trigger : on_submit sur Sales Order
-    Objectif :
-    Détecter une surconsommation si le client commande une quantité
-    supérieure à la consommation réelle entre ses deux dernières commandes.
-    """
 
     print("========== DÉBUT ALERT SALES ORDER ==========")
     frappe.log_error(">>>> START alert_sales_order")
@@ -2460,3 +2454,7 @@ def check_item_overconsumption(customer, item_code, item_name, ordered_qty, curr
         return alert_msg
 
     return None
+
+
+
+
