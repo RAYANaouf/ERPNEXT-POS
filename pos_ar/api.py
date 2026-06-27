@@ -2033,9 +2033,9 @@ def checking_the_invoice_permission_query_conditions(user):
 
 
 
-from frappe.utils import flt, nowdate
+#from frappe.utils import flt, nowdate
 
-def create_purchase_order_for_shortage(stock_entry_doc, method=None):
+#def create_purchase_order_for_shortage(stock_entry_doc, method=None):
     """
     Called after creating the Stock Entry from Material Request
     Automatically creates an intercompany Purchase Order for missing items
@@ -2092,7 +2092,7 @@ def create_purchase_order_for_shortage(stock_entry_doc, method=None):
         create_inter_company_purchase_order(mr_doc, shortage_items,  company , company_default_warehouse)
 
 
-def create_inter_company_purchase_order(material_request, shortage_items, company , company_default_warehouse):
+#def create_inter_company_purchase_order(material_request, shortage_items, company , company_default_warehouse):
     """
     Crée une Purchase Order inter-sociétés pour les articles en shortage
     Optilens Alger commande chez le fournisseur "ca" (Optilens ca)
