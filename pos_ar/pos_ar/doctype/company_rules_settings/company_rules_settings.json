@@ -1,7 +1,7 @@
 {
  "actions": [],
  "allow_rename": 1,
- "creation": "2026-06-20 17:50:07.063629",
+ "creation": "2026-06-24 15:34:11.586696",
  "doctype": "DocType",
  "editable_grid": 1,
  "engine": "InnoDB",
@@ -12,14 +12,15 @@
   "target",
   "alternative_document_type",
   "alternative_type",
-  "alternative"
+  "alternative",
+  "alternative_target"
  ],
  "fields": [
   {
    "fieldname": "document_type",
    "fieldtype": "Select",
    "in_list_view": 1,
-   "label": "Type Document",
+   "label": "Document Type",
    "options": "Purchase Order\nMaterial Request",
    "reqd": 1
   },
@@ -27,8 +28,9 @@
    "fieldname": "type",
    "fieldtype": "Select",
    "in_list_view": 1,
-   "label": "Type Source",
+   "label": "Source Type",
    "options": "Supplier\nWarehouse",
+   "read_only": 1,
    "reqd": 1
   },
   {
@@ -40,11 +42,12 @@
    "reqd": 1
   },
   {
+   "depends_on": "eval:doc.document_type=='Material Request'",
    "fieldname": "target",
-   "fieldtype": "Dynamic Link",
+   "fieldtype": "Link",
    "in_list_view": 1,
    "label": "Target",
-   "options": "type"
+   "options": "Warehouse"
   },
   {
    "fieldname": "alternative_document_type",
@@ -60,25 +63,34 @@
    "in_list_view": 1,
    "label": "Alternative Type",
    "options": "Supplier\nWarehouse",
+   "read_only": 1,
    "reqd": 1
   },
   {
    "fieldname": "alternative",
    "fieldtype": "Dynamic Link",
    "in_list_view": 1,
-   "label": "Alternative",
+   "label": "Alternative Source",
    "options": "alternative_type",
    "reqd": 1
+  },
+  {
+   "depends_on": "eval:doc.alternative_document_type=='Material Request'",
+   "fieldname": "alternative_target",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Alternative Target",
+   "options": "Warehouse"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2026-06-20 19:03:58.399733",
+ "modified": "2026-06-27 14:48:51.954860",
  "modified_by": "Administrator",
  "module": "POS AR",
- "name": "Company Rule Setting",
+ "name": "Company Rules Settings",
  "owner": "Administrator",
  "permissions": [],
  "row_format": "Dynamic",

@@ -5,5 +5,5 @@
 from frappe.model.document import Document
 
 
-class CompanyRuleSetting(Document):
+class CompanyRulesSettings(Document):
 	pass

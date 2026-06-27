@@ -2179,92 +2179,86 @@ def create_inter_company_purchase_order(material_request, shortage_items, compan
 
 
 
-def create_another_material_request_for_shortage(stock_entry_doc, method=None):
-    """
-    Called after creating the Stock Entry from Material Request
-    Automatically creates another Material Request to the other warehouse for missing items
-    """
-   
-    # Check if it's a hard transfer
-    if stock_entry_doc.purpose != "Material Transfer":
-        return
-
-    if stock_entry_doc.from_warehouse != "alger -1 - OA":
-        return
-    
-    # Check if there is a linked Material Request
-    if not stock_entry_doc.items or not stock_entry_doc.items[0].material_request:
-        return
-    
-    company = stock_entry_doc.company
-    # check if it is for Optilens Alger company
-    if company != "OPTILENS ALGER":
-        return
-
-    mr_id  = stock_entry_doc.items[0].material_request
-    mr_doc = frappe.get_doc("Material Request", mr_id)
-
-    # Retrieve the quantities requested vs. transferred
-    shortage_items = []
-    for mr_item in mr_doc.items:
-        # Find the quantity transferred for this item
-        transferred_qty = 0
-        for se_item in stock_entry_doc.items:
-            if se_item.item_code == mr_item.item_code:
-                transferred_qty += flt(se_item.qty)
-        
-        # Calculer le manque
-        shortage = flt(mr_item.qty) - transferred_qty
-        
-        if shortage > 0:
-            shortage_items.append({
-                "item_code": mr_item.item_code,
-                "item_name": mr_item.item_name,
-                "qty": shortage,
-                "uom": mr_item.uom,
-                "warehouse": mr_item.warehouse, 
-                "schedule_date": mr_item.schedule_date or nowdate()
-            })
-
-
-
-    if shortage_items:
-        new_mr = frappe.get_doc({
-            "doctype"               : "Material Request"     ,
-            "material_request_type" : "Material Transfer"    ,
-            "company"               : company                ,
-            "set_from_warehouse"    : "Bordj el kiffen - OA" ,
-            "set_warehouse"         : stock_entry_doc.to_warehouse ,
-            "items"                 : []
-        })
-        
-        for item in shortage_items:
-        
-            new_mr.append("items", {
-                "item_code": item["item_code"],
-                "item_name": item["item_name"],
-                "qty": item["qty"],
-                "uom": item["uom"],  
-                "schedule_date":  nowdate()
-            })
-
-        new_mr.insert(ignore_permissions=True)
-        new_mr.submit()
+# def create_another_material_request_for_shortage(stock_entry_doc, method=None):
+#     """
+#     Called after creating the Stock Entry from Material Request
+#     Automatically creates another Material Request to the other warehouse for missing items
+#     """
+#    
+#     # Check if it's a hard transfer
+#     if stock_entry_doc.purpose != "Material Transfer":
+#         return
+#
+#     if stock_entry_doc.from_warehouse != "alger -1 - OA":
+#         return
+#     
+#     # Check if there is a linked Material Request
+#     if not stock_entry_doc.items or not stock_entry_doc.items[0].material_request:
+#         return
+#     
+#     company = stock_entry_doc.company
+#     # check if it is for Optilens Alger company
+#     if company != "OPTILENS ALGER":
+#         return
+#
+#     mr_id  = stock_entry_doc.items[0].material_request
+#     mr_doc = frappe.get_doc("Material Request", mr_id)
+#
+#     # Retrieve the quantities requested vs. transferred
+#     shortage_items = []
+#     for mr_item in mr_doc.items:
+#         # Find the quantity transferred for this item
+#         transferred_qty = 0
+#         for se_item in stock_entry_doc.items:
+#             if se_item.item_code == mr_item.item_code:
+#                 transferred_qty += flt(se_item.qty)
+#         
+#         # Calculer le manque
+#         shortage = flt(mr_item.qty) - transferred_qty
+#         
+#         if shortage > 0:
+#             shortage_items.append({
+#                 "item_code": mr_item.item_code,
+#                 "item_name": mr_item.item_name,
+#                 "qty": shortage,
+#                 "uom": mr_item.uom,
+#                 "warehouse": mr_item.warehouse, 
+#                 "schedule_date": mr_item.schedule_date or nowdate()
+#             })
+#
+#     if shortage_items:
+#         new_mr = frappe.get_doc({
+#             "doctype"               : "Material Request"     ,
+#             "material_request_type" : "Material Transfer"    ,
+#             "company"               : company                ,
+#             "set_from_warehouse"    : "Bordj el kiffen - OA" ,
+#             "set_warehouse"         : stock_entry_doc.to_warehouse ,
+#             "items"                 : []
+#         })
+#         
+#         for item in shortage_items:
+#         
+#             new_mr.append("items", {
+#                 "item_code": item["item_code"],
+#                 "item_name": item["item_name"],
+#                 "qty": item["qty"],
+#                 "uom": item["uom"],  
+#                 "schedule_date":  nowdate()
+#             })
+#
+#         new_mr.insert(ignore_permissions=True)
+#         new_mr.submit()
 
 
-
-
-
-
-def get_mr_item_name(material_request, item_code):
-    """
-    Récupère le nom de la ligne d'article dans la Material Request
-    """
-    return frappe.db.get_value(
-        "Material Request Item",
-        {"parent": material_request, "item_code": item_code},
-        "name"
-    )
+# def get_mr_item_name(material_request, item_code):
+#     """
+#     Récupère le nom de la ligne d'article dans la Material Request
+#     """
+#     return frappe.db.get_value(
+#         "Material Request Item",
+#         {"parent": material_request, "item_code": item_code},
+#         "name"
+#     )
 
 
 
@@ -2340,121 +2334,116 @@ def get_partner_monitoring(token: str,  only_unsent: int = 1):
     
 
 import frappe
-from frappe import _
-from frappe.utils import flt, getdate
 
-
-@frappe.whitelist()
-def alert_sales_order(doc, method):
-
-    print("========== DÉBUT ALERT SALES ORDER ==========")
-    frappe.log_error(">>>> START alert_sales_order")
-
-    # Vérifier que la société = OPTILENS CA
-    if doc.company != "OPTILENS CA":
-        frappe.log_error(f"Commande ignorée — Société = {doc.company}")
+def process_supply_alternatives(doc, method):
+    if doc.doctype == "Stock Entry":
+        if not doc.items[0].material_request:
+            return
+        origin_type = "Material Request"
+        parent_needed_doc = frappe.get_doc("Material Request", doc.items[0].material_request)
+        source_entity = parent_needed_doc.set_from_warehouse or parent_needed_doc.items[0].from_warehouse
+        company = doc.company
+    
+    elif doc.doctype == "Purchase Invoice":
+        if not doc.items[0].purchase_order:
+            return
+        origin_type = "Purchase Order"
+        parent_needed_doc = frappe.get_doc("Purchase Order", doc.items[0].purchase_order)
+        source_entity = parent_needed_doc.supplier
+        company = doc.company
+    else:
         return
 
-    frappe.log_error(f"Analyse commande client = {doc.customer}, Date = {doc.transaction_date}")
-
-    alerts = []
-
-    for item in doc.items:
-        alert_msg = check_item_overconsumption(
-            customer=doc.customer,
-            item_code=item.item_code,
-            item_name=item.item_name,
-            ordered_qty=item.qty,
-            current_order_date=doc.transaction_date,
-        )
-
-        if alert_msg:
-            alerts.append(alert_msg)
-
-    # Si des alertes existent → créer un commentaire dans le Sales Order
-    if alerts:
-        comment = "⚠️ ALERTE SURCONSOMMATION DÉTECTÉE\n\n" + "\n".join(alerts)
-        doc.add_comment("Comment", text=comment)
-        frappe.log_error("Alerte enregistrée dans le document")
-    else:
-        frappe.log_error("Aucune surconsommation détectée")
-
-    print("========== FIN ALERT SALES ORDER ==========")
-    frappe.log_error(">>>> END alert_sales_order")
-
-
-def check_item_overconsumption(customer, item_code, item_name, ordered_qty, current_order_date):
-    """
-    Règle métier :
-    Comparer la nouvelle commande avec la consommation réelle
-    entre la DERNIÈRE COMMANDE et la nouvelle commande.
-    """
-
-    # 1️⃣ Récupérer la dernière commande précédente
-    last_so_query = """
-        SELECT so.name, so.transaction_date, soi.qty
-        FROM `tabSales Order` so
-        INNER JOIN `tabSales Order Item` soi ON soi.parent = so.name
-        WHERE so.docstatus = 1
-          AND so.customer = %s
-          AND soi.item_code = %s
-          AND so.transaction_date < %s
-        ORDER BY so.transaction_date DESC
-        LIMIT 1
-    """
-
-    last_so = frappe.db.sql(
-        last_so_query,
-        (customer, item_code, current_order_date),
+    rules = frappe.db.get_values(
+        "Company Rules Settings", 
+        {"parent": company}, 
+        ["document_type", "source", "alternative_document_type", "alternative", "alternative_target"], 
         as_dict=True
     )
+    
+    selected_rule = None
+    for r in rules:
+        if r.document_type == origin_type and r.source == source_entity:
+            selected_rule = r
+            break
 
-    # 👉 S’il n’y a pas d’ancienne commande → pas de comparaison
-    if not last_so:
-        return None
+    if not selected_rule:
+        return
 
-    last_order_date = last_so[0].transaction_date
-    last_order_name = last_so[0].name
+    items_to_order = []
+    for item in parent_needed_doc.items:
+        qty_requested = item.qty 
+        qty_received = 0
+        
+        if origin_type == "Material Request":
+            qty_received = frappe.db.get_value("Stock Entry Detail", {"material_request_item": item.name, "docstatus": 1}, "sum(qty)") or 0
+        elif origin_type == "Purchase Order":
+            qty_received = frappe.db.get_value("Purchase Invoice Item", {"po_detail": item.name, "docstatus": 1}, "sum(qty)") or 0
+        
+        shortage = qty_requested - qty_received
+        
+        if shortage > 0:
+            items_to_order.append({
+                "item_code": item.item_code,
+                "qty": shortage,
+                "uom": item.uom,
+                "rate": getattr(item, "rate", 0)
+            })
 
-    # 2️⃣ Calculer la consommation réelle entre les deux dates
-    consumption_query = """
-        SELECT COALESCE(SUM(dni.qty), 0) AS total_consumed
-        FROM `tabDelivery Note` dn
-        INNER JOIN `tabDelivery Note Item` dni ON dni.parent = dn.name
-        WHERE dn.docstatus = 1
-          AND dn.customer = %s
-          AND dni.item_code = %s
-          AND dn.posting_date >= %s
-          AND dn.posting_date < %s
-    """
+    if not items_to_order:
+        return
 
-    consumption = frappe.db.sql(
-        consumption_query,
-        (customer, item_code, last_order_date, current_order_date),
-        as_dict=True
-    )
-
-    total_consumed = flt(consumption[0].total_consumed)
-
-    # 3️⃣ Comparaison nouvelle commande vs consommation réelle
-    if ordered_qty > total_consumed:
-        surplus = ordered_qty - total_consumed
-        display_name = item_name or item_code
-
-        alert_msg = (
-            f"- **{display_name}** ({item_code}) : "
-            f"Commande actuelle **{int(ordered_qty)}** > "
-            f"Consommation réelle **{int(total_consumed)}** "
-            f"depuis la dernière commande du {last_order_date} "
-            f"(Doc: {last_order_name}) "
-            f"(Surplus **+{int(surplus)}**)"
-        )
-
-        frappe.log_error(f"ALERTE CONSOMMATION ENTRE LES DEUX COMMANDES — {alert_msg}")
-        return alert_msg
-
-    return None
+    create_alternative_document(selected_rule, items_to_order, company, parent_needed_doc)
 
 
+def create_alternative_document(rule, items, company, original_doc):
+    if rule.alternative_document_type == "Purchase Order":
+        new_doc = frappe.new_doc("Purchase Order")
+        new_doc.company = company
+        new_doc.supplier = rule.alternative
+        new_doc.transaction_date = frappe.utils.nowdate()
+        new_doc.schedule_date = frappe.utils.nowdate()
+        
+        new_doc.custom_generate_order = 1 
+        
+        if hasattr(original_doc, "set_warehouse") and original_doc.set_warehouse:
+            new_doc.set_warehouse = original_doc.set_warehouse
 
+        for item in items:
+            new_doc.append("items", {
+                "item_code": item["item_code"],
+                "qty": item["qty"],
+                "uom": item["uom"],
+                "warehouse": original_doc.items[0].warehouse,
+                "rate": item["rate"] or frappe.db.get_value("Item Price", {"item_code": item["item_code"], "price_list": new_doc.buying_price_list}, "price_list_rate") or 0
+            })
+            
+        new_doc.insert(ignore_permissions=True)
+        new_doc.flags.ignore_validate_update_after_submit = True
+        new_doc.submit()  
+        frappe.msgprint(f"🔄 Purchase Order {new_doc.name} has been automatically created and SUBMITTED.")
+            
+    elif rule.alternative_document_type == "Material Request":
+        new_doc = frappe.new_doc("Material Request")
+        new_doc.company = company
+        new_doc.material_request_type = "Material Transfer"
+        new_doc.transaction_date = frappe.utils.nowdate()
+        new_doc.schedule_date = frappe.utils.nowdate()
+        
+        new_doc.set_from_warehouse = rule.alternative
+        new_doc.set_warehouse = rule.alternative_target or original_doc.items[0].warehouse
+        
+        for item in items:
+            new_doc.append("items", {
+                "item_code": item["item_code"],
+                "qty": item["qty"],
+                "uom": item["uom"],
+                "from_warehouse": rule.alternative,
+                "warehouse": new_doc.set_warehouse
+            })
 
+        new_doc.insert(ignore_permissions=True)
+        
+        new_doc.flags.ignore_validate_update_after_submit = True
+        new_doc.submit()
+        frappe.msgprint(f"🔄 Material Request {new_doc.name} has been automatically created and SUBMITTED.")
