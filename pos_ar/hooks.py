@@ -168,7 +168,7 @@ doc_events = {
         "on_cancel": "pos_ar.api.update_customer_debt_on_invoice",
     },
     "Stock Entry": {
-        "on_submit": ["pos_ar.api.create_purchase_order_for_shortage","pos_ar.api.process_supply_alternatives"],
+        "on_submit": "pos_ar.api.process_supply_alternatives",
     },
     "Checking The Invoice": {
         "on_cancel": "pos_ar.api.on_checking_the_invoice_cancel",
