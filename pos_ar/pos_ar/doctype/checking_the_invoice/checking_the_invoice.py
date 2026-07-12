@@ -155,14 +155,14 @@ class CheckingTheInvoice(Document):
 
 
     def create_vendor_credit_note(self, original_si, items, customer, company):
-        """
-        Crée un avoir de vente (Sales Invoice Return) côté vendeur EN BROUILLON
-        """
-        print("================> we are hereeeeeeeeeeeeeeeee!!!!")
         credit = frappe.new_doc("Sales Invoice")
         credit.customer = customer
+        credit.customer_name = frappe.db.get_value("Customer", customer, "customer_name")
+        credit.title = credit.customer_name
         credit.company = company
         credit.posting_date = self.date
+        credit.due_date = self.date
+        
         credit.is_return = 1
         credit.price_list = original_si.selling_price_list
         credit.return_against = original_si.name
@@ -171,53 +171,77 @@ class CheckingTheInvoice(Document):
         credit.update_outstanding_for_self = 0
         credit.custom_checking_invoice_peice = self.name
         
-        # Entrepôt par défaut du vendeur
         vendor_warehouse = frappe.db.get_value(
             "Company", 
             company, 
             "custom_default_warehouse"
         )
 
+        has_items = False
         for item in items:
             orig = self.get_original_si_item(original_si, item.article)
-            if not orig:
-                continue
+            
+            if orig:
+                rate = orig.rate
+                warehouse = vendor_warehouse or orig.warehouse
+                income_account = orig.income_account
+                return_item_link = orig.name
+            else:
+                rate = frappe.db.get_value("Item Price", {"item_code": item.article, "price_list": original_si.selling_price_list}, "price_list_rate") or 0
+                warehouse = vendor_warehouse or (original_si.items[0].warehouse if original_si.items else None)
+                income_account = frappe.db.get_value("Company", company, "default_income_account") or (original_si.items[0].income_account if original_si.items else None)
+                return_item_link = None
 
             credit.append("items", {
                 "item_code": item.article,
                 "qty": item.ecart,
-                "rate": orig.rate,
-                "warehouse": vendor_warehouse or orig.warehouse
+                "rate": rate,
+                "warehouse": warehouse,
+                "income_account": income_account,
+                "return_item_link": return_item_link
             })
+            has_items = True
 
-        
-        # Set missing values (like currency, income accounts, etc.)
+        if not has_items:
+            return None
+            
         credit.set_missing_values()
-        # Calculate taxes and totals so grand_total is not None
+        credit.payment_terms_template = None
+        credit.set("payment_schedule", [])
+        credit.due_date = self.date
         credit.calculate_taxes_and_totals()
 
         credit.flags.ignore_permissions = True
+        credit.flags.ignore_validate = True 
+        credit.flags.ignore_mandatory = True
         credit.insert()
+        
+        credit.flags.ignore_permissions = True
+        credit.flags.ignore_validate = True
+        credit.flags.ignore_mandatory = True
+        credit.flags.ignore_links = True
+        credit.flags.ignore_validate_update_stock = True
         credit.submit()
         
+        frappe.db.set_value("Sales Invoice", credit.name, "status", "Return", update_modified=False)
+        
         frappe.msgprint(
-            f"✅ Avoir de vente créé en brouillon : {credit.name}<br>"
-            f"💡 La Purchase Invoice Return sera créée automatiquement lors de la validation",
-            indicator="blue"
+            msg=f"Sales Credit Note created and submitted: {credit.name}<br>Purchase Invoice Return will be generated on approval.",
+            title="Success",
+            indicator="green"
         )
         return credit
 
 
     def create_vendor_sales_invoice(self, original_si, items, customer, company):
-        """
-        Crée une facture de vente supplémentaire côté vendeur EN BROUILLON
-        
-        """
-        
         inv = frappe.new_doc("Sales Invoice")
         inv.customer = customer
+        inv.customer_name = frappe.db.get_value("Customer", customer, "customer_name")
+        inv.title = inv.customer_name
         inv.company = company
         inv.posting_date = self.date
+        inv.due_date = self.date
+        
         inv.price_list = original_si.selling_price_list
         inv.update_stock = 1
         inv.custom_checking_invoice_peice = self.name
@@ -229,31 +253,53 @@ class CheckingTheInvoice(Document):
             "custom_default_warehouse"
         )
 
+        has_items = False
         for item in items:
             orig = self.get_original_si_item(original_si, item.article)
-            if not orig:
-                continue
+            
+            if orig:
+                rate = orig.rate
+                warehouse = vendor_warehouse or orig.warehouse
+                income_account = orig.income_account
+            else:
+                rate = frappe.db.get_value("Item Price", {"item_code": item.article, "price_list": original_si.selling_price_list}, "price_list_rate") or 0
+                warehouse = vendor_warehouse or (original_si.items[0].warehouse if original_si.items else None)
+                income_account = frappe.db.get_value("Company", company, "default_income_account") or (original_si.items[0].income_account if original_si.items else None)
 
             inv.append("items", {
                 "item_code": item.article,
                 "qty": item.ecart,
-                "rate": orig.rate,
-                "warehouse": vendor_warehouse or orig.warehouse
+                "rate": rate,
+                "warehouse": warehouse,
+                "income_account": income_account
             })
+            has_items = True
         
-        # Set missing values (like currency, income accounts, etc.)
+        if not has_items:
+            return None
+            
         inv.set_missing_values()
-        # Calculate taxes and totals so grand_total is not None
+        inv.payment_terms_template = None
+        inv.set("payment_schedule", [])
+        inv.due_date = self.date
         inv.calculate_taxes_and_totals()
 
         inv.flags.ignore_permissions = True
+        inv.flags.ignore_validate = True 
+        inv.flags.ignore_mandatory = True
         inv.insert()
+        
+        inv.flags.ignore_permissions = True
+        inv.flags.ignore_validate = True
+        inv.flags.ignore_mandatory = True
         inv.submit()
         
+        frappe.db.set_value("Sales Invoice", inv.name, "status", "Unpaid", update_modified=False)
+        
         frappe.msgprint(
-            f"✅ Facture de vente créée en brouillon : {inv.name}<br>"
-            f"💡 La Purchase Invoice sera créée automatiquement lors de la validation",
-            indicator="blue"
+            msg=f"Sales Invoice created and submitted: {inv.name}<br>Purchase Invoice will be generated on approval.",
+            title="Success",
+            indicator="green"
         )
         return inv
    

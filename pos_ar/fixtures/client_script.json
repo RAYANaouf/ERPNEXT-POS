@@ -317,5 +317,16 @@
   "name": "Employee Script",
   "script": "frappe.ui.form.on('Employee', {\n\trefresh(frm) {\n\t    frm.get_field('custom_warning').$wrapper.html(`\n            <div style=\"padding:10px;background:#ffe6e6;border-left:4px solid red;\">\n                ⚠️ This table should NOT contain unauthorized warehouses or warehouses from other companies.\n            </div>\n        `);\n\t}\n})\n",
   "view": "Form"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Client Script",
+  "dt": "Purchase Order",
+  "enabled": 1,
+  "modified": "2026-07-04 15:14:47.048220",
+  "module": "POS AR",
+  "name": "Purchase Order Custom Filters",
+  "script": "frappe.ui.form.on('Purchase Order', {\r\n    onload: function(frm) {\r\n        set_supplier_warehouse_filter(frm);\r\n    },\r\n    supplier: function(frm) {\r\n        set_supplier_warehouse_filter(frm);\r\n    }\r\n});\r\n\r\nfunction set_supplier_warehouse_filter(frm) {\r\n    if (frm.doc.supplier) {\r\n        frappe.db.get_value('Supplier', frm.doc.supplier, ['is_internal_supplier', 'represents_company'])\r\n            .then(r => {\r\n                let data = r.message;\r\n                if (data && data.is_internal_supplier && data.represents_company) {\r\n                    frm.set_query('custom_requested_source_warehouse', function() {\r\n                        return {\r\n                            filters: {\r\n                                'company': data.represents_company,\r\n                                'is_group': 0\r\n                            }\r\n                        };\r\n                    });\r\n                }\r\n            });\r\n    }\r\n}",
+  "view": "Form"
  }
 ]
