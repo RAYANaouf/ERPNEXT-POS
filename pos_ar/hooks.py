@@ -114,6 +114,8 @@ permission_query_conditions = {
     "Sales Invoice"        : "pos_ar.api.sales_invoice_query",
     "Purchase Order"       : "pos_ar.api.purchase_order_query",
     "Material Request"     : "pos_ar.api.material_request_query",
+    "Item Group"           : "pos_ar.api.item_group_permission_query_conditions",
+    "Item"                 : "pos_ar.api.item_permission_query_conditions",
 }
 #
 
@@ -122,7 +124,10 @@ has_permission = {
     #"Event": "frappe.desk.doctype.event.event.has_permission",
     "Purchase Invoice" : "pos_ar.api.purchase_invoice_permission",
     "Customer"         : "pos_ar.api.customer_permission",
-    "Supplier"         : "pos_ar.api.supplier_permission"
+    "Supplier"         : "pos_ar.api.supplier_permission",
+    "Item Group"       : "pos_ar.api.item_group_permission",
+    "Item"             : "pos_ar.api.item_permission",
+
 }
 
 
@@ -172,6 +177,9 @@ doc_events = {
     },
     "Checking The Invoice": {
         "on_cancel": "pos_ar.api.on_checking_the_invoice_cancel",
+    },
+    "Item Group": {
+        "validate": "pos_ar.api.validate_item_group_companies"
     },
 
 }

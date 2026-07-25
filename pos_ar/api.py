@@ -2447,3 +2447,172 @@ def create_alternative_document(rule, items, company, original_doc):
         new_doc.flags.ignore_validate_update_after_submit = True
         new_doc.submit()
         frappe.msgprint(f"🔄 Material Request {new_doc.name} has been automatically created and SUBMITTED.")
+
+
+
+def get_user_companies(user=None):
+    if not user:
+        user = frappe.session.user
+
+    user_permissions = frappe.get_all(
+        "User Permission",
+        filters={
+            "user": user,
+            "allow": "Company"
+        },
+        pluck="for_value"
+    )
+
+    return user_permissions if user_permissions else None
+
+
+
+def validate_item_group_companies(doc, method=None):
+    if not doc.parent_item_group or not doc.get("custom_company"):
+        return
+
+    child_companies = set(row.company for row in doc.custom_company)
+
+    parent_companies = frappe.get_all(
+        "Item Group Company",
+        filters={"parent": doc.parent_item_group},
+        pluck="company"
+    )
+
+    if parent_companies:
+        parent_companies_set = set(parent_companies)
+        invalid_companies = child_companies - parent_companies_set
+
+        if invalid_companies:
+            companies_list = ", ".join(invalid_companies)
+            parent_list = ", ".join(parent_companies_set)
+
+            frappe.throw(
+                msg=f"""<b>Company Assignment Mismatch:</b><br><br>
+                The parent group <b>{doc.parent_item_group}</b> belongs to: <b>{parent_list}</b>.<br>
+                You cannot assign the company <b>{companies_list}</b> to this child group.<br><br>
+                <i>A child item group must belong to the same company as its parent.</i>""",
+                title="Invalid Assignment"
+            )
+
+
+
+
+def item_group_permission_query_conditions(user=None):
+    if not user:
+        user = frappe.session.user
+
+    if user == "Administrator":
+        return ""
+
+    user_companies = get_user_companies(user)
+    if user_companies is None:
+        return ""
+
+    if user_companies:
+        companies_str = ", ".join([f"'{c}'" for c in user_companies])
+
+        return f"""`tabItem Group`.name IN (
+            SELECT child.name 
+            FROM `tabItem Group` parent
+            JOIN `tabItem Group Company` igc ON igc.parent = parent.name
+            JOIN `tabItem Group` child ON child.lft >= parent.lft AND child.rgt <= parent.rgt
+            WHERE igc.company IN ({companies_str})
+        )
+        OR `tabItem Group`.name NOT IN (
+            SELECT child.name
+            FROM `tabItem Group` parent
+            JOIN `tabItem Group Company` igc ON igc.parent = parent.name
+            JOIN `tabItem Group` child ON child.lft >= parent.lft AND child.rgt <= parent.rgt
+        )"""
+
+    return """`tabItem Group`.name NOT IN (
+        SELECT parent FROM `tabItem Group Company`
+    )"""
+
+
+def item_group_permission(doc, ptype="read", user=None):
+    if not user:
+        user = frappe.session.user
+
+    if user == "Administrator":
+        return True
+
+    user_companies = get_user_companies(user)
+    if user_companies is None:
+        return True
+
+    group_name = doc.name if hasattr(doc, "name") else doc
+
+    group_info = frappe.db.get_value("Item Group", group_name, ["lft", "rgt"], as_dict=True)
+    if not group_info:
+        return True
+
+    ancestors = frappe.get_all(
+        "Item Group",
+        filters={
+            "lft": ["<=", group_info.lft],
+            "rgt": [">=", group_info.rgt]
+        },
+        pluck="name"
+    )
+
+    if not ancestors:
+        return True
+
+    assigned_companies = frappe.get_all(
+        "Item Group Company",
+        filters={"parent": ["in", ancestors]},
+        pluck="company"
+    )
+
+    if not assigned_companies:
+        return True
+
+    if any(c in assigned_companies for c in user_companies):
+        return True
+
+    return False
+
+
+def item_permission_query_conditions(user=None):
+    if not user:
+        user = frappe.session.user
+
+    if user == "Administrator":
+        return ""
+
+    user_companies = get_user_companies(user)
+    if user_companies is None:
+        return ""
+
+    cond = item_group_permission_query_conditions(user)
+    if not cond:
+        return ""
+
+    allowed_groups = frappe.db.sql(
+        f"SELECT name FROM `tabItem Group` WHERE {cond}",
+        pluck=True
+    )
+
+    if not allowed_groups:
+        return "`tabItem`.name IS NULL"
+
+    escaped_groups = [frappe.db.escape(g) for g in allowed_groups]
+    groups_str = ", ".join(escaped_groups)
+
+    return f"`tabItem`.item_group IN ({groups_str})"
+
+
+def item_permission(doc, ptype="read", user=None):
+    if not user:
+        user = frappe.session.user
+
+    if user == "Administrator":
+        return True
+
+    item_group = doc.item_group if hasattr(doc, "item_group") else None
+    if not item_group:
+        return True
+
+    return item_group_permission(item_group, ptype=ptype, user=user)
