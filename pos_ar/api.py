@@ -2336,36 +2336,73 @@ def get_partner_monitoring(token: str,  only_unsent: int = 1):
 import frappe
 
 def process_supply_alternatives(doc, method):
+    if getattr(doc.flags, "in_process_supply_alternatives", False):
+        return
+    doc.flags.in_process_supply_alternatives = True
+
+    origin_type = None
+    source_entity = None
+    parent_needed_doc = None
+    company = None
+
     if doc.doctype == "Stock Entry":
-        if not doc.items[0].material_request:
+        if not doc.items or not doc.items[0].material_request:
             return
         origin_type = "Material Request"
         parent_needed_doc = frappe.get_doc("Material Request", doc.items[0].material_request)
         source_entity = parent_needed_doc.set_from_warehouse or parent_needed_doc.items[0].from_warehouse
         company = doc.company
-    
+
     elif doc.doctype == "Purchase Invoice":
-        if not doc.items[0].purchase_order:
+        if not doc.items or not doc.items[0].purchase_order:
             return
         origin_type = "Purchase Order"
         parent_needed_doc = frappe.get_doc("Purchase Order", doc.items[0].purchase_order)
         source_entity = parent_needed_doc.supplier
         company = doc.company
+
+    elif doc.doctype == "Sales Order":
+        if doc.status != "Closed":
+            return
+
+        has_sales_invoice = frappe.db.exists("Sales Invoice Item", {
+            "sales_order": doc.name,
+            "docstatus": 1
+        })
+
+        if has_sales_invoice:
+            return
+
+        po_name = doc.get("po_no") or frappe.db.get_value("Sales Order", doc.name, "po_no")
+        if not po_name:
+            po_name = frappe.db.get_value("Purchase Order Item", {"sales_order": doc.name}, "parent")
+
+        if po_name and frappe.db.exists("Purchase Order", po_name):
+            origin_type = "Purchase Order"
+            parent_needed_doc = frappe.get_doc("Purchase Order", po_name)
+            source_entity = parent_needed_doc.supplier
+            company = parent_needed_doc.company
+        else:
+            origin_type = "Sales Order"
+            parent_needed_doc = doc
+            source_entity = doc.customer
+            company = doc.company
+
     else:
         return
 
-    rules = frappe.db.get_values(
+    rules = frappe.db.get_all(
         "Company Rules Settings", 
-        {"parent": company}, 
-        ["document_type", "source", "alternative_document_type", "alternative", "alternative_target"], 
-        as_dict=True
+        filters={"parent": company}, 
+        fields=["document_type", "source", "alternative_document_type", "alternative", "alternative_target"]
     )
     
     selected_rule = None
-    for r in rules:
-        if r.document_type == origin_type and r.source == source_entity:
-            selected_rule = r
-            break
+    if rules:
+        for r in rules:
+            if r.get("document_type") == origin_type and str(r.get("source")).strip() == str(source_entity).strip():
+                selected_rule = r
+                break
 
     if not selected_rule:
         return
@@ -2379,15 +2416,20 @@ def process_supply_alternatives(doc, method):
             qty_received = frappe.db.get_value("Stock Entry Detail", {"material_request_item": item.name, "docstatus": 1}, "sum(qty)") or 0
         elif origin_type == "Purchase Order":
             qty_received = frappe.db.get_value("Purchase Invoice Item", {"po_detail": item.name, "docstatus": 1}, "sum(qty)") or 0
-        
+        elif origin_type == "Sales Order":
+            delivered_qty = getattr(item, "delivered_qty", 0) or 0
+            qty_received = delivered_qty
+            
         shortage = qty_requested - qty_received
         
         if shortage > 0:
+            target_wh = getattr(item, "warehouse", None) or getattr(parent_needed_doc, "set_warehouse", None)
             items_to_order.append({
                 "item_code": item.item_code,
                 "qty": shortage,
                 "uom": item.uom,
-                "rate": getattr(item, "rate", 0)
+                "rate": getattr(item, "rate", 0),
+                "warehouse": target_wh
             })
 
     if not items_to_order:
@@ -2397,58 +2439,63 @@ def process_supply_alternatives(doc, method):
 
 
 def create_alternative_document(rule, items, company, original_doc):
-    if rule.alternative_document_type == "Purchase Order":
+    alt_type = rule.get("alternative_document_type")
+    alt_source = rule.get("alternative")
+    alt_target = rule.get("alternative_target")
+
+    if alt_type == "Purchase Order":
         new_doc = frappe.new_doc("Purchase Order")
         new_doc.company = company
-        new_doc.supplier = rule.alternative
+        new_doc.supplier = alt_source
         new_doc.transaction_date = frappe.utils.nowdate()
         new_doc.schedule_date = frappe.utils.nowdate()
-        
         new_doc.custom_generate_order = 1 
         
         if hasattr(original_doc, "set_warehouse") and original_doc.set_warehouse:
             new_doc.set_warehouse = original_doc.set_warehouse
 
         for item in items:
+            default_wh = item.get("warehouse") or (original_doc.items[0].warehouse if original_doc.items and hasattr(original_doc.items[0], "warehouse") else None)
+            item_rate = item.get("rate") or frappe.db.get_value("Item Price", {"item_code": item["item_code"], "price_list": getattr(new_doc, "buying_price_list", None)}, "price_list_rate") or 0
+            
             new_doc.append("items", {
                 "item_code": item["item_code"],
                 "qty": item["qty"],
                 "uom": item["uom"],
-                "warehouse": original_doc.items[0].warehouse,
-                "rate": item["rate"] or frappe.db.get_value("Item Price", {"item_code": item["item_code"], "price_list": new_doc.buying_price_list}, "price_list_rate") or 0
+                "warehouse": default_wh,
+                "rate": item_rate
             })
             
         new_doc.insert(ignore_permissions=True)
         new_doc.flags.ignore_validate_update_after_submit = True
-        new_doc.submit()  
-        frappe.msgprint(f"🔄 Purchase Order {new_doc.name} has been automatically created and SUBMITTED.")
+        new_doc.submit()
+        frappe.msgprint(f"🔄 Purchase Order **{new_doc.name}** généré et soumis automatiquement.")
             
-    elif rule.alternative_document_type == "Material Request":
+    elif alt_type == "Material Request":
         new_doc = frappe.new_doc("Material Request")
         new_doc.company = company
         new_doc.material_request_type = "Material Transfer"
         new_doc.transaction_date = frappe.utils.nowdate()
         new_doc.schedule_date = frappe.utils.nowdate()
         
-        new_doc.set_from_warehouse = rule.alternative
-        new_doc.set_warehouse = rule.alternative_target or original_doc.items[0].warehouse
+        fallback_target_wh = original_doc.items[0].warehouse if (original_doc.items and hasattr(original_doc.items[0], "warehouse")) else None
+        
+        new_doc.set_from_warehouse = alt_source
+        new_doc.set_warehouse = alt_target or fallback_target_wh
         
         for item in items:
             new_doc.append("items", {
                 "item_code": item["item_code"],
                 "qty": item["qty"],
                 "uom": item["uom"],
-                "from_warehouse": rule.alternative,
+                "from_warehouse": alt_source,
                 "warehouse": new_doc.set_warehouse
             })
 
         new_doc.insert(ignore_permissions=True)
-        
         new_doc.flags.ignore_validate_update_after_submit = True
         new_doc.submit()
-        frappe.msgprint(f"🔄 Material Request {new_doc.name} has been automatically created and SUBMITTED.")
-
-
+        frappe.msgprint(f"🔄 Material Request **{new_doc.name}** généré et soumis automatiquement.")
 
 def get_user_companies(user=None):
     if not user:

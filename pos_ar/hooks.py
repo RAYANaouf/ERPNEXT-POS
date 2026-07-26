@@ -181,6 +181,9 @@ doc_events = {
     "Item Group": {
         "validate": "pos_ar.api.validate_item_group_companies"
     },
+    "Sales Order": {
+        "on_change": "pos_ar.api.process_supply_alternatives"
+    },
 
 }
    
