@@ -12,6 +12,7 @@
   "purchase_invoice_company",
   "supplier",
   "supplier_company",
+  "supplier_warehouse",
   "items",
   "client_note",
   "supplier_note",
@@ -144,13 +145,20 @@
    "fieldname": "supplier_note",
    "fieldtype": "Small Text",
    "label": "Supplier Note"
+  },
+  {
+   "fieldname": "supplier_warehouse",
+   "fieldtype": "Link",
+   "label": " Supplier's warehouse",
+   "options": "Warehouse",
+   "read_only": 1
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-05-09 15:35:22.695470",
+ "modified": "2026-07-29 16:38:04.008858",
  "modified_by": "Administrator",
  "module": "POS AR",
  "name": "Checking The Invoice",

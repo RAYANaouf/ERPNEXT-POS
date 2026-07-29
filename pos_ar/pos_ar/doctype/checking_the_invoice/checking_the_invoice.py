@@ -400,6 +400,14 @@ def create_checking_invoice(purchase_invoice_name):
             "Supplier", pi.supplier, "represents_company"
         )
 
+    supplier_warehouse = None
+    if pi.bill_no and frappe.db.exists("Sales Invoice", pi.bill_no):
+        supplier_warehouse = frappe.db.get_value(
+            "Sales Invoice",
+            pi.bill_no,
+            "set_warehouse"
+        )    
+
     pi_items = frappe.db.get_all(
         "Purchase Invoice Item",
         filters={"parent": purchase_invoice_name},
@@ -414,6 +422,8 @@ def create_checking_invoice(purchase_invoice_name):
     doc.supplier = pi.supplier
     if supplier_company:
         doc.supplier_company = supplier_company
+    if supplier_warehouse:
+        doc.supplier_warehouse = supplier_warehouse    
     doc.date = frappe.utils.nowdate()
     doc.flags.ignore_permissions = True
     doc.flags.ignore_mandatory = True
