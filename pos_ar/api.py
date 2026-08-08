@@ -1184,7 +1184,8 @@ def auto_inter_company_purchase_invoice_creation_from_alger(doc, method):
                 positive_items.append(it)
             elif it.qty < 0:
                 negative_items.append(it)
-        sales_order = next((it.sales_order for it in doc.items if getattr(it, "sales_order", None)), None)        
+        sales_order = next((it.sales_order for it in doc.items if getattr(it, "sales_order", None)), None)   
+        po = None     
         if sales_order:        
           po_no = frappe.db.get_value("Sales Order", sales_order, "po_no")
           if po_no and frappe.db.exists("Purchase Order", po_no):
