@@ -56,9 +56,10 @@
   },
   {
    "fieldname": "supplier",
-   "fieldtype": "Data",
+   "fieldtype": "Link",
    "in_list_view": 1,
    "label": "Supplier",
+   "options": "Supplier",
    "read_only": 1
   },
   {
@@ -131,9 +132,10 @@
   },
   {
    "fieldname": "supplier_company",
-   "fieldtype": "Data",
+   "fieldtype": "Link",
    "hidden": 1,
    "label": "Supplier Company",
+   "options": "Company",
    "read_only": 1
   },
   {
@@ -158,8 +160,8 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-07-29 16:38:04.008858",
- "modified_by": "Administrator",
+ "modified": "2026-07-29 17:43:39.425725",
+ "modified_by": "farid-info@gmail.com",
  "module": "POS AR",
  "name": "Checking The Invoice",
  "naming_rule": "Expression (old style)",

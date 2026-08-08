@@ -12,7 +12,7 @@ app_license = "mit"
 
 # include js, css files in header of desk.html
 app_include_css = "/assets/pos_ar/css/main.css"
-app_include_js  = ["/assets/pos_ar/js/pos.bundle.js","https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js","/assets/pos_ar/js/sw.js"]
+app_include_js  = ["/assets/pos_ar/js/pos.bundle.js","https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js","/assets/pos_ar/js/sw.js","/assets/pos_ar/js/pos_single_tab_lock.js"]
 # include js, css files in header of web template
 # web_include_css = "/assets/pos_ar/css/pos_ar.css"
 # web_include_js = "/assets/pos_ar/js/pos_ar.js"
@@ -157,8 +157,8 @@ override_doctype_class = {
 
 doc_events = {
     "Sales Invoice": {
-        "on_submit": ["pos_ar.api.update_customer_debt_on_invoice" ,  "pos_ar.api.auto_inter_company_purchase_invoice_creation" , "pos_ar.api.auto_inter_company_purchase_invoice_creation_from_alger" ],
-        "on_cancel": ["pos_ar.api.update_customer_debt_on_invoice" ,  "pos_ar.api.auto_inter_company_purchase_invoice_creation" , "pos_ar.api.auto_inter_company_purchase_invoice_creation_from_alger"],
+        "on_submit": ["pos_ar.api.update_customer_debt_on_invoice" ,  "pos_ar.api.auto_inter_company_purchase_invoice_creation" , "pos_ar.api.auto_inter_company_purchase_invoice_creation_from_alger" ,],
+        "on_cancel": ["pos_ar.api.update_customer_debt_on_invoice" ,  "pos_ar.api.auto_inter_company_purchase_invoice_creation" , "pos_ar.api.auto_inter_company_purchase_invoice_creation_from_alger",],
     },
     "Purchase Invoice": {
         "on_submit": ["pos_ar.api.update_checking_invoice_peices","pos_ar.api.process_supply_alternatives"],

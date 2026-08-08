@@ -1184,7 +1184,11 @@ def auto_inter_company_purchase_invoice_creation_from_alger(doc, method):
                 positive_items.append(it)
             elif it.qty < 0:
                 negative_items.append(it)
-
+        sales_order = next((it.sales_order for it in doc.items if getattr(it, "sales_order", None)), None)        
+        if sales_order:        
+          po_no = frappe.db.get_value("Sales Order", sales_order, "po_no")
+          if po_no and frappe.db.exists("Purchase Order", po_no):
+            po = frappe.get_doc("Purchase Order", po_no)   
 
           
         # Create mirrored Purchase Invoice
@@ -1215,6 +1219,11 @@ def auto_inter_company_purchase_invoice_creation_from_alger(doc, method):
                 }
                 if target_company_wh:
                     row["warehouse"] = target_company_wh
+                if po:
+                    po_detail = next((p_it for p_it in po.items if p_it.item_code == it.item_code), None)
+                    if po_detail:
+                        row["purchase_order"] = po.name
+                        row["po_detail"] = po_detail.name                   
                 pi.append("items", row)
 
             pi.flags.ignore_permissions = True
@@ -1248,6 +1257,11 @@ def auto_inter_company_purchase_invoice_creation_from_alger(doc, method):
                 }
                 if target_company_wh:
                     row["warehouse"] = target_company_wh
+                if po:
+                 po_detail = next((p_it for p_it in po.items if p_it.item_code == it.item_code), None)
+                 if po_detail:
+                  row["purchase_order"] = po.name
+                  row["po_detail"] = po_detail.name    
                 pr.append("items", row)
 
             pr.flags.ignore_permissions = True
@@ -2496,6 +2510,30 @@ def create_alternative_document(rule, items, company, original_doc):
         new_doc.flags.ignore_validate_update_after_submit = True
         new_doc.submit()
         frappe.msgprint(f"🔄 Material Request **{new_doc.name}** généré et soumis automatiquement.")
+@frappe.validate_and_sanitize_search_inputs
+def supplier_query_for_company(doctype, txt, searchfield, start, page_len, filters):
+    company = filters.get("company") if filters else None
+
+    conditions = ""
+    values = {
+        "txt": "%{}%".format(txt or ""),
+        "start": start,
+        "page_len": page_len,
+    }
+
+    if company:
+        values["company"] = company
+        conditions = "and (s.company = %(company)s or s.is_internal_supplier = 1)"
+
+    return frappe.db.sql("""
+        select s.name, s.supplier_name
+        from `tabSupplier` s
+        where s.disabled = 0
+        and (s.name like %(txt)s or s.supplier_name like %(txt)s)
+        {conditions}
+        order by s.name
+        limit %(page_len)s offset %(start)s
+    """.format(conditions=conditions), values)        
 
 def get_user_companies(user=None):
     if not user:
