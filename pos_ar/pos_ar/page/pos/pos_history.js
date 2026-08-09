@@ -453,12 +453,16 @@ pos_ar.PointOfSale.pos_history = class {
 
 	
 	async print_receipt(pos , status) {
+		console.log("test")
+
 		try {
 			if (!pos) {
 				console.error("No POS data provided");
 				frappe.throw(__("Error: No POS data available for printing"));
 				return;
 			}
+
+			
 
 
 			let paymentStatus = "";
@@ -532,6 +536,8 @@ pos_ar.PointOfSale.pos_history = class {
 						}
 					});
 					previous_balance = result.message ?? 0;
+					frappe.log_error(`front => Customer: ${customer.name}\nPrevious balance: ${previous_balance}`, 'POS Receipt Debt Debug')
+					console.log(`front => Customer: ${customer.name}\nPrevious balance: ${previous_balance}`)
 				} catch (error) {
 					console.error("Error calculating customer debt:", error);
 				}
