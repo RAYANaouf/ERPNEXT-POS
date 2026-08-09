@@ -146,7 +146,7 @@ pos_ar.PointOfSale.FetchHandler = class FetchHandler{
 			});
 			return response.message;  // The fetched item barcodes
 		} catch (error) {
-			console.error('Error fetching Item Barcodes:', error);
+			console.error('Error fetching Customer Debt:', error);
 			return [];
 		}
 	}

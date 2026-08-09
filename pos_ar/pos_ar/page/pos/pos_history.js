@@ -521,20 +521,20 @@ pos_ar.PointOfSale.pos_history = class {
 				return;
 			}
 	
-			let previous_balance = customer.custom_debt;
+			let previous_balance = customer.custom_debt ?? 0;
 			if (this.app_settings.settings.onlineDebt) {
-				console.log("trying new method  : ", customer)
-				previous_balance = await this.app_data.fetchCustomerDebt(customer.name);
-				frappe.call({
-					method: "pos_ar.api.calculate_customer_debt",
-					args: {
-						customer: customer.name,
-						company: this.app_data.appData.pos_profile.company
-					}
-				}).then((result) => {
-					console.log("result : ", result.message)
-					previous_balance = result.message;
-				});
+				try {
+					const result = await frappe.call({
+						method: "pos_ar.api.calculate_customer_debt",
+						args: {
+							customer: customer.name,
+							company: this.app_data.appData.pos_profile.company
+						}
+					});
+					previous_balance = result.message ?? 0;
+				} catch (error) {
+					console.error("Error calculating customer debt:", error);
+				}
 			}
 	
 			// Parse creation time

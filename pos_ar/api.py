@@ -39,77 +39,42 @@ def _find_internal_supplier_for(company_to_represent: str) -> str | None:
 
 
 
-def update_all_customers_debt(doc, method):
-    """
-    Updates the custom_debt field for all customers in the Customer Doctype,
-    considering both Sales Invoices and POS Invoices.
-    """
-    try:
-        # Get all customers from Sales and POS Invoices
-        customers = frappe.db.sql("""
-            SELECT DISTINCT customer
-            FROM (
-                SELECT customer FROM `tabSales Invoice` WHERE docstatus = 1
-                UNION
-                SELECT customer FROM `tabPOS Invoice` WHERE docstatus = 1 AND consolidated_invoice IS NULL AND outstanding_amount > 0
-            ) AS customer_list
-        """, as_list=True)
-
-        # Update debts for each customer
-        for customer_record in customers:
-            customer = customer_record[0]
-            
-            # Calculate total outstanding for the customer
-            total_outstanding = frappe.db.sql(""" 
-                SELECT SUM(outstanding_amount)
-                FROM (
-                    SELECT outstanding_amount
-                    FROM `tabSales Invoice`
-                    WHERE customer = %s AND docstatus = 1 AND outstanding_amount > 0
-                    
-                    UNION ALL
-
-                    SELECT outstanding_amount
-                    FROM `tabPOS Invoice`
-                    WHERE customer = %s AND docstatus = 1 AND consolidated_invoice IS NULL AND outstanding_amount > 0
-                ) AS combined
-            """, (customer, customer))[0][0] or 0
-
-            # Update the custom_debt field in the Customer Doctype
-            frappe.db.set_value("Customer", customer, {"custom_debt": total_outstanding , "custom_debt_date": datetime.now() })
-
-        frappe.logger().info("All customer debts updated successfully.")
-    except Exception as e:
-        frappe.logger().error(f"Error updating debts for all customers: {str(e)}")
-
-
 @frappe.whitelist()
-def calculate_customer_debt(customer , company=None):
-    
-    pos_invoices =frappe.get_all(
-        "POS Invoice" , 
-        filters={
-            "customer": customer , 
-            "company": company , 
-            "docstatus": 1 , 
-            "consolidated_invoice": None , 
-            "outstanding_amount": [">" , 0]
-        },
-        fields=["outstanding_amount"]
-    )
+def calculate_customer_debt(customer, company=None):
+    company_condition = ""
+    pos_values = [customer]
+    si_values = [customer]
 
-    sales_invoices =frappe.get_all(
-        "Sales Invoice" , 
-        filters={
-            "customer": customer , 
-            "company": company , 
-            "docstatus": 1 , 
-            "outstanding_amount": [">" , 0]
-        },
-        fields=["outstanding_amount"]
-    )
+    if company:
+        company_condition = " AND company = %s"
+        pos_values.append(company)
+        si_values.append(company)
 
-    total_outstanding = sum([invoice["outstanding_amount"] for invoice in pos_invoices]) + sum([invoice["outstanding_amount"] for invoice in sales_invoices])
+    pos_invoices = frappe.db.sql(f"""
+        SELECT outstanding_amount
+        FROM `tabPOS Invoice`
+        WHERE customer = %s
+          AND docstatus = 1
+          AND (consolidated_invoice IS NULL OR consolidated_invoice = '')
+          AND outstanding_amount > 0
+          {company_condition}
+    """, tuple(pos_values), as_dict=True)
+
+    sales_invoices = frappe.db.sql(f"""
+        SELECT outstanding_amount
+        FROM `tabSales Invoice`
+        WHERE customer = %s
+          AND docstatus = 1
+          AND outstanding_amount > 0
+          {company_condition}
+    """, tuple(si_values), as_dict=True)
+
+    total_outstanding = sum([invoice.outstanding_amount for invoice in pos_invoices]) + sum([invoice.outstanding_amount for invoice in sales_invoices])
+
+    frappe.log_error(
+        title=f"Customer Debt : {customer}   At: {datetime.now()}",
+        message=f"Customer: {customer}\nTotal outstanding: {total_outstanding}\nAt: {datetime.now()}\n\nPOS Invoices: {pos_invoices}\n\nSales Invoices: {sales_invoices}"
+    )
 
     return total_outstanding
 
@@ -824,7 +789,7 @@ def get_all_item_qty(warehouse=None, since=None):
         SELECT pii.item_code, SUM(pii.qty) AS pos_invoice_qty
         FROM `tabPOS Invoice Item` pii
         JOIN `tabPOS Invoice` pi ON pi.name = pii.parent
-        WHERE pi.consolidated_invoice IS NULL
+        WHERE (pi.consolidated_invoice IS NULL OR pi.consolidated_invoice = '')
         AND pii.warehouse = %s
         AND pi.docstatus = 1
         AND pii.item_code IN ({placeholders})
@@ -929,7 +894,7 @@ def update_customer_debt_on_invoice(doc, method):
 
                     SELECT outstanding_amount
                     FROM `tabPOS Invoice`
-                    WHERE customer = %s AND docstatus = 1 AND consolidated_invoice IS NULL AND outstanding_amount > 0
+                    WHERE customer = %s AND docstatus = 1 AND (consolidated_invoice IS NULL OR consolidated_invoice = '') AND outstanding_amount > 0
                 ) AS combined
             """, (customer, customer))[0][0] or 0
 
