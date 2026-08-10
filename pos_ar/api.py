@@ -2509,8 +2509,12 @@ def get_user_companies(user=None):
         "User Permission",
         filters={
             "user": user,
-            "allow": "Company"
+            "allow": "Company",
         },
+        or_filters=[
+            ["applicable_for", "is", "not set"],
+            ["applicable_for", "=", ""]
+        ],
         pluck="for_value"
     )
 
