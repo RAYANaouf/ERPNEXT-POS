@@ -525,8 +525,11 @@ pos_ar.PointOfSale.pos_history = class {
 				return;
 			}
 	
+
+			console.log("test2")
 			let previous_balance = customer.custom_debt ?? 0;
 			if (this.app_settings.settings.onlineDebt) {
+				console.log("test3")
 				try {
 					const result = await frappe.call({
 						method: "pos_ar.api.calculate_customer_debt",
@@ -535,9 +538,13 @@ pos_ar.PointOfSale.pos_history = class {
 							company: this.app_data.appData.pos_profile.company
 						}
 					});
+					console.log("test4  result :: " , result)
 					previous_balance = result.message ?? 0;
-					frappe.log_error(`front => Customer: ${customer.name}\nPrevious balance: ${previous_balance}`, 'POS Receipt Debt Debug')
+
+					console.log("test5  previous_balance :: " , previous_balance)
 					console.log(`front => Customer: ${customer.name}\nPrevious balance: ${previous_balance}`)
+
+					console.log("test6  previous_balance :: " , previous_balance)
 				} catch (error) {
 					console.error("Error calculating customer debt:", error);
 				}
@@ -720,6 +727,8 @@ pos_ar.PointOfSale.pos_history = class {
 				: 0;
 			totals.grandTotal = totals.netTotal - discount;
 	
+
+			console.log("test7  soldes :: " , previous_balance)
 			// Add totals section
 			receiptHTML += `
 						</tbody>
