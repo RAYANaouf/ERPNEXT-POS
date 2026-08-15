@@ -434,28 +434,28 @@ pos_ar.PointOfSale.pos_debt_cart = class{
 			// Call the server method to update the invoice payment
 			const result = await this.app_data.update_sales_invoice_payment(invoice.name, paymentAmount);
 
-			// add check in to the voucher.
-			const check_in_amount    = paymentAmount - result.remaining;
-			const checkInOut         = frappe.model.get_new_doc('check_in_out')
-			checkInOut.creation_time = frappe.datetime.now_datetime();
-			checkInOut.user          = frappe.session.user;
-			checkInOut.check_type    = 'In';
-			checkInOut.is_sync       = 0 ;
-			checkInOut.amount        = parseFloat(check_in_amount);
-			checkInOut.reason_note   = 'Debt payment.';
-			
-			
-			this.app_data.saveCheckInOut(
-				checkInOut,
-				(res)=>{
-					this.refresh_check_in_out()
-				},(err)=>{
-					console.log('err to save checkInOut : ' , err)
-				}
-			)
-
 			// Ensure result is valid and contains the `remaining` field
-			if (result && typeof result.remaining === "number") {
+			if (result && !result.error && typeof result.remaining === "number") {
+				// add check in to the voucher.
+				const check_in_amount    = paymentAmount - result.remaining;
+				const checkInOut         = frappe.model.get_new_doc('check_in_out')
+				checkInOut.creation_time = frappe.datetime.now_datetime();
+				checkInOut.user          = frappe.session.user;
+				checkInOut.check_type    = 'In';
+				checkInOut.is_sync       = 0 ;
+				checkInOut.amount        = parseFloat(check_in_amount);
+				checkInOut.reason_note   = 'Debt payment.';
+				
+				
+				this.app_data.saveCheckInOut(
+					checkInOut,
+					(res)=>{
+						this.refresh_check_in_out()
+					},(err)=>{
+						console.log('err to save checkInOut : ' , err)
+					}
+				)
+
 				// Update the payment amount and UI
 				this.payment_amount = result.remaining;
 				this.leftContainer.find("#debt_paymentAmount").val(result.remaining);
@@ -463,7 +463,7 @@ pos_ar.PointOfSale.pos_debt_cart = class{
 				// Refresh the client's debt details
 				await this.refreshClientDebtPart(this.selected_client);
 			} else {
-				throw new Error("Unexpected server response. Please try again.");
+				throw new Error(result.error || "Unexpected server response. Please try again.");
 			}
 		} catch (error) {
 			// Log the error for debugging purposes
@@ -489,36 +489,36 @@ pos_ar.PointOfSale.pos_debt_cart = class{
 			// Call the server method to update the invoice payment
 			const result = await this.app_data.paySelectedInvoice(this._selected_invoice , paymentAmount);
 
-			// add check in to the voucher.
-			const check_in_amount    = paymentAmount - result.remaining;
-			const checkInOut         = frappe.model.get_new_doc('check_in_out')
-			checkInOut.creation_time = frappe.datetime.now_datetime();
-			checkInOut.user          = frappe.session.user;
-			checkInOut.check_type    = 'In';
-			checkInOut.is_sync       = 0   ;
-			checkInOut.amount        = parseFloat(check_in_amount);
-			checkInOut.reason_note   = 'Debt payment.';
-						
-						
-			this.app_data.saveCheckInOut(
-				checkInOut,
-				(res)=>{
-					this.refresh_check_in_out()
-				},(err)=>{
-					console.log('err to save checkInOut : ' , err)
-				}
-			)
-
 			// Ensure result is valid and contains the `remaining` field
-			if (result && typeof result.remaining === "number") {
+			if (result && !result.error && typeof result.remaining === "number") {
 				// Update the payment amount and UI
 				this.payment_amount = result.remaining;
 				this.leftContainer.find("#debt_paymentAmount").val(result.remaining);
 
 				// Refresh the client's debt details
 				await this.refreshClientDebtPart(this.selected_client);
+
+				// add check in to the voucher.
+				const check_in_amount    = paymentAmount - result.remaining;
+				const checkInOut         = frappe.model.get_new_doc('check_in_out')
+				checkInOut.creation_time = frappe.datetime.now_datetime();
+				checkInOut.user          = frappe.session.user;
+				checkInOut.check_type    = 'In';
+				checkInOut.is_sync       = 0   ;
+				checkInOut.amount        = parseFloat(check_in_amount);
+				checkInOut.reason_note   = 'Debt payment.';
+							
+							
+				this.app_data.saveCheckInOut(
+					checkInOut,
+					(res)=>{
+						this.refresh_check_in_out()
+					},(err)=>{
+						console.log('err to save checkInOut : ' , err)
+					}
+				)
 			} else {
-				throw new Error("Unexpected server response. Please try again.");
+				throw new Error(result.error || "Unexpected server response. Please try again.");
 			}
 		} catch (error) {
 			// Log the error for debugging purposes
