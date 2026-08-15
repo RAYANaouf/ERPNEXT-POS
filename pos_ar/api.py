@@ -974,6 +974,56 @@ def remove_ctn(doc, method):
 
 
 
+def _get_or_create_target_bundle(source_item, target_company, target_warehouse, type_of_transaction="Inward", voucher_no=None):
+
+    has_batch_no = frappe.db.get_value("Item", source_item.item_code, "has_batch_no")
+    if not has_batch_no:
+        return None
+
+    batch_no = None
+
+    if getattr(source_item, "serial_and_batch_bundle", None):
+        source_bundle = frappe.get_doc("Serial and Batch Bundle", source_item.serial_and_batch_bundle)
+        if source_bundle.entries:
+            batch_no = source_bundle.entries[0].batch_no
+    elif getattr(source_item, "batch_no", None):
+        batch_no = source_item.batch_no
+
+    if not batch_no:
+        return None
+
+    if not frappe.db.exists("Batch", batch_no):
+        batch = frappe.get_doc({
+            "doctype": "Batch",
+            "batch_id": batch_no,
+            "item": source_item.item_code
+        })
+        batch.flags.ignore_permissions = True
+        batch.insert()
+
+    qty = abs(source_item.qty) if type_of_transaction == "Inward" else -abs(source_item.qty)
+
+    bundle = frappe.get_doc({
+        "doctype": "Serial and Batch Bundle",
+        "item_code": source_item.item_code,
+        "warehouse": target_warehouse,
+        "company": target_company,
+        "type_of_transaction": type_of_transaction,
+        "voucher_type": "Purchase Invoice",
+        "voucher_no": voucher_no,  
+        "entries": [{
+            "batch_no": batch_no,
+            "qty": qty
+        }]
+    })
+    bundle.flags.ignore_permissions = True
+    bundle.insert()
+    return bundle.name
+
+
+# ==============================================================================
+# FONCTIONS REPRISES
+# ==============================================================================
 
 def auto_inter_company_purchase_invoice_creation(doc, method):
     # Only Sales Invoice from OPTILENS CA
@@ -1021,7 +1071,7 @@ def auto_inter_company_purchase_invoice_creation(doc, method):
             print("sales_invoice_return_against ==============> : ", sales_invoice_return_against)
             print("sales_invoice_return_against_doc ==============> : ", sales_invoice_return_against_doc)
             print("purchase_invoice_return_against_doc ==============> : ", sales_invoice_return_against_doc.custom_purchase_invoice_id)
-          
+            
 
   
 
@@ -1058,6 +1108,16 @@ def auto_inter_company_purchase_invoice_creation(doc, method):
                         break
                 print("heeree po_detail ==============> : ", po_detail.name)    
             
+            # --- AJOUT BATCH ---
+            bundle_id = None
+            if doc.update_stock and target_company_wh:
+                trans_type = "Outward" if is_return else "Inward"
+                bundle_id = _get_or_create_target_bundle(
+                    source_item=it,
+                    target_company=target_company,
+                    target_warehouse=target_company_wh,
+                    type_of_transaction=trans_type
+                )
 
             if po_detail and po : 
                 pi.append("items", {
@@ -1069,6 +1129,7 @@ def auto_inter_company_purchase_invoice_creation(doc, method):
                     "warehouse": target_company_wh,
                     "purchase_order": po.name,  # may be None if not found; OK
                     "po_detail": po_detail.name,     # row link for PO achievement
+                    "serial_and_batch_bundle": bundle_id,
                 })
             else:
                 pi.append("items", {
@@ -1078,6 +1139,7 @@ def auto_inter_company_purchase_invoice_creation(doc, method):
                     "qty": it.qty,
                     "rate": it.rate,
                     "warehouse": target_company_wh,
+                    "serial_and_batch_bundle": bundle_id,
                 })
              
 
@@ -1152,9 +1214,9 @@ def auto_inter_company_purchase_invoice_creation_from_alger(doc, method):
         sales_order = next((it.sales_order for it in doc.items if getattr(it, "sales_order", None)), None)   
         po = None     
         if sales_order:        
-          po_no = frappe.db.get_value("Sales Order", sales_order, "po_no")
-          if po_no and frappe.db.exists("Purchase Order", po_no):
-            po = frappe.get_doc("Purchase Order", po_no)   
+            po_no = frappe.db.get_value("Sales Order", sales_order, "po_no")
+            if po_no and frappe.db.exists("Purchase Order", po_no):
+                po = frappe.get_doc("Purchase Order", po_no)   
 
           
         # Create mirrored Purchase Invoice
@@ -1176,12 +1238,23 @@ def auto_inter_company_purchase_invoice_creation_from_alger(doc, method):
                 pi.set_warehouse = target_company_wh
         
             for it in positive_items:
+                # --- AJOUT BATCH ---
+                bundle_id = None
+                if doc.update_stock and target_company_wh:
+                    bundle_id = _get_or_create_target_bundle(
+                        source_item=it,
+                        target_company=target_company,
+                        target_warehouse=target_company_wh,
+                        type_of_transaction="Inward"
+                    )
+
                 row = {
                     "item_code": it.item_code,
                     "item_name": it.item_name,
                     "uom": it.uom,
                     "qty": it.qty,
                     "rate": it.rate,
+                    "serial_and_batch_bundle": bundle_id,
                 }
                 if target_company_wh:
                     row["warehouse"] = target_company_wh
@@ -1214,20 +1287,31 @@ def auto_inter_company_purchase_invoice_creation_from_alger(doc, method):
                 pr.set_warehouse = target_company_wh
         
             for it in negative_items:
+                # --- AJOUT BATCH ---
+                bundle_id = None
+                if doc.update_stock and target_company_wh:
+                    bundle_id = _get_or_create_target_bundle(
+                        source_item=it,
+                        target_company=target_company,
+                        target_warehouse=target_company_wh,
+                        type_of_transaction="Outward"
+                    )
+
                 row = {
                     "item_code": it.item_code,
                     "item_name": it.item_name,
                     "uom": it.uom,
                     "qty": it.qty,
                     "rate": it.rate,
+                    "serial_and_batch_bundle": bundle_id,
                 }
                 if target_company_wh:
                     row["warehouse"] = target_company_wh
                 if po:
-                 po_detail = next((p_it for p_it in po.items if p_it.item_code == it.item_code), None)
-                 if po_detail:
-                  row["purchase_order"] = po.name
-                  row["po_detail"] = po_detail.name    
+                    po_detail = next((p_it for p_it in po.items if p_it.item_code == it.item_code), None)
+                    if po_detail:
+                        row["purchase_order"] = po.name
+                        row["po_detail"] = po_detail.name    
                 pr.append("items", row)
 
             pr.flags.ignore_permissions = True
@@ -1316,13 +1400,6 @@ def update_checking_invoice_peices(doc, method):
         frappe.db.commit()
 
     frappe.db.after_commit(do_update)
-
-
-
-
-
-
-
 
 
 
