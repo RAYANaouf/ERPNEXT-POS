@@ -7,7 +7,7 @@ frappe.pages['pricing'].on_page_load = function(wrapper) {
         single_column: true
     });
 
-    frappe.require(["pos.bundle.js"], function() {
+    frappe.require(["pricing.bundle.js"], function() {
         new pos_ar.Pricing.PricingController(wrapper);
     });
 };

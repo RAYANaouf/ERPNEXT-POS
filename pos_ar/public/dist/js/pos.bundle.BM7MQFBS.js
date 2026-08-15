@@ -2367,29 +2367,29 @@
           return;
         }
         const result = await this.app_data.update_sales_invoice_payment(invoice.name, paymentAmount);
-        const check_in_amount = paymentAmount - result.remaining;
-        const checkInOut = frappe.model.get_new_doc("check_in_out");
-        checkInOut.creation_time = frappe.datetime.now_datetime();
-        checkInOut.user = frappe.session.user;
-        checkInOut.check_type = "In";
-        checkInOut.is_sync = 0;
-        checkInOut.amount = parseFloat(check_in_amount);
-        checkInOut.reason_note = "Debt payment.";
-        this.app_data.saveCheckInOut(
-          checkInOut,
-          (res) => {
-            this.refresh_check_in_out();
-          },
-          (err) => {
-            console.log("err to save checkInOut : ", err);
-          }
-        );
-        if (result && typeof result.remaining === "number") {
+        if (result && !result.error && typeof result.remaining === "number") {
+          const check_in_amount = paymentAmount - result.remaining;
+          const checkInOut = frappe.model.get_new_doc("check_in_out");
+          checkInOut.creation_time = frappe.datetime.now_datetime();
+          checkInOut.user = frappe.session.user;
+          checkInOut.check_type = "In";
+          checkInOut.is_sync = 0;
+          checkInOut.amount = parseFloat(check_in_amount);
+          checkInOut.reason_note = "Debt payment.";
+          this.app_data.saveCheckInOut(
+            checkInOut,
+            (res) => {
+              this.refresh_check_in_out();
+            },
+            (err) => {
+              console.log("err to save checkInOut : ", err);
+            }
+          );
           this.payment_amount = result.remaining;
           this.leftContainer.find("#debt_paymentAmount").val(result.remaining);
           await this.refreshClientDebtPart(this.selected_client);
         } else {
-          throw new Error("Unexpected server response. Please try again.");
+          throw new Error(result.error || "Unexpected server response. Please try again.");
         }
       } catch (error) {
         console.error("Error processing sales invoice payment:", error);
@@ -2403,29 +2403,29 @@
         this.show_waiting();
         const paymentAmount = parseFloat(this.payment_amount) || 0;
         const result = await this.app_data.paySelectedInvoice(this._selected_invoice, paymentAmount);
-        const check_in_amount = paymentAmount - result.remaining;
-        const checkInOut = frappe.model.get_new_doc("check_in_out");
-        checkInOut.creation_time = frappe.datetime.now_datetime();
-        checkInOut.user = frappe.session.user;
-        checkInOut.check_type = "In";
-        checkInOut.is_sync = 0;
-        checkInOut.amount = parseFloat(check_in_amount);
-        checkInOut.reason_note = "Debt payment.";
-        this.app_data.saveCheckInOut(
-          checkInOut,
-          (res) => {
-            this.refresh_check_in_out();
-          },
-          (err) => {
-            console.log("err to save checkInOut : ", err);
-          }
-        );
-        if (result && typeof result.remaining === "number") {
+        if (result && !result.error && typeof result.remaining === "number") {
           this.payment_amount = result.remaining;
           this.leftContainer.find("#debt_paymentAmount").val(result.remaining);
           await this.refreshClientDebtPart(this.selected_client);
+          const check_in_amount = paymentAmount - result.remaining;
+          const checkInOut = frappe.model.get_new_doc("check_in_out");
+          checkInOut.creation_time = frappe.datetime.now_datetime();
+          checkInOut.user = frappe.session.user;
+          checkInOut.check_type = "In";
+          checkInOut.is_sync = 0;
+          checkInOut.amount = parseFloat(check_in_amount);
+          checkInOut.reason_note = "Debt payment.";
+          this.app_data.saveCheckInOut(
+            checkInOut,
+            (res) => {
+              this.refresh_check_in_out();
+            },
+            (err) => {
+              console.log("err to save checkInOut : ", err);
+            }
+          );
         } else {
-          throw new Error("Unexpected server response. Please try again.");
+          throw new Error(result.error || "Unexpected server response. Please try again.");
         }
       } catch (error) {
         console.error("Error processing sales invoice payment:", error);
@@ -6367,4 +6367,4 @@ Previous balance: ${previous_balance}`);
     window.pos_ar = pos_ar;
   }
 })();
-//# sourceMappingURL=pos.bundle.WRGIALF5.js.map
+//# sourceMappingURL=pos.bundle.BM7MQFBS.js.map

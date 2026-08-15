@@ -9,7 +9,7 @@ frappe.pages['myaccessories'].on_page_load = function(wrapper) {
 		single_column: true
 	});
 
-	frappe.require(["pos.bundle.js"], function() {
+	frappe.require(["myaccessories.bundle.js"], function() {
         new pos_ar.myaccessories.AccessoriesController(wrapper);
     });
 }
