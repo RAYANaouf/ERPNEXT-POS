@@ -24,6 +24,7 @@ pos_ar.PointOfSale.Controller = class {
 		this.db          = null;
 
 		this.syncInput   = false
+		this.isCompleting = false
 
 
 
@@ -1219,6 +1220,8 @@ pos_ar.PointOfSale.Controller = class {
 
 
 	onCompleteOrder() {
+		if (this.isCompleting) return;
+		this.isCompleting = true;
 
 		this.payment_cart.show_waiting()
 
@@ -1234,6 +1237,8 @@ pos_ar.PointOfSale.Controller = class {
 				'Done',
 				false
 			)
+			this.isCompleting = false;
+			this.payment_cart.hide_waiting();
 			return;
 		}
 
@@ -1270,8 +1275,11 @@ pos_ar.PointOfSale.Controller = class {
 		this.selectedItemMaps.get(this.selectedTab.tabName).is_return = is_return
 
 		this.selectedItemMaps.get(this.selectedTab.tabName).items = items
-		if (items.length == 0)
+		if (items.length == 0){
+			this.isCompleting = false;
+			this.payment_cart.hide_waiting();
 			return
+		}
 
 		let total = 0
 		this.selectedItemMaps.get(this.selectedTab.tabName).items.forEach(item => {
@@ -1339,12 +1347,14 @@ pos_ar.PointOfSale.Controller = class {
 					this.selected_item_cart.createNewTab();
 				}
 				this.screenManager.navigate('home')
+				this.isCompleting = false;
 				/*** END   : deleting pos when finishing **/
 
 
 			}).catch(err => {
 				this.payment_cart.hide_waiting()
 				console.log("cant push pos invoice : ", err);
+				this.isCompleting = false;
 			})
 		}
 		//if( status == 'Unpaid'){
@@ -1403,6 +1413,7 @@ pos_ar.PointOfSale.Controller = class {
 
 			this.unsyncedPos += 1;
 			this.customer_box.setNotSynced(this.unsyncedPos);
+			this.isCompleting = false;
 		}
 	}
 
