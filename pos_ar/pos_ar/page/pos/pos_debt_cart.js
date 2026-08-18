@@ -401,8 +401,15 @@ pos_ar.PointOfSale.pos_debt_cart = class{
 			// Call the server method to update the invoice payment
 			const result = await this.app_data.update_invoice_payment(invoice.name, paymentAmount , this.openingEntry);
 
-			// Update the payment amount and UI
-			this.payment_amount = result.remaining;
+			if (result && result.error) {
+				frappe.msgprint(__(result.error));
+				return;
+			}else{
+				// Update the payment amount and UI
+				this.payment_amount = result.remaining;
+			}
+
+			
 			this.leftContainer.find("#debt_paymentAmount").val(result.remaining);
 
 			// Refresh the client's debt details
