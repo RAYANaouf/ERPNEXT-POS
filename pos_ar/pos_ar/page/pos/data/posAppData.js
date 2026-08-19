@@ -181,10 +181,10 @@ pos_ar.PointOfSale.posAppData = class {
 		this.db.saveCheckInOut(checkInOut,onSuccess,onFailure)
 	}
 	savePosInvoice(posInvoice){
-		this.db.savePosInvoice(posInvoice)
+		return this.db.savePosInvoice(posInvoice)
 	}
 	updatePosInvoice(posInvoice){
-		this.db.updatePosInvoice(posInvoice)
+		return this.db.updatePosInvoice(posInvoice)
 	}
 	getNotSyncedPos(onSuccess,onFailure){
 		this.db.getNotSyncedPos(

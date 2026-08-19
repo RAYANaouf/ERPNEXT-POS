@@ -127,10 +127,10 @@
       this.db.saveCheckInOut(checkInOut, onSuccess, onFailure);
     }
     savePosInvoice(posInvoice) {
-      this.db.savePosInvoice(posInvoice);
+      return this.db.savePosInvoice(posInvoice);
     }
     updatePosInvoice(posInvoice) {
-      this.db.updatePosInvoice(posInvoice);
+      return this.db.updatePosInvoice(posInvoice);
     }
     getNotSyncedPos(onSuccess, onFailure) {
       this.db.getNotSyncedPos(
@@ -2348,7 +2348,12 @@
       try {
         this.show_waiting();
         const result = await this.app_data.update_invoice_payment(invoice.name, paymentAmount, this.openingEntry);
-        this.payment_amount = result.remaining;
+        if (result && result.error) {
+          frappe.msgprint(__(result.error));
+          return;
+        } else {
+          this.payment_amount = result.remaining;
+        }
         this.leftContainer.find("#debt_paymentAmount").val(result.remaining);
         await this.refreshClientDebtPart(this.selected_client);
       } catch (error) {
@@ -5011,6 +5016,7 @@ Previous balance: ${previous_balance}`);
       this.invoiceData = { netTotal: 0, grandTotal: 0, paidAmount: 0, toChange: 0, discount: 0 };
       this.db = null;
       this.syncInput = false;
+      this.isCompleting = false;
       this.start_app();
     }
     async start_app() {
@@ -5579,7 +5585,7 @@ Previous balance: ${previous_balance}`);
     }
     savePosInvoice(saveWithZeroRate) {
       this.selectedItemMaps.get(this.selectedTab.tabName).synced = false;
-      this.appData.savePosInvoice(this.selectedItemMaps.get(this.selectedTab.tabName));
+      return this.appData.savePosInvoice(this.selectedItemMaps.get(this.selectedTab.tabName));
     }
     saveThatPosInvoice(pos_invoice) {
       pos_invoice.synced = false;
@@ -5881,9 +5887,12 @@ Previous balance: ${previous_balance}`);
       this.item_details.refreshDate(this.selectedItem);
       this.savePosInvoice();
     }
-    onCompleteOrder() {
+    async onCompleteOrder() {
+      if (this.isCompleting)
+        return;
+      this.isCompleting = true;
       this.payment_cart.show_waiting();
-      this.savePosInvoice();
+      await this.savePosInvoice();
       if (this.defaultCustomer.name == "") {
         frappe.warn(
           "Customer didnt selected!",
@@ -5893,6 +5902,8 @@ Previous balance: ${previous_balance}`);
           "Done",
           false
         );
+        this.isCompleting = false;
+        this.payment_cart.hide_waiting();
         return;
       }
       let items = [];
@@ -5919,8 +5930,11 @@ Previous balance: ${previous_balance}`);
       console.log("items ============================> ", items);
       this.selectedItemMaps.get(this.selectedTab.tabName).is_return = is_return;
       this.selectedItemMaps.get(this.selectedTab.tabName).items = items;
-      if (items.length == 0)
+      if (items.length == 0) {
+        this.isCompleting = false;
+        this.payment_cart.hide_waiting();
         return;
+      }
       let total = 0;
       this.selectedItemMaps.get(this.selectedTab.tabName).items.forEach((item) => {
         total += item.rate * item.qty;
@@ -5945,12 +5959,12 @@ Previous balance: ${previous_balance}`);
         pos.synced = true;
         frappe.db.insert(
           pos
-        ).then((r) => {
+        ).then(async (r) => {
           this.payment_cart.hide_waiting();
           pos.opened = 0;
           pos.real_name = r.name;
           this.history_cart.print_receipt(pos);
-          this.appData.updatePosInvoice(pos);
+          await this.appData.updatePosInvoice(pos);
           this.selectedItemMaps.delete(this.selectedTab.tabName);
           let tabs = Array.from(this.selectedItemMaps.keys());
           if (tabs.length > 0) {
@@ -5959,9 +5973,11 @@ Previous balance: ${previous_balance}`);
             this.selected_item_cart.createNewTab();
           }
           this.screenManager.navigate("home");
+          this.isCompleting = false;
         }).catch((err) => {
           this.payment_cart.hide_waiting();
           console.log("cant push pos invoice : ", err);
+          this.isCompleting = false;
         });
       } else {
         this.payment_cart.hide_waiting();
@@ -5979,6 +5995,7 @@ Previous balance: ${previous_balance}`);
         this.appData.updatePosInvoice(pos);
         this.unsyncedPos += 1;
         this.customer_box.setNotSynced(this.unsyncedPos);
+        this.isCompleting = false;
       }
     }
     onSync() {
@@ -6367,4 +6384,4 @@ Previous balance: ${previous_balance}`);
     window.pos_ar = pos_ar;
   }
 })();
-//# sourceMappingURL=pos.bundle.BM7MQFBS.js.map
+//# sourceMappingURL=pos.bundle.GSXHBEM3.js.map

@@ -745,7 +745,7 @@ pos_ar.PointOfSale.Controller = class {
 
 	savePosInvoice(saveWithZeroRate) {
 		this.selectedItemMaps.get(this.selectedTab.tabName).synced = false;
-		this.appData.savePosInvoice(this.selectedItemMaps.get(this.selectedTab.tabName))
+		return this.appData.savePosInvoice(this.selectedItemMaps.get(this.selectedTab.tabName))
 	}
 
 	saveThatPosInvoice(pos_invoice) {
@@ -1219,13 +1219,13 @@ pos_ar.PointOfSale.Controller = class {
 	}
 
 
-	onCompleteOrder() {
+	async onCompleteOrder() {
 		if (this.isCompleting) return;
 		this.isCompleting = true;
 
 		this.payment_cart.show_waiting()
 
-		this.savePosInvoice()
+		await this.savePosInvoice()
 
 		//check if they set a customer
 		if (this.defaultCustomer.name == "") {
@@ -1321,7 +1321,7 @@ pos_ar.PointOfSale.Controller = class {
 
 			frappe.db.insert(
 				pos
-			).then(r => {
+			).then(async r => {
 
 				this.payment_cart.hide_waiting()
 
@@ -1329,7 +1329,7 @@ pos_ar.PointOfSale.Controller = class {
 				pos.real_name = r.name
 
 				this.history_cart.print_receipt(pos)
-				this.appData.updatePosInvoice(pos)
+				await this.appData.updatePosInvoice(pos)
 
 				/*** START : deleting pos when finishing **/
 				//print the pos
