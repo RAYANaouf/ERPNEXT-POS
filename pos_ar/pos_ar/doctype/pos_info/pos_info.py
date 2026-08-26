@@ -144,7 +144,7 @@ def get_mode_of_payments():
 
 
 @frappe.whitelist()
-def update_invoice_payment(invoice_name, payment_amount , openingEntry):
+def update_invoice_payment(invoice_name, payment_amount, openingEntry):
 
 	if isinstance(openingEntry, str):
 		openingEntry = json.loads(openingEntry)
@@ -157,7 +157,9 @@ def update_invoice_payment(invoice_name, payment_amount , openingEntry):
 		new_pos_invoice.pos_profile = openingEntry["pos_profile"]
 		new_pos_invoice.posting_date = pos_invoice.posting_date
 
-
+		for item in new_pos_invoice.items:
+			item.serial_and_batch_bundle = None
+			item.batch_no = None
 
 		outstanding_amount = float(new_pos_invoice.outstanding_amount)
 		client_payment_amount = float(payment_amount)
