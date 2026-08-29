@@ -165,6 +165,8 @@ doc_events = {
         "on_cancel": "pos_ar.api.update_checking_invoice_peices",
     },
     "POS Invoice": {
+        "before_validate": "pos_ar.api.auto_allocate_batches_for_pos_invoice",
+        "after_insert": "pos_ar.api.link_pos_invoice_batch_bundles",
         "on_submit": "pos_ar.api.update_customer_debt_on_invoice",
         "on_cancel": "pos_ar.api.update_customer_debt_on_invoice",
     },

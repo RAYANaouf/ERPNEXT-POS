@@ -1225,6 +1225,42 @@ pos_ar.PointOfSale.Controller = class {
 
 		this.payment_cart.show_waiting()
 
+		const cart = this.selectedItemMaps.get(this.selectedTab.tabName);
+		const cartItems = (cart.items || []).map((item) => ({
+			item_code: item.item_code || item.name,
+			qty: item.qty,
+			warehouse: this.appData.appData.pos_profile.warehouse,
+		}));
+		try {
+			const stockCheck = await frappe.call({
+				method: "pos_ar.api.check_pos_cart_stock",
+				args: {
+					items: cartItems,
+					warehouse: this.appData.appData.pos_profile.warehouse,
+				},
+			});
+			const stock = stockCheck.message || {};
+			if (!stock.ok) {
+				frappe.msgprint({
+					title: stock.title || __("Insufficient Stock"),
+					indicator: "red",
+					message: stock.message,
+				});
+				this.isCompleting = false;
+				this.payment_cart.hide_waiting();
+				return;
+			}
+		} catch (e) {
+			this.isCompleting = false;
+			this.payment_cart.hide_waiting();
+			frappe.msgprint({
+				title: __("Error"),
+				indicator: "red",
+				message: __("Could not check stock"),
+			});
+			return;
+		}
+
 		await this.savePosInvoice()
 
 		//check if they set a customer
@@ -1255,7 +1291,7 @@ pos_ar.PointOfSale.Controller = class {
 				'qty': item.qty,
 				'description': item.description,
 				'image': item.image,
-				'use_serial_batch_fields': 1,
+				'use_serial_batch_fields': 0,
 				'cost_center': this.appData.appData.pos_profile.cost_center,
 				'discount_percentage': item.discount_percentage,
 				'discount_amount': item.discount_amount,
@@ -1319,9 +1355,7 @@ pos_ar.PointOfSale.Controller = class {
 		if (status == 'Unpaid') {
 			pos.synced = true
 
-			frappe.db.insert(
-				pos
-			).then(async r => {
+			pos_ar.insertPosInvoice(pos).then(async r => {
 
 				this.payment_cart.hide_waiting()
 
@@ -1458,9 +1492,7 @@ pos_ar.PointOfSale.Controller = class {
 				allUnsyncedPos.forEach(pos => {
 					// we still didnt implement the  base_paid_amount and amount_eligible_for_commissionseen
 					// value in deafault pos ==>  ["Administrator"]. i think it is an array.
-					frappe.db.insert(
-						pos
-					).then(r => {
+					pos_ar.insertPosInvoice(pos).then(r => {
 						const updatedPos = structuredClone(pos)
 						updatedPos.synced = true;
 						updatedPos.real_name = r.name
@@ -1474,16 +1506,16 @@ pos_ar.PointOfSale.Controller = class {
 							this.isSyncing = false; // UNLOCK
 							this.unsyncedPos = 0;
 						}
-					}).catch(err => {
+					}).catch(() => {
 						counter += 1;
 						failure += 1;
-
-						//if the last pos save seccessfully then hide the progress bar
 						if (counter == allUnsyncedPos.length) {
 							frappe.hide_progress();
-							this.customer_box.setSynced();
-							this.isSyncing = false; // UNLOCK
-							this.unsyncedPos = 0;
+							this.isSyncing = false;
+							if (failure === 0) {
+								this.customer_box.setSynced();
+								this.unsyncedPos = 0;
+							}
 						}
 
 					})

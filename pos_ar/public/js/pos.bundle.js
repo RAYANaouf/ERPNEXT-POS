@@ -23,6 +23,29 @@ import "../../pos_ar/page/pos/pos_unsynced_cart.js";
 
 import "../../pos_ar/page/pos/posController.js";
 
+pos_ar.insertPosInvoice = function (pos) {
+	return new Promise((resolve, reject) => {
+		frappe.call({
+			method: "pos_ar.api.insert_pos_invoice",
+			args: { doc: pos },
+			callback: (r) => {
+				const res = r.message || {};
+				if (res.ok) {
+					resolve(res.doc);
+					return;
+				}
+				frappe.msgprint({
+					title: res.title || __("Error"),
+					indicator: "red",
+					message: res.message || __("Could not save POS Invoice"),
+				});
+				reject(res);
+			},
+			error: (err) => reject(err),
+		});
+	});
+};
+
 // 3. Ensure Controller is exposed on window for page initialization
 if (typeof pos_ar !== "undefined" && pos_ar.PointOfSale) {
     window.pos_ar = pos_ar;

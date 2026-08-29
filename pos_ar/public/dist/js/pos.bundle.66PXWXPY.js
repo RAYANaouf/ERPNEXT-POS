@@ -4942,20 +4942,13 @@ Previous balance: ${previous_balance}`);
       this.refreshInvoiceDetails();
     }
     async retrySync(invoice) {
-      frappe.db.insert(
-        invoice
-      ).then((r) => {
+      pos_ar.insertPosInvoice(invoice).then((r) => {
         const updatedPos = structuredClone(invoice);
         updatedPos.synced = true;
         updatedPos.real_name = r.name;
         this.appData.updatePosInvoice(updatedPos);
       }).catch((err) => {
         console.error("Error retrying sync:", err);
-        frappe.msgprint({
-          title: __("Error"),
-          indicator: "red",
-          message: __("Failed to sync invoice")
-        });
       });
     }
     async deleteInvoice(invoice_name) {
@@ -5892,6 +5885,41 @@ Previous balance: ${previous_balance}`);
         return;
       this.isCompleting = true;
       this.payment_cart.show_waiting();
+      const cart = this.selectedItemMaps.get(this.selectedTab.tabName);
+      const cartItems = (cart.items || []).map((item) => ({
+        item_code: item.item_code || item.name,
+        qty: item.qty,
+        warehouse: this.appData.appData.pos_profile.warehouse
+      }));
+      try {
+        const stockCheck = await frappe.call({
+          method: "pos_ar.api.check_pos_cart_stock",
+          args: {
+            items: cartItems,
+            warehouse: this.appData.appData.pos_profile.warehouse
+          }
+        });
+        const stock = stockCheck.message || {};
+        if (!stock.ok) {
+          frappe.msgprint({
+            title: stock.title || __("Insufficient Stock"),
+            indicator: "red",
+            message: stock.message
+          });
+          this.isCompleting = false;
+          this.payment_cart.hide_waiting();
+          return;
+        }
+      } catch (e) {
+        this.isCompleting = false;
+        this.payment_cart.hide_waiting();
+        frappe.msgprint({
+          title: __("Error"),
+          indicator: "red",
+          message: __("Could not check stock")
+        });
+        return;
+      }
       await this.savePosInvoice();
       if (this.defaultCustomer.name == "") {
         frappe.warn(
@@ -5916,7 +5944,7 @@ Previous balance: ${previous_balance}`);
           "qty": item.qty,
           "description": item.description,
           "image": item.image,
-          "use_serial_batch_fields": 1,
+          "use_serial_batch_fields": 0,
           "cost_center": this.appData.appData.pos_profile.cost_center,
           "discount_percentage": item.discount_percentage,
           "discount_amount": item.discount_amount,
@@ -5957,9 +5985,7 @@ Previous balance: ${previous_balance}`);
       pos.custom_is_shared = this.settings_data.settings.sendInvoiceToOtherPos ? 1 : 0;
       if (status == "Unpaid") {
         pos.synced = true;
-        frappe.db.insert(
-          pos
-        ).then(async (r) => {
+        pos_ar.insertPosInvoice(pos).then(async (r) => {
           this.payment_cart.hide_waiting();
           pos.opened = 0;
           pos.real_name = r.name;
@@ -6024,9 +6050,7 @@ Previous balance: ${previous_balance}`);
         (allUnsyncedPos) => {
           frappe.show_progress("Syncing Invoices...", 0, allUnsyncedPos.length, "syncing");
           allUnsyncedPos.forEach((pos) => {
-            frappe.db.insert(
-              pos
-            ).then((r) => {
+            pos_ar.insertPosInvoice(pos).then((r) => {
               const updatedPos = structuredClone(pos);
               updatedPos.synced = true;
               updatedPos.real_name = r.name;
@@ -6039,14 +6063,16 @@ Previous balance: ${previous_balance}`);
                 this.isSyncing = false;
                 this.unsyncedPos = 0;
               }
-            }).catch((err) => {
+            }).catch(() => {
               counter += 1;
               failure += 1;
               if (counter == allUnsyncedPos.length) {
                 frappe.hide_progress();
-                this.customer_box.setSynced();
                 this.isSyncing = false;
-                this.unsyncedPos = 0;
+                if (failure === 0) {
+                  this.customer_box.setSynced();
+                  this.unsyncedPos = 0;
+                }
               }
             });
           });
@@ -6380,8 +6406,30 @@ Previous balance: ${previous_balance}`);
 
   // ../pos_ar/pos_ar/public/js/pos.bundle.js
   frappe.provide("pos_ar.PointOfSale");
+  pos_ar.insertPosInvoice = function(pos) {
+    return new Promise((resolve, reject) => {
+      frappe.call({
+        method: "pos_ar.api.insert_pos_invoice",
+        args: { doc: pos },
+        callback: (r) => {
+          const res = r.message || {};
+          if (res.ok) {
+            resolve(res.doc);
+            return;
+          }
+          frappe.msgprint({
+            title: res.title || __("Error"),
+            indicator: "red",
+            message: res.message || __("Could not save POS Invoice")
+          });
+          reject(res);
+        },
+        error: (err) => reject(err)
+      });
+    });
+  };
   if (typeof pos_ar !== "undefined" && pos_ar.PointOfSale) {
     window.pos_ar = pos_ar;
   }
 })();
-//# sourceMappingURL=pos.bundle.GSXHBEM3.js.map
+//# sourceMappingURL=pos.bundle.66PXWXPY.js.map

@@ -336,24 +336,13 @@ pos_ar.PointOfSale.pos_unsynced_cart = class {
 
     async retrySync(invoice) {
 
-        frappe.db.insert(
-            invoice
-        ).then(r =>{
+        pos_ar.insertPosInvoice(invoice).then(r =>{
             const updatedPos = structuredClone(invoice)
             updatedPos.synced = true;
             updatedPos.real_name = r.name
             this.appData.updatePosInvoice(updatedPos)
-            
-            //this.customer_box.setSynced();
-            //this.unsyncedPos = 0;
-            
         }).catch(err =>{
             console.error('Error retrying sync:', err);
-            frappe.msgprint({
-                title: __('Error'),
-                indicator: 'red',
-                message: __('Failed to sync invoice')
-            });
         })
     }
 

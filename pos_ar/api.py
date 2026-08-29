@@ -8,7 +8,8 @@ import os
 from frappe.utils import get_url
 import json
 
-from frappe.utils import cint
+from frappe.utils import cint, flt, strip_html
+from frappe import _
 
 
 
@@ -974,34 +975,210 @@ def remove_ctn(doc, method):
 
 
 
+def _item_batch_availability(item_code, warehouse, posting_date=None, posting_time=None):
+    from erpnext.stock.doctype.serial_and_batch_bundle.serial_and_batch_bundle import get_auto_batch_nos
+
+    batches = get_auto_batch_nos(
+        frappe._dict(
+            {
+                "item_code": item_code,
+                "warehouse": warehouse,
+                "qty": 0,
+                "based_on": frappe.db.get_single_value("Stock Settings", "pick_serial_and_batch_based_on"),
+                "posting_date": posting_date,
+                "posting_time": posting_time,
+            }
+        )
+    ) or []
+    return sum(flt(b.get("qty")) for b in batches), len(batches)
+
+
+def _batch_stock_message(item_code, available, n_lots, required, warehouse):
+    return _(
+        "Item {0}: batch qty available is {1} (across {2} lots) but {3} is required in {4}."
+    ).format(
+        frappe.bold(item_code),
+        frappe.bold(available),
+        n_lots,
+        frappe.bold(required),
+        frappe.bold(warehouse),
+    )
+
+
+def auto_allocate_batches_for_pos_invoice(doc, method=None):
+    """Create a Serial and Batch Bundle that can span several lots for POS Invoice items."""
+    if getattr(doc, "is_return", 0):
+        return
+
+    from erpnext.stock.serial_batch_bundle import SerialBatchCreation
+
+    invoice_exists = bool(doc.name) and frappe.db.exists("POS Invoice", doc.name)
+
+    for item in doc.get("items") or []:
+        if not item.item_code or flt(item.qty) <= 0 or item.get("serial_and_batch_bundle"):
+            continue
+
+        item_details = frappe.get_cached_value(
+            "Item", item.item_code, ["has_batch_no", "has_serial_no"], as_dict=True
+        )
+        if not item_details or not item_details.has_batch_no or item_details.has_serial_no:
+            continue
+
+        warehouse = item.warehouse or doc.get("set_warehouse")
+        if not warehouse:
+            continue
+
+        stock_qty = flt(item.stock_qty) or flt(item.qty) * flt(item.conversion_factor or 1)
+        if stock_qty <= 0:
+            continue
+
+        available_total, n_lots = _item_batch_availability(
+            item.item_code, warehouse, doc.posting_date, doc.posting_time
+        )
+        if available_total < stock_qty:
+            frappe.throw(
+                _batch_stock_message(item.item_code, available_total, n_lots, stock_qty, warehouse),
+                title=_("Insufficient Stock"),
+            )
+
+        bundle_args = {
+            "item_code": item.item_code,
+            "warehouse": warehouse,
+            "voucher_type": "POS Invoice",
+            "voucher_detail_no": item.name,
+            "posting_date": doc.posting_date,
+            "posting_time": doc.posting_time,
+            "qty": stock_qty,
+            "type_of_transaction": "Outward",
+            "company": doc.company,
+            "do_not_submit": True,
+        }
+        if invoice_exists:
+            bundle_args["voucher_no"] = doc.name
+
+        bundle = SerialBatchCreation(bundle_args).make_serial_and_batch_bundle()
+        if not bundle or not bundle.get("name"):
+            continue
+
+        item.serial_and_batch_bundle = bundle.name
+        item.use_serial_batch_fields = 0
+        item.batch_no = None
+
+
+@frappe.whitelist()
+def check_pos_cart_stock(items, warehouse=None):
+    """Check lot stock for the cart before completing / syncing a POS sale."""
+    if isinstance(items, str):
+        items = json.loads(items)
+
+    errors = []
+    for item in items or []:
+        item_code = item.get("item_code") or item.get("name")
+        qty = flt(item.get("qty"))
+        if not item_code or qty <= 0:
+            continue
+
+        item_details = frappe.get_cached_value(
+            "Item", item_code, ["has_batch_no", "has_serial_no"], as_dict=True
+        )
+        if not item_details or not item_details.has_batch_no or item_details.has_serial_no:
+            continue
+
+        item_warehouse = item.get("warehouse") or warehouse
+        if not item_warehouse:
+            continue
+
+        available, n_lots = _item_batch_availability(item_code, item_warehouse)
+        if available < qty:
+            errors.append(
+                _batch_stock_message(item_code, available, n_lots, qty, item_warehouse)
+            )
+
+    if errors:
+        return {
+            "ok": 0,
+            "title": _("Insufficient Stock"),
+            "message": "<br>".join(errors),
+        }
+    return {"ok": 1}
+
+
+@frappe.whitelist()
+def insert_pos_invoice(doc):
+    """Insert a POS Invoice and return a JSON error instead of an HTML 500 page."""
+    if isinstance(doc, str):
+        doc = json.loads(doc)
+    try:
+        inserted = frappe.get_doc(doc).insert()
+        return {"ok": 1, "doc": inserted.as_dict()}
+    except frappe.ValidationError as e:
+        frappe.clear_messages()
+        return {
+            "ok": 0,
+            "title": _("Insufficient Stock"),
+            "message": strip_html(str(e)),
+        }
+
+
+def _ensure_batch_exists(batch_no, item_code):
+    if frappe.db.exists("Batch", batch_no):
+        return
+    batch = frappe.get_doc({
+        "doctype": "Batch",
+        "batch_id": batch_no,
+        "item": item_code,
+    })
+    batch.flags.ignore_permissions = True
+    batch.insert()
+
+
+def link_pos_invoice_batch_bundles(doc, method=None):
+    """Set voucher_no on auto-created bundles after the POS Invoice is inserted."""
+    for item in doc.get("items") or []:
+        if not item.serial_and_batch_bundle:
+            continue
+        frappe.db.set_value(
+            "Serial and Batch Bundle",
+            item.serial_and_batch_bundle,
+            {
+                "voucher_no": doc.name,
+                "voucher_type": "POS Invoice",
+                "voucher_detail_no": item.name,
+            },
+            update_modified=False,
+        )
+
+
 def _get_or_create_target_bundle(source_item, target_company, target_warehouse, type_of_transaction="Inward", voucher_no=None):
 
     has_batch_no = frappe.db.get_value("Item", source_item.item_code, "has_batch_no")
     if not has_batch_no:
         return None
 
-    batch_no = None
-
+    entries = []
     if getattr(source_item, "serial_and_batch_bundle", None):
         source_bundle = frappe.get_doc("Serial and Batch Bundle", source_item.serial_and_batch_bundle)
-        if source_bundle.entries:
-            batch_no = source_bundle.entries[0].batch_no
+        for entry in source_bundle.entries:
+            if not entry.batch_no:
+                continue
+            _ensure_batch_exists(entry.batch_no, source_item.item_code)
+            qty = abs(flt(entry.qty))
+            if type_of_transaction == "Outward":
+                qty = -qty
+            entries.append({
+                "batch_no": entry.batch_no,
+                "qty": qty,
+            })
     elif getattr(source_item, "batch_no", None):
-        batch_no = source_item.batch_no
-
-    if not batch_no:
-        return None
-
-    if not frappe.db.exists("Batch", batch_no):
-        batch = frappe.get_doc({
-            "doctype": "Batch",
-            "batch_id": batch_no,
-            "item": source_item.item_code
+        _ensure_batch_exists(source_item.batch_no, source_item.item_code)
+        qty = abs(flt(source_item.qty)) if type_of_transaction == "Inward" else -abs(flt(source_item.qty))
+        entries.append({
+            "batch_no": source_item.batch_no,
+            "qty": qty,
         })
-        batch.flags.ignore_permissions = True
-        batch.insert()
 
-    qty = abs(source_item.qty) if type_of_transaction == "Inward" else -abs(source_item.qty)
+    if not entries:
+        return None
 
     bundle = frappe.get_doc({
         "doctype": "Serial and Batch Bundle",
@@ -1010,11 +1187,8 @@ def _get_or_create_target_bundle(source_item, target_company, target_warehouse, 
         "company": target_company,
         "type_of_transaction": type_of_transaction,
         "voucher_type": "Purchase Invoice",
-        "voucher_no": voucher_no,  
-        "entries": [{
-            "batch_no": batch_no,
-            "qty": qty
-        }]
+        "voucher_no": voucher_no,
+        "entries": entries,
     })
     bundle.flags.ignore_permissions = True
     bundle.insert()
