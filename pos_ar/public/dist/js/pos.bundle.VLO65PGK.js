@@ -3007,8 +3007,7 @@ Previous balance: ${previous_balance}`);
 					<div style="font-size:10px;">Commande: ${pos.refNum}</div>
 					<div style="font-size:10px;">Date: ${date}</div>
 					<div style="font-size:10px;">Heure: ${time}</div>
-					${this.company.name == "OPTILENS TIZIOUZOU" ? `<div style="font-size:10px;" >Num\xE9ro: 026124922</div>` : ""}
-					${this.company.name == "OPTILENS AZAZGA" ? `<div style="font-size:10px;" >Num\xE9ro: 0798 41\xA048\xA035</div>` : ""}
+					${this.company.phone_no ? `<div style="font-size:10px;">Num\xE9ro: ${this.company.phone_no}</div>` : ""}
 					<div style="${statusStyle}">Statut: ${paymentStatus}</div>
 				</div>
 			</div>
@@ -6432,4 +6431,4 @@ Previous balance: ${previous_balance}`);
     window.pos_ar = pos_ar;
   }
 })();
-//# sourceMappingURL=pos.bundle.66PXWXPY.js.map
+//# sourceMappingURL=pos.bundle.VLO65PGK.js.map
