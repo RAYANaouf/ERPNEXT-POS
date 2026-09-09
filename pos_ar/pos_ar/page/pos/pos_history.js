@@ -500,15 +500,6 @@ pos_ar.PointOfSale.pos_history = class {
 
 			console.log("paymentStatus : ", paymentStatus, "  pos : " , pos)
 	
-			// Initialize totals
-			const totals = {
-				netTotal: 0,
-				taxes: 0,
-				grandTotal: 0,
-				totalQty: 0,
-				totalItems: 0
-			};
-	
 			// Format number helper
 			const formatNumber = (num) => {
 				return new Intl.NumberFormat('fr-DZ', {
@@ -516,6 +507,10 @@ pos_ar.PointOfSale.pos_history = class {
 					maximumFractionDigits: 0
 				}).format(num);
 			};
+
+			const allItems = pos.items || [];
+			const returnItems = allItems.filter(item => Number(item.qty) < 0);
+			const saleItems = allItems.filter(item => Number(item.qty) > 0);
 	
 			// Get customer data
 			const customer = this.app_data.appData.customers.find(c => c.name === pos.customer);
@@ -650,6 +645,15 @@ pos_ar.PointOfSale.pos_history = class {
 					.text-right {
 						text-align: right;
 					}
+					.return-banner {
+						text-align: center;
+						font-size: 18px;
+						font-weight: bold;
+						letter-spacing: 2px;
+						margin: 6px 0 8px;
+						padding: 4px 0;
+						border: 2px solid #000;
+					}
 				</style>
 			`;
 	
@@ -662,36 +666,41 @@ pos_ar.PointOfSale.pos_history = class {
 				logo = '/assets/pos_ar/images/logo.jpg'
 			}
 
-			// Generate receipt HTML
-			let receiptHTML = `
-				${styles}
-				<div class="receipt-container">
-					<div class="logo-container">
-						<img src="${logo}" alt="Company Logo" onerror="this.style.display='none';">
-					</div>`
+			const buildReceipt = (items, isReturn) => {
+				const totals = {
+					netTotal: 0,
+					taxes: 0,
+					grandTotal: 0,
+					totalQty: 0,
+					totalItems: 0
+				};
+
+				let html = `
+					<div class="receipt-container">
+						<div class="logo-container">
+							<img src="${logo}" alt="Company Logo" onerror="this.style.display='none';">
+						</div>`
 
 				if(this.company.name == "OPTILENS AZAZGA"){
-					receiptHTML +=		
-						`<div class="company-name"> NacimoLens AZAZGA </div>`
+					html += `<div class="company-name"> NacimoLens AZAZGA </div>`
 				}else if(this.company.name != "OPTILENS TIZIOUZOU"){
-					receiptHTML +=		
-						`<div class="company-name">${this.company.company_name}</div>`
+					html += `<div class="company-name">${this.company.company_name}</div>`
 				}
 
-			receiptHTML +=	
-			`
-			<div class="receipt-header">
-				<div class="customer-info">
-					<div class="bold">Client: ${pos.customer}</div>
-					<div style="font-size:10px;">Commande: ${pos.refNum}</div>
-					<div style="font-size:10px;">Date: ${date}</div>
-					<div style="font-size:10px;">Heure: ${time}</div>
-					${this.company.phone_no ? `<div style="font-size:10px;">Numéro: ${this.company.phone_no}</div>` : ''}
-					<div style="${statusStyle}">Statut: ${paymentStatus}</div>
-				</div>
-			</div>
-			<table class="receipt-table">
-
+				html += `
+					<div class="receipt-header">
+						<div class="customer-info">
+							${isReturn ? `<div class="return-banner">RETOUR</div>` : ''}
+							<div class="bold">Client: ${pos.customer}</div>
+							<div style="font-size:10px;">Commande: ${pos.refNum}</div>
+							${isReturn && pos.return_against ? `<div style="font-size:10px;">Retour de: ${pos.return_against}</div>` : ''}
+							<div style="font-size:10px;">Date: ${date}</div>
+							<div style="font-size:10px;">Heure: ${time}</div>
+							${this.company.phone_no ? `<div style="font-size:10px;">Numéro: ${this.company.phone_no}</div>` : ''}
+							<div style="${statusStyle}">Statut: ${paymentStatus}</div>
+						</div>
+					</div>
+					<table class="receipt-table">
 						<div class="table-header">
 							<tr>
 								<th>Article</th>
@@ -701,38 +710,33 @@ pos_ar.PointOfSale.pos_history = class {
 							</tr>
 						</div>
 						<tbody>
-			`;
-	
-			// Add items
-			pos.items.forEach(item => {
-				const itemTotal = item.rate * item.qty;
-				totals.netTotal += itemTotal;
-				totals.totalQty += item.qty;
-				totals.totalItems += 1;
-	
-				receiptHTML += `
-					<tr>
-						<td>${item.item_name}</td>
-						<td class="text-right">${item.qty}</td>
-						<td class="text-right">${formatNumber(item.rate)}</td>
-						<td class="text-right">${formatNumber(itemTotal)}</td>
-					</tr>
 				`;
-			});
-	
-			// Calculate totals
-			const discount = pos.additional_discount_percentage
-				? (totals.netTotal * pos.additional_discount_percentage / 100)
-				: 0;
-			totals.grandTotal = totals.netTotal - discount;
-	
 
-			console.log("test7  soldes :: " , previous_balance)
-			// Add totals section
-			receiptHTML += `
+				items.forEach(item => {
+					const itemTotal = item.rate * item.qty;
+					totals.netTotal += itemTotal;
+					totals.totalQty += item.qty;
+					totals.totalItems += 1;
+
+					html += `
+						<tr>
+							<td>${item.item_name}</td>
+							<td class="text-right">${item.qty}</td>
+							<td class="text-right">${formatNumber(item.rate)}</td>
+							<td class="text-right">${formatNumber(itemTotal)}</td>
+						</tr>
+					`;
+				});
+
+				const discount = pos.additional_discount_percentage
+					? (totals.netTotal * pos.additional_discount_percentage / 100)
+					: 0;
+				totals.grandTotal = totals.netTotal - discount;
+
+				html += `
 						</tbody>
 					</table>
-	
+
 					<div class="totals">
 						<div>Quantité Totale: ${totals.totalQty}</div>
 						<div>Remise: ${formatNumber(discount)} DA</div>
@@ -747,17 +751,27 @@ pos_ar.PointOfSale.pos_history = class {
 							</div>
 						</div>
 					</div>
-	
+
 					<div class="receipt-footer">
 						<div>Merci de votre visite!</div>`
 
-			if(this.company.name != "OPTILENS TIZIOUZOU" || this.company.name != "OPTILENS AZAZGA"  ){
-				receiptHTML += 	`<div>${this.company.company_name}</div>`
-			}
+				if(this.company.name != "OPTILENS TIZIOUZOU" || this.company.name != "OPTILENS AZAZGA"  ){
+					html += `<div>${this.company.company_name}</div>`
+				}
 
-			receiptHTML += 		`</div>
-				</div>
-			`;
+				html += `</div>
+					</div>
+				`;
+
+				return html;
+			};
+
+			console.log("test7  soldes :: " , previous_balance)
+
+			// RETOUR seulement si le ticket est 100% retour (aucune vente).
+			// Un mélange retour + verres = un seul bon normal.
+			const isPureReturn = returnItems.length > 0 && saleItems.length === 0;
+			const receiptHTML = `${styles}${buildReceipt(isPureReturn ? returnItems : allItems, isPureReturn)}`;
 	
 			// Print the receipt
 			const printWindow = window.open('', '_blank');
