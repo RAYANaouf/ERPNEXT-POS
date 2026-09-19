@@ -12,7 +12,12 @@ app_license = "mit"
 
 # include js, css files in header of desk.html
 app_include_css = "/assets/pos_ar/css/main.css"
-app_include_js  = ["/assets/pos_ar/js/pos.bundle.js","https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js","/assets/pos_ar/js/sw.js",]
+app_include_js  = [
+	"/assets/pos_ar/js/pos.bundle.js",
+	"https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js",
+	"/assets/pos_ar/js/sw.js",
+	"/assets/pos_ar/js/flexible_list_columns.js?v=20260902-1915",
+]
 # include js, css files in header of web template
 # web_include_css = "/assets/pos_ar/css/pos_ar.css"
 # web_include_js = "/assets/pos_ar/js/pos_ar.js"
@@ -68,7 +73,7 @@ app_include_js  = ["/assets/pos_ar/js/pos.bundle.js","https://cdnjs.cloudflare.c
 # ------------
 
 # before_install = "pos_ar.install.before_install"
-# after_install = "pos_ar.install.after_install"
+after_install = "pos_ar.install.after_migrate"
 
 # Uninstallation
 # ------------
@@ -175,6 +180,7 @@ doc_events = {
         "on_cancel": "pos_ar.api.update_customer_debt_on_invoice",
     },
     "Stock Entry": {
+        "validate": "pos_ar.api.validate_stock_incident",
         "on_submit": "pos_ar.api.process_supply_alternatives",
     },
     "Checking The Invoice": {
@@ -188,7 +194,9 @@ doc_events = {
     },
 
 }
-   
+
+
+after_migrate = ["pos_ar.install.after_migrate"]
 
 
 # Scheduled Tasks
@@ -323,5 +331,8 @@ fixtures = [
         'filters': [
             ["module" , "in" , ["POS AR"]],
         ]
-    }
+    },
+    {
+        'dt': 'Stock Incident Reason',
+    },
 ]

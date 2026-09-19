@@ -673,5 +673,49 @@
    }
   ],
   "timeout": 0
+ },
+ {
+  "add_total_row": 1,
+  "add_translate_data": 0,
+  "columns": [],
+  "disabled": 0,
+  "docstatus": 0,
+  "doctype": "Report",
+  "filters": [],
+  "is_standard": "No",
+  "javascript": "frappe.query_reports[\"Stock Incidents\"] = {\n\tfilters: [\n\t\t{\n\t\t\tfieldname: \"from_date\",\n\t\t\tlabel: __(\"From Date\"),\n\t\t\tfieldtype: \"Date\",\n\t\t\tdefault: frappe.datetime.add_months(frappe.datetime.get_today(), -1),\n\t\t\treqd: 1,\n\t\t},\n\t\t{\n\t\t\tfieldname: \"to_date\",\n\t\t\tlabel: __(\"To Date\"),\n\t\t\tfieldtype: \"Date\",\n\t\t\tdefault: frappe.datetime.get_today(),\n\t\t\treqd: 1,\n\t\t},\n\t\t{\n\t\t\tfieldname: \"company\",\n\t\t\tlabel: __(\"Company\"),\n\t\t\tfieldtype: \"Link\",\n\t\t\toptions: \"Company\",\n\t\t\tdefault: frappe.defaults.get_user_default(\"Company\"),\n\t\t},\n\t\t{\n\t\t\tfieldname: \"purpose\",\n\t\t\tlabel: __(\"Purpose\"),\n\t\t\tfieldtype: \"Select\",\n\t\t\toptions: \"\\nMaterial Issue\\nMaterial Receipt\",\n\t\t},\n\t\t{\n\t\t\tfieldname: \"reason\",\n\t\t\tlabel: __(\"Raison\"),\n\t\t\tfieldtype: \"Link\",\n\t\t\toptions: \"Stock Incident Reason\",\n\t\t},\n\t\t{\n\t\t\tfieldname: \"owner\",\n\t\t\tlabel: __(\"User\"),\n\t\t\tfieldtype: \"Link\",\n\t\t\toptions: \"User\",\n\t\t},\n\t\t{\n\t\t\tfieldname: \"warehouse\",\n\t\t\tlabel: __(\"Warehouse\"),\n\t\t\tfieldtype: \"Link\",\n\t\t\toptions: \"Warehouse\",\n\t\t},\n\t],\n};",
+  "json": null,
+  "letter_head": null,
+  "modified": "2026-09-19 16:50:00.000000",
+  "module": "POS AR",
+  "name": "Stock Incidents",
+  "prepared_report": 0,
+  "query": null,
+  "ref_doctype": "Stock Entry",
+  "reference_report": null,
+  "report_name": "Stock Incidents",
+  "report_script": "columns = [\n\t{\"label\": _(\"Date\"), \"fieldname\": \"posting_date\", \"fieldtype\": \"Date\", \"width\": 100},\n\t{\"label\": _(\"Stock Entry\"), \"fieldname\": \"stock_entry\", \"fieldtype\": \"Link\", \"options\": \"Stock Entry\", \"width\": 140},\n\t{\"label\": _(\"Purpose\"), \"fieldname\": \"purpose\", \"fieldtype\": \"Data\", \"width\": 140},\n\t{\"label\": _(\"Raison\"), \"fieldname\": \"reason\", \"fieldtype\": \"Link\", \"options\": \"Stock Incident Reason\", \"width\": 160},\n\t{\"label\": _(\"User\"), \"fieldname\": \"owner\", \"fieldtype\": \"Link\", \"options\": \"User\", \"width\": 140},\n\t{\"label\": _(\"Warehouse\"), \"fieldname\": \"warehouse\", \"fieldtype\": \"Link\", \"options\": \"Warehouse\", \"width\": 150},\n\t{\"label\": _(\"Item Name\"), \"fieldname\": \"item_name\", \"fieldtype\": \"Data\", \"width\": 160},\n\t{\"label\": _(\"Qty\"), \"fieldname\": \"qty\", \"fieldtype\": \"Float\", \"width\": 90},\n\t{\"label\": _(\"Details\"), \"fieldname\": \"notes\", \"fieldtype\": \"Data\", \"width\": 220},\n]\n\nmeta = frappe.get_meta(\"Stock Entry\")\nif not meta.has_field(\"custom_is_stock_incident\"):\n\tdata = [columns, [], None, None, []]\nelse:\n\tconditions = []\n\tvalues = {}\n\n\tif filters.get(\"from_date\"):\n\t\tconditions.append(\"se.posting_date >= %(from_date)s\")\n\t\tvalues[\"from_date\"] = frappe.utils.getdate(filters.from_date)\n\tif filters.get(\"to_date\"):\n\t\tconditions.append(\"se.posting_date <= %(to_date)s\")\n\t\tvalues[\"to_date\"] = frappe.utils.getdate(filters.to_date)\n\tif filters.get(\"company\"):\n\t\tconditions.append(\"se.company = %(company)s\")\n\t\tvalues[\"company\"] = filters.company\n\tif filters.get(\"purpose\"):\n\t\tconditions.append(\"se.purpose = %(purpose)s\")\n\t\tvalues[\"purpose\"] = filters.purpose\n\tif filters.get(\"reason\") and meta.has_field(\"custom_incident_reason\"):\n\t\tconditions.append(\"se.custom_incident_reason = %(reason)s\")\n\t\tvalues[\"reason\"] = filters.reason\n\tif filters.get(\"owner\"):\n\t\tconditions.append(\"se.owner = %(owner)s\")\n\t\tvalues[\"owner\"] = filters.owner\n\tif filters.get(\"warehouse\"):\n\t\tconditions.append(\n\t\t\t\"(sed.s_warehouse = %(warehouse)s or sed.t_warehouse = %(warehouse)s\"\n\t\t\t\" or se.from_warehouse = %(warehouse)s or se.to_warehouse = %(warehouse)s)\"\n\t\t)\n\t\tvalues[\"warehouse\"] = filters.warehouse\n\n\tcondition_sql = \"\"\n\tif conditions:\n\t\tcondition_sql = \" and \" + \" and \".join(conditions)\n\n\tnotes_select = \"se.remarks as notes\"\n\tif meta.has_field(\"custom_incident_notes\"):\n\t\tnotes_select = \"ifnull(se.custom_incident_notes, se.remarks) as notes\"\n\n\treason_select = \"'' as reason\"\n\tif meta.has_field(\"custom_incident_reason\"):\n\t\treason_select = \"se.custom_incident_reason as reason\"\n\n\tquery = (\n\t\t\"select se.posting_date, se.name as stock_entry, se.purpose, \"\n\t\t+ reason_select + \", se.owner, \"\n\t\t+ \"ifnull(sed.s_warehouse, ifnull(se.from_warehouse, ifnull(sed.t_warehouse, se.to_warehouse))) as warehouse, \"\n\t\t+ \"sed.item_name, sed.qty, \" + notes_select + \" \"\n\t\t+ \"from `tabStock Entry` se \"\n\t\t+ \"inner join `tabStock Entry Detail` sed on sed.parent = se.name \"\n\t\t+ \"where se.docstatus = 1 \"\n\t\t+ \"and se.custom_is_stock_incident = 1 \"\n\t\t+ \"and se.purpose in ('Material Issue', 'Material Receipt') \"\n\t\t+ condition_sql + \" \"\n\t\t+ \"order by se.posting_date desc, se.name desc\"\n\t)\n\n\trows = frappe.db.sql(query, values, as_dict=True)\n\n\tqtys = {}\n\tentries = {}\n\tfor row in rows:\n\t\treason = row.get(\"reason\") or _(\"Sans raison\")\n\t\tqtys[reason] = qtys.get(reason, 0) + frappe.utils.flt(row.get(\"qty\"))\n\t\tif reason not in entries:\n\t\t\tentries[reason] = []\n\t\tstock_entry = row.get(\"stock_entry\")\n\t\tif stock_entry and stock_entry not in entries[reason]:\n\t\t\tentries[reason].append(stock_entry)\n\n\tlabels = list(qtys.keys())\n\tincident_values = []\n\tqty_values = []\n\tfor label in labels:\n\t\tincident_values.append(len(entries[label]))\n\t\tqty_values.append(qtys[label])\n\n\tchart = {\n\t\t\"data\": {\n\t\t\t\"labels\": labels,\n\t\t\t\"datasets\": [\n\t\t\t\t{\"name\": _(\"Incidents\"), \"values\": incident_values},\n\t\t\t\t{\"name\": _(\"Quantite\"), \"values\": qty_values},\n\t\t\t],\n\t\t},\n\t\t\"type\": \"bar\",\n\t}\n\n\tseen = []\n\tfor row in rows:\n\t\tstock_entry = row.get(\"stock_entry\")\n\t\tif stock_entry and stock_entry not in seen:\n\t\t\tseen.append(stock_entry)\n\tincident_count = len(seen)\n\ttotal_qty = 0\n\tfor row in rows:\n\t\ttotal_qty = total_qty + frappe.utils.flt(row.get(\"qty\"))\n\n\tsummary = [\n\t\t{\n\t\t\t\"value\": incident_count,\n\t\t\t\"label\": _(\"Incidents\"),\n\t\t\t\"datatype\": \"Int\",\n\t\t\t\"indicator\": \"red\" if incident_count else \"green\",\n\t\t},\n\t\t{\n\t\t\t\"value\": total_qty,\n\t\t\t\"label\": _(\"Pieces\"),\n\t\t\t\"datatype\": \"Float\",\n\t\t\t\"indicator\": \"orange\" if total_qty else \"green\",\n\t\t},\n\t]\n\n\tdata = [columns, rows, None, chart, summary]",
+  "report_type": "Script Report",
+  "roles": [
+   {
+    "parent": "Stock Incidents",
+    "parentfield": "roles",
+    "parenttype": "Report",
+    "role": "Stock User"
+   },
+   {
+    "parent": "Stock Incidents",
+    "parentfield": "roles",
+    "parenttype": "Report",
+    "role": "Stock Manager"
+   },
+   {
+    "parent": "Stock Incidents",
+    "parentfield": "roles",
+    "parenttype": "Report",
+    "role": "System Manager"
+   }
+  ],
+  "timeout": 0
  }
 ]

@@ -2922,3 +2922,38 @@ def item_permission(doc, ptype="read", user=None):
         return True
 
     return item_group_permission(item_group, ptype=ptype, user=user)
+
+
+def validate_stock_incident(doc, method=None):
+	"""Require a structured reason when Material Issue/Receipt is marked as an incident."""
+	if not doc.meta.has_field("custom_is_stock_incident"):
+		return
+
+	purpose = (doc.get("purpose") or "").strip()
+	is_incident = cint(doc.get("custom_is_stock_incident"))
+
+	if purpose not in ("Material Issue", "Material Receipt"):
+		if is_incident:
+			doc.custom_is_stock_incident = 0
+		if doc.meta.has_field("custom_incident_reason"):
+			doc.custom_incident_reason = None
+		if doc.meta.has_field("custom_incident_notes"):
+			doc.custom_incident_notes = None
+		return
+
+	if is_incident and not doc.get("custom_incident_reason"):
+		frappe.throw(_("Please select the incident reason (Raison)."))
+
+	reason = doc.get("custom_incident_reason")
+	if not reason or not frappe.db.exists("Stock Incident Reason", reason):
+		return
+
+	applies_to, is_active = frappe.db.get_value(
+		"Stock Incident Reason", reason, ["applies_to", "is_active"]
+	)
+	if not cint(is_active):
+		frappe.throw(_("Incident reason {0} is disabled.").format(reason))
+
+	expected = "Receipt" if purpose == "Material Receipt" else "Issue"
+	if applies_to not in (expected, "Both"):
+		frappe.throw(_("Reason {0} does not apply to {1}.").format(reason, purpose))

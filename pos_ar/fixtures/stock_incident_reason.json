@@ -1,0 +1,92 @@
+[
+ {
+  "applies_to": "Issue",
+  "description": "Boite / carton qui fuit, verres abimes",
+  "docstatus": 0,
+  "doctype": "Stock Incident Reason",
+  "is_active": 1,
+  "modified": "2026-09-19 16:50:00.000000",
+  "name": "Carton fuyant",
+  "reason_name": "Carton fuyant"
+ },
+ {
+  "applies_to": "Issue",
+  "description": "Carton ou blister casse, ouvert ou ecrase",
+  "docstatus": 0,
+  "doctype": "Stock Incident Reason",
+  "is_active": 1,
+  "modified": "2026-09-19 16:50:00.000000",
+  "name": "Emballage endommage",
+  "reason_name": "Emballage endommage"
+ },
+ {
+  "applies_to": "Issue",
+  "description": "Verres (lens) casses ou inutilisables",
+  "docstatus": 0,
+  "doctype": "Stock Incident Reason",
+  "is_active": 1,
+  "modified": "2026-09-19 16:50:00.000000",
+  "name": "Verres casses",
+  "reason_name": "Verres casses"
+ },
+ {
+  "applies_to": "Issue",
+  "description": "Quantite manquante a l'ouverture du carton",
+  "docstatus": 0,
+  "doctype": "Stock Incident Reason",
+  "is_active": 1,
+  "modified": "2026-09-19 16:50:00.000000",
+  "name": "Manquant ou perdu",
+  "reason_name": "Manquant ou perdu"
+ },
+ {
+  "applies_to": "Issue",
+  "description": "Pieces refusees pour defaut qualite",
+  "docstatus": 0,
+  "doctype": "Stock Incident Reason",
+  "is_active": 1,
+  "modified": "2026-09-19 16:50:00.000000",
+  "name": "Rejet qualite",
+  "reason_name": "Rejet qualite"
+ },
+ {
+  "applies_to": "Issue",
+  "description": "Produit expire",
+  "docstatus": 0,
+  "doctype": "Stock Incident Reason",
+  "is_active": 1,
+  "modified": "2026-09-19 16:50:00.000000",
+  "name": "Peremption",
+  "reason_name": "Peremption"
+ },
+ {
+  "applies_to": "Receipt",
+  "description": "Pieces retrouvees ou non saisies",
+  "docstatus": 0,
+  "doctype": "Stock Incident Reason",
+  "is_active": 1,
+  "modified": "2026-09-19 16:50:00.000000",
+  "name": "Stock trouve",
+  "reason_name": "Stock trouve"
+ },
+ {
+  "applies_to": "Receipt",
+  "description": "Pieces recuperees apres un incident",
+  "docstatus": 0,
+  "doctype": "Stock Incident Reason",
+  "is_active": 1,
+  "modified": "2026-09-19 16:50:00.000000",
+  "name": "Retour apres incident",
+  "reason_name": "Retour apres incident"
+ },
+ {
+  "applies_to": "Both",
+  "description": "Autre cause, a preciser dans les details",
+  "docstatus": 0,
+  "doctype": "Stock Incident Reason",
+  "is_active": 1,
+  "modified": "2026-09-19 16:50:00.000000",
+  "name": "Autre",
+  "reason_name": "Autre"
+ }
+]
