@@ -1,11 +1,21 @@
 [
  {
+  "applies_to": "Receipt",
+  "description": "Ecart positif d'inventaire",
+  "docstatus": 0,
+  "doctype": "Stock Incident Reason",
+  "is_active": 1,
+  "modified": "2026-09-19 15:30:45.390946",
+  "name": "Surplus inventaire",
+  "reason_name": "Surplus inventaire"
+ },
+ {
   "applies_to": "Issue",
   "description": "Boite / carton qui fuit, verres abimes",
   "docstatus": 0,
   "doctype": "Stock Incident Reason",
   "is_active": 1,
-  "modified": "2026-09-19 16:50:00.000000",
+  "modified": "2026-09-29 06:41:58.796921",
   "name": "Carton fuyant",
   "reason_name": "Carton fuyant"
  },
@@ -15,7 +25,7 @@
   "docstatus": 0,
   "doctype": "Stock Incident Reason",
   "is_active": 1,
-  "modified": "2026-09-19 16:50:00.000000",
+  "modified": "2026-09-29 06:41:58.805821",
   "name": "Emballage endommage",
   "reason_name": "Emballage endommage"
  },
@@ -25,7 +35,7 @@
   "docstatus": 0,
   "doctype": "Stock Incident Reason",
   "is_active": 1,
-  "modified": "2026-09-19 16:50:00.000000",
+  "modified": "2026-09-29 06:41:58.809519",
   "name": "Verres casses",
   "reason_name": "Verres casses"
  },
@@ -35,7 +45,7 @@
   "docstatus": 0,
   "doctype": "Stock Incident Reason",
   "is_active": 1,
-  "modified": "2026-09-19 16:50:00.000000",
+  "modified": "2026-09-29 06:41:58.813103",
   "name": "Manquant ou perdu",
   "reason_name": "Manquant ou perdu"
  },
@@ -45,7 +55,7 @@
   "docstatus": 0,
   "doctype": "Stock Incident Reason",
   "is_active": 1,
-  "modified": "2026-09-19 16:50:00.000000",
+  "modified": "2026-09-29 06:41:58.816755",
   "name": "Rejet qualite",
   "reason_name": "Rejet qualite"
  },
@@ -55,7 +65,7 @@
   "docstatus": 0,
   "doctype": "Stock Incident Reason",
   "is_active": 1,
-  "modified": "2026-09-19 16:50:00.000000",
+  "modified": "2026-09-29 06:41:58.820387",
   "name": "Peremption",
   "reason_name": "Peremption"
  },
@@ -65,7 +75,7 @@
   "docstatus": 0,
   "doctype": "Stock Incident Reason",
   "is_active": 1,
-  "modified": "2026-09-19 16:50:00.000000",
+  "modified": "2026-09-29 06:41:58.824103",
   "name": "Stock trouve",
   "reason_name": "Stock trouve"
  },
@@ -75,7 +85,7 @@
   "docstatus": 0,
   "doctype": "Stock Incident Reason",
   "is_active": 1,
-  "modified": "2026-09-19 16:50:00.000000",
+  "modified": "2026-09-29 06:41:58.827813",
   "name": "Retour apres incident",
   "reason_name": "Retour apres incident"
  },
@@ -85,7 +95,7 @@
   "docstatus": 0,
   "doctype": "Stock Incident Reason",
   "is_active": 1,
-  "modified": "2026-09-19 16:50:00.000000",
+  "modified": "2026-09-29 06:41:58.831751",
   "name": "Autre",
   "reason_name": "Autre"
  }

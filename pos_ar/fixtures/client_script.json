@@ -2,6 +2,28 @@
  {
   "docstatus": 0,
   "doctype": "Client Script",
+  "dt": "POS Profile",
+  "enabled": 1,
+  "modified": "2026-06-30 18:17:45.028301",
+  "module": "POS AR",
+  "name": "filter Cash In/Out on Class 5",
+  "script": "frappe.ui.form.on(\"POS Profile\", {\n    refresh(frm) {\n        frm.set_query(\"custom_cash_in\", function() {\n            return {\n                filters: {\n                    account_number: [\"like\", \"5%\"]\n                }\n            };\n        });\n        frm.set_query(\"custom_cash_out\", function() {\n            return {\n                filters: {\n                    account_number: [\"like\", \"5%\"]\n                }\n            };\n        });\n    }\n});",
+  "view": "Form"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Client Script",
+  "dt": "Sales Invoice",
+  "enabled": 1,
+  "modified": "2025-06-16 08:21:44.571672",
+  "module": "POS AR",
+  "name": "filter item by ctn",
+  "script": "frappe.ui.form.on('Sales Invoice', {\n\trefresh(frm) {\n\t\t// your code here\n\t}\n})\n\nfrappe.ui.form.on(\"CTN Transaction Sales Invoice\", {\n  ctn: function(frm, cdt, cdn) {\n    let row = frappe.get_doc(cdt, cdn);\n\n    if (!row.ctn) {\n      frm.fields_dict[\"custom_ctn_transaction\"].grid.get_field(\"item\").get_query = () => ({});\n      return;\n    }\n\n    frappe.call({\n      method: \"pos_ar.pos_ar.doctype.ctn_box.ctn_box.get_ctn_items\",\n      args: {\n        // pass in row.ctn if that’s actually the box name\n        ctn_box_name: row.ctn\n      },\n      callback: function(r) {\n          \n        if (r.message) {\n          \n          let allowed_items = r.message;\n          \n          console.log(allowed_items)\n          \n          frm.fields_dict[\"custom_ctn_transaction\"].grid.get_field(\"item\").get_query = \n            function(doc, cdt2, cdn2) {\n              return { filters: { name: [\"in\", allowed_items] } };\n            };\n\n          if (row.item && !allowed_items.includes(row.item)) {\n            frappe.model.set_value(cdt, cdn, \"item\", null);\n          }\n        }\n      }\n    });\n  }\n});\n",
+  "view": "Form"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Client Script",
   "dt": "Company",
   "enabled": 1,
   "modified": "2026-06-27 15:42:17.534762",
@@ -323,7 +345,7 @@
   "doctype": "Client Script",
   "dt": "Stock Entry",
   "enabled": 1,
-  "modified": "2026-09-19 16:50:00.000000",
+  "modified": "2026-09-29 06:41:58.847710",
   "module": "POS AR",
   "name": "Stock Entry Incident",
   "script": "frappe.ui.form.on(\"Stock Entry\", {\n\tonload(frm) {\n\t\tsetup_incident_reason_query(frm);\n\t},\n\n\trefresh(frm) {\n\t\tsetup_incident_reason_query(frm);\n\t\ttoggle_incident_fields(frm);\n\t},\n\n\tpurpose(frm) {\n\t\treset_incident_if_needed(frm);\n\t\tsetup_incident_reason_query(frm);\n\t\ttoggle_incident_fields(frm);\n\t},\n\n\tstock_entry_type(frm) {\n\t\treset_incident_if_needed(frm);\n\t\tsetup_incident_reason_query(frm);\n\t\ttoggle_incident_fields(frm);\n\t},\n\n\tcustom_is_stock_incident(frm) {\n\t\tif (!frm.doc.custom_is_stock_incident) {\n\t\t\tfrm.set_value(\"custom_incident_reason\", \"\");\n\t\t\tfrm.set_value(\"custom_incident_notes\", \"\");\n\t\t}\n\t\ttoggle_incident_fields(frm);\n\t},\n});\n\nfunction is_issue_or_receipt(frm) {\n\tconst purpose = frm.doc.purpose || \"\";\n\tconst entry_type = frm.doc.stock_entry_type || \"\";\n\treturn (\n\t\t[\"Material Issue\", \"Material Receipt\"].includes(purpose) ||\n\t\t[\"Material Issue\", \"Material Receipt\"].includes(entry_type)\n\t);\n}\n\nfunction incident_applies_to(frm) {\n\tconst purpose = frm.doc.purpose || frm.doc.stock_entry_type || \"\";\n\tif (purpose === \"Material Receipt\") {\n\t\treturn \"Receipt\";\n\t}\n\treturn \"Issue\";\n}\n\nfunction toggle_incident_fields(frm) {\n\tconst show = is_issue_or_receipt(frm);\n\tfrm.toggle_display(\"custom_incident_section\", show);\n\tfrm.toggle_display(\"custom_is_stock_incident\", show);\n\n\tconst show_details = show && Number(frm.doc.custom_is_stock_incident);\n\t[\n\t\t\"custom_cb_incident\",\n\t\t\"custom_incident_reason\",\n\t\t\"custom_incident_details_sb\",\n\t\t\"custom_incident_notes\",\n\t].forEach((field) => frm.toggle_display(field, show_details));\n\n\tfrm.toggle_reqd(\"custom_incident_reason\", show_details);\n}\n\nfunction reset_incident_if_needed(frm) {\n\tif (is_issue_or_receipt(frm)) {\n\t\treturn;\n\t}\n\tif (frm.doc.custom_is_stock_incident) {\n\t\tfrm.set_value(\"custom_is_stock_incident\", 0);\n\t}\n\tfrm.set_value(\"custom_incident_reason\", \"\");\n\tfrm.set_value(\"custom_incident_notes\", \"\");\n}\n\nfunction setup_incident_reason_query(frm) {\n\tif (!frm.fields_dict.custom_incident_reason) {\n\t\treturn;\n\t}\n\tfrm.set_query(\"custom_incident_reason\", function () {\n\t\treturn {\n\t\t\tfilters: {\n\t\t\t\tis_active: 1,\n\t\t\t\tapplies_to: [\"in\", [incident_applies_to(frm), \"Both\"]],\n\t\t\t},\n\t\t};\n\t});\n}",

@@ -1,5 +1,86 @@
 [
  {
+  "add_total_row": 1,
+  "add_translate_data": 0,
+  "columns": [],
+  "disabled": 0,
+  "docstatus": 0,
+  "doctype": "Report",
+  "filters": [
+   {
+    "default": null,
+    "fieldname": "company",
+    "fieldtype": "Link",
+    "label": "Company",
+    "mandatory": 1,
+    "options": "Company",
+    "parent": "Average Of Sell",
+    "parentfield": "filters",
+    "parenttype": "Report",
+    "wildcard_filter": 0
+   },
+   {
+    "default": null,
+    "fieldname": "warehouse",
+    "fieldtype": "Link",
+    "label": "Warehouse",
+    "mandatory": 1,
+    "options": "Warehouse",
+    "parent": "Average Of Sell",
+    "parentfield": "filters",
+    "parenttype": "Report",
+    "wildcard_filter": 0
+   },
+   {
+    "default": null,
+    "fieldname": "stock_warehouse",
+    "fieldtype": "Link",
+    "label": "Stock Warehouse",
+    "mandatory": 0,
+    "options": "Warehouse",
+    "parent": "Average Of Sell",
+    "parentfield": "filters",
+    "parenttype": "Report",
+    "wildcard_filter": 0
+   }
+  ],
+  "is_standard": "No",
+  "javascript": null,
+  "json": null,
+  "letter_head": null,
+  "modified": "2026-07-14 13:55:19.273761",
+  "module": "POS AR",
+  "name": "Average Of Sell",
+  "prepared_report": 0,
+  "query": "WITH monthly_sales AS (\r\n    SELECT\r\n        sii.item_code,\r\n        YEAR(si.posting_date) AS y,\r\n        MONTH(si.posting_date) AS m,\r\n        SUM(sii.qty) AS qty\r\n    FROM `tabSales Invoice Item` sii\r\n    INNER JOIN `tabSales Invoice` si\r\n        ON si.name = sii.parent\r\n    WHERE\r\n        si.docstatus = 1\r\n        AND (%(company)s IS NULL OR si.company = %(company)s)\r\n        AND (%(warehouse)s IS NULL OR sii.warehouse = %(warehouse)s)\r\n    GROUP BY\r\n        sii.item_code,\r\n        YEAR(si.posting_date),\r\n        MONTH(si.posting_date)\r\n),\r\n\r\nstock_qty AS (\r\n    SELECT\r\n        b.item_code,\r\n        SUM(b.actual_qty) AS actual_qty\r\n    FROM `tabBin` b\r\n    INNER JOIN `tabWarehouse` w\r\n        ON w.name = b.warehouse\r\n    WHERE\r\n        (%(company)s IS NULL OR w.company = %(company)s)\r\n    GROUP BY\r\n        b.item_code\r\n)\r\n\r\nSELECT\r\n    ms.item_code AS \"Item:Link/Item:150\",\r\n    ROUND(AVG(ms.qty), 2) AS \"Average Monthly Qty:Float:180\",\r\n    COALESCE(sq.actual_qty, 0) AS \"Current Stock:Float:150\",\r\n    CASE\r\n        WHEN AVG(ms.qty) = 0 THEN NULL\r\n        ELSE ROUND(COALESCE(sq.actual_qty, 0) / AVG(ms.qty), 2)\r\n    END AS \"Stock Coverage (Months):Float:180\"\r\nFROM monthly_sales ms\r\nLEFT JOIN stock_qty sq\r\n    ON sq.item_code = ms.item_code\r\nGROUP BY\r\n    ms.item_code,\r\n    sq.actual_qty\r\nORDER BY\r\n    ms.item_code;",
+  "ref_doctype": "Sales Invoice",
+  "reference_report": null,
+  "report_name": "Average Of Sell",
+  "report_script": null,
+  "report_type": "Query Report",
+  "roles": [
+   {
+    "parent": "Average Of Sell",
+    "parentfield": "roles",
+    "parenttype": "Report",
+    "role": "Accounts User"
+   },
+   {
+    "parent": "Average Of Sell",
+    "parentfield": "roles",
+    "parenttype": "Report",
+    "role": "Sales Manager"
+   },
+   {
+    "parent": "Average Of Sell",
+    "parentfield": "roles",
+    "parenttype": "Report",
+    "role": "Employee Self Service"
+   }
+  ],
+  "timeout": 0
+ },
+ {
   "add_total_row": 0,
   "add_translate_data": 0,
   "columns": [],
@@ -686,7 +767,7 @@
   "javascript": "frappe.query_reports[\"Stock Incidents\"] = {\n\tfilters: [\n\t\t{\n\t\t\tfieldname: \"from_date\",\n\t\t\tlabel: __(\"From Date\"),\n\t\t\tfieldtype: \"Date\",\n\t\t\tdefault: frappe.datetime.add_months(frappe.datetime.get_today(), -1),\n\t\t\treqd: 1,\n\t\t},\n\t\t{\n\t\t\tfieldname: \"to_date\",\n\t\t\tlabel: __(\"To Date\"),\n\t\t\tfieldtype: \"Date\",\n\t\t\tdefault: frappe.datetime.get_today(),\n\t\t\treqd: 1,\n\t\t},\n\t\t{\n\t\t\tfieldname: \"company\",\n\t\t\tlabel: __(\"Company\"),\n\t\t\tfieldtype: \"Link\",\n\t\t\toptions: \"Company\",\n\t\t\tdefault: frappe.defaults.get_user_default(\"Company\"),\n\t\t},\n\t\t{\n\t\t\tfieldname: \"purpose\",\n\t\t\tlabel: __(\"Purpose\"),\n\t\t\tfieldtype: \"Select\",\n\t\t\toptions: \"\\nMaterial Issue\\nMaterial Receipt\",\n\t\t},\n\t\t{\n\t\t\tfieldname: \"reason\",\n\t\t\tlabel: __(\"Raison\"),\n\t\t\tfieldtype: \"Link\",\n\t\t\toptions: \"Stock Incident Reason\",\n\t\t},\n\t\t{\n\t\t\tfieldname: \"owner\",\n\t\t\tlabel: __(\"User\"),\n\t\t\tfieldtype: \"Link\",\n\t\t\toptions: \"User\",\n\t\t},\n\t\t{\n\t\t\tfieldname: \"warehouse\",\n\t\t\tlabel: __(\"Warehouse\"),\n\t\t\tfieldtype: \"Link\",\n\t\t\toptions: \"Warehouse\",\n\t\t},\n\t],\n};",
   "json": null,
   "letter_head": null,
-  "modified": "2026-09-19 16:50:00.000000",
+  "modified": "2026-09-29 06:41:58.915016",
   "module": "POS AR",
   "name": "Stock Incidents",
   "prepared_report": 0,
