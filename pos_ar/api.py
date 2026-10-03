@@ -1238,17 +1238,12 @@ def auto_inter_company_purchase_invoice_creation(doc, method):
 
         
         
-        sales_invoice_return_against = doc.return_against 
-        purchase_invoice_return_against_doc = None
+        sales_invoice_return_against = doc.return_against
+        sales_invoice_return_against_doc = None
         if sales_invoice_return_against:
-            sales_invoice_return_against_doc    = frappe.get_doc("Sales Invoice", sales_invoice_return_against)
-            print("sales_invoice_return_against ==============> : ", sales_invoice_return_against)
-            print("sales_invoice_return_against_doc ==============> : ", sales_invoice_return_against_doc)
-            print("purchase_invoice_return_against_doc ==============> : ", sales_invoice_return_against_doc.custom_purchase_invoice_id)
-            
-
-  
-
+            sales_invoice_return_against_doc = frappe.get_doc(
+                "Sales Invoice", sales_invoice_return_against
+            )
 
         # Create mirrored PI
         target_company_wh = frappe.db.get_value("Company", target_company, "custom_default_warehouse")
@@ -1256,7 +1251,11 @@ def auto_inter_company_purchase_invoice_creation(doc, method):
         pi.buying_price_list = doc.selling_price_list
         if is_return:
             pi.is_return = is_return
-            pi.return_against = sales_invoice_return_against_doc.custom_purchase_invoice_id
+            if (
+                sales_invoice_return_against_doc
+                and sales_invoice_return_against_doc.custom_purchase_invoice_id
+            ):
+                pi.return_against = sales_invoice_return_against_doc.custom_purchase_invoice_id
             # FORCE the flag here
             pi.update_outstanding_for_self = 0
         pi.company = target_company
