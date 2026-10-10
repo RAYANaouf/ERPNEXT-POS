@@ -1247,6 +1247,8 @@ def auto_inter_company_purchase_invoice_creation(doc, method):
 
         # Create mirrored PI
         target_company_wh = frappe.db.get_value("Company", target_company, "custom_default_warehouse")
+        # Prefer PO warehouse (e.g. Bordj el kiffen), fallback to company default
+        po_wh = (po.set_warehouse if po and po.get("set_warehouse") else None) or target_company_wh
         pi = frappe.new_doc("Purchase Invoice")
         pi.buying_price_list = doc.selling_price_list
         if is_return:
@@ -1266,7 +1268,7 @@ def auto_inter_company_purchase_invoice_creation(doc, method):
         pi.bill_date = doc.posting_date
         pi.bill_no = doc.name
         pi.update_stock = doc.update_stock
-        pi.set_warehouse = target_company_wh
+        pi.set_warehouse = po_wh
 
         print("heeree the posting date ==============> : ", pi.posting_date)
         print("heeree the due date ==============> : ", pi.due_date)
@@ -1279,16 +1281,22 @@ def auto_inter_company_purchase_invoice_creation(doc, method):
                     if item.item_code == it.item_code:
                         po_detail = item
                         break
-                print("heeree po_detail ==============> : ", po_detail.name)    
+                if po_detail:
+                    print("heeree po_detail ==============> : ", po_detail.name)
+
+            item_wh = (
+                (po_detail.warehouse if po_detail and po_detail.get("warehouse") else None)
+                or po_wh
+            )
             
             # --- AJOUT BATCH ---
             bundle_id = None
-            if doc.update_stock and target_company_wh:
+            if doc.update_stock and item_wh:
                 trans_type = "Outward" if is_return else "Inward"
                 bundle_id = _get_or_create_target_bundle(
                     source_item=it,
                     target_company=target_company,
-                    target_warehouse=target_company_wh,
+                    target_warehouse=item_wh,
                     type_of_transaction=trans_type
                 )
 
@@ -1299,7 +1307,7 @@ def auto_inter_company_purchase_invoice_creation(doc, method):
                     "uom": it.uom,
                     "qty": it.qty,
                     "rate": it.rate,
-                    "warehouse": target_company_wh,
+                    "warehouse": item_wh,
                     "purchase_order": po.name,  # may be None if not found; OK
                     "po_detail": po_detail.name,     # row link for PO achievement
                     "serial_and_batch_bundle": bundle_id,
@@ -1311,7 +1319,7 @@ def auto_inter_company_purchase_invoice_creation(doc, method):
                     "uom": it.uom,
                     "qty": it.qty,
                     "rate": it.rate,
-                    "warehouse": target_company_wh,
+                    "warehouse": item_wh,
                     "serial_and_batch_bundle": bundle_id,
                 })
              
@@ -1394,7 +1402,8 @@ def auto_inter_company_purchase_invoice_creation_from_alger(doc, method):
           
         # Create mirrored Purchase Invoice
         target_company_wh = frappe.db.get_value("Company", target_company, "custom_default_warehouse")
-     
+        # Prefer PO warehouse (e.g. Bordj el kiffen), fallback to company default
+        po_wh = (po.set_warehouse if po and po.get("set_warehouse") else None) or target_company_wh
 
         if positive_items:
             pi = frappe.new_doc("Purchase Invoice")
@@ -1407,17 +1416,25 @@ def auto_inter_company_purchase_invoice_creation_from_alger(doc, method):
             pi.bill_date = doc.posting_date
             pi.bill_no = doc.name  # link back to SI number
             pi.update_stock = doc.update_stock
-            if target_company_wh:
-                pi.set_warehouse = target_company_wh
+            if po_wh:
+                pi.set_warehouse = po_wh
         
             for it in positive_items:
+                po_detail = None
+                if po:
+                    po_detail = next((p_it for p_it in po.items if p_it.item_code == it.item_code), None)
+                item_wh = (
+                    (po_detail.warehouse if po_detail and po_detail.get("warehouse") else None)
+                    or po_wh
+                )
+
                 # --- AJOUT BATCH ---
                 bundle_id = None
-                if doc.update_stock and target_company_wh:
+                if doc.update_stock and item_wh:
                     bundle_id = _get_or_create_target_bundle(
                         source_item=it,
                         target_company=target_company,
-                        target_warehouse=target_company_wh,
+                        target_warehouse=item_wh,
                         type_of_transaction="Inward"
                     )
 
@@ -1429,13 +1446,11 @@ def auto_inter_company_purchase_invoice_creation_from_alger(doc, method):
                     "rate": it.rate,
                     "serial_and_batch_bundle": bundle_id,
                 }
-                if target_company_wh:
-                    row["warehouse"] = target_company_wh
-                if po:
-                    po_detail = next((p_it for p_it in po.items if p_it.item_code == it.item_code), None)
-                    if po_detail:
-                        row["purchase_order"] = po.name
-                        row["po_detail"] = po_detail.name                   
+                if item_wh:
+                    row["warehouse"] = item_wh
+                if po_detail:
+                    row["purchase_order"] = po.name
+                    row["po_detail"] = po_detail.name
                 pi.append("items", row)
 
             pi.flags.ignore_permissions = True
@@ -1456,17 +1471,25 @@ def auto_inter_company_purchase_invoice_creation_from_alger(doc, method):
             pr.is_return            = 1
             pr.bill_no              = doc.name  # link back to SI number
             pr.update_stock         = doc.update_stock
-            if target_company_wh:
-                pr.set_warehouse = target_company_wh
+            if po_wh:
+                pr.set_warehouse = po_wh
         
             for it in negative_items:
+                po_detail = None
+                if po:
+                    po_detail = next((p_it for p_it in po.items if p_it.item_code == it.item_code), None)
+                item_wh = (
+                    (po_detail.warehouse if po_detail and po_detail.get("warehouse") else None)
+                    or po_wh
+                )
+
                 # --- AJOUT BATCH ---
                 bundle_id = None
-                if doc.update_stock and target_company_wh:
+                if doc.update_stock and item_wh:
                     bundle_id = _get_or_create_target_bundle(
                         source_item=it,
                         target_company=target_company,
-                        target_warehouse=target_company_wh,
+                        target_warehouse=item_wh,
                         type_of_transaction="Outward"
                     )
 
@@ -1478,13 +1501,11 @@ def auto_inter_company_purchase_invoice_creation_from_alger(doc, method):
                     "rate": it.rate,
                     "serial_and_batch_bundle": bundle_id,
                 }
-                if target_company_wh:
-                    row["warehouse"] = target_company_wh
-                if po:
-                    po_detail = next((p_it for p_it in po.items if p_it.item_code == it.item_code), None)
-                    if po_detail:
-                        row["purchase_order"] = po.name
-                        row["po_detail"] = po_detail.name    
+                if item_wh:
+                    row["warehouse"] = item_wh
+                if po_detail:
+                    row["purchase_order"] = po.name
+                    row["po_detail"] = po_detail.name
                 pr.append("items", row)
 
             pr.flags.ignore_permissions = True
