@@ -2944,6 +2944,27 @@ def item_permission(doc, ptype="read", user=None):
     return item_group_permission(item_group, ptype=ptype, user=user)
 
 
+def validate_unique_items(doc, method=None):
+	"""Prevent the same item from appearing in multiple rows of one document."""
+	seen = set()
+	duplicates = []
+
+	for row in doc.get("items") or []:
+		item_code = row.get("item_code")
+		if not item_code:
+			continue
+		if item_code in seen and item_code not in duplicates:
+			duplicates.append(item_code)
+		seen.add(item_code)
+
+	if duplicates:
+		frappe.throw(
+			_("L’article {0} apparaît plusieurs fois dans le tableau des articles.").format(
+				", ".join(duplicates)
+			)
+		)
+
+
 def validate_stock_incident(doc, method=None):
 	"""Require a structured reason when Material Issue/Receipt is marked as an incident."""
 	if not doc.meta.has_field("custom_is_stock_incident"):

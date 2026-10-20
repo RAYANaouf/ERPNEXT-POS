@@ -180,8 +180,14 @@ doc_events = {
         "on_cancel": "pos_ar.api.update_customer_debt_on_invoice",
     },
     "Stock Entry": {
-        "validate": "pos_ar.api.validate_stock_incident",
+        "validate": [
+            "pos_ar.api.validate_unique_items",
+            "pos_ar.api.validate_stock_incident",
+        ],
         "on_submit": "pos_ar.api.process_supply_alternatives",
+    },
+    "Material Request": {
+        "validate": "pos_ar.api.validate_unique_items",
     },
     "Checking The Invoice": {
         "on_cancel": "pos_ar.api.on_checking_the_invoice_cancel",
@@ -332,7 +338,17 @@ fixtures = [
             ["module" , "in" , ["POS AR"]],
         ]
     },
-    {
-        'dt': 'Stock Incident Reason',
-    },
+      {
+            'dt': 'Print Format',
+            'filters': [
+                ["module" , "in" , ["POS AR"]],
+            ]
+        },
+              {
+            'dt': 'Print Format',
+            'filters': [
+                ["module" , "in" , ["POS AR"]],
+            ]
+        },
+
 ]
