@@ -350,5 +350,71 @@
   "name": "Stock Entry Incident",
   "script": "frappe.ui.form.on(\"Stock Entry\", {\n\tonload(frm) {\n\t\tsetup_incident_reason_query(frm);\n\t},\n\n\trefresh(frm) {\n\t\tsetup_incident_reason_query(frm);\n\t\ttoggle_incident_fields(frm);\n\t},\n\n\tpurpose(frm) {\n\t\treset_incident_if_needed(frm);\n\t\tsetup_incident_reason_query(frm);\n\t\ttoggle_incident_fields(frm);\n\t},\n\n\tstock_entry_type(frm) {\n\t\treset_incident_if_needed(frm);\n\t\tsetup_incident_reason_query(frm);\n\t\ttoggle_incident_fields(frm);\n\t},\n\n\tcustom_is_stock_incident(frm) {\n\t\tif (!frm.doc.custom_is_stock_incident) {\n\t\t\tfrm.set_value(\"custom_incident_reason\", \"\");\n\t\t\tfrm.set_value(\"custom_incident_notes\", \"\");\n\t\t}\n\t\ttoggle_incident_fields(frm);\n\t},\n});\n\nfunction is_issue_or_receipt(frm) {\n\tconst purpose = frm.doc.purpose || \"\";\n\tconst entry_type = frm.doc.stock_entry_type || \"\";\n\treturn (\n\t\t[\"Material Issue\", \"Material Receipt\"].includes(purpose) ||\n\t\t[\"Material Issue\", \"Material Receipt\"].includes(entry_type)\n\t);\n}\n\nfunction incident_applies_to(frm) {\n\tconst purpose = frm.doc.purpose || frm.doc.stock_entry_type || \"\";\n\tif (purpose === \"Material Receipt\") {\n\t\treturn \"Receipt\";\n\t}\n\treturn \"Issue\";\n}\n\nfunction toggle_incident_fields(frm) {\n\tconst show = is_issue_or_receipt(frm);\n\tfrm.toggle_display(\"custom_incident_section\", show);\n\tfrm.toggle_display(\"custom_is_stock_incident\", show);\n\n\tconst show_details = show && Number(frm.doc.custom_is_stock_incident);\n\t[\n\t\t\"custom_cb_incident\",\n\t\t\"custom_incident_reason\",\n\t\t\"custom_incident_details_sb\",\n\t\t\"custom_incident_notes\",\n\t].forEach((field) => frm.toggle_display(field, show_details));\n\n\tfrm.toggle_reqd(\"custom_incident_reason\", show_details);\n}\n\nfunction reset_incident_if_needed(frm) {\n\tif (is_issue_or_receipt(frm)) {\n\t\treturn;\n\t}\n\tif (frm.doc.custom_is_stock_incident) {\n\t\tfrm.set_value(\"custom_is_stock_incident\", 0);\n\t}\n\tfrm.set_value(\"custom_incident_reason\", \"\");\n\tfrm.set_value(\"custom_incident_notes\", \"\");\n}\n\nfunction setup_incident_reason_query(frm) {\n\tif (!frm.fields_dict.custom_incident_reason) {\n\t\treturn;\n\t}\n\tfrm.set_query(\"custom_incident_reason\", function () {\n\t\treturn {\n\t\t\tfilters: {\n\t\t\t\tis_active: 1,\n\t\t\t\tapplies_to: [\"in\", [incident_applies_to(frm), \"Both\"]],\n\t\t\t},\n\t\t};\n\t});\n}",
   "view": "Form"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Client Script",
+  "dt": "Purchase Order",
+  "enabled": 1,
+  "modified": "2026-10-20 11:15:26.062574",
+  "module": "POS AR",
+  "name": "Unique Items - Purchase Order",
+  "script": "(() => {\n    function duplicateMessage(itemCode, rowIndex) {\n        return __(\"L'article {0} est déjà présent à la ligne {1}. Chaque article ne peut être ajouté qu'une seule fois.\", [frappe.utils.escape_html(itemCode), rowIndex]);\n    }\n\n    frappe.ui.form.on(\"Purchase Order\", {\n        validate(frm) {\n            const seen = new Map();\n            for (const row of frm.doc.items || []) {\n                if (!row.item_code) continue;\n                if (seen.has(row.item_code)) {\n                    frappe.throw(duplicateMessage(row.item_code, seen.get(row.item_code)));\n                }\n                seen.set(row.item_code, row.idx);\n            }\n        }\n    });\n\n    frappe.ui.form.on(\"Purchase Order Item\", {\n        item_code(frm, cdt, cdn) {\n            const row = locals[cdt] && locals[cdt][cdn];\n            if (!row || !row.item_code) return;\n            const duplicate = (frm.doc.items || []).find(\n                other => other.name !== row.name && other.item_code === row.item_code\n            );\n            if (!duplicate) return;\n            const message = duplicateMessage(row.item_code, duplicate.idx);\n            return frappe.model.set_value(cdt, cdn, \"item_code\", \"\").then(() => {\n                frappe.msgprint({title: __(\"Article en double\"), message, indicator: \"red\"});\n            });\n        }\n    });\n})();",
+  "view": "Form"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Client Script",
+  "dt": "Sales Order",
+  "enabled": 1,
+  "modified": "2026-10-20 11:15:45.698360",
+  "module": "POS AR",
+  "name": "Unique Items - Sales Order",
+  "script": "(() => {\n    function duplicateMessage(itemCode, rowIndex) {\n        return __(\"L'article {0} est déjà présent à la ligne {1}. Chaque article ne peut être ajouté qu'une seule fois.\", [frappe.utils.escape_html(itemCode), rowIndex]);\n    }\n\n    frappe.ui.form.on(\"Sales Order\", {\n        validate(frm) {\n            const seen = new Map();\n            for (const row of frm.doc.items || []) {\n                if (!row.item_code) continue;\n                if (seen.has(row.item_code)) {\n                    frappe.throw(duplicateMessage(row.item_code, seen.get(row.item_code)));\n                }\n                seen.set(row.item_code, row.idx);\n            }\n        }\n    });\n\n    frappe.ui.form.on(\"Sales Order Item\", {\n        item_code(frm, cdt, cdn) {\n            const row = locals[cdt] && locals[cdt][cdn];\n            if (!row || !row.item_code) return;\n            const duplicate = (frm.doc.items || []).find(\n                other => other.name !== row.name && other.item_code === row.item_code\n            );\n            if (!duplicate) return;\n            const message = duplicateMessage(row.item_code, duplicate.idx);\n            return frappe.model.set_value(cdt, cdn, \"item_code\", \"\").then(() => {\n                frappe.msgprint({title: __(\"Article en double\"), message, indicator: \"red\"});\n            });\n        }\n    });\n})();",
+  "view": "Form"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Client Script",
+  "dt": "Purchase Invoice",
+  "enabled": 1,
+  "modified": "2026-10-20 11:16:21.262168",
+  "module": "POS AR",
+  "name": "Unique Items - Purchase Invoice",
+  "script": "(() => {\n    function duplicateMessage(itemCode, rowIndex) {\n        return __(\"L'article {0} est déjà présent à la ligne {1}. Chaque article ne peut être ajouté qu'une seule fois.\", [frappe.utils.escape_html(itemCode), rowIndex]);\n    }\n\n    frappe.ui.form.on(\"Purchase Invoice\", {\n        validate(frm) {\n            const seen = new Map();\n            for (const row of frm.doc.items || []) {\n                if (!row.item_code) continue;\n                if (seen.has(row.item_code)) {\n                    frappe.throw(duplicateMessage(row.item_code, seen.get(row.item_code)));\n                }\n                seen.set(row.item_code, row.idx);\n            }\n        }\n    });\n\n    frappe.ui.form.on(\"Purchase Invoice Item\", {\n        item_code(frm, cdt, cdn) {\n            const row = locals[cdt] && locals[cdt][cdn];\n            if (!row || !row.item_code) return;\n            const duplicate = (frm.doc.items || []).find(\n                other => other.name !== row.name && other.item_code === row.item_code\n            );\n            if (!duplicate) return;\n            const message = duplicateMessage(row.item_code, duplicate.idx);\n            return frappe.model.set_value(cdt, cdn, \"item_code\", \"\").then(() => {\n                frappe.msgprint({title: __(\"Article en double\"), message, indicator: \"red\"});\n            });\n        }\n    });\n})();",
+  "view": "Form"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Client Script",
+  "dt": "Sales Invoice",
+  "enabled": 1,
+  "modified": "2026-10-20 11:16:47.163915",
+  "module": "POS AR",
+  "name": "Unique Items - Sales Invoice",
+  "script": "(() => {\n    function duplicateMessage(itemCode, rowIndex) {\n        return __(\"L'article {0} est déjà présent à la ligne {1}. Chaque article ne peut être ajouté qu'une seule fois.\", [frappe.utils.escape_html(itemCode), rowIndex]);\n    }\n\n    frappe.ui.form.on(\"Sales Invoice\", {\n        validate(frm) {\n            const seen = new Map();\n            for (const row of frm.doc.items || []) {\n                if (!row.item_code) continue;\n                if (seen.has(row.item_code)) {\n                    frappe.throw(duplicateMessage(row.item_code, seen.get(row.item_code)));\n                }\n                seen.set(row.item_code, row.idx);\n            }\n        }\n    });\n\n    frappe.ui.form.on(\"Sales Invoice Item\", {\n        item_code(frm, cdt, cdn) {\n            const row = locals[cdt] && locals[cdt][cdn];\n            if (!row || !row.item_code) return;\n            const duplicate = (frm.doc.items || []).find(\n                other => other.name !== row.name && other.item_code === row.item_code\n            );\n            if (!duplicate) return;\n            const message = duplicateMessage(row.item_code, duplicate.idx);\n            return frappe.model.set_value(cdt, cdn, \"item_code\", \"\").then(() => {\n                frappe.msgprint({title: __(\"Article en double\"), message, indicator: \"red\"});\n            });\n        }\n    });\n})();",
+  "view": "Form"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Client Script",
+  "dt": "Stock Entry",
+  "enabled": 1,
+  "modified": "2026-10-20 11:17:03.361105",
+  "module": "POS AR",
+  "name": "Unique Items - Stock Entry",
+  "script": "(() => {\n    function duplicateMessage(itemCode, rowIndex) {\n        return __(\"L'article {0} est déjà présent à la ligne {1}. Chaque article ne peut être ajouté qu'une seule fois.\", [frappe.utils.escape_html(itemCode), rowIndex]);\n    }\n\n    frappe.ui.form.on(\"Stock Entry\", {\n        validate(frm) {\n            const seen = new Map();\n            for (const row of frm.doc.items || []) {\n                if (!row.item_code) continue;\n                if (seen.has(row.item_code)) {\n                    frappe.throw(duplicateMessage(row.item_code, seen.get(row.item_code)));\n                }\n                seen.set(row.item_code, row.idx);\n            }\n        }\n    });\n\n    frappe.ui.form.on(\"Stock Entry Detail\", {\n        item_code(frm, cdt, cdn) {\n            const row = locals[cdt] && locals[cdt][cdn];\n            if (!row || !row.item_code) return;\n            const duplicate = (frm.doc.items || []).find(\n                other => other.name !== row.name && other.item_code === row.item_code\n            );\n            if (!duplicate) return;\n            const message = duplicateMessage(row.item_code, duplicate.idx);\n            return frappe.model.set_value(cdt, cdn, \"item_code\", \"\").then(() => {\n                frappe.msgprint({title: __(\"Article en double\"), message, indicator: \"red\"});\n            });\n        }\n    });\n})();",
+  "view": "Form"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Client Script",
+  "dt": "Material Request",
+  "enabled": 1,
+  "modified": "2026-10-20 11:17:16.511200",
+  "module": "POS AR",
+  "name": "Unique Items - Material Request",
+  "script": "(() => {\n    function duplicateMessage(itemCode, rowIndex) {\n        return __(\"L'article {0} est déjà présent à la ligne {1}. Chaque article ne peut être ajouté qu'une seule fois.\", [frappe.utils.escape_html(itemCode), rowIndex]);\n    }\n\n    frappe.ui.form.on(\"Material Request\", {\n        validate(frm) {\n            const seen = new Map();\n            for (const row of frm.doc.items || []) {\n                if (!row.item_code) continue;\n                if (seen.has(row.item_code)) {\n                    frappe.throw(duplicateMessage(row.item_code, seen.get(row.item_code)));\n                }\n                seen.set(row.item_code, row.idx);\n            }\n        }\n    });\n\n    frappe.ui.form.on(\"Material Request Item\", {\n        item_code(frm, cdt, cdn) {\n            const row = locals[cdt] && locals[cdt][cdn];\n            if (!row || !row.item_code) return;\n            const duplicate = (frm.doc.items || []).find(\n                other => other.name !== row.name && other.item_code === row.item_code\n            );\n            if (!duplicate) return;\n            const message = duplicateMessage(row.item_code, duplicate.idx);\n            return frappe.model.set_value(cdt, cdn, \"item_code\", \"\").then(() => {\n                frappe.msgprint({title: __(\"Article en double\"), message, indicator: \"red\"});\n            });\n        }\n    });\n})();",
+  "view": "Form"
  }
 ]
