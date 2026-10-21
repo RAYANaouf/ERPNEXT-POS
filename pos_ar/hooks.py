@@ -162,7 +162,6 @@ override_doctype_class = {
 
 doc_events = {
     "Sales Invoice": {
-        "validate": "pos_ar.api.validate_unique_items",
         "on_submit": ["pos_ar.api.update_customer_debt_on_invoice" ,  "pos_ar.api.auto_inter_company_purchase_invoice_creation" , "pos_ar.api.auto_inter_company_purchase_invoice_creation_from_alger" ,],
         "on_cancel": ["pos_ar.api.update_customer_debt_on_invoice" ,  "pos_ar.api.auto_inter_company_purchase_invoice_creation" , "pos_ar.api.auto_inter_company_purchase_invoice_creation_from_alger",],
     },
