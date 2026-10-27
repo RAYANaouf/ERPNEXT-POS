@@ -130,6 +130,7 @@ has_permission = {
     "Purchase Invoice" : "pos_ar.api.purchase_invoice_permission",
     "Customer"         : "pos_ar.api.customer_permission",
     "Supplier"         : "pos_ar.api.supplier_permission",
+    "Checking The Invoice": "pos_ar.api.checking_the_invoice_permission",
     "Item Group"       : "pos_ar.api.item_group_permission",
     "Item"             : "pos_ar.api.item_permission",
 

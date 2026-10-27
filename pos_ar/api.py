@@ -2219,6 +2219,45 @@ def supplier_permission(doc, ptype, user):
 
 
 # Checking The Invoice
+def checking_the_invoice_permission(doc, ptype=None, user=None):
+    user = user or frappe.session.user
+
+    if user == "Administrator":
+        return True
+
+    # La creation reste controlee par les roles existants.
+    if ptype == "create":
+        return None
+
+    allowed_companies = frappe.get_all(
+        "User Permission",
+        filters={
+            "user": user,
+            "allow": "Company",
+        },
+        or_filters=[
+            ["apply_to_all_doctypes", "=", 1],
+            ["applicable_for", "=", "Checking The Invoice"],
+        ],
+        pluck="for_value",
+    )
+
+    # Meme comportement que la fonction qui filtre la liste.
+    if not allowed_companies:
+        return True
+
+    if doc.get("purchase_invoice_company") in allowed_companies:
+        return True
+
+    state = doc.get("workflow_state")
+
+    return (
+        doc.get("supplier_company") in allowed_companies
+        and state is not None
+        and state != "Draft"
+    )
+
+
 def checking_the_invoice_permission_query_conditions(user):
     if user == "Administrator":
         return ""
