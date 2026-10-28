@@ -3012,6 +3012,13 @@ def validate_stock_incident(doc, method=None):
 	purpose = (doc.get("purpose") or "").strip()
 	is_incident = cint(doc.get("custom_is_stock_incident"))
 
+	if doc.get("custom_stock_correction_report"):
+		from pos_ar.pos_ar.doctype.stock_correction_report.stock_correction_report import (
+			validate_correction_stock_entry,
+		)
+
+		validate_correction_stock_entry(doc)
+
 	if purpose not in ("Material Issue", "Material Receipt"):
 		if is_incident:
 			doc.custom_is_stock_incident = 0
@@ -3033,6 +3040,11 @@ def validate_stock_incident(doc, method=None):
 	)
 	if not cint(is_active):
 		frappe.throw(_("Incident reason {0} is disabled.").format(reason))
+
+	if applies_to == "Stock Correction":
+		if not doc.get("custom_stock_correction_report"):
+			frappe.throw(_("Stock Correction reasons must be used through Stock Correction Report."))
+		return
 
 	expected = "Receipt" if purpose == "Material Receipt" else "Issue"
 	if applies_to not in (expected, "Both"):

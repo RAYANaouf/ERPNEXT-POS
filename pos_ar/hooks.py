@@ -208,7 +208,7 @@ doc_events = {
 }
 
 
-after_migrate = ["pos_ar.install.after_migrate"]
+# Custom fields, client scripts and reports are synchronized from fixtures.
 
 
 # Scheduled Tasks
@@ -345,12 +345,6 @@ fixtures = [
         ]
     },
       {
-            'dt': 'Print Format',
-            'filters': [
-                ["module" , "in" , ["POS AR"]],
-            ]
-        },
-              {
             'dt': 'Print Format',
             'filters': [
                 ["module" , "in" , ["POS AR"]],

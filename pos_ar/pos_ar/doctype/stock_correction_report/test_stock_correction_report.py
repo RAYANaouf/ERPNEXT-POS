@@ -1,9 +1,10 @@
 # Copyright (c) 2026, rayan aouf and Contributors
 # See license.txt
 
-# import frappe
+
 from frappe.tests.utils import FrappeTestCase
 
 
-class TestStockCorrectionReport(FrappeTestCase):
+class test_stock_correction_report(FrappeTestCase):
 	pass
+

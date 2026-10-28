@@ -10,8 +10,11 @@
   "date",
   "prepared_by",
   "column_break_1",
-  "warehouse",
   "company",
+  "warehouse",
+  "incident_section",
+  "incident_reason",
+  "incident_notes",
   "section_wrong",
   "wrong_items",
   "column_break_vukj",
@@ -28,6 +31,7 @@
    "label": "Informations G\u00e9n\u00e9rales"
   },
   {
+   "default": "Today",
    "fieldname": "date",
    "fieldtype": "Date",
    "in_list_view": 1,
@@ -60,7 +64,7 @@
   {
    "fieldname": "wrong_items",
    "fieldtype": "Table",
-   "label": "Wrong Items List",
+   "label": "Articles \u00e0 sortir (r\u00e9f\u00e9rence incorrecte)",
    "options": "Stock Adjustment Item"
   },
   {
@@ -70,13 +74,14 @@
   {
    "fieldname": "true_items",
    "fieldtype": "Table",
-   "label": "True Items List",
+   "label": "Articles \u00e0 entrer (r\u00e9f\u00e9rence r\u00e9elle)",
    "options": "Stock Adjustment Item"
   },
   {
    "fieldname": "material_issue_ref",
    "fieldtype": "Link",
    "label": "R\u00e9f. Sortie de Stock (Issue)",
+   "no_copy": 1,
    "options": "Stock Entry",
    "read_only": 1
   },
@@ -84,6 +89,7 @@
    "fieldname": "material_receipt_ref",
    "fieldtype": "Link",
    "label": "R\u00e9f. Entr\u00e9e de Stock (Receipt)",
+   "no_copy": 1,
    "options": "Stock Entry",
    "read_only": 1
   },
@@ -101,18 +107,39 @@
    "fieldname": "company",
    "fieldtype": "Link",
    "label": "Company",
-   "options": "Company"
+   "options": "Company",
+   "reqd": 1
   },
   {
    "fieldname": "column_break_vukj",
    "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "incident_section",
+   "fieldtype": "Section Break",
+   "label": "Incident / Anomalie"
+  },
+  {
+   "fieldname": "incident_reason",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Raison",
+   "options": "Stock Incident Reason",
+   "reqd": 1
+  },
+  {
+   "description": "Ex. : bo\u00eete annonc\u00e9e de 40 HC 0.00 / 0.00 ; 30 verres HC 0.00 / -0.25 trouv\u00e9s.",
+   "fieldname": "incident_notes",
+   "fieldtype": "Small Text",
+   "label": "D\u00e9tails de l'incident"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-05-06 20:38:07.181390",
+ "modified": "2026-10-28 18:33:16.825458",
  "modified_by": "Administrator",
  "module": "POS AR",
  "name": "Stock Correction Report",
