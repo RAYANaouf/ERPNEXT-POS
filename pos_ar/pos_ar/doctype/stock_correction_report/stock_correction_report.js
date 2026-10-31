@@ -11,7 +11,21 @@ frappe.ui.form.on("Stock Correction Report", {
         }
     },
 
+    company(frm) {
+        if (frm.doc.warehouse) {
+            frm.set_value("warehouse", null);
+        }
+    },
+
     setup(frm) {
+        frm.set_query("warehouse", () => ({
+            filters: {
+                company: frm.doc.company || "",
+                is_group: 0,
+                disabled: 0,
+            },
+        }));
+
         frm.set_query("incident_reason", () => ({
             filters: {
                 is_active: 1,

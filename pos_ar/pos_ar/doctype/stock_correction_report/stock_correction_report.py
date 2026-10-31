@@ -17,6 +17,13 @@ class StockCorrectionReport(Document):
             self.material_receipt_ref = None
 
     def validate(self):
+        if self.company and self.warehouse:
+            warehouse_company = frappe.get_cached_value("Warehouse", self.warehouse, "company")
+            if warehouse_company != self.company:
+                frappe.throw(
+                    _("L'entrepôt sélectionné doit appartenir à la société {0}.").format(self.company)
+                )
+
         reason = frappe.db.get_value(
             "Stock Incident Reason", self.incident_reason, ["applies_to", "is_active"], as_dict=True
         ) if self.incident_reason else None
