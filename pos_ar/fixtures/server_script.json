@@ -302,5 +302,43 @@
   "reference_doctype": "Item Price",
   "script": "price_list_name = \"TP - Alger\"\nrole_name = \"Responsable Tarifs Partenaires\"\ntargets_tp = doc.price_list == price_list_name\nif not doc.get(\"__islocal\") and doc.get(\"name\"):\n    previous_price_list = frappe.db.get_value(\"Item Price\", doc.name, \"price_list\")\n    if previous_price_list == price_list_name:\n        targets_tp = True\nif targets_tp and frappe.session.user != \"Administrator\":\n    has_role = frappe.db.exists(\"Has Role\", {\"parent\": frappe.session.user, \"parenttype\": \"User\", \"role\": role_name})\n    if not has_role:\n        frappe.throw(\"Seul le rôle Responsable Tarifs Partenaires peut modifier le tarif TP - Alger.\")",
   "script_type": "DocType Event"
+ },
+ {
+  "allow_guest": 0,
+  "api_method": null,
+  "cron_format": null,
+  "disabled": 0,
+  "docstatus": 0,
+  "doctype": "Server Script",
+  "doctype_event": "Before Submit",
+  "enable_rate_limit": 0,
+  "event_frequency": "All",
+  "modified": "2026-10-31 19:32:19.176999",
+  "module": "POS AR",
+  "name": "POS Invoice - Public payment required",
+  "rate_limit_count": 5,
+  "rate_limit_seconds": 86400,
+  "reference_doctype": "POS Invoice",
+  "script": "if doc.get(\"customer\") and not doc.get(\"is_return\"):\n    customer_name = frappe.db.get_value(\"Customer\", doc.customer, \"customer_name\") or \"\"\n    if \"public\" in doc.customer.lower() or \"public\" in customer_name.lower():\n        total = frappe.utils.flt(doc.get(\"rounded_total\") or doc.get(\"grand_total\"))\n        paid = 0\n        for payment in doc.get(\"payments\") or []:\n            paid = paid + frappe.utils.flt(payment.get(\"amount\"))\n        if doc.get(\"redeem_loyalty_points\"):\n            paid = paid + frappe.utils.flt(doc.get(\"loyalty_amount\")) / frappe.utils.flt(doc.get(\"conversion_rate\") or 1)\n        remaining = frappe.utils.flt(\n            total - paid\n            - frappe.utils.flt(doc.get(\"write_off_amount\"))\n            + frappe.utils.flt(doc.get(\"change_amount\")),\n            doc.precision(\"grand_total\")\n        )\n        if remaining > 0:\n            frappe.throw(_(\"The Public customer must pay the full amount of this sale. Credit sales are not allowed.\"))\n",
+  "script_type": "DocType Event"
+ },
+ {
+  "allow_guest": 0,
+  "api_method": null,
+  "cron_format": null,
+  "disabled": 0,
+  "docstatus": 0,
+  "doctype": "Server Script",
+  "doctype_event": "Before Submit",
+  "enable_rate_limit": 0,
+  "event_frequency": "All",
+  "modified": "2026-10-31 19:32:11.342330",
+  "module": "POS AR",
+  "name": "Sales Invoice - Public payment required",
+  "rate_limit_count": 5,
+  "rate_limit_seconds": 86400,
+  "reference_doctype": "Sales Invoice",
+  "script": "if doc.get(\"customer\") and not doc.get(\"is_return\"):\n    customer_name = frappe.db.get_value(\"Customer\", doc.customer, \"customer_name\") or \"\"\n    if \"public\" in doc.customer.lower() or \"public\" in customer_name.lower():\n        remaining = frappe.utils.flt(\n            doc.get(\"outstanding_amount\"),\n            doc.precision(\"outstanding_amount\")\n        )\n        if remaining > 0:\n            frappe.throw(_(\"The Public customer must pay the full amount of this sale. Credit sales are not allowed.\"))\n",
+  "script_type": "DocType Event"
  }
 ]
