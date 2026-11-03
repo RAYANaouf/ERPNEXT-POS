@@ -1,0 +1,157 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "field:control_name",
+ "creation": "2026-11-03 10:07:00.203781",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "control_name",
+  "document_type",
+  "header_column",
+  "company",
+  "is_active",
+  "route_section",
+  "source_warehouse",
+  "route_column",
+  "target_warehouse",
+  "rules_section",
+  "rules",
+  "notes_section",
+  "notes"
+ ],
+ "fields": [
+  {
+   "fieldname": "control_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Control Name",
+   "reqd": 1,
+   "unique": 1
+  },
+  {
+   "default": "Both",
+   "fieldname": "document_type",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Document Type",
+   "options": "Material Request\nStock Entry\nBoth",
+   "reqd": 1
+  },
+  {
+   "fieldname": "header_column",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Company",
+   "options": "Company",
+   "reqd": 1
+  },
+  {
+   "default": "1",
+   "fieldname": "is_active",
+   "fieldtype": "Check",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Active"
+  },
+  {
+   "fieldname": "route_section",
+   "fieldtype": "Section Break",
+   "label": "Transfer Route"
+  },
+  {
+   "fieldname": "source_warehouse",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Source Warehouse",
+   "options": "Warehouse",
+   "reqd": 1
+  },
+  {
+   "fieldname": "route_column",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "target_warehouse",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Target Warehouse",
+   "options": "Warehouse",
+   "reqd": 1
+  },
+  {
+   "description": "Each row combines the item group, SPH range and CYL range. Several rows can target the same group. A prohibition takes priority; otherwise the lowest quantity limit applies. Transfers with no matching rule remain allowed.",
+   "fieldname": "rules_section",
+   "fieldtype": "Section Break",
+   "label": "Item Group Rules"
+  },
+  {
+   "fieldname": "rules",
+   "fieldtype": "Table",
+   "label": "Rules",
+   "options": "Transfer Control Rule",
+   "reqd": 1
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "notes_section",
+   "fieldtype": "Section Break",
+   "label": "Notes"
+  },
+  {
+   "fieldname": "notes",
+   "fieldtype": "Small Text",
+   "label": "Manager Notes"
+  }
+ ],
+ "links": [],
+ "modified": "2026-11-03 10:43:41.807584",
+ "modified_by": "Administrator",
+ "module": "POS AR",
+ "name": "Transfer Control",
+ "naming_rule": "By fieldname",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "write": 1
+  },
+  {
+   "create": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Stock Manager",
+   "write": 1
+  },
+  {
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Stock User",
+   "select": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "search_fields": "control_name,company,source_warehouse,target_warehouse",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "control_name",
+ "track_changes": 1
+}

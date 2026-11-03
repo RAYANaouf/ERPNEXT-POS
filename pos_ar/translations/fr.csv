@@ -1,0 +1,79 @@
+Transfer Control,Paramétrage des transferts
+Transfer Control Rule,Règle de transfert
+Control Name,Nom du paramétrage
+Document Type,Document concerné
+Company,Société
+Active,Actif
+Inactive,Inactif
+Transfer Route,Trajet du transfert
+Source Warehouse,Dépôt source
+Target Warehouse,Dépôt destination
+Item Group Rules,Règles par groupe d'articles
+Rules,Règles
+Notes,Notes
+Manager Notes,Notes du gestionnaire
+Item Group,Groupe d'articles
+Items in This Group,Articles concernés par ce groupe
+Applicable Powers,Puissances concernées
+SPH Sign,Signe SPH
+CYL Sign,Signe CYL
+Minimum SPH (Without Sign),SPH minimale (sans le signe)
+Maximum SPH (Without Sign),SPH maximale (sans le signe)
+Minimum CYL (Without Sign),CYL minimale (sans le signe)
+Maximum CYL (Without Sign),CYL maximale (sans le signe)
+Exclude Maximum SPH,Ne pas inclure la valeur SPH maximale
+Exclude Maximum CYL,Ne pas inclure la valeur CYL maximale
+Decision,Décision
+Maximum Quantity (Stock UOM),Quantité maximale (unité de stock)
+Ranges and Limit,Plages et plafond
+Both,Les deux
+Block Transfer,Transfert interdit
+Limit Quantity,Quantité limitée
+Material Request,Demande de matériel
+Stock Entry,Mouvement de stock
+Select the company first. Only this source warehouse and this transfer direction are covered.,"Choisir d'abord la société. La règle concerne uniquement ce dépôt source, dans ce sens de transfert."
+"The warehouse must exactly match the transfer row. Another warehouse, even with a similar name, is not covered.","Le dépôt doit être exactement celui de la ligne du transfert. Un autre dépôt, même de nom proche, n'est pas couvert."
+"Each row combines the item group, SPH range and CYL range. Several rows can target the same group. A prohibition takes priority; otherwise the lowest quantity limit applies. Transfers with no matching rule remain allowed.","Chaque ligne combine le groupe, la plage SPH et la plage CYL. Plusieurs lignes peuvent concerner le même groupe. L'interdiction est prioritaire ; sinon le plus petit plafond s'applique. Sans règle correspondante, le transfert reste autorisé."
+"Select the sign separately. For a power of -2.25, select - and enter 2.25. The rule only applies to items in the selected group that match both SPH and CYL.","Choisir le signe séparément. Exemple : pour une puissance -2,25, choisir le signe - et saisir 2,25. La règle ne concerne que les articles du groupe choisi qui respectent à la fois SPH et CYL."
+"Example: for -2.25, enter 2.25 and select the - sign.","Exemple : pour -2,25, saisir 2,25 et choisir le signe -."
+Example: maximum 4.00. Checked: 4.00 is not included. Unchecked: 4.00 is included.,"Exemple : maximum 4,00. Case cochée : 4,00 n'est pas concerné. Case décochée : 4,00 est concerné."
+"Total quantity of the same item for this route in the document, expressed in its stock unit of measure.","Total du même article pour ce trajet dans le document, exprimé dans son unité de stock."
+"Transfer controls apply when saving, including drafts. Open a row to set the signs, power ranges and decision.","Les contrôles s'appliquent dès l'enregistrement, y compris aux brouillons. Ouvrez une ligne pour définir les signes, les plages et la décision."
+{0} only,{0} uniquement
+"{0} to {1}, maximum excluded","{0} à {1}, maximum exclu"
+"{0} to {1}, maximum included","{0} à {1}, maximum inclus"
+Max. {0},Max. {0}
+Checking items in this group...,Vérification des articles du groupe…
+{0} active item(s). Values without signs: SPH from {1} to {2}; CYL from {3} to {4}.,{0} article(s) actif(s). Valeurs sans le signe : SPH de {1} à {2} ; CYL de {3} à {4}.
+No active items are visible in this group.,Aucun article actif visible dans ce groupe.
+{0} item(s) match the selected signs and ranges.,{0} article(s) correspondent aux signes et aux plages saisis.
+No items match the selected signs and ranges. This rule will not restrict any current items in this group.,Aucun article ne correspond aux signes et aux plages saisis. Cette règle ne limitera aucun des articles actuels de ce groupe.
+{0}: enter a valid numeric value.,{0} : saisir une valeur numérique valide.
+"Select Material Request, Stock Entry or Both.","Choisir Demande de matériel, Mouvement de stock ou Les deux."
+Select the company before selecting warehouses.,Choisir la société avant les dépôts.
+Select the source warehouse and target warehouse.,Choisir le dépôt source et le dépôt destination.
+The source and target warehouses must be different.,Les dépôts source et destination doivent être différents.
+Warehouse {0} must belong to company {1}.,Le dépôt {0} doit appartenir à la société {1}.
+Warehouse {0} must be active and must not be a group.,Le dépôt {0} doit être actif et ne pas être un groupe.
+Add at least one item group rule.,Ajouter au moins une règle par groupe d'articles.
+Row {0},Ligne {0}
+{0}: select an item group.,{0} : choisir un groupe d'articles.
+{0}: select a valid {1} sign.,{0} : choisir un signe {1} valide.
+{0} / Minimum {1},{0} / {1} minimale
+{0} / Maximum {1},{0} / {1} maximale
+"{0}: the {1} range must be non-negative, ordered and non-empty.","{0} : la plage {1} doit être positive ou nulle, ordonnée et non vide."
+{0}: select a valid decision.,{0} : choisir une décision valide.
+{0} / Maximum Quantity,{0} / Quantité maximale
+{0}: the maximum quantity must be greater than zero.,{0} : la quantité maximale doit être strictement positive.
+Item {0} / {1},Article {0} / {1}
+Item {0}: the {1} sign must be + or -.,Article {0} : le signe {1} doit être + ou -.
+Quantity,Quantité
+Conversion Factor,Facteur de conversion
+Maximum Quantity,Quantité maximale
+Transfer quantities must be non-negative and the conversion factor must be greater than zero.,Les quantités de transfert doivent être positives ou nulles et le facteur de conversion supérieur à zéro.
+Item not found: {0}.,Article introuvable : {0}.
+"Transfer prohibited: item {0} (SPH {1} / CYL {2}) cannot be transferred from {3} to {4}. Configuration: {5}, rule {6}.","Transfert interdit : l'article {0} (SPH {1} / CYL {2}) ne peut pas être transféré de {3} vers {4}. Paramétrage : {5}, règle {6}."
+"Transfer limited: item {0} (SPH {1} / CYL {2}) is limited to {3} {4} from {5} to {6}. Total requested quantity: {7}. Configuration: {8}, rule {9}.","Transfert limité : l'article {0} (SPH {1} / CYL {2}) est limité à {3} {4} de {5} vers {6}. Quantité totale demandée : {7}. Paramétrage : {8}, règle {9}."
+Select the SPH and CYL signs to check the range.,Choisir les signes SPH et CYL pour vérifier la plage.
+Cannot rename {0}: {1} already exists.,Impossible de renommer {0} : {1} existe déjà.
+The selected group and all its subgroups are included automatically. Sibling groups are not included.,Le groupe choisi et tous ses sous-groupes sont inclus automatiquement. Les groupes voisins ne sont pas inclus.
