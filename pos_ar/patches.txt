@@ -1,4 +1,5 @@
 [pre_model_sync]
+execute:frappe.get_attr('pos_ar.pos_ar.doctype.transfer_control.transfer_control.migrate_legacy_doctypes')()
 # Patches added in this section will be executed before doctypes are migrated
 # Read docs to understand patches: https://frappeframework.com/docs/v14/user/en/database-migrations
 

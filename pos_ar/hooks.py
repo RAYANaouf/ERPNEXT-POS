@@ -167,7 +167,7 @@ doc_events = {
         "on_cancel": ["pos_ar.api.update_customer_debt_on_invoice" ,  "pos_ar.api.auto_inter_company_purchase_invoice_creation" , "pos_ar.api.auto_inter_company_purchase_invoice_creation_from_alger",],
     },
     "Purchase Invoice": {
-        "validate": "pos_ar.api.validate_unique_items",
+    #    "validate": "pos_ar.api.validate_unique_items",
         "on_submit": ["pos_ar.api.update_checking_invoice_peices","pos_ar.api.process_supply_alternatives"],
         "on_cancel": "pos_ar.api.update_checking_invoice_peices",
     },
@@ -185,11 +185,15 @@ doc_events = {
         "validate": [
             "pos_ar.api.validate_unique_items",
             "pos_ar.api.validate_stock_incident",
+            "pos_ar.pos_ar.doctype.transfer_control.transfer_control.validate_transfer",
         ],
         "on_submit": "pos_ar.api.process_supply_alternatives",
     },
     "Material Request": {
-        "validate": "pos_ar.api.validate_unique_items",
+        "validate": [
+            "pos_ar.api.validate_unique_items",
+            "pos_ar.pos_ar.doctype.transfer_control.transfer_control.validate_transfer",
+        ],
     },
     "Purchase Order": {
         "validate": "pos_ar.api.validate_unique_items",
