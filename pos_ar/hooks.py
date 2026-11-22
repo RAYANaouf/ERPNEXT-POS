@@ -167,6 +167,8 @@ doc_events = {
         "on_cancel": ["pos_ar.api.update_customer_debt_on_invoice" ,  "pos_ar.api.auto_inter_company_purchase_invoice_creation" , "pos_ar.api.auto_inter_company_purchase_invoice_creation_from_alger",],
     },
     "Purchase Invoice": {
+        "after_insert": "pos_ar.pos_ar.doctype.checking_the_invoice.invoice_tags.sync_purchase_invoice_tag",
+        "on_update": "pos_ar.pos_ar.doctype.checking_the_invoice.invoice_tags.sync_purchase_invoice_tag",
     #    "validate": "pos_ar.api.validate_unique_items",
         "on_submit": ["pos_ar.api.update_checking_invoice_peices","pos_ar.api.process_supply_alternatives"],
         "on_cancel": "pos_ar.api.update_checking_invoice_peices",
@@ -199,7 +201,14 @@ doc_events = {
         "validate": "pos_ar.api.validate_unique_items",
     },
     "Checking The Invoice": {
-        "on_cancel": "pos_ar.api.on_checking_the_invoice_cancel",
+        "after_insert": "pos_ar.pos_ar.doctype.checking_the_invoice.invoice_tags.sync_checking_invoice_tag",
+        "on_update": "pos_ar.pos_ar.doctype.checking_the_invoice.invoice_tags.sync_checking_invoice_tag",
+        "on_update_after_submit": "pos_ar.pos_ar.doctype.checking_the_invoice.invoice_tags.sync_checking_invoice_tag",
+        "on_cancel": [
+            "pos_ar.api.on_checking_the_invoice_cancel",
+            "pos_ar.pos_ar.doctype.checking_the_invoice.invoice_tags.sync_checking_invoice_tag",
+        ],
+        "on_trash": "pos_ar.pos_ar.doctype.checking_the_invoice.invoice_tags.sync_checking_invoice_tag",
     },
     "Item Group": {
         "validate": "pos_ar.api.validate_item_group_companies"
